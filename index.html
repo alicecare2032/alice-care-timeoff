@@ -279,25 +279,28 @@
             transform: translateY(-2px);
         }
         
-        .add-service {
+        .add-service-inline {
             background: #62B790;
             color: white;
             border: none;
-            padding: 14px 28px;
-            border-radius: 8px;
+            padding: 8px 12px;
+            border-radius: 50%;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 18px;
             font-weight: 600;
             font-family: 'Poppins', sans-serif;
             transition: all 0.3s;
-            display: block;
-            margin: 0 auto;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
         
-        .add-service:hover {
+        .add-service-inline:hover {
             background: #54a07e;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(98, 183, 144, 0.3);
+            transform: scale(1.1);
         }
         
         .submit-btn {
@@ -667,6 +670,7 @@
                                     <label>Hours Missed <span class="required">*</span></label>
                                     <input type="number" name="hoursMissed[]" step="0.25" min="0" max="24" placeholder="0.00" required style="max-width: 120px;" onchange="updateDayTotal()" oninput="updateDayTotal()">
                                 </div>
+                                <button type="button" class="add-service-inline" onclick="addService()" title="Add another service">+</button>
                             </div>
                         </div>
                     </div>
@@ -677,8 +681,6 @@
                             <span id="dayTotalHours" class="day-total-value">0.00 hours</span>
                         </div>
                     </div>
-                    
-                    <button type="button" class="add-service" onclick="addService()">+ Add Another Service</button>
                 </div>
                 
                 <button type="submit" class="submit-btn">Submit Request</button>
@@ -789,7 +791,7 @@
         function generateRequestId() {
             const timestamp = Date.now();
             const random = Math.floor(Math.random() * 1000);
-            return `AC-${timestamp}-${random}`;
+            return 'AC-' + timestamp + '-' + random;
         }
         
         function switchTab(tab) {
@@ -798,7 +800,9 @@
             const dashboardView = document.getElementById('dashboardView');
             const tabs = document.querySelectorAll('.tab-btn');
             
-            tabs.forEach(btn => btn.classList.remove('active'));
+            tabs.forEach(function(btn) {
+                btn.classList.remove('active');
+            });
             
             formView.style.display = 'none';
             myRequestsView.classList.remove('active');
@@ -823,26 +827,7 @@
             const container = document.getElementById('servicesContainer');
             const serviceEntry = document.createElement('div');
             serviceEntry.className = 'service-entry';
-            serviceEntry.innerHTML = `
-                <div class="service-entry-header">
-                    <span class="service-number">Service #${serviceCount}</span>
-                    <button type="button" class="remove-service" onclick="removeService(this)">Remove</button>
-                </div>
-                <div class="form-row">
-                    <div class="form-group" style="flex: 2;">
-                        <label>Client Name <span class="required">*</span></label>
-                        <input type="text" name="client[]" required>
-                    </div>
-                    <div class="form-group" style="flex: 0 0 120px;">
-                        <label>Start Time <span class="required">*</span></label>
-                        <input type="time" name="startTime[]" required style="max-width: 120px;">
-                    </div>
-                    <div class="form-group" style="flex: 0 0 120px;">
-                        <label>Hours Missed <span class="required">*</span></label>
-                        <input type="number" name="hoursMissed[]" step="0.25" min="0" max="24" placeholder="0.00" required style="max-width: 120px;" onchange="updateDayTotal()" oninput="updateDayTotal()">
-                    </div>
-                </div>
-            `;
+            serviceEntry.innerHTML = '<div class="service-entry-header"><span class="service-number">Service #' + serviceCount + '</span><button type="button" class="remove-service" onclick="removeService(this)">Remove</button></div><div class="form-row"><div class="form-group" style="flex: 2;"><label>Client Name <span class="required">*</span></label><input type="text" name="client[]" required></div><div class="form-group" style="flex: 0 0 120px;"><label>Start Time <span class="required">*</span></label><input type="time" name="startTime[]" required style="max-width: 120px;"></div><div class="form-group" style="flex: 0 0 120px;"><label>Hours Missed <span class="required">*</span></label><input type="number" name="hoursMissed[]" step="0.25" min="0" max="24" placeholder="0.00" required style="max-width: 120px;" onchange="updateDayTotal()" oninput="updateDayTotal()"></div><button type="button" class="add-service-inline" onclick="addService()" title="Add another service">+</button></div>';
             container.appendChild(serviceEntry);
             updateDayTotal();
         }
@@ -856,8 +841,8 @@
         function updateServiceNumbers() {
             const services = document.querySelectorAll('.service-entry');
             serviceCount = services.length;
-            services.forEach((service, index) => {
-                service.querySelector('.service-number').textContent = `Service #${index + 1}`;
+            services.forEach(function(service, index) {
+                service.querySelector('.service-number').textContent = 'Service #' + (index + 1);
             });
         }
         
@@ -895,14 +880,10 @@
                 });
             }
             
-            // Save to requests array for local viewing
             requests.push(data);
             
-            // IMPORTANT: Replace with your Google Apps Script URL
-            // Get this URL from: Google Sheets > Extensions > Apps Script > Deploy > Web app URL
-            const GOOGLE_SCRIPT_URL = https://script.google.com/macros/s/AKfycbxGSPtPjGLgRG2E1IsMeKp4DWGPARiow9HKMGyuM8IK_u4oaPcVAN2PSa1NKkq4_oWY/exec;
+            const GOOGLE_SCRIPT_URL = https://script.google.com/macros/s/AKfycbxGSPtPjGLgRG2E1IsMeKp4DWGPARiow9HKMGyuM8IK_u4oaPcVAN2PSa1NKkq4_oWY/exec ;
             
-            // Send to Google Apps Script backend
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -911,46 +892,27 @@
                 },
                 body: JSON.stringify(data)
             })
-            .then(() => {
+            .then(function() {
                 console.log('Form Data:', data);
                 
                 document.getElementById('generatedId').textContent = requestId;
                 document.getElementById('successMessage').style.display = 'block';
-                this.reset();
                 
-                // Reset services
-                document.getElementById('servicesContainer').innerHTML = `
-                    <div class="service-entry">
-                        <div class="service-entry-header">
-                            <span class="service-number">Service #1</span>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group" style="flex: 2;">
-                                <label>Client Name <span class="required">*</span></label>
-                                <input type="text" name="client[]" required>
-                            </div>
-                            <div class="form-group" style="flex: 0 0 120px;">
-                                <label>Start Time <span class="required">*</span></label>
-                                <input type="time" name="startTime[]" required style="max-width: 120px;">
-                            </div>
-                            <div class="form-group" style="flex: 0 0 120px;">
-                                <label>Hours Missed <span class="required">*</span></label>
-                                <input type="number" name="hoursMissed[]" step="0.25" min="0" max="24" placeholder="0.00" required style="max-width: 120px;" onchange="updateDayTotal()" oninput="updateDayTotal()">
-                            </div>
-                        </div>
-                    </div>
-                `;
+                document.getElementById('timeOffForm').reset();
+                
+                document.getElementById('servicesContainer').innerHTML = '<div class="service-entry"><div class="service-entry-header"><span class="service-number">Service #1</span></div><div class="form-row"><div class="form-group" style="flex: 2;"><label>Client Name <span class="required">*</span></label><input type="text" name="client[]" required></div><div class="form-group" style="flex: 0 0 120px;"><label>Start Time <span class="required">*</span></label><input type="time" name="startTime[]" required style="max-width: 120px;"></div><div class="form-group" style="flex: 0 0 120px;"><label>Hours Missed <span class="required">*</span></label><input type="number" name="hoursMissed[]" step="0.25" min="0" max="24" placeholder="0.00" required style="max-width: 120px;" onchange="updateDayTotal()" oninput="updateDayTotal()"></div><button type="button" class="add-service-inline" onclick="addService()" title="Add another service">+</button></div></div>';
+                
                 serviceCount = 1;
                 updateDayTotal();
                 
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Submit Request';
                 
-                setTimeout(() => {
+                setTimeout(function() {
                     document.getElementById('successMessage').style.display = 'none';
                 }, 5000);
             })
-            .catch(error => {
+            .catch(function(error) {
                 console.error('Error:', error);
                 alert('There was an error submitting your request. Please try again.');
                 submitBtn.disabled = false;
@@ -967,7 +929,7 @@
             }
             
             let html = '';
-            requests.forEach(request => {
+            requests.forEach(function(request) {
                 const date = new Date(request.requestDate).toLocaleDateString('en-US', { 
                     year: 'numeric', 
                     month: 'long', 
@@ -981,62 +943,17 @@
                     minute: '2-digit'
                 });
                 
-                const totalHours = request.services.reduce((sum, s) => sum + parseFloat(s.hoursMissed), 0);
+                let totalHours = 0;
+                request.services.forEach(function(s) {
+                    totalHours += parseFloat(s.hoursMissed);
+                });
                 
-                html += `
-                    <div class="request-card">
-                        <div class="request-header">
-                            <div>
-                                <div class="request-id">${request.requestId}</div>
-                            </div>
-                            <div class="request-type ${request.requestType}">${request.requestType.toUpperCase()}</div>
-                        </div>
-                        <div class="request-info">
-                            <div class="info-item">
-                                <div class="info-label">Employee</div>
-                                <div class="info-value">${request.employeeName} ${request.employeeLastName}</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Employee ID</div>
-                                <div class="info-value">${request.employeeId}</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Email</div>
-                                <div class="info-value">${request.employeeEmail}</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Phone</div>
-                                <div class="info-value">${request.employeePhone}</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Request Date</div>
-                                <div class="info-value">${date}</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Submitted</div>
-                                <div class="info-value">${submittedDate}</div>
-                            </div>
-                        </div>
-                        <div class="services-list">
-                            <h4>Services Missed (${request.services.length})</h4>
-                            ${request.services.map((service, index) => `
-                                <div class="service-item">
-                                    <div class="service-main">
-                                        <strong>Service ${index + 1}:</strong> ${service.client}
-                                    </div>
-                                    <div class="service-details">
-                                        <span>Start: ${service.startTime}</span>
-                                        <span>Hours: ${service.hoursMissed}</span>
-                                    </div>
-                                </div>
-                            `).join('')}
-                            <div class="services-total">
-                                <span>Total Hours for the Day</span>
-                                <span>${totalHours.toFixed(2)} hours</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
+                let servicesHtml = '';
+                request.services.forEach(function(service, index) {
+                    servicesHtml += '<div class="service-item"><div class="service-main"><strong>Service ' + (index + 1) + ':</strong> ' + service.client + '</div><div class="service-details"><span>Start: ' + service.startTime + '</span><span>Hours: ' + service.hoursMissed + '</span></div></div>';
+                });
+                
+                html += '<div class="request-card"><div class="request-header"><div><div class="request-id">' + request.requestId + '</div></div><div class="request-type ' + request.requestType + '">' + request.requestType.toUpperCase() + '</div></div><div class="request-info"><div class="info-item"><div class="info-label">Employee</div><div class="info-value">' + request.employeeName + ' ' + request.employeeLastName + '</div></div><div class="info-item"><div class="info-label">Employee ID</div><div class="info-value">' + request.employeeId + '</div></div><div class="info-item"><div class="info-label">Email</div><div class="info-value">' + request.employeeEmail + '</div></div><div class="info-item"><div class="info-label">Phone</div><div class="info-value">' + request.employeePhone + '</div></div><div class="info-item"><div class="info-label">Request Date</div><div class="info-value">' + date + '</div></div><div class="info-item"><div class="info-label">Submitted</div><div class="info-value">' + submittedDate + '</div></div></div><div class="services-list"><h4>Services Missed (' + request.services.length + ')</h4>' + servicesHtml + '<div class="services-total"><span>Total Hours for the Day</span><span>' + totalHours.toFixed(2) + ' hours</span></div></div></div>';
             });
             
             requestsList.innerHTML = html;
@@ -1044,10 +961,16 @@
         
         function updateStats() {
             document.getElementById('totalRequests').textContent = requests.length;
-            document.getElementById('vacationRequests').textContent = 
-                requests.filter(r => r.requestType === 'vacation').length;
-            document.getElementById('sickRequests').textContent = 
-                requests.filter(r => r.requestType === 'sick').length;
+            
+            let vacCount = 0;
+            let sickCount = 0;
+            requests.forEach(function(r) {
+                if (r.requestType === 'vacation') vacCount++;
+                if (r.requestType === 'sick') sickCount++;
+            });
+            
+            document.getElementById('vacationRequests').textContent = vacCount;
+            document.getElementById('sickRequests').textContent = sickCount;
         }
         
         function filterMyRequests() {
@@ -1062,7 +985,9 @@
                 return;
             }
             
-            const myRequests = requests.filter(r => r.employeeId === employeeId);
+            const myRequests = requests.filter(function(r) {
+                return r.employeeId === employeeId;
+            });
             
             if (myRequests.length === 0) {
                 myRequestsList.innerHTML = '<p style="text-align: center; color: #3D3D3D; padding: 40px;">No requests found for this Employee ID.</p>';
@@ -1073,13 +998,19 @@
             }
             
             document.getElementById('myTotalRequests').textContent = myRequests.length;
-            document.getElementById('myVacationRequests').textContent = 
-                myRequests.filter(r => r.requestType === 'vacation').length;
-            document.getElementById('mySickRequests').textContent = 
-                myRequests.filter(r => r.requestType === 'sick').length;
+            
+            let vacCount = 0;
+            let sickCount = 0;
+            myRequests.forEach(function(r) {
+                if (r.requestType === 'vacation') vacCount++;
+                if (r.requestType === 'sick') sickCount++;
+            });
+            
+            document.getElementById('myVacationRequests').textContent = vacCount;
+            document.getElementById('mySickRequests').textContent = sickCount;
             
             let html = '';
-            myRequests.forEach(request => {
+            myRequests.forEach(function(request) {
                 const date = new Date(request.requestDate).toLocaleDateString('en-US', { 
                     year: 'numeric', 
                     month: 'long', 
@@ -1093,54 +1024,17 @@
                     minute: '2-digit'
                 });
                 
-                const totalHours = request.services.reduce((sum, s) => sum + parseFloat(s.hoursMissed), 0);
+                let totalHours = 0;
+                request.services.forEach(function(s) {
+                    totalHours += parseFloat(s.hoursMissed);
+                });
                 
-                html += `
-                    <div class="request-card">
-                        <div class="request-header">
-                            <div>
-                                <div class="request-id">${request.requestId}</div>
-                            </div>
-                            <div class="request-type ${request.requestType}">${request.requestType.toUpperCase()}</div>
-                        </div>
-                        <div class="request-info">
-                            <div class="info-item">
-                                <div class="info-label">Request Date</div>
-                                <div class="info-value">${date}</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Submitted</div>
-                                <div class="info-value">${submittedDate}</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Total Services</div>
-                                <div class="info-value">${request.services.length}</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Total Hours</div>
-                                <div class="info-value">${totalHours.toFixed(2)} hrs</div>
-                            </div>
-                        </div>
-                        <div class="services-list">
-                            <h4>Services Missed (${request.services.length})</h4>
-                            ${request.services.map((service, index) => `
-                                <div class="service-item">
-                                    <div class="service-main">
-                                        <strong>Service ${index + 1}:</strong> ${service.client}
-                                    </div>
-                                    <div class="service-details">
-                                        <span>Start: ${service.startTime}</span>
-                                        <span>Hours: ${service.hoursMissed}</span>
-                                    </div>
-                                </div>
-                            `).join('')}
-                            <div class="services-total">
-                                <span>Total Hours for the Day</span>
-                                <span>${totalHours.toFixed(2)} hours</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
+                let servicesHtml = '';
+                request.services.forEach(function(service, index) {
+                    servicesHtml += '<div class="service-item"><div class="service-main"><strong>Service ' + (index + 1) + ':</strong> ' + service.client + '</div><div class="service-details"><span>Start: ' + service.startTime + '</span><span>Hours: ' + service.hoursMissed + '</span></div></div>';
+                });
+                
+                html += '<div class="request-card"><div class="request-header"><div><div class="request-id">' + request.requestId + '</div></div><div class="request-type ' + request.requestType + '">' + request.requestType.toUpperCase() + '</div></div><div class="request-info"><div class="info-item"><div class="info-label">Request Date</div><div class="info-value">' + date + '</div></div><div class="info-item"><div class="info-label">Submitted</div><div class="info-value">' + submittedDate + '</div></div><div class="info-item"><div class="info-label">Total Services</div><div class="info-value">' + request.services.length + '</div></div><div class="info-item"><div class="info-label">Total Hours</div><div class="info-value">' + totalHours.toFixed(2) + ' hrs</div></div></div><div class="services-list"><h4>Services Missed (' + request.services.length + ')</h4>' + servicesHtml + '<div class="services-total"><span>Total Hours for the Day</span><span>' + totalHours.toFixed(2) + ' hours</span></div></div></div>';
             });
             
             myRequestsList.innerHTML = html;
@@ -1150,25 +1044,35 @@
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const typeFilter = document.getElementById('typeFilter').value;
             
-            let filtered = requests;
+            let filtered = requests.slice();
             
             if (typeFilter) {
-                filtered = filtered.filter(r => r.requestType === typeFilter);
+                filtered = filtered.filter(function(r) {
+                    return r.requestType === typeFilter;
+                });
             }
             
             if (searchTerm) {
-                filtered = filtered.filter(r => 
-                    r.employeeName.toLowerCase().includes(searchTerm) ||
-                    r.employeeLastName.toLowerCase().includes(searchTerm) ||
-                    r.employeeId.toLowerCase().includes(searchTerm) ||
-                    r.services.some(s => s.client.toLowerCase().includes(searchTerm))
-                );
+                filtered = filtered.filter(function(r) {
+                    const nameMatch = r.employeeName.toLowerCase().indexOf(searchTerm) !== -1 || 
+                                    r.employeeLastName.toLowerCase().indexOf(searchTerm) !== -1;
+                    const idMatch = r.employeeId.toLowerCase().indexOf(searchTerm) !== -1;
+                    
+                    let clientMatch = false;
+                    r.services.forEach(function(s) {
+                        if (s.client.toLowerCase().indexOf(searchTerm) !== -1) {
+                            clientMatch = true;
+                        }
+                    });
+                    
+                    return nameMatch || idMatch || clientMatch;
+                });
             }
             
-            const originalRequests = requests;
+            const tempRequests = requests;
             requests = filtered;
             displayRequests();
-            requests = originalRequests;
+            requests = tempRequests;
         }
     </script>
 </body>
