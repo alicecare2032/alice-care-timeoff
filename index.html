@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alice Care - Time Off Request</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #E5ECF3;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .nav-tabs {
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            display: flex;
+            gap: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(26, 54, 92, 0.1);
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            color: #1A365C;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn.active {
+            background: #F57600;
+            color: white;
+        }
+        
+        .tab-btn:hover:not(.active) {
+            background: #E5ECF3;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(26, 54, 92, 0.15);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #1A365C;
+            color: white;
+            padding: 40px 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border: 40px solid rgba(245, 118, 0, 0.1);
+            border-radius: 50%;
+            top: -150px;
+            right: -100px;
+        }
+        
+        .logo {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 0;
+        }
+        
+        .logo .alice {
+            color: #F57600;
+            font-weight: 700;
+        }
+        
+        .logo .dot {
+            color: #F57600;
+            font-weight: 700;
+            margin: 0 -2px;
+        }
+        
+        .logo .care {
+            color: white;
+            font-weight: 400;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .form-content {
+            padding: 40px 30px;
+        }
+        
+        .notice-box {
+            background: #E5ECF3;
+            border-left: 4px solid #F57600;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .notice-box h3 {
+            color: #1A365C;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .notice-box p {
+            color: #3D3D3D;
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        
+        .notice-box p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #E5ECF3;
+        }
+        
+        .section:last-child {
+            border-bottom: none;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            color: #1A365C;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: #F57600;
+            border-radius: 2px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            align-items: flex-end;
+        }
+        
+        .form-group {
+            margin-bottom: 0;
+            flex: 1;
+        }
+        
+        .form-group.full-width {
+            flex: 1 1 100%;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #1A365C;
+            font-size: 14px;
+        }
+        
+        label .required {
+            color: #FF7475;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="date"],
+        input[type="time"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #D3D7DF;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s;
+            background: white;
+        }
+        
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #F57600;
+            box-shadow: 0 0 0 3px rgba(245, 118, 0, 0.1);
+        }
+        
+        .service-entry {
+            background: #E5ECF3;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            position: relative;
+            border: 2px solid transparent;
+            transition: border 0.3s;
+        }
+        
+        .service-entry:hover {
+            border-color: #F57600;
+        }
+        
+        .service-entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .service-number {
+            font-weight: 600;
+            color: #1A365C;
+            font-size: 16px;
+        }
+        
+        .remove-service {
+            background: #FF7475;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s;
+        }
+        
+        .remove-service:hover {
+            background: #ff5c5d;
+            transform: translateY(-2px);
+        }
+        
+        .add-service-inline {
+            background: #62B790;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .add-service-inline:hover {
+            background: #54a07e;
+            transform: scale(1.1);
+        }
+        
+        .submit-btn {
+            background: #F57600;
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        
+        .submit-btn:hover:not(:disabled) {
+            background: #e06d00;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(245, 118, 0, 0.3);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .success-message {
+            background: #62B790;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+            font-weight: 500;
+        }
+        
+        .dashboard {
+            display: none;
+        }
+        
+        .dashboard.active {
+            display: block;
+        }
+        
+        .dashboard-header {
+            background: #1A365C;
+            color: white;
+            padding: 30px;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .dashboard-header h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #E5ECF3;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #F57600;
+        }
+        
+        .stat-card h3 {
+            font-size: 14px;
+            color: #3D3D3D;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .stat-card .number {
+            font-size: 32px;
+            color: #1A365C;
+            font-weight: 700;
+        }
+        
+        .requests-list {
+            padding: 30px;
+        }
+        
+        .search-filter {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .search-filter input,
+        .search-filter select {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .request-card {
+            background: white;
+            border: 2px solid #E5ECF3;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+        
+        .request-card:hover {
+            border-color: #F57600;
+            box-shadow: 0 4px 12px rgba(245, 118, 0, 0.1);
+        }
+        
+        .request-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+        
+        .request-id {
+            font-size: 12px;
+            color: #3D3D3D;
+            background: #E5ECF3;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        
+        .request-type {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .request-type.vacation {
+            background: #E0F1E9;
+            color: #62B790;
+        }
+        
+        .request-type.sick {
+            background: #FFE3E3;
+            color: #FF7475;
+        }
+        
+        .request-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .info-item {
+            font-size: 13px;
+        }
+        
+        .info-label {
+            color: #3D3D3D;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .info-value {
+            color: #1A365C;
+            font-weight: 600;
+        }
+        
+        .services-list {
+            background: #E5ECF3;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .services-list h4 {
+            font-size: 14px;
+            color: #1A365C;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .service-item {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .service-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .service-item .service-main {
+            flex: 1;
+        }
+        
+        .service-item .service-details {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+            color: #3D3D3D;
+        }
+        
+        .services-total {
+            background: #1A365C;
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+        
+        .day-total-container {
+            margin: 20px 0;
+            padding: 0 24px;
+        }
+        
+        .day-total {
+            background: #1A365C;
+            color: white;
+            padding: 16px 20px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .day-total-value {
+            font-size: 24px;
+            color: #F57600;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .form-group {
+                margin-bottom: 20px;
+            }
+            
+            .form-group[style*="flex: 0 0 120px"] {
+                flex: 1 1 auto !important;
+                max-width: 100% !important;
+            }
+            
+            .form-group[style*="flex: 2"] {
+                flex: 1 1 auto !important;
+            }
+            
+            input[style*="max-width: 120px"] {
+                max-width: 100% !important;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .stats-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('form')">Submit Request</button>
+        <button class="tab-btn" onclick="switchTab('myRequests')">My Requests</button>
+        <button class="tab-btn" onclick="switchTab('dashboard')">HR Dashboard</button>
+    </div>
+
+    <!-- FORM VIEW -->
+    <div id="formView" class="container">
+        <div class="header">
+            <div class="logo">
+                <span class="alice">alice</span><span class="dot">.</span><span class="care">care</span>
+            </div>
+            <h1>Time Off Request</h1>
+            <p>Submit your vacation or sick time request</p>
+        </div>
+        
+        <div class="form-content">
+            <div class="notice-box">
+                <h3>Important Notice:</h3>
+                <p>Submitting a vacation or sick leave request does not guarantee approval. Each request is reviewed based on staffing needs, accrued hours, and eligibility. Vacation and sick time are earned through accrual as outlined in the Alice Care Employee Handbook. You can view your current accrued balances and employee ID by logging into your Paychex Flex account.</p>
+                <p>Incomplete forms or requests containing inaccurate information will not be processed. Please ensure all required fields are filled out correctly before submission.</p>
+            </div>
+
+            <form id="timeOffForm">
+                <div class="section">
+                    <h2 class="section-title">Employee Information</h2>
+                    <div class="form-row" style="flex-wrap: wrap;">
+                        <div class="form-group" style="flex: 1 1 calc(50% - 10px); margin-bottom: 20px;">
+                            <label for="employeeId">Employee ID <span class="required">*</span></label>
+                            <input type="text" id="employeeId" name="employeeId" required>
+                        </div>
+                        <div class="form-group" style="flex: 1 1 calc(50% - 10px); margin-bottom: 20px;">
+                            <label for="employeeName">First Name <span class="required">*</span></label>
+                            <input type="text" id="employeeName" name="employeeName" required>
+                        </div>
+                        <div class="form-group" style="flex: 1 1 calc(50% - 10px); margin-bottom: 20px;">
+                            <label for="employeeLastName">Last Name <span class="required">*</span></label>
+                            <input type="text" id="employeeLastName" name="employeeLastName" required>
+                        </div>
+                        <div class="form-group" style="flex: 1 1 calc(50% - 10px); margin-bottom: 20px;">
+                            <label for="employeeEmail">Email <span class="required">*</span></label>
+                            <input type="email" id="employeeEmail" name="employeeEmail" required>
+                        </div>
+                        <div class="form-group" style="flex: 1 1 calc(50% - 10px); margin-bottom: 20px;">
+                            <label for="employeePhone">Phone Number <span class="required">*</span></label>
+                            <input type="tel" id="employeePhone" name="employeePhone" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2 class="section-title">Request Details</h2>
+                    <div class="form-row" style="flex-wrap: wrap;">
+                        <div class="form-group" style="flex: 1 1 calc(50% - 10px); margin-bottom: 20px;">
+                            <label for="requestType">Request Type <span class="required">*</span></label>
+                            <select id="requestType" name="requestType" required>
+                                <option value="">Select Type</option>
+                                <option value="vacation">Vacation</option>
+                                <option value="sick">Sick Time</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="flex: 1 1 calc(50% - 10px); margin-bottom: 20px;">
+                            <label for="requestDate">Date <span class="required">*</span></label>
+                            <input type="date" id="requestDate" name="requestDate" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2 class="section-title">Services Missed</h2>
+                    <div id="servicesContainer">
+                        <div class="service-entry">
+                            <div class="service-entry-header">
+                                <span class="service-number">Service #1</span>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="flex: 2;">
+                                    <label>Client Name <span class="required">*</span></label>
+                                    <input type="text" name="client[]" required>
+                                </div>
+                                <div class="form-group" style="flex: 0 0 120px;">
+                                    <label>Start Time <span class="required">*</span></label>
+                                    <input type="time" name="startTime[]" required style="max-width: 120px;">
+                                </div>
+                                <div class="form-group" style="flex: 0 0 120px;">
+                                    <label>Hours Missed <span class="required">*</span></label>
+                                    <input type="number" name="hoursMissed[]" step="0.25" min="0" max="24" placeholder="0.00" required style="max-width: 120px;" onchange="updateDayTotal()" oninput="updateDayTotal()">
+                                </div>
+                                <button type="button" class="add-service-inline" onclick="addService()" title="Add another service">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="day-total-container">
+                        <div class="day-total">
+                            <span>Total Hours for the Day:</span>
+                            <span id="dayTotalHours" class="day-total-value">0.00 hours</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-btn">Submit Request</button>
+                
+                <div id="successMessage" class="success-message">
+                    ✓ Your request has been submitted successfully! Request ID: <span id="generatedId"></span><br>
+                    You and payroll@alicecare.com will receive confirmation emails shortly.
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MY REQUESTS VIEW -->
+    <div id="myRequestsView" class="container dashboard">
+        <div class="dashboard-header">
+            <div class="logo">
+                <span class="alice">alice</span><span class="dot">.</span><span class="care">care</span>
+            </div>
+            <h2>My Time Off Requests</h2>
+            <p>View your submitted time off requests</p>
+        </div>
+        
+        <div class="stats-row">
+            <div class="stat-card">
+                <h3>My Total Requests</h3>
+                <div class="number" id="myTotalRequests">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>My Vacation Requests</h3>
+                <div class="number" id="myVacationRequests">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>My Sick Time Requests</h3>
+                <div class="number" id="mySickRequests">0</div>
+            </div>
+        </div>
+        
+        <div class="requests-list">
+            <div class="form-group" style="max-width: 300px; margin-bottom: 20px;">
+                <label for="myEmployeeIdFilter">Enter Your Employee ID to View Requests <span class="required">*</span></label>
+                <input type="text" id="myEmployeeIdFilter" placeholder="Enter your Employee ID" onkeyup="filterMyRequests()">
+            </div>
+            
+            <div id="myRequestsList"></div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD VIEW -->
+    <div id="dashboardView" class="container dashboard">
+        <div class="dashboard-header">
+            <div class="logo">
+                <span class="alice">alice</span><span class="dot">.</span><span class="care">care</span>
+            </div>
+            <h2>HR Dashboard - All Time Off Requests</h2>
+            <p>Review and manage all employee time off requests</p>
+        </div>
+        
+        <div class="stats-row">
+            <div class="stat-card">
+                <h3>Total Requests</h3>
+                <div class="number" id="totalRequests">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Vacation Requests</h3>
+                <div class="number" id="vacationRequests">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Sick Time Requests</h3>
+                <div class="number" id="sickRequests">0</div>
+            </div>
+        </div>
+        
+        <div class="requests-list">
+            <div class="search-filter">
+                <input type="text" id="searchInput" placeholder="Search by name, ID, or client..." onkeyup="filterRequests()">
+                <select id="typeFilter" onchange="filterRequests()">
+                    <option value="">All Types</option>
+                    <option value="vacation">Vacation</option>
+                    <option value="sick">Sick Time</option>
+                </select>
+            </div>
+            
+            <div id="requestsList"></div>
+        </div>
+    </div>
+    
+    <script>
+        let serviceCount = 1;
+        let requests = [];
+        
+        function updateDayTotal() {
+            const hoursInputs = document.querySelectorAll('input[name="hoursMissed[]"]');
+            let total = 0;
+            
+            hoursInputs.forEach(input => {
+                const value = parseFloat(input.value) || 0;
+                total += value;
+            });
+            
+            document.getElementById('dayTotalHours').textContent = total.toFixed(2) + ' hours';
+        }
+        
+        function loadRequests() {
+            displayRequests();
+            updateStats();
+        }
+        
+        function generateRequestId() {
+            const timestamp = Date.now();
+            const random = Math.floor(Math.random() * 1000);
+            return 'AC-' + timestamp + '-' + random;
+        }
+        
+        function switchTab(tab) {
+            const formView = document.getElementById('formView');
+            const myRequestsView = document.getElementById('myRequestsView');
+            const dashboardView = document.getElementById('dashboardView');
+            const tabs = document.querySelectorAll('.tab-btn');
+            
+            tabs.forEach(function(btn) {
+                btn.classList.remove('active');
+            });
+            
+            formView.style.display = 'none';
+            myRequestsView.classList.remove('active');
+            dashboardView.classList.remove('active');
+            
+            if (tab === 'form') {
+                formView.style.display = 'block';
+                tabs[0].classList.add('active');
+            } else if (tab === 'myRequests') {
+                myRequestsView.classList.add('active');
+                tabs[1].classList.add('active');
+                filterMyRequests();
+            } else if (tab === 'dashboard') {
+                dashboardView.classList.add('active');
+                tabs[2].classList.add('active');
+                loadRequests();
+            }
+        }
+        
+        function addService() {
+            serviceCount++;
+            const container = document.getElementById('servicesContainer');
+            const serviceEntry = document.createElement('div');
+            serviceEntry.className = 'service-entry';
+            serviceEntry.innerHTML = '<div class="service-entry-header"><span class="service-number">Service #' + serviceCount + '</span><button type="button" class="remove-service" onclick="removeService(this)">Remove</button></div><div class="form-row"><div class="form-group" style="flex: 2;"><label>Client Name <span class="required">*</span></label><input type="text" name="client[]" required></div><div class="form-group" style="flex: 0 0 120px;"><label>Start Time <span class="required">*</span></label><input type="time" name="startTime[]" required style="max-width: 120px;"></div><div class="form-group" style="flex: 0 0 120px;"><label>Hours Missed <span class="required">*</span></label><input type="number" name="hoursMissed[]" step="0.25" min="0" max="24" placeholder="0.00" required style="max-width: 120px;" onchange="updateDayTotal()" oninput="updateDayTotal()"></div><button type="button" class="add-service-inline" onclick="addService()" title="Add another service">+</button></div>';
+            container.appendChild(serviceEntry);
+            updateDayTotal();
+        }
+        
+        function removeService(button) {
+            button.closest('.service-entry').remove();
+            updateServiceNumbers();
+            updateDayTotal();
+        }
+        
+        function updateServiceNumbers() {
+            const services = document.querySelectorAll('.service-entry');
+            serviceCount = services.length;
+            services.forEach(function(service, index) {
+                service.querySelector('.service-number').textContent = 'Service #' + (index + 1);
+            });
+        }
+        
+        document.getElementById('timeOffForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.querySelector('.submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+            
+            const formData = new FormData(this);
+            const requestId = generateRequestId();
+            const data = {
+                requestId: requestId,
+                employeeId: formData.get('employeeId'),
+                employeeName: formData.get('employeeName'),
+                employeeLastName: formData.get('employeeLastName'),
+                employeeEmail: formData.get('employeeEmail'),
+                employeePhone: formData.get('employeePhone'),
+                requestType: formData.get('requestType'),
+                requestDate: formData.get('requestDate'),
+                submittedDate: new Date().toISOString(),
+                services: []
+            };
+            
+            const clients = formData.getAll('client[]');
+            const startTimes = formData.getAll('startTime[]');
+            const hoursMissed = formData.getAll('hoursMissed[]');
+            
+            for (let i = 0; i < clients.length; i++) {
+                data.services.push({
+                    client: clients[i],
+                    startTime: startTimes[i],
+                    hoursMissed: hoursMissed[i]
+                });
+            }
+            
+            requests.push(data);
+            
+            const GOOGLE_SCRIPT_URL = https://script.google.com/macros/s/AKfycbxGSPtPjGLgRG2E1IsMeKp4DWGPARiow9HKMGyuM8IK_u4oaPcVAN2PSa1NKkq4_oWY/exec ;
+            
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(function() {
+                console.log('Form Data:', data);
+                
+                document.getElementById('generatedId').textContent = requestId;
+                document.getElementById('successMessage').style.display = 'block';
+                
+                document.getElementById('timeOffForm').reset();
+                
+                document.getElementById('servicesContainer').innerHTML = '<div class="service-entry"><div class="service-entry-header"><span class="service-number">Service #1</span></div><div class="form-row"><div class="form-group" style="flex: 2;"><label>Client Name <span class="required">*</span></label><input type="text" name="client[]" required></div><div class="form-group" style="flex: 0 0 120px;"><label>Start Time <span class="required">*</span></label><input type="time" name="startTime[]" required style="max-width: 120px;"></div><div class="form-group" style="flex: 0 0 120px;"><label>Hours Missed <span class="required">*</span></label><input type="number" name="hoursMissed[]" step="0.25" min="0" max="24" placeholder="0.00" required style="max-width: 120px;" onchange="updateDayTotal()" oninput="updateDayTotal()"></div><button type="button" class="add-service-inline" onclick="addService()" title="Add another service">+</button></div></div>';
+                
+                serviceCount = 1;
+                updateDayTotal();
+                
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Request';
+                
+                setTimeout(function() {
+                    document.getElementById('successMessage').style.display = 'none';
+                }, 5000);
+            })
+            .catch(function(error) {
+                console.error('Error:', error);
+                alert('There was an error submitting your request. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Request';
+            });
+        });
+        
+        function displayRequests() {
+            const requestsList = document.getElementById('requestsList');
+            
+            if (requests.length === 0) {
+                requestsList.innerHTML = '<p style="text-align: center; color: #3D3D3D; padding: 40px;">No requests submitted yet.</p>';
+                return;
+            }
+            
+            let html = '';
+            requests.forEach(function(request) {
+                const date = new Date(request.requestDate).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+                const submittedDate = new Date(request.submittedDate).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                let totalHours = 0;
+                request.services.forEach(function(s) {
+                    totalHours += parseFloat(s.hoursMissed);
+                });
+                
+                let servicesHtml = '';
+                request.services.forEach(function(service, index) {
+                    servicesHtml += '<div class="service-item"><div class="service-main"><strong>Service ' + (index + 1) + ':</strong> ' + service.client + '</div><div class="service-details"><span>Start: ' + service.startTime + '</span><span>Hours: ' + service.hoursMissed + '</span></div></div>';
+                });
+                
+                html += '<div class="request-card"><div class="request-header"><div><div class="request-id">' + request.requestId + '</div></div><div class="request-type ' + request.requestType + '">' + request.requestType.toUpperCase() + '</div></div><div class="request-info"><div class="info-item"><div class="info-label">Employee</div><div class="info-value">' + request.employeeName + ' ' + request.employeeLastName + '</div></div><div class="info-item"><div class="info-label">Employee ID</div><div class="info-value">' + request.employeeId + '</div></div><div class="info-item"><div class="info-label">Email</div><div class="info-value">' + request.employeeEmail + '</div></div><div class="info-item"><div class="info-label">Phone</div><div class="info-value">' + request.employeePhone + '</div></div><div class="info-item"><div class="info-label">Request Date</div><div class="info-value">' + date + '</div></div><div class="info-item"><div class="info-label">Submitted</div><div class="info-value">' + submittedDate + '</div></div></div><div class="services-list"><h4>Services Missed (' + request.services.length + ')</h4>' + servicesHtml + '<div class="services-total"><span>Total Hours for the Day</span><span>' + totalHours.toFixed(2) + ' hours</span></div></div></div>';
+            });
+            
+            requestsList.innerHTML = html;
+        }
+        
+        function updateStats() {
+            document.getElementById('totalRequests').textContent = requests.length;
+            
+            let vacCount = 0;
+            let sickCount = 0;
+            requests.forEach(function(r) {
+                if (r.requestType === 'vacation') vacCount++;
+                if (r.requestType === 'sick') sickCount++;
+            });
+            
+            document.getElementById('vacationRequests').textContent = vacCount;
+            document.getElementById('sickRequests').textContent = sickCount;
+        }
+        
+        function filterMyRequests() {
+            const employeeId = document.getElementById('myEmployeeIdFilter').value.trim();
+            const myRequestsList = document.getElementById('myRequestsList');
+            
+            if (!employeeId) {
+                myRequestsList.innerHTML = '<p style="text-align: center; color: #3D3D3D; padding: 40px;">Please enter your Employee ID to view your requests.</p>';
+                document.getElementById('myTotalRequests').textContent = '0';
+                document.getElementById('myVacationRequests').textContent = '0';
+                document.getElementById('mySickRequests').textContent = '0';
+                return;
+            }
+            
+            const myRequests = requests.filter(function(r) {
+                return r.employeeId === employeeId;
+            });
+            
+            if (myRequests.length === 0) {
+                myRequestsList.innerHTML = '<p style="text-align: center; color: #3D3D3D; padding: 40px;">No requests found for this Employee ID.</p>';
+                document.getElementById('myTotalRequests').textContent = '0';
+                document.getElementById('myVacationRequests').textContent = '0';
+                document.getElementById('mySickRequests').textContent = '0';
+                return;
+            }
+            
+            document.getElementById('myTotalRequests').textContent = myRequests.length;
+            
+            let vacCount = 0;
+            let sickCount = 0;
+            myRequests.forEach(function(r) {
+                if (r.requestType === 'vacation') vacCount++;
+                if (r.requestType === 'sick') sickCount++;
+            });
+            
+            document.getElementById('myVacationRequests').textContent = vacCount;
+            document.getElementById('mySickRequests').textContent = sickCount;
+            
+            let html = '';
+            myRequests.forEach(function(request) {
+                const date = new Date(request.requestDate).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+                const submittedDate = new Date(request.submittedDate).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                let totalHours = 0;
+                request.services.forEach(function(s) {
+                    totalHours += parseFloat(s.hoursMissed);
+                });
+                
+                let servicesHtml = '';
+                request.services.forEach(function(service, index) {
+                    servicesHtml += '<div class="service-item"><div class="service-main"><strong>Service ' + (index + 1) + ':</strong> ' + service.client + '</div><div class="service-details"><span>Start: ' + service.startTime + '</span><span>Hours: ' + service.hoursMissed + '</span></div></div>';
+                });
+                
+                html += '<div class="request-card"><div class="request-header"><div><div class="request-id">' + request.requestId + '</div></div><div class="request-type ' + request.requestType + '">' + request.requestType.toUpperCase() + '</div></div><div class="request-info"><div class="info-item"><div class="info-label">Request Date</div><div class="info-value">' + date + '</div></div><div class="info-item"><div class="info-label">Submitted</div><div class="info-value">' + submittedDate + '</div></div><div class="info-item"><div class="info-label">Total Services</div><div class="info-value">' + request.services.length + '</div></div><div class="info-item"><div class="info-label">Total Hours</div><div class="info-value">' + totalHours.toFixed(2) + ' hrs</div></div></div><div class="services-list"><h4>Services Missed (' + request.services.length + ')</h4>' + servicesHtml + '<div class="services-total"><span>Total Hours for the Day</span><span>' + totalHours.toFixed(2) + ' hours</span></div></div></div>';
+            });
+            
+            myRequestsList.innerHTML = html;
+        }
+        
+        function filterRequests() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const typeFilter = document.getElementById('typeFilter').value;
+            
+            let filtered = requests.slice();
+            
+            if (typeFilter) {
+                filtered = filtered.filter(function(r) {
+                    return r.requestType === typeFilter;
+                });
+            }
+            
+            if (searchTerm) {
+                filtered = filtered.filter(function(r) {
+                    const nameMatch = r.employeeName.toLowerCase().indexOf(searchTerm) !== -1 || 
+                                    r.employeeLastName.toLowerCase().indexOf(searchTerm) !== -1;
+                    const idMatch = r.employeeId.toLowerCase().indexOf(searchTerm) !== -1;
+                    
+                    let clientMatch = false;
+                    r.services.forEach(function(s) {
+                        if (s.client.toLowerCase().indexOf(searchTerm) !== -1) {
+                            clientMatch = true;
+                        }
+                    });
+                    
+                    return nameMatch || idMatch || clientMatch;
+                });
+            }
+            
+            const tempRequests = requests;
+            requests = filtered;
+            displayRequests();
+            requests = tempRequests;
+        }
+    </script>
+</body>
+</html>
