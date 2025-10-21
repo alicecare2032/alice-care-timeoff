@@ -584,7 +584,8 @@
     <div class="nav-tabs">
         <button class="tab-btn active" onclick="switchTab('form')">Submit Request</button>
         <button class="tab-btn" onclick="switchTab('myRequests')">My Requests</button>
-     <!--   <button class="tab-btn" onclick="switchTab('dashboard')">HR Dashboard</button> -->
+        <!-- HR Dashboard temporarily hidden until authentication is added -->
+        <!-- <button class="tab-btn" onclick="switchTab('dashboard')">HR Dashboard</button> -->
     </div>
 
     <!-- FORM VIEW -->
@@ -786,24 +787,24 @@
         // IMPORTANT: Replace with your Google Apps Script URL
         var GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxGSPtPjGLgRG2E1IsMeKp4DWGPARiow9HKMGyuM8IK_u4oaPcVAN2PSa1NKkq4_oWY/exec';
         
-        // Load requests from Google Sheets
-function loadRequestsFromSheet(callback) {
-    fetch(GOOGLE_SCRIPT_URL)
-        .then(function(response) {
-            return response.json();
-        })
-        .then(function(result) {
-            if (result.success) {
-                requests = result.requests;
-                if (callback) {
-                    callback();
-                }
-            }
-        })
-        .catch(function(error) {
-            console.error('Error loading requests:', error);
-        });
-}
+        // Load requests from Google Sheets with callback
+        function loadRequestsFromSheet(callback) {
+            fetch(GOOGLE_SCRIPT_URL)
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(result) {
+                    if (result.success) {
+                        requests = result.requests;
+                        if (callback) {
+                            callback();
+                        }
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Error loading requests:', error);
+                });
+        }
         
         // Update total hours
         function updateDayTotal() {
@@ -831,11 +832,11 @@ function loadRequestsFromSheet(callback) {
         attachHoursListeners();
         
         function loadRequests() {
-    loadRequestsFromSheet(function() {
-        displayRequests();
-        updateStats();
-    });
-}
+            loadRequestsFromSheet(function() {
+                displayRequests();
+                updateStats();
+            });
+        }
         
         function generateRequestId() {
             var timestamp = Date.now();
@@ -860,18 +861,18 @@ function loadRequestsFromSheet(callback) {
             if (tab === 'form') {
                 formView.style.display = 'block';
                 tabs[0].classList.add('active');
-} else if (tab === 'myRequests') {
-    myRequestsView.classList.add('active');
-    tabs[1].classList.add('active');
-    loadRequestsFromSheet(filterMyRequests);
- } else if (tab === 'dashboard') {
-    dashboardView.classList.add('active');
-    tabs[2].classList.add('active');
-    loadRequestsFromSheet(function() {
-        displayRequests();
-        updateStats();
-    });
-}
+            } else if (tab === 'myRequests') {
+                myRequestsView.classList.add('active');
+                tabs[1].classList.add('active');
+                loadRequestsFromSheet(filterMyRequests);
+            } else if (tab === 'dashboard') {
+                dashboardView.classList.add('active');
+                tabs[2].classList.add('active');
+                loadRequestsFromSheet(function() {
+                    displayRequests();
+                    updateStats();
+                });
+            }
         }
         
         function addService() {
