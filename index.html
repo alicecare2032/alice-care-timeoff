@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - Time Off Request v10.0</title>
+    <title>Alice Care - Time Off Request v10.0/title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <style>
@@ -686,12 +686,12 @@
                 <div class="captcha-container">
                     <div class="g-recaptcha" data-sitekey="6LfjRvErAAAAADX6Bqb-xQr6kA1oTwAvBaGuSsi6"></div>
                 </div>
-                <div class="captcha-error" id="captchaError">⚠️ Please complete the reCAPTCHA verification</div>
+                <div class="captcha-error" id="captchaError">âš ï¸ Please complete the reCAPTCHA verification</div>
                 
                 <button type="submit" class="submit-btn">Submit Request</button>
                 
                 <div id="successMessage" class="success-message">
-                    ✓ Your request has been submitted successfully! Request ID: <span id="generatedId"></span><br>
+                    âœ“ Your request has been submitted successfully! Request ID: <span id="generatedId"></span><br>
                     You and payroll@alicecare.com will receive confirmation emails shortly.
                 </div>
             </form>
@@ -729,11 +729,11 @@
                 <div class="form-row" style="flex-wrap: wrap;">
                     <div class="form-group" style="flex: 1 1 calc(50% - 10px); margin-bottom: 15px;">
                         <label for="myEmployeeIdFilter">Employee ID <span class="required">*</span></label>
-                        <input type="text" id="myEmployeeIdFilter" placeholder="Enter your Employee ID" oninput="filterMyRequests()">
+                        <input type="text" id="myEmployeeIdFilter" placeholder="Enter your Employee ID" onkeyup="filterMyRequests()">
                     </div>
                     <div class="form-group" style="flex: 1 1 calc(50% - 10px); margin-bottom: 15px;">
                         <label for="myEmployeeEmailFilter">Email <span class="required">*</span></label>
-                        <input type="email" id="myEmployeeEmailFilter" placeholder="Enter your Email" oninput="filterMyRequests()">
+                        <input type="email" id="myEmployeeEmailFilter" placeholder="Enter your Email" onkeyup="filterMyRequests()">
                     </div>
                 </div>
             </div>
@@ -864,19 +864,7 @@
             } else if (tab === 'myRequests') {
                 myRequestsView.classList.add('active');
                 tabs[1].classList.add('active');
-                // Show loading state immediately
-                document.getElementById('myRequestsList').innerHTML = '<p style="text-align: center; color: #3D3D3D; padding: 40px;">Loading your requests...</p>';
-                // Load requests and then filter
-                loadRequestsFromSheet(function() {
-                    // Auto-filter if fields already have values
-                    var employeeId = document.getElementById('myEmployeeIdFilter').value.trim();
-                    var employeeEmail = document.getElementById('myEmployeeEmailFilter').value.trim();
-                    if (employeeId || employeeEmail) {
-                        filterMyRequests();
-                    } else {
-                        document.getElementById('myRequestsList').innerHTML = '<p style="text-align: center; color: #3D3D3D; padding: 40px;">Please enter both your Employee ID and Email to view your requests.</p>';
-                    }
-                });
+                loadRequestsFromSheet(filterMyRequests);
             } else if (tab === 'dashboard') {
                 dashboardView.classList.add('active');
                 tabs[2].classList.add('active');
@@ -1075,22 +1063,10 @@
                 return;
             }
             
-            // Check if requests are loaded
-            if (!requests || requests.length === 0) {
-                myRequestsList.innerHTML = '<p style="text-align: center; color: #3D3D3D; padding: 40px;">Loading requests... If this persists, no requests have been submitted yet.</p>';
-                document.getElementById('myTotalRequests').textContent = '0';
-                document.getElementById('myVacationRequests').textContent = '0';
-                document.getElementById('mySickRequests').textContent = '0';
-                return;
-            }
-            
             var myRequests = [];
             for (var i = 0; i < requests.length; i++) {
-                // More robust comparison - trim and lowercase both values
-                var storedId = String(requests[i].employeeId || '').trim();
-                var storedEmail = String(requests[i].employeeEmail || '').trim().toLowerCase();
-                
-                if (storedId === employeeId && storedEmail === employeeEmail) {
+                if (requests[i].employeeId === employeeId && 
+                    requests[i].employeeEmail.toLowerCase() === employeeEmail) {
                     myRequests.push(requests[i]);
                 }
             }
