@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - HR Dashboard v.0.0</title>
+    <title>Alice Care - HR Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -153,7 +153,8 @@
         
         input[type="text"],
         input[type="number"],
-        select {
+        select,
+        textarea {
             padding: 10px 14px;
             border: 2px solid #D3D7DF;
             border-radius: 8px;
@@ -163,7 +164,8 @@
         }
         
         input:focus,
-        select:focus {
+        select:focus,
+        textarea:focus {
             outline: none;
             border-color: #F57600;
             box-shadow: 0 0 0 3px rgba(245, 118, 0, 0.1);
@@ -630,6 +632,10 @@
                 <label>Reviewer Name <span style="color: #FF7475;">*</span></label>
                 <input type="text" id="reviewerName" placeholder="Enter your name" required>
             </div>
+            <div class="form-group">
+                <label>Review Comments <span style="color: #FF7475;">*</span></label>
+                <textarea id="reviewComments" placeholder="Enter your review comments..." required style="width: 100%; padding: 12px 16px; border: 2px solid #D3D7DF; border-radius: 8px; font-size: 14px; font-family: 'Poppins', sans-serif; min-height: 100px; resize: vertical;"></textarea>
+            </div>
             <p style="color: #3D3D3D; font-size: 14px; margin-bottom: 20px;">
                 By marking this request as reviewed, you confirm that you have reviewed all the details and the request is ready for approval.
             </p>
@@ -657,6 +663,10 @@
                 <small style="color: #3D3D3D; font-size: 12px; margin-top: 5px; display: block;">
                     Requested hours: <span id="requestedHoursDisplay">0.00</span>
                 </small>
+            </div>
+            <div class="form-group">
+                <label>Approval Comments <span style="color: #FF7475;">*</span></label>
+                <textarea id="approvalComments" placeholder="Enter your approval comments..." required style="width: 100%; padding: 12px 16px; border: 2px solid #D3D7DF; border-radius: 8px; font-size: 14px; font-family: 'Poppins', sans-serif; min-height: 100px; resize: vertical;"></textarea>
             </div>
             <p style="color: #3D3D3D; font-size: 14px; margin-bottom: 20px;">
                 By approving this request, you authorize the employee to take the specified hours off.
@@ -776,8 +786,14 @@
                         '<h5>Review Status</h5>' +
                         '<div class="value">✓ Reviewed</div>' +
                         '<div style="font-size: 12px; color: #3D3D3D; margin-top: 5px;">By: ' + (req.reviewedBy || 'N/A') + '</div>' +
-                        '<div style="font-size: 11px; color: #3D3D3D;">' + reviewDate + '</div>' +
-                        '</div>';
+                        '<div style="font-size: 11px; color: #3D3D3D;">' + reviewDate + '</div>';
+                    if (req.reviewComments) {
+                        reviewStatusHtml += '<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #D3D7DF;">' +
+                            '<div style="font-size: 11px; color: #3D3D3D; margin-bottom: 4px;">Comments:</div>' +
+                            '<div style="font-size: 12px; color: #1A365C;">' + req.reviewComments + '</div>' +
+                            '</div>';
+                    }
+                    reviewStatusHtml += '</div>';
                 } else {
                     reviewStatusHtml += '<div class="status-box">' +
                         '<h5>Review Status</h5>' +
@@ -795,8 +811,14 @@
                         '<div class="value">✓ Approved</div>' +
                         '<div style="font-size: 12px; color: #3D3D3D; margin-top: 5px;">By: ' + (req.approvedBy || 'N/A') + '</div>' +
                         '<div style="font-size: 11px; color: #3D3D3D;">' + approvalDate + '</div>' +
-                        '<div style="font-size: 13px; color: #1A365C; margin-top: 8px; font-weight: 600;">Approved Hours: ' + (req.approvedHours || '0.00') + '</div>' +
-                        '</div>';
+                        '<div style="font-size: 13px; color: #1A365C; margin-top: 8px; font-weight: 600;">Approved Hours: ' + (req.approvedHours || '0.00') + '</div>';
+                    if (req.approvalComments) {
+                        reviewStatusHtml += '<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #D3D7DF;">' +
+                            '<div style="font-size: 11px; color: #3D3D3D; margin-bottom: 4px;">Comments:</div>' +
+                            '<div style="font-size: 12px; color: #1A365C;">' + req.approvalComments + '</div>' +
+                            '</div>';
+                    }
+                    reviewStatusHtml += '</div>';
                 } else {
                     reviewStatusHtml += '<div class="status-box">' +
                         '<h5>Approval Status</h5>' +
@@ -920,6 +942,7 @@
         function openReviewModal(requestId) {
             currentRequestId = requestId;
             document.getElementById('reviewerName').value = '';
+            document.getElementById('reviewComments').value = '';
             document.getElementById('reviewModal').style.display = 'block';
         }
         
@@ -928,6 +951,7 @@
             document.getElementById('approverName').value = '';
             document.getElementById('approvedHours').value = requestedHours.toFixed(2);
             document.getElementById('requestedHoursDisplay').textContent = requestedHours.toFixed(2);
+            document.getElementById('approvalComments').value = '';
             document.getElementById('approvalModal').style.display = 'block';
         }
         
@@ -938,9 +962,15 @@
         
         function submitReview() {
             var reviewerName = document.getElementById('reviewerName').value.trim();
+            var reviewComments = document.getElementById('reviewComments').value.trim();
             
             if (!reviewerName) {
                 alert('Please enter your name');
+                return;
+            }
+            
+            if (!reviewComments) {
+                alert('Please enter review comments');
                 return;
             }
             
@@ -948,7 +978,8 @@
                 action: 'review',
                 requestId: currentRequestId,
                 reviewerName: reviewerName,
-                reviewedDate: new Date().toISOString()
+                reviewedDate: new Date().toISOString(),
+                reviewComments: reviewComments
             };
             
             updateRequest(data, 'reviewModal');
@@ -957,6 +988,7 @@
         function submitApproval() {
             var approverName = document.getElementById('approverName').value.trim();
             var approvedHours = parseFloat(document.getElementById('approvedHours').value);
+            var approvalComments = document.getElementById('approvalComments').value.trim();
             
             if (!approverName) {
                 alert('Please enter your name');
@@ -968,12 +1000,18 @@
                 return;
             }
             
+            if (!approvalComments) {
+                alert('Please enter approval comments');
+                return;
+            }
+            
             var data = {
                 action: 'approve',
                 requestId: currentRequestId,
                 approverName: approverName,
                 approvedDate: new Date().toISOString(),
-                approvedHours: approvedHours
+                approvedHours: approvedHours,
+                approvalComments: approvalComments
             };
             
             updateRequest(data, 'approvalModal');
