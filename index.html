@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - Time Off Request v10.4</title>
+    <title>Alice Care - Time Off Request v10.7</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <style>
@@ -729,13 +729,14 @@
                 <div class="form-row" style="flex-wrap: wrap;">
                     <div class="form-group" style="flex: 1 1 calc(50% - 10px); margin-bottom: 15px;">
                         <label for="myEmployeeIdFilter">Employee ID <span class="required">*</span></label>
-                        <input type="text" id="myEmployeeIdFilter" placeholder="Enter your Employee ID" oninput="filterMyRequests()">
+                        <input type="text" id="myEmployeeIdFilter" placeholder="Enter your Employee ID">
                     </div>
                     <div class="form-group" style="flex: 1 1 calc(50% - 10px); margin-bottom: 15px;">
                         <label for="myEmployeeEmailFilter">Email <span class="required">*</span></label>
-                        <input type="email" id="myEmployeeEmailFilter" placeholder="Enter your Email" oninput="filterMyRequests()">
+                        <input type="email" id="myEmployeeEmailFilter" placeholder="Enter your Email">
                     </div>
                 </div>
+                <button type="button" class="submit-btn" onclick="searchMyRequests()" style="margin-top: 10px;">Search My Requests</button>
             </div>
             
             <div id="myRequestsList"></div>
@@ -864,18 +865,11 @@
             } else if (tab === 'myRequests') {
                 myRequestsView.classList.add('active');
                 tabs[1].classList.add('active');
-                // Show loading state immediately
-                document.getElementById('myRequestsList').innerHTML = '<p style="text-align: center; color: #3D3D3D; padding: 40px;">Loading your requests...</p>';
-                // Load requests and then filter
+                // Show initial message
+                document.getElementById('myRequestsList').innerHTML = '<p style="text-align: center; color: #3D3D3D; padding: 40px;">Enter your Employee ID and Email, then click "Search My Requests"</p>';
+                // Pre-load data in background
                 loadRequestsFromSheet(function() {
-                    // Auto-filter if fields already have values
-                    var employeeId = document.getElementById('myEmployeeIdFilter').value.trim();
-                    var employeeEmail = document.getElementById('myEmployeeEmailFilter').value.trim();
-                    if (employeeId || employeeEmail) {
-                        filterMyRequests();
-                    } else {
-                        document.getElementById('myRequestsList').innerHTML = '<p style="text-align: center; color: #3D3D3D; padding: 40px;">Please enter both your Employee ID and Email to view your requests.</p>';
-                    }
+                    console.log('Requests loaded successfully. Total:', requests.length);
                 });
             } else if (tab === 'dashboard') {
                 dashboardView.classList.add('active');
@@ -1062,22 +1056,39 @@
             document.getElementById('sickRequests').textContent = sickCount;
         }
         
-        function filterMyRequests() {
+        function searchMyRequests() {
             var employeeId = document.getElementById('myEmployeeIdFilter').value.trim();
             var employeeEmail = document.getElementById('myEmployeeEmailFilter').value.trim().toLowerCase();
             var myRequestsList = document.getElementById('myRequestsList');
             
             if (!employeeId || !employeeEmail) {
-                myRequestsList.innerHTML = '<p style="text-align: center; color: #3D3D3D; padding: 40px;">Please enter both your Employee ID and Email to view your requests.</p>';
-                document.getElementById('myTotalRequests').textContent = '0';
-                document.getElementById('myVacationRequests').textContent = '0';
-                document.getElementById('mySickRequests').textContent = '0';
+                alert('Please enter both Employee ID and Email');
                 return;
             }
             
+            // Show loading state
+            myRequestsList.innerHTML = '<p style="text-align: center; color: #3D3D3D; padding: 40px;">Searching for your requests...</p>';
+            
+            // Load fresh data from Google Sheets and then search
+            loadRequestsFromSheet(function() {
+                filterMyRequests();
+            });
+        }
+        
+        function filterMyRequests() {
+            var employeeId = document.getElementById('myEmployeeIdFilter').value.trim();
+            var employeeEmail = document.getElementById('myEmployeeEmailFilter').value.trim().toLowerCase();
+            var myRequestsList = document.getElementById('myRequestsList');
+            
+            // Debug logging
+            console.log('=== SEARCHING FOR REQUESTS ===');
+            console.log('Searching for Employee ID:', employeeId);
+            console.log('Searching for Email:', employeeEmail);
+            console.log('Total requests in system:', requests.length);
+            
             // Check if requests are loaded
             if (!requests || requests.length === 0) {
-                myRequestsList.innerHTML = '<p style="text-align: center; color: #3D3D3D; padding: 40px;">Loading requests... If this persists, no requests have been submitted yet.</p>';
+                myRequestsList.innerHTML = '<p style="text-align: center; color: #3D3D3D; padding: 40px;">No requests found in the system yet.</p>';
                 document.getElementById('myTotalRequests').textContent = '0';
                 document.getElementById('myVacationRequests').textContent = '0';
                 document.getElementById('mySickRequests').textContent = '0';
@@ -1090,10 +1101,17 @@
                 var storedId = String(requests[i].employeeId || '').trim();
                 var storedEmail = String(requests[i].employeeEmail || '').trim().toLowerCase();
                 
+                // Debug logging for each request
+                console.log('Request #' + (i + 1) + ' - ID: "' + storedId + '", Email: "' + storedEmail + '"');
+                
                 if (storedId === employeeId && storedEmail === employeeEmail) {
+                    console.log('✓ MATCH FOUND!');
                     myRequests.push(requests[i]);
                 }
             }
+            
+            console.log('Total matches found:', myRequests.length);
+            console.log('=== END SEARCH ===');
             
             if (myRequests.length === 0) {
                 myRequestsList.innerHTML = '<p style="text-align: center; color: #3D3D3D; padding: 40px;"><strong>No requests found.</strong><br><br>Please verify that both your Employee ID and Email are correct and match the information used when submitting requests.</p>';
