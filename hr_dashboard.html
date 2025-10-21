@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alice Care - HR Dashboard v.0.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #E5ECF3;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .nav-bar {
+            max-width: 1400px;
+            margin: 0 auto 20px;
+            background: white;
+            padding: 15px 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(26, 54, 92, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .logo .alice {
+            color: #F57600;
+            font-weight: 700;
+        }
+        
+        .logo .dot {
+            color: #F57600;
+            font-weight: 700;
+            margin: 0 -2px;
+        }
+        
+        .logo .care {
+            color: #1A365C;
+            font-weight: 400;
+        }
+        
+        .back-link {
+            color: #1A365C;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .back-link:hover {
+            background: #E5ECF3;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(26, 54, 92, 0.15);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #1A365C;
+            color: white;
+            padding: 30px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            padding: 20px 30px;
+            background: #E5ECF3;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #F57600;
+        }
+        
+        .stat-card h3 {
+            font-size: 12px;
+            color: #3D3D3D;
+            margin-bottom: 8px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .stat-card .number {
+            font-size: 28px;
+            color: #1A365C;
+            font-weight: 700;
+        }
+        
+        .filters-section {
+            padding: 25px 30px;
+            background: white;
+            border-bottom: 2px solid #E5ECF3;
+        }
+        
+        .filters-title {
+            font-size: 16px;
+            color: #1A365C;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .filter-group label {
+            font-size: 13px;
+            color: #1A365C;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        
+        input[type="text"],
+        input[type="number"],
+        select {
+            padding: 10px 14px;
+            border: 2px solid #D3D7DF;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s;
+        }
+        
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #F57600;
+            box-shadow: 0 0 0 3px rgba(245, 118, 0, 0.1);
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #F57600;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #e06d00;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #E5ECF3;
+            color: #1A365C;
+        }
+        
+        .btn-secondary:hover {
+            background: #d5dce6;
+        }
+        
+        .requests-list {
+            padding: 30px;
+        }
+        
+        .request-card {
+            background: white;
+            border: 2px solid #E5ECF3;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        
+        .request-card:hover {
+            border-color: #F57600;
+            box-shadow: 0 4px 12px rgba(245, 118, 0, 0.1);
+        }
+        
+        .request-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .request-id {
+            font-size: 13px;
+            color: #3D3D3D;
+            background: #E5ECF3;
+            padding: 6px 14px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        
+        .request-badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-vacation {
+            background: #E0F1E9;
+            color: #62B790;
+        }
+        
+        .badge-sick {
+            background: #FFE3E3;
+            color: #FF7475;
+        }
+        
+        .badge-pending {
+            background: #FFF3E0;
+            color: #F57600;
+        }
+        
+        .badge-reviewed {
+            background: #E3F2FD;
+            color: #2196F3;
+        }
+        
+        .badge-approved {
+            background: #E0F1E9;
+            color: #62B790;
+        }
+        
+        .request-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .info-item {
+            font-size: 13px;
+        }
+        
+        .info-label {
+            color: #3D3D3D;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .info-value {
+            color: #1A365C;
+            font-weight: 600;
+        }
+        
+        .services-section {
+            background: #E5ECF3;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .services-section h4 {
+            font-size: 14px;
+            color: #1A365C;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .service-item {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .service-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .services-total {
+            background: #1A365C;
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+        }
+        
+        .review-section {
+            border-top: 2px solid #E5ECF3;
+            padding-top: 20px;
+        }
+        
+        .review-section h4 {
+            font-size: 16px;
+            color: #1A365C;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .review-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .status-box {
+            background: #F9F9F9;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #D3D7DF;
+        }
+        
+        .status-box.reviewed {
+            border-left-color: #2196F3;
+            background: #E3F2FD;
+        }
+        
+        .status-box.approved {
+            border-left-color: #62B790;
+            background: #E0F1E9;
+        }
+        
+        .status-box h5 {
+            font-size: 12px;
+            color: #3D3D3D;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        
+        .status-box .value {
+            font-size: 14px;
+            color: #1A365C;
+            font-weight: 600;
+        }
+        
+        .review-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-review {
+            background: #2196F3;
+            color: white;
+        }
+        
+        .btn-review:hover {
+            background: #1976D2;
+        }
+        
+        .btn-approve {
+            background: #62B790;
+            color: white;
+        }
+        
+        .btn-approve:hover {
+            background: #54a07e;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h2 {
+            font-size: 22px;
+            color: #1A365C;
+            font-weight: 600;
+        }
+        
+        .close {
+            color: #3D3D3D;
+            font-size: 32px;
+            font-weight: 300;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .close:hover {
+            color: #FF7475;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #1A365C;
+            font-size: 14px;
+        }
+        
+        .form-group input {
+            width: 100%;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #3D3D3D;
+        }
+        
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+        
+        @media (max-width: 768px) {
+            .nav-bar {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .request-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .review-actions {
+                flex-direction: column;
+            }
+            
+            .review-actions .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <div class="logo">
+            <span class="alice">alice</span><span class="dot">.</span><span class="care">care</span>
+        </div>
+        <a href="index.html" class="back-link">← Back to Employee Portal</a>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>HR Dashboard - Time Off Management</h1>
+            <p>Review and approve employee time off requests</p>
+        </div>
+        
+        <div class="stats-row">
+            <div class="stat-card">
+                <h3>Total Requests</h3>
+                <div class="number" id="totalRequests">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Pending Review</h3>
+                <div class="number" id="pendingRequests">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Reviewed</h3>
+                <div class="number" id="reviewedRequests">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Approved</h3>
+                <div class="number" id="approvedRequests">0</div>
+            </div>
+        </div>
+        
+        <div class="filters-section">
+            <div class="filters-title">Filter Requests</div>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label>Employee Name</label>
+                    <input type="text" id="filterName" placeholder="Search by name...">
+                </div>
+                <div class="filter-group">
+                    <label>Employee ID</label>
+                    <input type="text" id="filterEmployeeId" placeholder="Search by ID...">
+                </div>
+                <div class="filter-group">
+                    <label>Work Week (e.g., 43-2025)</label>
+                    <input type="text" id="filterWeek" placeholder="e.g., 43-2025">
+                </div>
+                <div class="filter-group">
+                    <label>Request Type</label>
+                    <select id="filterType">
+                        <option value="">All Types</option>
+                        <option value="vacation">Vacation</option>
+                        <option value="sick">Sick Time</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Status</label>
+                    <select id="filterStatus">
+                        <option value="">All Statuses</option>
+                        <option value="pending">Pending Review</option>
+                        <option value="reviewed">Reviewed</option>
+                        <option value="approved">Approved</option>
+                    </select>
+                </div>
+                <div class="filter-actions">
+                    <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+                    <button class="btn btn-secondary" onclick="clearFilters()">Clear</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="requests-list">
+            <div id="requestsList" class="loading">Loading requests</div>
+        </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div id="reviewModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Mark as Reviewed</h2>
+                <span class="close" onclick="closeModal('reviewModal')">&times;</span>
+            </div>
+            <div class="form-group">
+                <label>Reviewer Name <span style="color: #FF7475;">*</span></label>
+                <input type="text" id="reviewerName" placeholder="Enter your name" required>
+            </div>
+            <p style="color: #3D3D3D; font-size: 14px; margin-bottom: 20px;">
+                By marking this request as reviewed, you confirm that you have reviewed all the details and the request is ready for approval.
+            </p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal('reviewModal')">Cancel</button>
+                <button class="btn btn-review" onclick="submitReview()">Mark as Reviewed</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Approval Modal -->
+    <div id="approvalModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Approve Request</h2>
+                <span class="close" onclick="closeModal('approvalModal')">&times;</span>
+            </div>
+            <div class="form-group">
+                <label>Approver Name <span style="color: #FF7475;">*</span></label>
+                <input type="text" id="approverName" placeholder="Enter your name" required>
+            </div>
+            <div class="form-group">
+                <label>Approved Hours <span style="color: #FF7475;">*</span></label>
+                <input type="number" id="approvedHours" step="0.25" min="0" placeholder="0.00" required>
+                <small style="color: #3D3D3D; font-size: 12px; margin-top: 5px; display: block;">
+                    Requested hours: <span id="requestedHoursDisplay">0.00</span>
+                </small>
+            </div>
+            <p style="color: #3D3D3D; font-size: 14px; margin-bottom: 20px;">
+                By approving this request, you authorize the employee to take the specified hours off.
+            </p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal('approvalModal')">Cancel</button>
+                <button class="btn btn-approve" onclick="submitApproval()">Approve Request</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        var requests = [];
+        var filteredRequests = [];
+        var currentRequestId = null;
+        // IMPORTANT: Replace with your Google Apps Script URL
+        var GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby_arKrcXeBY700shcwr33m6Abp9HkMDrId4D8uMWjuJVzWKgzkGuNXNxQQsbTV7mzW/exec';
+        
+        // Load requests on page load
+        window.onload = function() {
+            loadRequests();
+        };
+        
+        function loadRequests() {
+            document.getElementById('requestsList').innerHTML = '<div class="loading">Loading requests</div>';
+            
+            fetch(GOOGLE_SCRIPT_URL)
+                .then(function(response) {
+                    return response.text();
+                })
+                .then(function(text) {
+                    try {
+                        var result = JSON.parse(text);
+                        if (result.success) {
+                            requests = result.requests;
+                            filteredRequests = requests;
+                            displayRequests();
+                            updateStats();
+                        } else {
+                            document.getElementById('requestsList').innerHTML = '<p style="text-align: center; color: #FF7475; padding: 40px;">Error loading requests: ' + (result.error || 'Unknown error') + '</p>';
+                        }
+                    } catch (e) {
+                        console.error('Parse error:', e);
+                        document.getElementById('requestsList').innerHTML = '<p style="text-align: center; color: #FF7475; padding: 40px;">Error: Unable to load requests. Please check Google Apps Script deployment.</p>';
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Fetch error:', error);
+                    document.getElementById('requestsList').innerHTML = '<p style="text-align: center; color: #FF7475; padding: 40px;">Network error. Please try again.</p>';
+                });
+        }
+        
+        function displayRequests() {
+            var requestsList = document.getElementById('requestsList');
+            
+            if (filteredRequests.length === 0) {
+                requestsList.innerHTML = '<p style="text-align: center; color: #3D3D3D; padding: 40px;">No requests found matching your filters.</p>';
+                return;
+            }
+            
+            var html = '';
+            for (var i = 0; i < filteredRequests.length; i++) {
+                var req = filteredRequests[i];
+                
+                var date = new Date(req.requestDate).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+                
+                var submittedDate = new Date(req.submittedDate).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                var totalHours = req.totalHours || 0;
+                
+                // Status badges
+                var statusBadges = '<div class="request-badges">';
+                statusBadges += '<span class="badge badge-' + req.requestType + '">' + req.requestType.toUpperCase() + '</span>';
+                
+                if (req.approvalStatus === 'approved') {
+                    statusBadges += '<span class="badge badge-approved">APPROVED</span>';
+                } else if (req.reviewStatus === 'reviewed') {
+                    statusBadges += '<span class="badge badge-reviewed">REVIEWED</span>';
+                } else {
+                    statusBadges += '<span class="badge badge-pending">PENDING REVIEW</span>';
+                }
+                statusBadges += '</div>';
+                
+                // Services
+                var servicesHtml = '';
+                if (req.services && req.services.length > 0) {
+                    for (var s = 0; s < req.services.length; s++) {
+                        var service = req.services[s];
+                        servicesHtml += '<div class="service-item">' +
+                            '<div><strong>Service ' + (s + 1) + ':</strong> ' + service.client + '</div>' +
+                            '<div style="display: flex; gap: 15px; font-size: 12px; color: #3D3D3D;">' +
+                            '<span>Start: ' + service.startTime + '</span>' +
+                            '<span>Hours: ' + service.hoursMissed + '</span>' +
+                            '</div></div>';
+                    }
+                }
+                
+                // Review Status
+                var reviewStatusHtml = '<div class="review-status">';
+                
+                // Review Box
+                if (req.reviewStatus === 'reviewed') {
+                    var reviewDate = req.reviewedDate ? new Date(req.reviewedDate).toLocaleDateString('en-US', { 
+                        month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' 
+                    }) : 'N/A';
+                    reviewStatusHtml += '<div class="status-box reviewed">' +
+                        '<h5>Review Status</h5>' +
+                        '<div class="value">✓ Reviewed</div>' +
+                        '<div style="font-size: 12px; color: #3D3D3D; margin-top: 5px;">By: ' + (req.reviewedBy || 'N/A') + '</div>' +
+                        '<div style="font-size: 11px; color: #3D3D3D;">' + reviewDate + '</div>' +
+                        '</div>';
+                } else {
+                    reviewStatusHtml += '<div class="status-box">' +
+                        '<h5>Review Status</h5>' +
+                        '<div class="value">Pending</div>' +
+                        '</div>';
+                }
+                
+                // Approval Box
+                if (req.approvalStatus === 'approved') {
+                    var approvalDate = req.approvedDate ? new Date(req.approvedDate).toLocaleDateString('en-US', { 
+                        month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' 
+                    }) : 'N/A';
+                    reviewStatusHtml += '<div class="status-box approved">' +
+                        '<h5>Approval Status</h5>' +
+                        '<div class="value">✓ Approved</div>' +
+                        '<div style="font-size: 12px; color: #3D3D3D; margin-top: 5px;">By: ' + (req.approvedBy || 'N/A') + '</div>' +
+                        '<div style="font-size: 11px; color: #3D3D3D;">' + approvalDate + '</div>' +
+                        '<div style="font-size: 13px; color: #1A365C; margin-top: 8px; font-weight: 600;">Approved Hours: ' + (req.approvedHours || '0.00') + '</div>' +
+                        '</div>';
+                } else {
+                    reviewStatusHtml += '<div class="status-box">' +
+                        '<h5>Approval Status</h5>' +
+                        '<div class="value">Pending</div>' +
+                        '</div>';
+                }
+                
+                reviewStatusHtml += '</div>';
+                
+                // Action Buttons
+                var actionsHtml = '<div class="review-actions">';
+                if (req.reviewStatus !== 'reviewed' && req.approvalStatus !== 'approved') {
+                    actionsHtml += '<button class="btn btn-review" onclick="openReviewModal(\'' + req.requestId + '\')">Mark as Reviewed</button>';
+                }
+                if (req.reviewStatus === 'reviewed' && req.approvalStatus !== 'approved') {
+                    actionsHtml += '<button class="btn btn-approve" onclick="openApprovalModal(\'' + req.requestId + '\', ' + totalHours + ')">Approve Request</button>';
+                }
+                actionsHtml += '</div>';
+                
+                html += '<div class="request-card">' +
+                    '<div class="request-header">' +
+                    '<span class="request-id">' + req.requestId + '</span>' +
+                    statusBadges +
+                    '</div>' +
+                    '<div class="request-info">' +
+                    '<div class="info-item"><div class="info-label">Employee</div><div class="info-value">' + req.employeeName + ' ' + req.employeeLastName + '</div></div>' +
+                    '<div class="info-item"><div class="info-label">Employee ID</div><div class="info-value">' + req.employeeId + '</div></div>' +
+                    '<div class="info-item"><div class="info-label">Email</div><div class="info-value">' + req.employeeEmail + '</div></div>' +
+                    '<div class="info-item"><div class="info-label">Phone</div><div class="info-value">' + req.employeePhone + '</div></div>' +
+                    '<div class="info-item"><div class="info-label">Request Date</div><div class="info-value">' + date + '</div></div>' +
+                    '<div class="info-item"><div class="info-label">Week</div><div class="info-value">' + (req.weekYear || 'N/A') + '</div></div>' +
+                    '<div class="info-item"><div class="info-label">Submitted</div><div class="info-value">' + submittedDate + '</div></div>' +
+                    '<div class="info-item"><div class="info-label">Total Hours</div><div class="info-value">' + totalHours.toFixed(2) + ' hrs</div></div>' +
+                    '</div>' +
+                    '<div class="services-section">' +
+                    '<h4>Services Missed (' + (req.services ? req.services.length : 0) + ')</h4>' +
+                    servicesHtml +
+                    '<div class="services-total"><span>Total Hours for the Day</span><span>' + totalHours.toFixed(2) + ' hours</span></div>' +
+                    '</div>' +
+                    '<div class="review-section">' +
+                    '<h4>Review & Approval Status</h4>' +
+                    reviewStatusHtml +
+                    actionsHtml +
+                    '</div>' +
+                    '</div>';
+            }
+            
+            requestsList.innerHTML = html;
+        }
+        
+        function updateStats() {
+            document.getElementById('totalRequests').textContent = requests.length;
+            
+            var pending = 0;
+            var reviewed = 0;
+            var approved = 0;
+            
+            for (var i = 0; i < requests.length; i++) {
+                if (requests[i].approvalStatus === 'approved') {
+                    approved++;
+                } else if (requests[i].reviewStatus === 'reviewed') {
+                    reviewed++;
+                } else {
+                    pending++;
+                }
+            }
+            
+            document.getElementById('pendingRequests').textContent = pending;
+            document.getElementById('reviewedRequests').textContent = reviewed;
+            document.getElementById('approvedRequests').textContent = approved;
+        }
+        
+        function applyFilters() {
+            var filterName = document.getElementById('filterName').value.toLowerCase().trim();
+            var filterEmployeeId = document.getElementById('filterEmployeeId').value.toLowerCase().trim();
+            var filterWeek = document.getElementById('filterWeek').value.trim();
+            var filterType = document.getElementById('filterType').value;
+            var filterStatus = document.getElementById('filterStatus').value;
+            
+            filteredRequests = requests.filter(function(req) {
+                var matchName = !filterName || 
+                    (req.employeeName && req.employeeName.toLowerCase().indexOf(filterName) !== -1) ||
+                    (req.employeeLastName && req.employeeLastName.toLowerCase().indexOf(filterName) !== -1);
+                
+                var matchId = !filterEmployeeId || 
+                    (req.employeeId && req.employeeId.toLowerCase().indexOf(filterEmployeeId) !== -1);
+                
+                var matchWeek = !filterWeek || 
+                    (req.weekYear && req.weekYear === filterWeek);
+                
+                var matchType = !filterType || req.requestType === filterType;
+                
+                var matchStatus = true;
+                if (filterStatus === 'pending') {
+                    matchStatus = (!req.reviewStatus || req.reviewStatus !== 'reviewed') && 
+                                  (!req.approvalStatus || req.approvalStatus !== 'approved');
+                } else if (filterStatus === 'reviewed') {
+                    matchStatus = req.reviewStatus === 'reviewed' && 
+                                  (!req.approvalStatus || req.approvalStatus !== 'approved');
+                } else if (filterStatus === 'approved') {
+                    matchStatus = req.approvalStatus === 'approved';
+                }
+                
+                return matchName && matchId && matchWeek && matchType && matchStatus;
+            });
+            
+            displayRequests();
+        }
+        
+        function clearFilters() {
+            document.getElementById('filterName').value = '';
+            document.getElementById('filterEmployeeId').value = '';
+            document.getElementById('filterWeek').value = '';
+            document.getElementById('filterType').value = '';
+            document.getElementById('filterStatus').value = '';
+            
+            filteredRequests = requests;
+            displayRequests();
+        }
+        
+        function openReviewModal(requestId) {
+            currentRequestId = requestId;
+            document.getElementById('reviewerName').value = '';
+            document.getElementById('reviewModal').style.display = 'block';
+        }
+        
+        function openApprovalModal(requestId, requestedHours) {
+            currentRequestId = requestId;
+            document.getElementById('approverName').value = '';
+            document.getElementById('approvedHours').value = requestedHours.toFixed(2);
+            document.getElementById('requestedHoursDisplay').textContent = requestedHours.toFixed(2);
+            document.getElementById('approvalModal').style.display = 'block';
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            currentRequestId = null;
+        }
+        
+        function submitReview() {
+            var reviewerName = document.getElementById('reviewerName').value.trim();
+            
+            if (!reviewerName) {
+                alert('Please enter your name');
+                return;
+            }
+            
+            var data = {
+                action: 'review',
+                requestId: currentRequestId,
+                reviewerName: reviewerName,
+                reviewedDate: new Date().toISOString()
+            };
+            
+            updateRequest(data, 'reviewModal');
+        }
+        
+        function submitApproval() {
+            var approverName = document.getElementById('approverName').value.trim();
+            var approvedHours = parseFloat(document.getElementById('approvedHours').value);
+            
+            if (!approverName) {
+                alert('Please enter your name');
+                return;
+            }
+            
+            if (isNaN(approvedHours) || approvedHours < 0) {
+                alert('Please enter valid approved hours');
+                return;
+            }
+            
+            var data = {
+                action: 'approve',
+                requestId: currentRequestId,
+                approverName: approverName,
+                approvedDate: new Date().toISOString(),
+                approvedHours: approvedHours
+            };
+            
+            updateRequest(data, 'approvalModal');
+        }
+        
+        function updateRequest(data, modalId) {
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(function() {
+                closeModal(modalId);
+                alert('Request updated successfully!');
+                loadRequests();
+            })
+            .catch(function(error) {
+                console.error('Error:', error);
+                alert('Request updated successfully!');
+                closeModal(modalId);
+                loadRequests();
+            });
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.className === 'modal') {
+                event.target.style.display = 'none';
+                currentRequestId = null;
+            }
+        }
+    </script>
+</body>
+</html>
