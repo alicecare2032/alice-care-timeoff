@@ -787,22 +787,23 @@
         var GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxGSPtPjGLgRG2E1IsMeKp4DWGPARiow9HKMGyuM8IK_u4oaPcVAN2PSa1NKkq4_oWY/exec';
         
         // Load requests from Google Sheets
-        function loadRequestsFromSheet() {
-            fetch(GOOGLE_SCRIPT_URL)
-                .then(function(response) {
-                    return response.json();
-                })
-                .then(function(result) {
-                    if (result.success) {
-                        requests = result.requests;
-                        displayRequests();
-                        updateStats();
-                    }
-                })
-                .catch(function(error) {
-                    console.error('Error loading requests:', error);
-                });
-        }
+function loadRequestsFromSheet(callback) {
+    fetch(GOOGLE_SCRIPT_URL)
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(result) {
+            if (result.success) {
+                requests = result.requests;
+                if (callback) {
+                    callback();
+                }
+            }
+        })
+        .catch(function(error) {
+            console.error('Error loading requests:', error);
+        });
+}
         
         // Update total hours
         function updateDayTotal() {
@@ -830,8 +831,11 @@
         attachHoursListeners();
         
         function loadRequests() {
-            loadRequestsFromSheet();
-        }
+    loadRequestsFromSheet(function() {
+        displayRequests();
+        updateStats();
+    });
+}
         
         function generateRequestId() {
             var timestamp = Date.now();
@@ -856,15 +860,18 @@
             if (tab === 'form') {
                 formView.style.display = 'block';
                 tabs[0].classList.add('active');
-            } else if (tab === 'myRequests') {
-                myRequestsView.classList.add('active');
-                tabs[1].classList.add('active');
-                loadRequestsFromSheet();
-            } else if (tab === 'dashboard') {
-                dashboardView.classList.add('active');
-                tabs[2].classList.add('active');
-                loadRequests();
-            }
+} else if (tab === 'myRequests') {
+    myRequestsView.classList.add('active');
+    tabs[1].classList.add('active');
+    loadRequestsFromSheet(filterMyRequests);
+ } else if (tab === 'dashboard') {
+    dashboardView.classList.add('active');
+    tabs[2].classList.add('active');
+    loadRequestsFromSheet(function() {
+        displayRequests();
+        updateStats();
+    });
+}
         }
         
         function addService() {
