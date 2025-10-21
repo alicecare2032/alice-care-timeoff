@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - Time Off Request v10.7_1</title>
+    <title>Alice Care - Time Off Request v11.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <style>
@@ -560,6 +560,64 @@
             color: #F57600;
         }
         
+        .info-tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 5px;
+        }
+        
+        .info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            background: #F57600;
+            color: white;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: help;
+            vertical-align: middle;
+        }
+        
+        .info-tooltip .tooltip-text {
+            visibility: hidden;
+            width: 280px;
+            background-color: #1A365C;
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+            padding: 12px;
+            position: absolute;
+            z-index: 1000;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -140px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 13px;
+            font-weight: 400;
+            line-height: 1.4;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .info-tooltip .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #1A365C transparent transparent transparent;
+        }
+        
+        .info-tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
         @media (max-width: 768px) {
             .form-row {
                 flex-direction: column;
@@ -610,7 +668,13 @@
                     <h2 class="section-title">Employee Information</h2>
                     <div class="form-row" style="flex-wrap: wrap;">
                         <div class="form-group" style="flex: 1 1 calc(50% - 10px); margin-bottom: 20px;">
-                            <label for="employeeId">Employee ID <span class="required">*</span></label>
+                            <label for="employeeId">
+                                Employee ID <span class="required">*</span>
+                                <span class="info-tooltip">
+                                    <span class="info-icon">i</span>
+                                    <span class="tooltip-text">Your Employee ID can be found on your Paychex paystub or in your Paychex profile</span>
+                                </span>
+                            </label>
                             <input type="text" id="employeeId" name="employeeId" required>
                         </div>
                         <div class="form-group" style="flex: 1 1 calc(50% - 10px); margin-bottom: 20px;">
@@ -728,7 +792,13 @@
                 <h3 style="color: #1A365C; margin-bottom: 15px; font-size: 16px;">Enter Your Information to View Your Requests</h3>
                 <div class="form-row" style="flex-wrap: wrap;">
                     <div class="form-group" style="flex: 1 1 calc(50% - 10px); margin-bottom: 15px;">
-                        <label for="myEmployeeIdFilter">Employee ID <span class="required">*</span></label>
+                        <label for="myEmployeeIdFilter">
+                            Employee ID <span class="required">*</span>
+                            <span class="info-tooltip">
+                                <span class="info-icon">i</span>
+                                <span class="tooltip-text">Your Employee ID can be found on your Paychex paystub or in your Paychex profile</span>
+                            </span>
+                        </label>
                         <input type="text" id="myEmployeeIdFilter" placeholder="Enter your Employee ID">
                     </div>
                     <div class="form-group" style="flex: 1 1 calc(50% - 10px); margin-bottom: 15px;">
@@ -786,24 +856,38 @@
         var serviceCount = 1;
         var requests = [];
         // IMPORTANT: Replace with your Google Apps Script URL
-        var GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyjVqGibwwjwJZ2nJZG7IDwRU9exKVVSmQn2BKJjIElks8mTVocQreG5e6YRLBU1gVf/exec';
+        var GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxGSPtPjGLgRG2E1IsMeKp4DWGPARiow9HKMGyuM8IK_u4oaPcVAN2PSa1NKkq4_oWY/exec';
         
         // Load requests from Google Sheets with callback
         function loadRequestsFromSheet(callback) {
             fetch(GOOGLE_SCRIPT_URL)
                 .then(function(response) {
-                    return response.json();
+                    console.log('Response status:', response.status);
+                    return response.text(); // Get as text first to see what we're receiving
                 })
-                .then(function(result) {
-                    if (result.success) {
-                        requests = result.requests;
-                        if (callback) {
-                            callback();
+                .then(function(text) {
+                    console.log('Response text:', text.substring(0, 200)); // Log first 200 chars
+                    try {
+                        var result = JSON.parse(text);
+                        if (result.success) {
+                            requests = result.requests;
+                            console.log('Successfully loaded', requests.length, 'requests');
+                            if (callback) {
+                                callback();
+                            }
+                        } else {
+                            console.error('Script returned success=false:', result.error);
+                            alert('Error loading requests: ' + (result.error || 'Unknown error'));
                         }
+                    } catch (e) {
+                        console.error('Failed to parse JSON:', e);
+                        console.error('Received text:', text);
+                        alert('Error: The Google Apps Script is not returning valid data. Please check:\n1. Script is deployed as Web App\n2. Access is set to "Anyone"\n3. Script has been authorized');
                     }
                 })
                 .catch(function(error) {
-                    console.error('Error loading requests:', error);
+                    console.error('Fetch error:', error);
+                    alert('Network error loading requests: ' + error.message);
                 });
         }
         
