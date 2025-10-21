@@ -964,6 +964,11 @@
             var reviewerName = document.getElementById('reviewerName').value.trim();
             var reviewComments = document.getElementById('reviewComments').value.trim();
             
+            console.log('=== SUBMIT REVIEW ===');
+            console.log('Reviewer Name:', reviewerName);
+            console.log('Review Comments:', reviewComments);
+            console.log('Request ID:', currentRequestId);
+            
             if (!reviewerName) {
                 alert('Please enter your name');
                 return;
@@ -982,6 +987,8 @@
                 reviewComments: reviewComments
             };
             
+            console.log('Data being sent:', JSON.stringify(data));
+            
             updateRequest(data, 'reviewModal');
         }
         
@@ -989,6 +996,12 @@
             var approverName = document.getElementById('approverName').value.trim();
             var approvedHours = parseFloat(document.getElementById('approvedHours').value);
             var approvalComments = document.getElementById('approvalComments').value.trim();
+            
+            console.log('=== SUBMIT APPROVAL ===');
+            console.log('Approver Name:', approverName);
+            console.log('Approved Hours:', approvedHours);
+            console.log('Approval Comments:', approvalComments);
+            console.log('Request ID:', currentRequestId);
             
             if (!approverName) {
                 alert('Please enter your name');
@@ -1014,10 +1027,16 @@
                 approvalComments: approvalComments
             };
             
+            console.log('Data being sent:', JSON.stringify(data));
+            
             updateRequest(data, 'approvalModal');
         }
         
         function updateRequest(data, modalId) {
+            console.log('=== UPDATE REQUEST ===');
+            console.log('Sending POST to:', GOOGLE_SCRIPT_URL);
+            console.log('Payload:', JSON.stringify(data, null, 2));
+            
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -1027,12 +1046,13 @@
                 body: JSON.stringify(data)
             })
             .then(function() {
+                console.log('POST request completed (no-cors mode)');
                 closeModal(modalId);
                 alert('Request updated successfully!');
                 loadRequests();
             })
             .catch(function(error) {
-                console.error('Error:', error);
+                console.error('POST request error:', error);
                 alert('Request updated successfully!');
                 closeModal(modalId);
                 loadRequests();
