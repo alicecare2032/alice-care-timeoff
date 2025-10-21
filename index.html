@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - Time Off Request v10.0/title>
+    <title>Alice Care - Time Off Request v10.10/title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <style>
@@ -1063,24 +1063,20 @@
                 return;
             }
             
-            // Check if requests are loaded
-            if (!requests || requests.length === 0) {
-                myRequestsList.innerHTML = '<p style="text-align: center; color: #3D3D3D; padding: 40px;">Loading requests... If this persists, no requests have been submitted yet.</p>';
+            var myRequests = [];
+            for (var i = 0; i < requests.length; i++) {
+                if (requests[i].employeeId === employeeId && 
+                    requests[i].employeeEmail.toLowerCase() === employeeEmail) {
+                    myRequests.push(requests[i]);
+                }
+            }
+            
+            if (myRequests.length === 0) {
+                myRequestsList.innerHTML = '<p style="text-align: center; color: #3D3D3D; padding: 40px;"><strong>No requests found.</strong><br><br>Please verify that both your Employee ID and Email are correct and match the information used when submitting requests.</p>';
                 document.getElementById('myTotalRequests').textContent = '0';
                 document.getElementById('myVacationRequests').textContent = '0';
                 document.getElementById('mySickRequests').textContent = '0';
                 return;
-            }
-            
-            var myRequests = [];
-            for (var i = 0; i < requests.length; i++) {
-                // More robust comparison - trim and lowercase both values
-                var storedId = String(requests[i].employeeId || '').trim();
-                var storedEmail = String(requests[i].employeeEmail || '').trim().toLowerCase();
-                
-                if (storedId === employeeId && storedEmail === employeeEmail) {
-                    myRequests.push(requests[i]);
-                }
             }
             
             document.getElementById('myTotalRequests').textContent = myRequests.length;
