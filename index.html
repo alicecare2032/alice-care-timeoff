@@ -783,6 +783,26 @@
     <script>
         var serviceCount = 1;
         var requests = [];
+        // IMPORTANT: Replace with your Google Apps Script URL
+        var GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxGSPtPjGLgRG2E1IsMeKp4DWGPARiow9HKMGyuM8IK_u4oaPcVAN2PSa1NKkq4_oWY/exec';
+        
+        // Load requests from Google Sheets
+        function loadRequestsFromSheet() {
+            fetch(GOOGLE_SCRIPT_URL)
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(result) {
+                    if (result.success) {
+                        requests = result.requests;
+                        displayRequests();
+                        updateStats();
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Error loading requests:', error);
+                });
+        }
         
         // Update total hours
         function updateDayTotal() {
@@ -810,8 +830,7 @@
         attachHoursListeners();
         
         function loadRequests() {
-            displayRequests();
-            updateStats();
+            loadRequestsFromSheet();
         }
         
         function generateRequestId() {
@@ -840,7 +859,7 @@
             } else if (tab === 'myRequests') {
                 myRequestsView.classList.add('active');
                 tabs[1].classList.add('active');
-                filterMyRequests();
+                loadRequestsFromSheet();
             } else if (tab === 'dashboard') {
                 dashboardView.classList.add('active');
                 tabs[2].classList.add('active');
@@ -922,9 +941,6 @@
             }
             
             requests.push(data);
-            
-            // REPLACE THIS WITH YOUR GOOGLE APPS SCRIPT URL
-            var GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxGSPtPjGLgRG2E1IsMeKp4DWGPARiow9HKMGyuM8IK_u4oaPcVAN2PSa1NKkq4_oWY/exec';
             
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
@@ -1028,10 +1044,11 @@
         
         function filterMyRequests() {
             var employeeId = document.getElementById('myEmployeeIdFilter').value.trim();
+            var employeeEmail = document.getElementById('myEmployeeEmailFilter').value.trim().toLowerCase();
             var myRequestsList = document.getElementById('myRequestsList');
             
-            if (!employeeId) {
-                myRequestsList.innerHTML = '<p style="text-align: center; color: #3D3D3D; padding: 40px;">Please enter your Employee ID to view your requests.</p>';
+            if (!employeeId || !employeeEmail) {
+                myRequestsList.innerHTML = '<p style="text-align: center; color: #3D3D3D; padding: 40px;">Please enter both your Employee ID and Email to view your requests.</p>';
                 document.getElementById('myTotalRequests').textContent = '0';
                 document.getElementById('myVacationRequests').textContent = '0';
                 document.getElementById('mySickRequests').textContent = '0';
@@ -1040,13 +1057,14 @@
             
             var myRequests = [];
             for (var i = 0; i < requests.length; i++) {
-                if (requests[i].employeeId === employeeId) {
+                if (requests[i].employeeId === employeeId && 
+                    requests[i].employeeEmail.toLowerCase() === employeeEmail) {
                     myRequests.push(requests[i]);
                 }
             }
             
             if (myRequests.length === 0) {
-                myRequestsList.innerHTML = '<p style="text-align: center; color: #3D3D3D; padding: 40px;">No requests found for this Employee ID.</p>';
+                myRequestsList.innerHTML = '<p style="text-align: center; color: #3D3D3D; padding: 40px;"><strong>No requests found.</strong><br><br>Please verify that both your Employee ID and Email are correct and match the information used when submitting requests.</p>';
                 document.getElementById('myTotalRequests').textContent = '0';
                 document.getElementById('myVacationRequests').textContent = '0';
                 document.getElementById('mySickRequests').textContent = '0';
