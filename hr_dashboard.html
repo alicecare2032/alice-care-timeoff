@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - HR Dashboard v.13</title>
+    <title>Alice Care - HR Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -416,6 +416,16 @@
             background: #54a07e;
         }
         
+        .btn-export {
+            background: #62B790;
+            color: white;
+        }
+        
+        .btn-export:hover {
+            background: #54a07e;
+            transform: translateY(-2px);
+        }
+        
         .modal {
             display: none;
             position: fixed;
@@ -578,7 +588,12 @@
         </div>
         
         <div class="filters-section">
-            <div class="filters-title">Filter Requests</div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <div class="filters-title">Filter Requests</div>
+                <div id="filterCount" style="font-size: 14px; color: #3D3D3D; font-weight: 500;">
+                    Showing <span style="color: #F57600; font-weight: 700;">0</span> requests
+                </div>
+            </div>
             <div class="filters-grid">
                 <div class="filter-group">
                     <label>Employee Name</label>
@@ -612,6 +627,7 @@
                 <div class="filter-actions">
                     <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
                     <button class="btn btn-secondary" onclick="clearFilters()">Clear</button>
+                    <button class="btn btn-export" onclick="exportReport()">📊 Export Report</button>
                 </div>
             </div>
         </div>
@@ -692,6 +708,7 @@
         
         function loadRequests() {
             document.getElementById('requestsList').innerHTML = '<div class="loading">Loading requests</div>';
+            document.getElementById('filterCount').innerHTML = 'Loading...';
             
             fetch(GOOGLE_SCRIPT_URL)
                 .then(function(response) {
@@ -721,6 +738,10 @@
         
         function displayRequests() {
             var requestsList = document.getElementById('requestsList');
+            
+            // Update filter count
+            var filterCountText = 'Showing <span style="color: #F57600; font-weight: 700;">' + filteredRequests.length + '</span> request' + (filteredRequests.length !== 1 ? 's' : '');
+            document.getElementById('filterCount').innerHTML = filterCountText;
             
             if (filteredRequests.length === 0) {
                 requestsList.innerHTML = '<p style="text-align: center; color: #3D3D3D; padding: 40px;">No requests found matching your filters.</p>';
@@ -937,6 +958,90 @@
             
             filteredRequests = requests;
             displayRequests();
+        }
+        
+        function exportReport() {
+            if (filteredRequests.length === 0) {
+                alert('No data to export. Please apply filters or ensure requests are loaded.');
+                return;
+            }
+            
+            console.log('=== EXPORT REPORT ===');
+            console.log('Exporting', filteredRequests.length, 'requests');
+            
+            // Define CSV headers
+            var csvContent = 'Employee Name,Employee Number,Type of Request,Hours Requested,Hours Approved,Status\n';
+            
+            // Add data rows
+            for (var i = 0; i < filteredRequests.length; i++) {
+                var req = filteredRequests[i];
+                
+                // Employee Name
+                var employeeName = (req.employeeName + ' ' + req.employeeLastName).replace(/,/g, ' ');
+                
+                // Employee Number
+                var employeeNumber = req.employeeId || '';
+                
+                // Type of Request
+                var requestType = req.requestType ? req.requestType.toUpperCase() : '';
+                
+                // Hours Requested
+                var hoursRequested = req.totalHours || '0.00';
+                
+                // Hours Approved
+                var hoursApproved = req.approvedHours || (req.approvalStatus === 'approved' ? req.totalHours : '0.00');
+                
+                // Status
+                var status = '';
+                if (req.approvalStatus === 'approved') {
+                    status = 'APPROVED';
+                } else if (req.reviewStatus === 'reviewed') {
+                    status = 'REVIEWED';
+                } else {
+                    status = 'PENDING';
+                }
+                
+                // Create CSV row
+                var row = [
+                    '"' + employeeName + '"',
+                    '"' + employeeNumber + '"',
+                    '"' + requestType + '"',
+                    hoursRequested,
+                    hoursApproved,
+                    '"' + status + '"'
+                ].join(',');
+                
+                csvContent += row + '\n';
+            }
+            
+            // Generate filename with current date and time
+            var now = new Date();
+            var dateStr = now.getFullYear() + '-' + 
+                         String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                         String(now.getDate()).padStart(2, '0');
+            var timeStr = String(now.getHours()).padStart(2, '0') + '' + 
+                         String(now.getMinutes()).padStart(2, '0');
+            var filename = 'TimeOff_Report_' + dateStr + '_' + timeStr + '.csv';
+            
+            // Create blob and download
+            var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            
+            // Create download link
+            var link = document.createElement('a');
+            if (link.download !== undefined) {
+                var url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', filename);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                console.log('Export completed:', filename);
+                alert('Report exported successfully!\nFilename: ' + filename);
+            } else {
+                alert('Export failed. Your browser does not support file downloads.');
+            }
         }
         
         function openReviewModal(requestId) {
