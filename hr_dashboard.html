@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - HR Dashboard</title>
+    <title>Alice Care - HR Dashboard v24</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -175,6 +175,11 @@
             display: flex;
             gap: 10px;
             align-items: flex-end;
+        }
+        
+        .filter-actions .btn {
+            flex: 1;
+            min-width: 140px;
         }
         
         .btn {
@@ -627,7 +632,7 @@
                 <div class="filter-actions">
                     <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
                     <button class="btn btn-secondary" onclick="clearFilters()">Clear</button>
-                    <button class="btn btn-export" onclick="exportReport()">📊 Export Report</button>
+                    <button class="btn btn-export" onclick="exportReport()">📄 Export</button>
                 </div>
             </div>
         </div>
@@ -969,49 +974,70 @@
             console.log('=== EXPORT REPORT ===');
             console.log('Exporting', filteredRequests.length, 'requests');
             
-            // Define CSV headers
-            var csvContent = 'Employee Name,Employee Number,Type of Request,Hours Requested,Hours Approved,Status\n';
+            // Separate requests by type
+            var sickRequests = [];
+            var vacationRequests = [];
             
-            // Add data rows
             for (var i = 0; i < filteredRequests.length; i++) {
                 var req = filteredRequests[i];
-                
-                // Employee Name
-                var employeeName = (req.employeeName + ' ' + req.employeeLastName).replace(/,/g, ' ');
-                
-                // Employee Number
-                var employeeNumber = req.employeeId || '';
-                
-                // Type of Request
-                var requestType = req.requestType ? req.requestType.toUpperCase() : '';
-                
-                // Hours Requested
-                var hoursRequested = req.totalHours || '0.00';
-                
-                // Hours Approved
-                var hoursApproved = req.approvedHours || (req.approvalStatus === 'approved' ? req.totalHours : '0.00');
-                
-                // Status
-                var status = '';
-                if (req.approvalStatus === 'approved') {
-                    status = 'APPROVED';
-                } else if (req.reviewStatus === 'reviewed') {
-                    status = 'REVIEWED';
-                } else {
-                    status = 'PENDING';
+                if (req.requestType === 'sick') {
+                    sickRequests.push(req);
+                } else if (req.requestType === 'vacation') {
+                    vacationRequests.push(req);
                 }
-                
-                // Create CSV row
-                var row = [
-                    '"' + employeeName + '"',
-                    '"' + employeeNumber + '"',
-                    '"' + requestType + '"',
-                    hoursRequested,
-                    hoursApproved,
-                    '"' + status + '"'
-                ].join(',');
-                
-                csvContent += row + '\n';
+            }
+            
+            var textContent = '';
+            
+            // Add Sick requests
+            if (sickRequests.length > 0) {
+                textContent += '* Sick\n';
+                for (var i = 0; i < sickRequests.length; i++) {
+                    var req = sickRequests[i];
+                    var employeeName = req.employeeName + ' ' + req.employeeLastName;
+                    var employeeNumber = req.employeeId || '';
+                    var hoursRequested = req.totalHours || '0.00';
+                    var hoursApproved = req.approvedHours || (req.approvalStatus === 'approved' ? req.totalHours : '0.00');
+                    
+                    textContent += '   * Name: ' + employeeName + '\n';
+                    textContent += '   * EmployeeID: ' + employeeNumber + '\n';
+                    textContent += '   * Requested: ' + hoursRequested + '\n';
+                    textContent += '   * Approved: ' + hoursApproved + '\n';
+                    
+                    // Add blank line between entries (except last one)
+                    if (i < sickRequests.length - 1) {
+                        textContent += '\n';
+                    }
+                }
+                textContent += '\n';
+            }
+            
+            // Add Vacation requests
+            if (vacationRequests.length > 0) {
+                textContent += '* Vacation\n';
+                for (var i = 0; i < vacationRequests.length; i++) {
+                    var req = vacationRequests[i];
+                    var employeeName = req.employeeName + ' ' + req.employeeLastName;
+                    var employeeNumber = req.employeeId || '';
+                    var hoursRequested = req.totalHours || '0.00';
+                    var hoursApproved = req.approvedHours || (req.approvalStatus === 'approved' ? req.totalHours : '0.00');
+                    
+                    textContent += '   * Name: ' + employeeName + '\n';
+                    textContent += '   * EmployeeID: ' + employeeNumber + '\n';
+                    textContent += '   * Requested: ' + hoursRequested + '\n';
+                    textContent += '   * Approved: ' + hoursApproved + '\n';
+                    
+                    // Add blank line between entries (except last one)
+                    if (i < vacationRequests.length - 1) {
+                        textContent += '\n';
+                    }
+                }
+            }
+            
+            // If no data at all
+            if (textContent === '') {
+                alert('No data to export.');
+                return;
             }
             
             // Generate filename with current date and time
@@ -1021,10 +1047,10 @@
                          String(now.getDate()).padStart(2, '0');
             var timeStr = String(now.getHours()).padStart(2, '0') + '' + 
                          String(now.getMinutes()).padStart(2, '0');
-            var filename = 'TimeOff_Report_' + dateStr + '_' + timeStr + '.csv';
+            var filename = 'TimeOff_Report_' + dateStr + '_' + timeStr + '.txt';
             
             // Create blob and download
-            var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            var blob = new Blob([textContent], { type: 'text/plain;charset=utf-8;' });
             
             // Create download link
             var link = document.createElement('a');
