@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - HR Dashboard v24</title>
+    <title>Alice Care - HR Dashboard v.23</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -632,7 +632,7 @@
                 <div class="filter-actions">
                     <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
                     <button class="btn btn-secondary" onclick="clearFilters()">Clear</button>
-                    <button class="btn btn-export" onclick="exportReport()">Export</button>
+                    <button class="btn btn-export" onclick="exportReport()">📊 Export Report</button>
                 </div>
             </div>
         </div>
@@ -704,7 +704,7 @@
         var filteredRequests = [];
         var currentRequestId = null;
         // IMPORTANT: Replace with your Google Apps Script URL
-        var GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby_arKrcXeBY700shcwr33m6Abp9HkMDrId4D8uMWjuJVzWKgzkGuNXNxQQsbTV7mzW/exec';
+        var GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxGSPtPjGLgRG2E1IsMeKp4DWGPARiow9HKMGyuM8IK_u4oaPcVAN2PSa1NKkq4_oWY/exec';
         
         // Load requests on page load
         window.onload = function() {
@@ -974,38 +974,68 @@
             console.log('=== EXPORT REPORT ===');
             console.log('Exporting', filteredRequests.length, 'requests');
             
-            // Separate requests by type
-            var sickRequests = [];
-            var vacationRequests = [];
+            // Aggregate requests by employee and type
+            var aggregatedData = {};
             
             for (var i = 0; i < filteredRequests.length; i++) {
                 var req = filteredRequests[i];
-                if (req.requestType === 'sick') {
-                    sickRequests.push(req);
-                } else if (req.requestType === 'vacation') {
-                    vacationRequests.push(req);
+                var employeeId = req.employeeId;
+                var requestType = req.requestType;
+                var key = employeeId + '_' + requestType;
+                
+                if (!aggregatedData[key]) {
+                    aggregatedData[key] = {
+                        employeeName: req.employeeName + ' ' + req.employeeLastName,
+                        employeeId: employeeId,
+                        requestType: requestType,
+                        totalRequested: 0,
+                        totalApproved: 0
+                    };
+                }
+                
+                // Sum requested hours
+                aggregatedData[key].totalRequested += parseFloat(req.totalHours) || 0;
+                
+                // Sum approved hours (only if approved, otherwise 0)
+                if (req.approvalStatus === 'approved' && req.approvedHours) {
+                    aggregatedData[key].totalApproved += parseFloat(req.approvedHours);
                 }
             }
+            
+            // Convert aggregated data to arrays separated by type
+            var sickData = [];
+            var vacationData = [];
+            
+            for (var key in aggregatedData) {
+                if (aggregatedData[key].requestType === 'sick') {
+                    sickData.push(aggregatedData[key]);
+                } else if (aggregatedData[key].requestType === 'vacation') {
+                    vacationData.push(aggregatedData[key]);
+                }
+            }
+            
+            // Sort by employee name
+            sickData.sort(function(a, b) {
+                return a.employeeName.localeCompare(b.employeeName);
+            });
+            vacationData.sort(function(a, b) {
+                return a.employeeName.localeCompare(b.employeeName);
+            });
             
             var textContent = '';
             
             // Add Sick requests
-            if (sickRequests.length > 0) {
+            if (sickData.length > 0) {
                 textContent += '* Sick\n';
-                for (var i = 0; i < sickRequests.length; i++) {
-                    var req = sickRequests[i];
-                    var employeeName = req.employeeName + ' ' + req.employeeLastName;
-                    var employeeNumber = req.employeeId || '';
-                    var hoursRequested = req.totalHours || '0.00';
-                    var hoursApproved = req.approvedHours || (req.approvalStatus === 'approved' ? req.totalHours : '0.00');
-                    
-                    textContent += '   * Name: ' + employeeName + '\n';
-                    textContent += '   * EmployeeID: ' + employeeNumber + '\n';
-                    textContent += '   * Requested: ' + hoursRequested + '\n';
-                    textContent += '   * Approved: ' + hoursApproved + '\n';
+                for (var i = 0; i < sickData.length; i++) {
+                    var data = sickData[i];
+                    textContent += 'Name: ' + data.employeeName + '\n';
+                    textContent += 'EmployeeID: ' + data.employeeId + '\n';
+                    textContent += 'Requested: ' + data.totalRequested.toFixed(2) + '\n';
+                    textContent += 'Approved: ' + data.totalApproved.toFixed(2) + '\n';
                     
                     // Add blank line between entries (except last one)
-                    if (i < sickRequests.length - 1) {
+                    if (i < sickData.length - 1) {
                         textContent += '\n';
                     }
                 }
@@ -1013,22 +1043,17 @@
             }
             
             // Add Vacation requests
-            if (vacationRequests.length > 0) {
+            if (vacationData.length > 0) {
                 textContent += '* Vacation\n';
-                for (var i = 0; i < vacationRequests.length; i++) {
-                    var req = vacationRequests[i];
-                    var employeeName = req.employeeName + ' ' + req.employeeLastName;
-                    var employeeNumber = req.employeeId || '';
-                    var hoursRequested = req.totalHours || '0.00';
-                    var hoursApproved = req.approvedHours || (req.approvalStatus === 'approved' ? req.totalHours : '0.00');
-                    
-                    textContent += '   * Name: ' + employeeName + '\n';
-                    textContent += '   * EmployeeID: ' + employeeNumber + '\n';
-                    textContent += '   * Requested: ' + hoursRequested + '\n';
-                    textContent += '   * Approved: ' + hoursApproved + '\n';
+                for (var i = 0; i < vacationData.length; i++) {
+                    var data = vacationData[i];
+                    textContent += 'Name: ' + data.employeeName + '\n';
+                    textContent += 'EmployeeID: ' + data.employeeId + '\n';
+                    textContent += 'Requested: ' + data.totalRequested.toFixed(2) + '\n';
+                    textContent += 'Approved: ' + data.totalApproved.toFixed(2) + '\n';
                     
                     // Add blank line between entries (except last one)
-                    if (i < vacationRequests.length - 1) {
+                    if (i < vacationData.length - 1) {
                         textContent += '\n';
                     }
                 }
