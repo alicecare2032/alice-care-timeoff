@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - Admin Portal</title>
+    <title>Alice Care - Admin Portal v.4</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -434,6 +434,37 @@
             transform: none;
         }
 
+        .btn-success {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: auto;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+        .btn-success:disabled {
+            background: #D3D7DF;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
         /* Success/Error Messages */
         .message {
             display: none;
@@ -570,8 +601,11 @@
                 <!-- Content will be dynamically loaded here -->
             </div>
             <div class="modal-footer">
-                <button class="btn-secondary" onclick="closeModal()">Close</button>
-                <button class="btn-primary" id="saveBtn" onclick="saveChanges()">Save Changes</button>
+                <button class="btn-success" id="generateCarePlanBtn" onclick="generateCarePlan()">📄 Generate Care Plan</button>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-secondary" onclick="closeModal()">Close</button>
+                    <button class="btn-primary" id="saveBtn" onclick="saveChanges()">Save Changes</button>
+                </div>
             </div>
         </div>
     </div>
@@ -1064,6 +1098,57 @@
             }, 5000);
 
             messageDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // Generate Care Plan Document
+        async function generateCarePlan() {
+            if (!currentEditingRow) return;
+
+            const generateBtn = document.getElementById('generateCarePlanBtn');
+            generateBtn.disabled = true;
+            generateBtn.textContent = '⏳ Generating...';
+
+            try {
+                const submission = allSubmissions.find(sub => sub.rowIndex === currentEditingRow);
+                
+                if (!submission) {
+                    throw new Error('Submission data not found');
+                }
+
+                // Send request to Google Apps Script
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'generateCarePlan',
+                        data: {
+                            rowIndex: currentEditingRow
+                        }
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.result === 'success') {
+                    showMessage('success', `Care Plan generated successfully: ${result.documentName}`);
+                    
+                    // Open the document in a new tab
+                    if (result.documentUrl) {
+                        window.open(result.documentUrl, '_blank');
+                    }
+                } else {
+                    throw new Error(result.message || 'Failed to generate Care Plan');
+                }
+
+            } catch (error) {
+                console.error('Error generating Care Plan:', error);
+                showMessage('error', 'Failed to generate Care Plan: ' + error.message);
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.textContent = '📄 Generate Care Plan';
+            }
         }
     </script>
 </body>
