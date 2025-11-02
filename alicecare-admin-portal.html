@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - Admin Portal v.1</title>
+    <title>Alice Care - Admin Portal v.2</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -141,36 +141,6 @@
         .filter-group select:focus {
             outline: none;
             border-color: #F57600;
-        }
-
-        /* Stats Section */
-        .stats-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            border-left: 4px solid #F57600;
-        }
-
-        .stat-card h3 {
-            font-size: 13px;
-            color: #7EA1C4;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-
-        .stat-card .value {
-            font-size: 28px;
-            font-weight: 600;
-            color: #1A365C;
         }
 
         /* List Section */
@@ -550,50 +520,24 @@
         <div id="successMessage" class="message success"></div>
         <div id="errorMessage" class="message error"></div>
 
-        <!-- Stats Section -->
-        <div class="stats-section">
-            <div class="stat-card">
-                <h3>Total Submissions</h3>
-                <div class="value" id="statTotal">-</div>
-            </div>
-            <div class="stat-card">
-                <h3>This Month</h3>
-                <div class="value" id="statMonth">-</div>
-            </div>
-            <div class="stat-card">
-                <h3>This Week</h3>
-                <div class="value" id="statWeek">-</div>
-            </div>
-            <div class="stat-card">
-                <h3>Active Filters</h3>
-                <div class="value" id="statFilters">0</div>
-            </div>
-        </div>
-
         <!-- Filters Section -->
         <div class="filters-section">
             <div class="filters-header">
-                <h2>Filters</h2>
-                <button class="clear-filters-btn" onclick="clearFilters()">Clear All Filters</button>
+                <h2>Search & Filter</h2>
+                <button class="clear-filters-btn" onclick="clearFilters()">Clear All</button>
             </div>
             <div class="filters-grid">
                 <div class="filter-group">
-                    <label>Search by Name</label>
-                    <input type="text" id="filterName" placeholder="Insured name...">
+                    <label>Insured Name</label>
+                    <input type="text" id="filterInsuredName" placeholder="Search by insured name...">
+                </div>
+                <div class="filter-group">
+                    <label>Responsible Party</label>
+                    <input type="text" id="filterResponsibleParty" placeholder="Search by responsible party...">
                 </div>
                 <div class="filter-group">
                     <label>Insurance Company</label>
-                    <select id="filterInsurance">
-                        <option value="">All Companies</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label>From Date</label>
-                    <input type="date" id="filterDateFrom">
-                </div>
-                <div class="filter-group">
-                    <label>To Date</label>
-                    <input type="date" id="filterDateTo">
+                    <input type="text" id="filterInsurance" placeholder="Search by insurance company...">
                 </div>
             </div>
         </div>
@@ -648,10 +592,9 @@
 
         // Setup filter listeners
         function setupFilterListeners() {
-            document.getElementById('filterName').addEventListener('input', applyFilters);
-            document.getElementById('filterInsurance').addEventListener('change', applyFilters);
-            document.getElementById('filterDateFrom').addEventListener('change', applyFilters);
-            document.getElementById('filterDateTo').addEventListener('change', applyFilters);
+            document.getElementById('filterInsuredName').addEventListener('input', applyFilters);
+            document.getElementById('filterResponsibleParty').addEventListener('input', applyFilters);
+            document.getElementById('filterInsurance').addEventListener('input', applyFilters);
         }
 
         // Load submissions from Google Sheets
@@ -665,9 +608,7 @@
 
                 if (data.result === 'success') {
                     allSubmissions = data.submissions;
-                    populateInsuranceFilter(allSubmissions);
                     applyFilters();
-                    updateStats();
                 } else {
                     throw new Error(data.message || 'Failed to load submissions');
                 }
@@ -682,54 +623,25 @@
             }
         }
 
-        // Populate insurance filter dropdown
-        function populateInsuranceFilter(submissions) {
-            const insuranceSet = new Set();
-            submissions.forEach(sub => {
-                if (sub.insurance) {
-                    insuranceSet.add(sub.insurance);
-                }
-            });
-
-            const filterSelect = document.getElementById('filterInsurance');
-            const currentValue = filterSelect.value;
-            
-            filterSelect.innerHTML = '<option value="">All Companies</option>';
-            
-            Array.from(insuranceSet).sort().forEach(insurance => {
-                const option = document.createElement('option');
-                option.value = insurance;
-                option.textContent = insurance;
-                filterSelect.appendChild(option);
-            });
-
-            filterSelect.value = currentValue;
-        }
-
         // Apply filters
         function applyFilters() {
-            const nameFilter = document.getElementById('filterName').value.toLowerCase();
-            const insuranceFilter = document.getElementById('filterInsurance').value;
-            const dateFromFilter = document.getElementById('filterDateFrom').value;
-            const dateToFilter = document.getElementById('filterDateTo').value;
+            const insuredNameFilter = document.getElementById('filterInsuredName').value.toLowerCase().trim();
+            const responsiblePartyFilter = document.getElementById('filterResponsibleParty').value.toLowerCase().trim();
+            const insuranceFilter = document.getElementById('filterInsurance').value.toLowerCase().trim();
 
             filteredSubmissions = allSubmissions.filter(sub => {
-                // Name filter
-                if (nameFilter && !sub.insuredName.toLowerCase().includes(nameFilter)) {
+                // Insured name filter (partial match)
+                if (insuredNameFilter && !(sub.insuredName || '').toLowerCase().includes(insuredNameFilter)) {
                     return false;
                 }
 
-                // Insurance filter
-                if (insuranceFilter && sub.insurance !== insuranceFilter) {
+                // Responsible party filter (partial match)
+                if (responsiblePartyFilter && !(sub.responsibleParty || '').toLowerCase().includes(responsiblePartyFilter)) {
                     return false;
                 }
 
-                // Date range filter
-                const subDate = new Date(sub.timestamp).toISOString().split('T')[0];
-                if (dateFromFilter && subDate < dateFromFilter) {
-                    return false;
-                }
-                if (dateToFilter && subDate > dateToFilter) {
+                // Insurance company filter (partial match)
+                if (insuranceFilter && !(sub.insurance || '').toLowerCase().includes(insuranceFilter)) {
                     return false;
                 }
 
@@ -737,47 +649,14 @@
             });
 
             renderSubmissionsList();
-            updateActiveFiltersCount();
         }
 
         // Clear all filters
         function clearFilters() {
-            document.getElementById('filterName').value = '';
+            document.getElementById('filterInsuredName').value = '';
+            document.getElementById('filterResponsibleParty').value = '';
             document.getElementById('filterInsurance').value = '';
-            document.getElementById('filterDateFrom').value = '';
-            document.getElementById('filterDateTo').value = '';
             applyFilters();
-        }
-
-        // Update active filters count
-        function updateActiveFiltersCount() {
-            let count = 0;
-            if (document.getElementById('filterName').value) count++;
-            if (document.getElementById('filterInsurance').value) count++;
-            if (document.getElementById('filterDateFrom').value) count++;
-            if (document.getElementById('filterDateTo').value) count++;
-            
-            document.getElementById('statFilters').textContent = count;
-        }
-
-        // Update stats
-        function updateStats() {
-            const now = new Date();
-            const thisMonth = allSubmissions.filter(sub => {
-                const subDate = new Date(sub.timestamp);
-                return subDate.getMonth() === now.getMonth() && 
-                       subDate.getFullYear() === now.getFullYear();
-            }).length;
-
-            const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-            const thisWeek = allSubmissions.filter(sub => {
-                const subDate = new Date(sub.timestamp);
-                return subDate >= oneWeekAgo;
-            }).length;
-
-            document.getElementById('statTotal').textContent = allSubmissions.length;
-            document.getElementById('statMonth').textContent = thisMonth;
-            document.getElementById('statWeek').textContent = thisWeek;
         }
 
         // Render submissions list
