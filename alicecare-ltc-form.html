@@ -301,6 +301,132 @@
             border-radius: 6px;
             color: #1A365C;
         }
+
+        /* Schedule Styles */
+        .schedule-container {
+            background: white;
+            border: 2px solid #D3D7DF;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .schedule-row {
+            display: grid;
+            grid-template-columns: 150px 1fr 1fr 120px;
+            gap: 15px;
+            padding: 15px;
+            align-items: center;
+            border-bottom: 1px solid #E5ECF3;
+        }
+
+        .schedule-row:last-child {
+            border-bottom: none;
+        }
+
+        .schedule-header {
+            background-color: #1A365C;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            padding: 12px 15px;
+        }
+
+        .schedule-total {
+            background-color: #FCECCD;
+            font-weight: 600;
+            border-top: 2px solid #F29F07;
+        }
+
+        .schedule-day {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .schedule-day input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin: 0;
+        }
+
+        .schedule-day label {
+            margin: 0;
+            font-weight: 500;
+            color: #1A365C;
+            cursor: pointer;
+        }
+
+        .schedule-time,
+        .schedule-hours {
+            display: flex;
+            align-items: center;
+        }
+
+        .time-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #D3D7DF;
+            border-radius: 6px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .time-input:focus {
+            outline: none;
+            border-color: #F57600;
+            box-shadow: 0 0 0 3px rgba(245, 118, 0, 0.1);
+        }
+
+        .hours-display,
+        .hours-display-total {
+            width: 100%;
+            padding: 8px 12px;
+            background-color: #E5ECF3;
+            border: 2px solid #7EA1C4;
+            border-radius: 6px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1A365C;
+            text-align: center;
+        }
+
+        .hours-display-total {
+            background-color: #F29F07;
+            color: white;
+            border-color: #F29F07;
+            font-size: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .schedule-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .schedule-header {
+                display: none;
+            }
+
+            .schedule-day {
+                font-weight: 600;
+                font-size: 16px;
+                padding: 5px 0;
+            }
+
+            .schedule-time,
+            .schedule-hours {
+                padding-left: 30px;
+            }
+
+            .schedule-time::before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: #7EA1C4;
+                margin-right: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -494,16 +620,6 @@
                     <div class="note-box">
                         <strong>If Yes:</strong> The client will pay out of pocket until the first insurance payment is received. Alice Care will then reimburse the client for any covered services, and future payments will be transferred from the client's credit card to insurance billing.
                     </div>
-
-                    <div class="form-group">
-                        <label for="form1099">1099 Completed</label>
-                        <select id="form1099" name="form1099">
-                            <option value="">Select Status</option>
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                            <option value="Undetermined">Undetermined</option>
-                        </select>
-                    </div>
                 </div>
 
                 <!-- Activities of Daily Living (ADL) Section -->
@@ -581,23 +697,156 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="invoiceSentTo">Invoice Sent To</label>
-                        <input type="text" id="invoiceSentTo" name="invoiceSentTo">
+                        <label for="invoiceSentTo">Invoice Sent To (email or fax)</label>
+                        <input type="text" id="invoiceSentTo" name="invoiceSentTo" placeholder="e.g., claims@insurance.com or Fax: (916) 555-1234">
                     </div>
 
                     <div class="form-group">
                         <label for="invoiceContactInfo">Contact Information for Invoicing</label>
                         <textarea id="invoiceContactInfo" name="invoiceContactInfo" placeholder="Email, phone, address for invoice recipient..."></textarea>
                     </div>
+                </div>
 
-                    <div class="row">
-                        <div class="form-group">
-                            <label for="icd10Code">ICD-10 Code</label>
-                            <input type="text" id="icd10Code" name="icd10Code" placeholder="e.g., Z74.1">
+                <!-- Weekly Schedule Section -->
+                <div class="section">
+                    <h2 class="section-title">Weekly Schedule</h2>
+                    <p style="margin-bottom: 20px; font-size: 14px; color: #7EA1C4;">Please provide the anticipated weekly care schedule:</p>
+                    
+                    <div class="schedule-container">
+                        <div class="schedule-row schedule-header">
+                            <div class="schedule-day">Day</div>
+                            <div class="schedule-time">Start Time</div>
+                            <div class="schedule-time">End Time</div>
+                            <div class="schedule-hours">Total Hours</div>
                         </div>
-                        <div class="form-group">
-                            <label for="cptCode">CPT Code</label>
-                            <input type="text" id="cptCode" name="cptCode" placeholder="e.g., 99509">
+
+                        <!-- Monday -->
+                        <div class="schedule-row">
+                            <div class="schedule-day">
+                                <input type="checkbox" id="schedule_monday" name="schedule_day" value="Monday">
+                                <label for="schedule_monday">Monday</label>
+                            </div>
+                            <div class="schedule-time">
+                                <input type="time" id="monday_start" name="monday_start" class="time-input" data-day="monday">
+                            </div>
+                            <div class="schedule-time">
+                                <input type="time" id="monday_end" name="monday_end" class="time-input" data-day="monday">
+                            </div>
+                            <div class="schedule-hours">
+                                <input type="text" id="monday_total" name="monday_total" readonly class="hours-display">
+                            </div>
+                        </div>
+
+                        <!-- Tuesday -->
+                        <div class="schedule-row">
+                            <div class="schedule-day">
+                                <input type="checkbox" id="schedule_tuesday" name="schedule_day" value="Tuesday">
+                                <label for="schedule_tuesday">Tuesday</label>
+                            </div>
+                            <div class="schedule-time">
+                                <input type="time" id="tuesday_start" name="tuesday_start" class="time-input" data-day="tuesday">
+                            </div>
+                            <div class="schedule-time">
+                                <input type="time" id="tuesday_end" name="tuesday_end" class="time-input" data-day="tuesday">
+                            </div>
+                            <div class="schedule-hours">
+                                <input type="text" id="tuesday_total" name="tuesday_total" readonly class="hours-display">
+                            </div>
+                        </div>
+
+                        <!-- Wednesday -->
+                        <div class="schedule-row">
+                            <div class="schedule-day">
+                                <input type="checkbox" id="schedule_wednesday" name="schedule_day" value="Wednesday">
+                                <label for="schedule_wednesday">Wednesday</label>
+                            </div>
+                            <div class="schedule-time">
+                                <input type="time" id="wednesday_start" name="wednesday_start" class="time-input" data-day="wednesday">
+                            </div>
+                            <div class="schedule-time">
+                                <input type="time" id="wednesday_end" name="wednesday_end" class="time-input" data-day="wednesday">
+                            </div>
+                            <div class="schedule-hours">
+                                <input type="text" id="wednesday_total" name="wednesday_total" readonly class="hours-display">
+                            </div>
+                        </div>
+
+                        <!-- Thursday -->
+                        <div class="schedule-row">
+                            <div class="schedule-day">
+                                <input type="checkbox" id="schedule_thursday" name="schedule_day" value="Thursday">
+                                <label for="schedule_thursday">Thursday</label>
+                            </div>
+                            <div class="schedule-time">
+                                <input type="time" id="thursday_start" name="thursday_start" class="time-input" data-day="thursday">
+                            </div>
+                            <div class="schedule-time">
+                                <input type="time" id="thursday_end" name="thursday_end" class="time-input" data-day="thursday">
+                            </div>
+                            <div class="schedule-hours">
+                                <input type="text" id="thursday_total" name="thursday_total" readonly class="hours-display">
+                            </div>
+                        </div>
+
+                        <!-- Friday -->
+                        <div class="schedule-row">
+                            <div class="schedule-day">
+                                <input type="checkbox" id="schedule_friday" name="schedule_day" value="Friday">
+                                <label for="schedule_friday">Friday</label>
+                            </div>
+                            <div class="schedule-time">
+                                <input type="time" id="friday_start" name="friday_start" class="time-input" data-day="friday">
+                            </div>
+                            <div class="schedule-time">
+                                <input type="time" id="friday_end" name="friday_end" class="time-input" data-day="friday">
+                            </div>
+                            <div class="schedule-hours">
+                                <input type="text" id="friday_total" name="friday_total" readonly class="hours-display">
+                            </div>
+                        </div>
+
+                        <!-- Saturday -->
+                        <div class="schedule-row">
+                            <div class="schedule-day">
+                                <input type="checkbox" id="schedule_saturday" name="schedule_day" value="Saturday">
+                                <label for="schedule_saturday">Saturday</label>
+                            </div>
+                            <div class="schedule-time">
+                                <input type="time" id="saturday_start" name="saturday_start" class="time-input" data-day="saturday">
+                            </div>
+                            <div class="schedule-time">
+                                <input type="time" id="saturday_end" name="saturday_end" class="time-input" data-day="saturday">
+                            </div>
+                            <div class="schedule-hours">
+                                <input type="text" id="saturday_total" name="saturday_total" readonly class="hours-display">
+                            </div>
+                        </div>
+
+                        <!-- Sunday -->
+                        <div class="schedule-row">
+                            <div class="schedule-day">
+                                <input type="checkbox" id="schedule_sunday" name="schedule_day" value="Sunday">
+                                <label for="schedule_sunday">Sunday</label>
+                            </div>
+                            <div class="schedule-time">
+                                <input type="time" id="sunday_start" name="sunday_start" class="time-input" data-day="sunday">
+                            </div>
+                            <div class="schedule-time">
+                                <input type="time" id="sunday_end" name="sunday_end" class="time-input" data-day="sunday">
+                            </div>
+                            <div class="schedule-hours">
+                                <input type="text" id="sunday_total" name="sunday_total" readonly class="hours-display">
+                            </div>
+                        </div>
+
+                        <!-- Weekly Total -->
+                        <div class="schedule-row schedule-total">
+                            <div class="schedule-day"><strong>Weekly Total</strong></div>
+                            <div class="schedule-time"></div>
+                            <div class="schedule-time"></div>
+                            <div class="schedule-hours">
+                                <input type="text" id="weekly_total" name="weekly_total" readonly class="hours-display-total">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -645,6 +894,10 @@
             const adlCheckboxes = document.querySelectorAll('input[name="adl"]:checked');
             const adlValues = Array.from(adlCheckboxes).map(cb => cb.value).join(', ');
             
+            // Handle schedule days
+            const scheduleDays = document.querySelectorAll('input[name="schedule_day"]:checked');
+            const scheduleDaysValues = Array.from(scheduleDays).map(cb => cb.value).join(', ');
+            
             // Create data object
             const data = {
                 timestamp: new Date().toISOString(),
@@ -665,13 +918,34 @@
                 phone: formData.get('phone'),
                 powerOfAttorney: formData.get('powerOfAttorney'),
                 transferOfBenefits: formData.get('transferOfBenefits'),
-                form1099: formData.get('form1099'),
+                form1099: 'Undetermined', // Default value for Google Sheet
                 adl: adlValues,
+                scheduleDays: scheduleDaysValues,
+                mondayStart: formData.get('monday_start'),
+                mondayEnd: formData.get('monday_end'),
+                mondayTotal: formData.get('monday_total'),
+                tuesdayStart: formData.get('tuesday_start'),
+                tuesdayEnd: formData.get('tuesday_end'),
+                tuesdayTotal: formData.get('tuesday_total'),
+                wednesdayStart: formData.get('wednesday_start'),
+                wednesdayEnd: formData.get('wednesday_end'),
+                wednesdayTotal: formData.get('wednesday_total'),
+                thursdayStart: formData.get('thursday_start'),
+                thursdayEnd: formData.get('thursday_end'),
+                thursdayTotal: formData.get('thursday_total'),
+                fridayStart: formData.get('friday_start'),
+                fridayEnd: formData.get('friday_end'),
+                fridayTotal: formData.get('friday_total'),
+                saturdayStart: formData.get('saturday_start'),
+                saturdayEnd: formData.get('saturday_end'),
+                saturdayTotal: formData.get('saturday_total'),
+                sundayStart: formData.get('sunday_start'),
+                sundayEnd: formData.get('sunday_end'),
+                sundayTotal: formData.get('sunday_total'),
+                weeklyTotal: formData.get('weekly_total'),
                 invoiceProcess: formData.get('invoiceProcess'),
                 invoiceSentTo: formData.get('invoiceSentTo'),
                 invoiceContactInfo: formData.get('invoiceContactInfo'),
-                icd10Code: formData.get('icd10Code'),
-                cptCode: formData.get('cptCode'),
                 additionalNotes: formData.get('additionalNotes')
             };
 
@@ -716,6 +990,56 @@
                 } else {
                     otherInput.style.display = 'none';
                 }
+            });
+        });
+
+        // Calculate hours for schedule
+        function calculateHours(day) {
+            const startTime = document.getElementById(`${day}_start`).value;
+            const endTime = document.getElementById(`${day}_end`).value;
+            const totalField = document.getElementById(`${day}_total`);
+
+            if (startTime && endTime) {
+                const start = new Date(`2000-01-01T${startTime}`);
+                const end = new Date(`2000-01-01T${endTime}`);
+                
+                let diff = (end - start) / 1000 / 60 / 60; // difference in hours
+                
+                // Handle overnight shifts
+                if (diff < 0) {
+                    diff += 24;
+                }
+                
+                totalField.value = `${diff.toFixed(2)} hrs`;
+            } else {
+                totalField.value = '';
+            }
+            
+            calculateWeeklyTotal();
+        }
+
+        function calculateWeeklyTotal() {
+            const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            let total = 0;
+            
+            days.forEach(day => {
+                const totalField = document.getElementById(`${day}_total`).value;
+                if (totalField) {
+                    const hours = parseFloat(totalField.replace(' hrs', ''));
+                    if (!isNaN(hours)) {
+                        total += hours;
+                    }
+                }
+            });
+            
+            document.getElementById('weekly_total').value = total > 0 ? `${total.toFixed(2)} hrs` : '';
+        }
+
+        // Add event listeners to all time inputs
+        document.querySelectorAll('.time-input').forEach(input => {
+            input.addEventListener('change', function() {
+                const day = this.dataset.day;
+                calculateHours(day);
             });
         });
     </script>
