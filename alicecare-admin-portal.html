@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - Admin Portal v.4</title>
+    <title>Alice Care - Admin Portal v.4_1</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -1090,12 +1090,12 @@
         // Show message
         function showMessage(type, message) {
             const messageDiv = document.getElementById(type === 'success' ? 'successMessage' : 'errorMessage');
-            messageDiv.textContent = message;
+            messageDiv.innerHTML = message; // Changed from textContent to innerHTML to support links
             messageDiv.style.display = 'block';
 
             setTimeout(() => {
                 messageDiv.style.display = 'none';
-            }, 5000);
+            }, 10000); // Increased to 10 seconds for link messages
 
             messageDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
@@ -1105,6 +1105,7 @@
             if (!currentEditingRow) return;
 
             const generateBtn = document.getElementById('generateCarePlanBtn');
+            const originalText = generateBtn.textContent;
             generateBtn.disabled = true;
             generateBtn.textContent = '⏳ Generating...';
 
@@ -1114,6 +1115,8 @@
                 if (!submission) {
                     throw new Error('Submission data not found');
                 }
+
+                console.log('Sending request to generate Care Plan for row:', currentEditingRow);
 
                 // Send request to Google Apps Script
                 const response = await fetch(GOOGLE_SCRIPT_URL, {
@@ -1129,25 +1132,49 @@
                     })
                 });
 
+                console.log('Response status:', response.status);
+                
                 const result = await response.json();
+                console.log('Response data:', result);
 
                 if (result.result === 'success') {
-                    showMessage('success', `Care Plan generated successfully: ${result.documentName}`);
+                    // Create a success message with clickable link
+                    const linkHtml = result.documentUrl ? 
+                        `<br><br><strong>Document:</strong> <a href="${result.documentUrl}" target="_blank" style="color: #F57600; text-decoration: underline;">${result.documentName}</a><br>` +
+                        `<strong>Folder:</strong> <a href="${result.folderUrl}" target="_blank" style="color: #1A365C; text-decoration: underline;">Open Client Folder</a>` 
+                        : '';
+                    
+                    showMessage('success', `✅ Care Plan generated successfully!${linkHtml}`);
                     
                     // Open the document in a new tab
                     if (result.documentUrl) {
-                        window.open(result.documentUrl, '_blank');
+                        setTimeout(() => {
+                            window.open(result.documentUrl, '_blank');
+                        }, 500);
                     }
                 } else {
-                    throw new Error(result.message || 'Failed to generate Care Plan');
+                    // Show detailed error
+                    const errorDetails = result.details ? `<br><br><small>Details: ${result.details}</small>` : '';
+                    const errorStep = result.step ? `<br><small>${result.step}</small>` : '';
+                    throw new Error(result.message + errorDetails + errorStep);
                 }
 
             } catch (error) {
                 console.error('Error generating Care Plan:', error);
-                showMessage('error', 'Failed to generate Care Plan: ' + error.message);
+                
+                // Show detailed error message
+                let errorMsg = '❌ Failed to generate Care Plan<br><br>';
+                errorMsg += `<strong>Error:</strong> ${error.message}<br><br>`;
+                errorMsg += '<strong>Troubleshooting:</strong><br>';
+                errorMsg += '1. Check Google Apps Script logs (Extensions > Apps Script > View > Logs)<br>';
+                errorMsg += '2. Verify MAIN_FOLDER_ID is correct in the script<br>';
+                errorMsg += '3. Ensure you granted Drive, Docs, and Sheets permissions<br>';
+                errorMsg += '4. Try the testCarePlanGeneration() function in Apps Script<br>';
+                
+                showMessage('error', errorMsg);
             } finally {
                 generateBtn.disabled = false;
-                generateBtn.textContent = '📄 Generate Care Plan';
+                generateBtn.textContent = originalText;
             }
         }
     </script>
