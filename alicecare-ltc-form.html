@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - LTC Insurance Onboarding v.2</title>
+    <title>Alice Care - LTC Insurance Onboarding v.2.1</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -517,19 +517,33 @@
                 <div class="section">
                     <h2 class="section-title">Maximum Spend</h2>
                     
-                    <div class="row-three">
+                    <div class="form-group">
+                        <label for="maxSpendPeriod">Maximum Spend Period</label>
+                        <select id="maxSpendPeriod" name="maxSpendPeriod">
+                            <option value="">Select period...</option>
+                            <option value="per day">Per Day</option>
+                            <option value="per month">Per Month</option>
+                            <option value="total">Total</option>
+                        </select>
+                    </div>
+
+                    <div class="row">
                         <div class="form-group">
-                            <label for="maxSpendDay">Per Day ($)</label>
-                            <input type="number" id="maxSpendDay" name="maxSpendDay" placeholder="0.00" step="0.01">
+                            <label for="maxSpendAmount">Amount</label>
+                            <input type="number" id="maxSpendAmount" name="maxSpendAmount" placeholder="0.00" step="0.01">
                         </div>
                         <div class="form-group">
-                            <label for="maxSpendMonth">Per Month ($)</label>
-                            <input type="number" id="maxSpendMonth" name="maxSpendMonth" placeholder="0.00" step="0.01">
+                            <label for="maxSpendUnit">Unit</label>
+                            <select id="maxSpendUnit" name="maxSpendUnit">
+                                <option value="">Select unit...</option>
+                                <option value="dollars">Dollars ($)</option>
+                                <option value="hours">Hours</option>
+                            </select>
                         </div>
-                        <div class="form-group">
-                            <label for="maxSpendTotal">Total ($)</label>
-                            <input type="number" id="maxSpendTotal" name="maxSpendTotal" placeholder="0.00" step="0.01">
-                        </div>
+                    </div>
+
+                    <div class="note-box" id="maxSpendSummary" style="display: none;">
+                        <strong>Summary:</strong> <span id="maxSpendSummaryText"></span>
                     </div>
                 </div>
 
@@ -554,8 +568,17 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="address">Address <span class="required">*</span></label>
-                        <textarea id="address" name="address" required></textarea>
+                        <label for="address">Service Address <span class="required">*</span></label>
+                        <select id="address" name="address" required>
+                            <option value="">Select an address or choose "Other"</option>
+                            <option value="8146 Greenback Ln Ste 106, Fair Oaks, CA 95628">8146 Greenback Ln Ste 106, Fair Oaks, CA 95628</option>
+                            <option value="other">Other (Enter custom address)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="customAddressGroup" style="display: none;">
+                        <label for="customAddress">Enter Custom Address <span class="required">*</span></label>
+                        <textarea id="customAddress" name="customAddress" placeholder="Enter full service address..."></textarea>
                     </div>
 
                     <div class="row">
@@ -898,6 +921,10 @@
             const scheduleDays = document.querySelectorAll('input[name="schedule_day"]:checked');
             const scheduleDaysValues = Array.from(scheduleDays).map(cb => cb.value).join(', ');
             
+            // Handle address (check if custom or dropdown)
+            const addressValue = formData.get('address');
+            const finalAddress = addressValue === 'other' ? formData.get('customAddress') : addressValue;
+            
             // Create data object
             const data = {
                 timestamp: new Date().toISOString(),
@@ -907,13 +934,13 @@
                 eliminationPeriod: formData.get('eliminationPeriod'),
                 eliminationPeriodOther: formData.get('eliminationPeriodOther'),
                 eliminationPeriodMet: formData.get('eliminationPeriodMet'),
-                maxSpendDay: formData.get('maxSpendDay'),
-                maxSpendMonth: formData.get('maxSpendMonth'),
-                maxSpendTotal: formData.get('maxSpendTotal'),
+                maxSpendPeriod: formData.get('maxSpendPeriod'),
+                maxSpendAmount: formData.get('maxSpendAmount'),
+                maxSpendUnit: formData.get('maxSpendUnit'),
                 insuredName: formData.get('insuredName'),
                 dateOfBirth: formData.get('dateOfBirth'),
                 responsibleParty: formData.get('responsibleParty'),
-                address: formData.get('address'),
+                address: finalAddress,
                 email: formData.get('email'),
                 phone: formData.get('phone'),
                 powerOfAttorney: formData.get('powerOfAttorney'),
@@ -993,6 +1020,43 @@
             });
         });
 
+        // Handle address dropdown - show custom address field if "other" selected
+        document.getElementById('address').addEventListener('change', function() {
+            const customAddressGroup = document.getElementById('customAddressGroup');
+            const customAddressField = document.getElementById('customAddress');
+            
+            if (this.value === 'other') {
+                customAddressGroup.style.display = 'block';
+                customAddressField.required = true;
+            } else {
+                customAddressGroup.style.display = 'none';
+                customAddressField.required = false;
+                customAddressField.value = '';
+            }
+        });
+
+        // Update max spend summary
+        function updateMaxSpendSummary() {
+            const period = document.getElementById('maxSpendPeriod').value;
+            const amount = document.getElementById('maxSpendAmount').value;
+            const unit = document.getElementById('maxSpendUnit').value;
+            const summaryBox = document.getElementById('maxSpendSummary');
+            const summaryText = document.getElementById('maxSpendSummaryText');
+
+            if (period && amount && unit) {
+                const unitDisplay = unit === 'dollars' ? '$' + amount : amount + ' hours';
+                const periodDisplay = period === 'per day' ? 'per day' : period === 'per month' ? 'per month' : 'total';
+                summaryText.textContent = `Maximum spend is ${unitDisplay} ${periodDisplay}`;
+                summaryBox.style.display = 'block';
+            } else {
+                summaryBox.style.display = 'none';
+            }
+        }
+
+        document.getElementById('maxSpendPeriod').addEventListener('change', updateMaxSpendSummary);
+        document.getElementById('maxSpendAmount').addEventListener('input', updateMaxSpendSummary);
+        document.getElementById('maxSpendUnit').addEventListener('change', updateMaxSpendSummary);
+
         // Calculate hours for schedule
         function calculateHours(day) {
             const startTime = document.getElementById(`${day}_start`).value;
@@ -1015,6 +1079,7 @@
                 totalField.value = '';
             }
             
+            // Update weekly total immediately after each calculation
             calculateWeeklyTotal();
         }
 
@@ -1035,9 +1100,15 @@
             document.getElementById('weekly_total').value = total > 0 ? `${total.toFixed(2)} hrs` : '';
         }
 
-        // Add event listeners to all time inputs
+        // Add event listeners to all time inputs for real-time calculation
         document.querySelectorAll('.time-input').forEach(input => {
             input.addEventListener('change', function() {
+                const day = this.dataset.day;
+                calculateHours(day);
+            });
+            
+            // Also trigger on input for more immediate feedback
+            input.addEventListener('input', function() {
                 const day = this.dataset.day;
                 calculateHours(day);
             });
