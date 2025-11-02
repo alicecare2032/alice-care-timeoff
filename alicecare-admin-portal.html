@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - Admin Portal v.2</title>
+    <title>Alice Care - Admin Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -844,6 +844,59 @@
                     </div>
                 </div>
 
+                <!-- Support Levels -->
+                <div class="section-title">Support Levels</div>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Bathing</div>
+                        <div class="detail-value">
+                            <input type="text" id="edit-supportLevelBathing" value="${submission.supportLevelBathing || ''}">
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Dressing</div>
+                        <div class="detail-value">
+                            <input type="text" id="edit-supportLevelDressing" value="${submission.supportLevelDressing || ''}">
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Bed/Chair</div>
+                        <div class="detail-value">
+                            <input type="text" id="edit-supportLevelBedChair" value="${submission.supportLevelBedChair || ''}">
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Walking</div>
+                        <div class="detail-value">
+                            <input type="text" id="edit-supportLevelWalking" value="${submission.supportLevelWalking || ''}">
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Toilet</div>
+                        <div class="detail-value">
+                            <input type="text" id="edit-supportLevelToilet" value="${submission.supportLevelToilet || ''}">
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Eating</div>
+                        <div class="detail-value">
+                            <input type="text" id="edit-supportLevelEating" value="${submission.supportLevelEating || ''}">
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Transferring</div>
+                        <div class="detail-value">
+                            <input type="text" id="edit-supportLevelTransferring" value="${submission.supportLevelTransferring || ''}">
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Cognitive</div>
+                        <div class="detail-value">
+                            <input type="text" id="edit-supportLevelCognitive" value="${submission.supportLevelCognitive || ''}">
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Weekly Schedule -->
                 <div class="section-title">Weekly Schedule</div>
                 <table class="schedule-table">
@@ -956,6 +1009,14 @@
                 powerOfAttorney: document.getElementById('edit-powerOfAttorney').value,
                 transferOfBenefits: document.getElementById('edit-transferOfBenefits').value,
                 adl: document.getElementById('edit-adl').value,
+                supportLevelBathing: document.getElementById('edit-supportLevelBathing').value,
+                supportLevelDressing: document.getElementById('edit-supportLevelDressing').value,
+                supportLevelBedChair: document.getElementById('edit-supportLevelBedChair').value,
+                supportLevelWalking: document.getElementById('edit-supportLevelWalking').value,
+                supportLevelToilet: document.getElementById('edit-supportLevelToilet').value,
+                supportLevelEating: document.getElementById('edit-supportLevelEating').value,
+                supportLevelTransferring: document.getElementById('edit-supportLevelTransferring').value,
+                supportLevelCognitive: document.getElementById('edit-supportLevelCognitive').value,
                 invoiceProcess: document.getElementById('edit-invoiceProcess').value,
                 invoiceSentTo: document.getElementById('edit-invoiceSentTo').value,
                 invoiceContactInfo: document.getElementById('edit-invoiceContactInfo').value,
