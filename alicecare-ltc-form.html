@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - LTC Insurance Onboarding v.3.0</title>
+    <title>Alice Care - LTC Insurance Onboarding v.3.1</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Google Places API for address autocomplete -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_PLACES_API_KEY&libraries=places"></script>
+    <!-- Google Places API for address autocomplete (loads asynchronously) -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_PLACES_API_KEY&libraries=places&callback=initializeAutocomplete"></script>
     <style>
         * {
             margin: 0;
@@ -506,16 +506,7 @@
                     
                     <div class="form-group">
                         <label for="insurance">Insurance Company *</label>
-                        <select id="insurance" name="insurance" required>
-                            <option value="">Select Insurance Company</option>
-                            <option value="Genworth">Genworth</option>
-                            <option value="John Hancock">John Hancock</option>
-                            <option value="Mutual of Omaha">Mutual of Omaha</option>
-                            <option value="New York Life">New York Life</option>
-                            <option value="Northwestern Mutual">Northwestern Mutual</option>
-                            <option value="Transamerica">Transamerica</option>
-                            <option value="other">Other</option>
-                        </select>
+                        <input type="text" id="insurance" name="insurance" placeholder="Enter insurance company name" required>
                     </div>
 
                     <div class="row">
@@ -548,10 +539,6 @@
                             <div class="radio-item">
                                 <input type="radio" id="ep90" name="eliminationPeriod" value="90 days">
                                 <label for="ep90">90 days</label>
-                            </div>
-                            <div class="radio-item">
-                                <input type="radio" id="ep100" name="eliminationPeriod" value="100 days">
-                                <label for="ep100">100 days</label>
                             </div>
                             <div class="radio-item">
                                 <input type="radio" id="epOther" name="eliminationPeriod" value="other">
@@ -634,9 +621,9 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="address">Service Address * (Start typing to search)</label>
-                        <input type="text" id="address" name="address" placeholder="Start typing your address..." required autocomplete="off">
-                        <small style="color: #7EA1C4; font-size: 12px;">Powered by Google Places</small>
+                        <label for="address">Service Address * (Start typing for suggestions)</label>
+                        <input type="text" id="address" name="address" placeholder="Enter service address..." required autocomplete="off">
+                        <small style="color: #7EA1C4; font-size: 12px;" id="googlePlacesNote">Address suggestions powered by Google Places (when enabled)</small>
                     </div>
 
                     <div class="row">
@@ -846,26 +833,54 @@
             };
         });
 
-        // Initialize Google Places Autocomplete
-        function initializeAutocomplete() {
+        // Initialize Google Places Autocomplete - GLOBAL FUNCTION for API callback
+        window.initializeAutocomplete = function() {
             const addressInput = document.getElementById('address');
+            const googleNote = document.getElementById('googlePlacesNote');
             
-            if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+            if (!addressInput) {
+                console.warn('Address input not found yet');
+                return;
+            }
+
+            // Check if Google Places API is available
+            if (typeof google === 'undefined' || !google.maps || !google.maps.places) {
+                console.warn('Google Places API not loaded. Address field will work as normal text input.');
+                if (googleNote) {
+                    googleNote.textContent = 'Enter your full service address';
+                }
+                return;
+            }
+
+            try {
                 const autocomplete = new google.maps.places.Autocomplete(addressInput, {
                     types: ['address'],
                     componentRestrictions: { country: 'us' }
                 });
 
                 autocomplete.addListener('place_changed', function() {
-                    const place = autocomplete.getPlace();
-                    if (place.formatted_address) {
-                        addressInput.value = place.formatted_address;
+                    try {
+                        const place = autocomplete.getPlace();
+                        if (place.formatted_address) {
+                            addressInput.value = place.formatted_address;
+                        }
+                    } catch (error) {
+                        console.error('Error handling place selection:', error);
                     }
                 });
-            } else {
-                console.warn('Google Places API not loaded. Address autocomplete will not work.');
+                
+                if (googleNote) {
+                    googleNote.textContent = 'Address suggestions powered by Google Places';
+                }
+                
+                console.log('Google Places Autocomplete initialized successfully');
+            } catch (error) {
+                console.error('Error initializing Google Places Autocomplete:', error);
+                if (googleNote) {
+                    googleNote.textContent = 'Enter your full service address';
+                }
             }
-        }
+        };
 
         // Initialize the schedule UI
         function initializeSchedule() {
@@ -1234,11 +1249,21 @@
             }
         });
 
-        // Initialize everything when page loads
+        // Initialize schedule when page loads
         window.addEventListener('load', function() {
+            // Initialize schedule (doesn't depend on external APIs)
             initializeSchedule();
-            initializeAutocomplete();
+            // Note: initializeAutocomplete() is called automatically by Google API callback
         });
+
+        // Also initialize on DOMContentLoaded as a fallback
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                if (!document.getElementById('scheduleContainer').hasChildNodes()) {
+                    initializeSchedule();
+                }
+            });
+        }
     </script>
 </body>
 </html>
