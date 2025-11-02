@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - LTC Insurance Onboarding v.3.2</title>
+    <title>Alice Care - LTC Insurance Onboarding v.3.3</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -675,61 +675,208 @@
                     
                     <div class="checkbox-group">
                         <div class="checkbox-item">
-                            <input type="checkbox" id="adl_bathing" name="adl" value="bathing">
-                            <label for="adl_bathing">Bathing</label>
+                            <input type="checkbox" id="adl_toileting" name="adl" value="TO">
+                            <label for="adl_toileting">TO (Toileting)</label>
                         </div>
                         <div class="checkbox-item">
-                            <input type="checkbox" id="adl_dressing" name="adl" value="dressing">
-                            <label for="adl_dressing">Dressing</label>
+                            <input type="checkbox" id="adl_eating" name="adl" value="EA">
+                            <label for="adl_eating">EA (Eating)</label>
                         </div>
                         <div class="checkbox-item">
-                            <input type="checkbox" id="adl_feeding" name="adl" value="feeding">
-                            <label for="adl_feeding">Feeding</label>
+                            <input type="checkbox" id="adl_ambulation" name="adl" value="AM">
+                            <label for="adl_ambulation">AM (Ambulation)</label>
                         </div>
                         <div class="checkbox-item">
-                            <input type="checkbox" id="adl_exercising" name="adl" value="exercising">
-                            <label for="adl_exercising">Exercising</label>
+                            <input type="checkbox" id="adl_transferring" name="adl" value="TR">
+                            <label for="adl_transferring">TR (Transferring)</label>
                         </div>
                         <div class="checkbox-item">
-                            <input type="checkbox" id="adl_hygiene" name="adl" value="personal hygiene and grooming">
-                            <label for="adl_hygiene">Personal hygiene and grooming</label>
+                            <input type="checkbox" id="adl_continence" name="adl" value="CO">
+                            <label for="adl_continence">CO (Continence)</label>
                         </div>
                         <div class="checkbox-item">
-                            <input type="checkbox" id="adl_transferring" name="adl" value="transferring/ambulating/positioning">
-                            <label for="adl_transferring">Transferring/ambulating/positioning</label>
+                            <input type="checkbox" id="adl_bathing" name="adl" value="BA">
+                            <label for="adl_bathing">BA (Bathing)</label>
                         </div>
                         <div class="checkbox-item">
-                            <input type="checkbox" id="adl_toileting" name="adl" value="toileting and incontinence care">
-                            <label for="adl_toileting">Toileting and incontinence care</label>
+                            <input type="checkbox" id="adl_dressing" name="adl" value="DR">
+                            <label for="adl_dressing">DR (Dressing)</label>
                         </div>
                         <div class="checkbox-item">
-                            <input type="checkbox" id="adl_phone" name="adl" value="making telephone calls">
-                            <label for="adl_phone">Making telephone calls</label>
+                            <input type="checkbox" id="adl_cognitive" name="adl" value="CS">
+                            <label for="adl_cognitive">CS (Cognitive Supervision)</label>
                         </div>
                         <div class="checkbox-item">
-                            <input type="checkbox" id="adl_medication" name="adl" value="assisting with medication">
-                            <label for="adl_medication">Assisting with medication that client self-administers</label>
+                            <input type="checkbox" id="adl_homemaker" name="adl" value="HM">
+                            <label for="adl_homemaker">HM (Homemaker Services)</label>
                         </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="adl_meals" name="adl" value="meal planning and preparation">
-                            <label for="adl_meals">Meal planning and preparation</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="adl_transportation" name="adl" value="transportation">
-                            <label for="adl_transportation">Transportation</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="adl_housekeeping" name="adl" value="housekeeping/laundry">
-                            <label for="adl_housekeeping">Housekeeping/laundry</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="adl_companionship" name="adl" value="companionship">
-                            <label for="adl_companionship">Companionship</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="adl_shopping" name="adl" value="shopping for personal care items or groceries">
-                            <label for="adl_shopping">Shopping for personal care items or groceries</label>
-                        </div>
+                    </div>
+                </div>
+
+                <!-- Level of Support ADLS Section -->
+                <div class="section">
+                    <h2 class="section-title">Level of Support ADLS</h2>
+                    <p style="margin-bottom: 20px; font-size: 14px; color: #7EA1C4;">For each activity, indicate the level of support required:</p>
+                    
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                            <thead>
+                                <tr style="background: #1A365C; color: white;">
+                                    <th style="padding: 12px; text-align: left; font-weight: 600; border: 1px solid #D3D7DF;">Level of Support ADLS</th>
+                                    <th style="padding: 12px; text-align: center; font-weight: 600; border: 1px solid #D3D7DF; min-width: 100px;">Independent</th>
+                                    <th style="padding: 12px; text-align: center; font-weight: 600; border: 1px solid #D3D7DF; min-width: 120px;">Requires Supervision<br><small style="font-weight: 400;">(Needs to be observed)</small></th>
+                                    <th style="padding: 12px; text-align: center; font-weight: 600; border: 1px solid #D3D7DF; min-width: 120px;">Requires Limited Assistance<br><small style="font-weight: 400;">(Prompting)</small></th>
+                                    <th style="padding: 12px; text-align: center; font-weight: 600; border: 1px solid #D3D7DF; min-width: 130px;">Extensive Assist<br><small style="font-weight: 400;">(Someone physically must assist them)</small></th>
+                                    <th style="padding: 12px; text-align: center; font-weight: 600; border: 1px solid #D3D7DF; min-width: 100px;">Total Dependence</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="background: #F8F9FB;">
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; font-weight: 500;">Bathing/Showering</td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_bathing" value="Independent" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_bathing" value="Requires Supervision" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_bathing" value="Requires Limited Assistance" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_bathing" value="Extensive Assist" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_bathing" value="Total Dependence" style="width: 20px; height: 20px;">
+                                    </td>
+                                </tr>
+                                <tr style="background: white;">
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; font-weight: 500;">Dressing</td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_dressing" value="Independent" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_dressing" value="Requires Supervision" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_dressing" value="Requires Limited Assistance" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_dressing" value="Extensive Assist" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_dressing" value="Total Dependence" style="width: 20px; height: 20px;">
+                                    </td>
+                                </tr>
+                                <tr style="background: #F8F9FB;">
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; font-weight: 500;">Getting in or out of a bed/chair</td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_bedchair" value="Independent" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_bedchair" value="Requires Supervision" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_bedchair" value="Requires Limited Assistance" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_bedchair" value="Extensive Assist" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_bedchair" value="Total Dependence" style="width: 20px; height: 20px;">
+                                    </td>
+                                </tr>
+                                <tr style="background: white;">
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; font-weight: 500;">Walking</td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_walking" value="Independent" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_walking" value="Requires Supervision" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_walking" value="Requires Limited Assistance" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_walking" value="Extensive Assist" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_walking" value="Total Dependence" style="width: 20px; height: 20px;">
+                                    </td>
+                                </tr>
+                                <tr style="background: #F8F9FB;">
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; font-weight: 500;">Using the Toilet</td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_toilet" value="Independent" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_toilet" value="Requires Supervision" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_toilet" value="Requires Limited Assistance" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_toilet" value="Extensive Assist" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_toilet" value="Total Dependence" style="width: 20px; height: 20px;">
+                                    </td>
+                                </tr>
+                                <tr style="background: white;">
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; font-weight: 500;">Eating</td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_eating" value="Independent" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_eating" value="Requires Supervision" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_eating" value="Requires Limited Assistance" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_eating" value="Extensive Assist" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_eating" value="Total Dependence" style="width: 20px; height: 20px;">
+                                    </td>
+                                </tr>
+                                <tr style="background: #F8F9FB;">
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; font-weight: 500;">Transferring</td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_transferring" value="Independent" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_transferring" value="Requires Supervision" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_transferring" value="Requires Limited Assistance" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_transferring" value="Extensive Assist" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_transferring" value="Total Dependence" style="width: 20px; height: 20px;">
+                                    </td>
+                                </tr>
+                                <tr style="background: white;">
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; font-weight: 500;">Cognitive Supervision (Companionship)</td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_cognitive" value="Independent" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_cognitive" value="Requires Supervision" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_cognitive" value="Requires Limited Assistance" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_cognitive" value="Extensive Assist" style="width: 20px; height: 20px;">
+                                    </td>
+                                    <td style="padding: 12px; border: 1px solid #D3D7DF; text-align: center;">
+                                        <input type="radio" name="support_cognitive" value="Total Dependence" style="width: 20px; height: 20px;">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
@@ -1090,6 +1237,18 @@
             const adlCheckboxes = document.querySelectorAll('input[name="adl"]:checked');
             const adlValues = Array.from(adlCheckboxes).map(cb => cb.value).join(', ');
             
+            // Handle Level of Support ADLS
+            const supportLevels = {
+                bathing: formData.get('support_bathing') || 'Not specified',
+                dressing: formData.get('support_dressing') || 'Not specified',
+                bedchair: formData.get('support_bedchair') || 'Not specified',
+                walking: formData.get('support_walking') || 'Not specified',
+                toilet: formData.get('support_toilet') || 'Not specified',
+                eating: formData.get('support_eating') || 'Not specified',
+                transferring: formData.get('support_transferring') || 'Not specified',
+                cognitive: formData.get('support_cognitive') || 'Not specified'
+            };
+            
             // Collect schedule data
             const scheduleDataForSubmission = {};
             DAYS.forEach(day => {
@@ -1129,6 +1288,14 @@
                 transferOfBenefits: formData.get('transferOfBenefits'),
                 form1099: 'Undetermined',
                 adl: adlValues,
+                supportLevelBathing: supportLevels.bathing,
+                supportLevelDressing: supportLevels.dressing,
+                supportLevelBedChair: supportLevels.bedchair,
+                supportLevelWalking: supportLevels.walking,
+                supportLevelToilet: supportLevels.toilet,
+                supportLevelEating: supportLevels.eating,
+                supportLevelTransferring: supportLevels.transferring,
+                supportLevelCognitive: supportLevels.cognitive,
                 schedule: JSON.stringify(scheduleDataForSubmission),
                 weeklyTotal: weeklyTotal.toFixed(2),
                 invoiceProcess: formData.get('invoiceProcess'),
