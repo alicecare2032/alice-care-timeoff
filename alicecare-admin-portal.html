@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LTC Admin v.4_10</title>
+    <title>LTC Admin v.4_11</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -933,18 +933,6 @@
                             <input type="tel" id="edit-phone" value="${submission.phone || ''}">
                         </div>
                     </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Primary Diagnose</div>
-                        <div class="detail-value">
-                            <input type="text" id="edit-primaryDiagnose" value="${submission.primaryDiagnose || ''}">
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Start Service Date</div>
-                        <div class="detail-value">
-                            <input type="date" id="edit-startServiceDate" value="${formatDateForInput(submission.startServiceDate)}">
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Legal Documents -->
@@ -1097,6 +1085,18 @@
                         <div class="detail-label">Additional Notes</div>
                         <div class="detail-value">
                             <textarea id="edit-additionalNotes">${submission.additionalNotes || ''}</textarea>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Primary Diagnose</div>
+                        <div class="detail-value">
+                            <input type="text" id="edit-primaryDiagnose" value="${submission.primaryDiagnose || ''}">
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Start Service Date</div>
+                        <div class="detail-value">
+                            <input type="date" id="edit-startServiceDate" value="${formatDateForInput(submission.startServiceDate)}">
                         </div>
                     </div>
                 </div>
