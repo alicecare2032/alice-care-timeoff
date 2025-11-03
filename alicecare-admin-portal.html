@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LTC Admin v.4_8</title>
+    <title>LTC Admin v.4_9</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -1155,9 +1155,14 @@
             };
 
             try {
-                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                console.log('Sending update request for row:', currentEditingRow);
+                console.log('Update data:', updatedData);
+                
+                // Use no-cors mode (same as Care Plan generation) because it's required for Google Apps Script
+                // This means we can't read the response, but the request will go through
+                await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
+                    mode: 'no-cors', // Required for Google Apps Script to work properly
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -1167,17 +1172,36 @@
                     })
                 });
 
-                showMessage('success', 'Changes saved successfully!');
-                closeModal();
+                console.log('Update request sent (no-cors mode - response is opaque)');
                 
-                // Reload submissions
-                setTimeout(() => {
-                    loadSubmissions();
-                }, 1000);
+                // Since we can't read the response with no-cors, we assume it worked
+                // and verify by reloading the data
+                showMessage('success', 'Update request sent! Reloading data to verify...');
+                
+                // Wait a moment for the server to process
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // Reload submissions to verify the change
+                await loadSubmissions();
+                
+                // Check if the update actually worked by comparing values
+                const updatedSubmission = allSubmissions.find(sub => sub.rowIndex === currentEditingRow);
+                if (updatedSubmission) {
+                    // Sample check on a key field to verify update
+                    if (updatedSubmission.insuredName === updatedData.insuredName) {
+                        showMessage('success', '✅ Changes saved successfully and verified!');
+                        closeModal();
+                    } else {
+                        showMessage('error', '⚠️ Update may not have saved. Please check the record and try again. If this persists, check Google Apps Script logs.');
+                    }
+                } else {
+                    showMessage('success', 'Update request sent. Please verify the changes in the record list.');
+                    closeModal();
+                }
 
             } catch (error) {
                 console.error('Error saving changes:', error);
-                showMessage('error', 'Failed to save changes. Please try again.');
+                showMessage('error', 'Failed to send update request: ' + error.message + '<br>Please try again or check Google Apps Script logs.');
             } finally {
                 saveBtn.disabled = false;
                 saveBtn.textContent = 'Save Changes';
