@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LTC Admin v.4_11</title>
+    <title>LTC Admin v.4_12</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -640,8 +640,25 @@
                 const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getAll`);
                 const data = await response.json();
 
+                console.log('=== LOADED SUBMISSIONS ===');
+                console.log('Total submissions:', data.data ? data.data.length : 0);
+                
                 if (data.result === 'success') {
-                    allSubmissions = data.data || []; // Fixed: API returns data.data, not data.submissions
+                    allSubmissions = data.data || [];
+                    
+                    // Log first submission as a sample
+                    if (allSubmissions.length > 0) {
+                        console.log('=== SAMPLE SUBMISSION (First Row) ===');
+                        const sample = allSubmissions[0];
+                        console.log('Invoice Process:', sample.invoiceProcess);
+                        console.log('Invoice Sent To:', sample.invoiceSentTo);
+                        console.log('Invoice Contact Info:', sample.invoiceContactInfo);
+                        console.log('Additional Notes:', sample.additionalNotes);
+                        console.log('Primary Diagnose:', sample.primaryDiagnose);
+                        console.log('Start Service Date:', sample.startServiceDate);
+                        console.log('Available keys:', Object.keys(sample).sort().join(', '));
+                    }
+                    
                     applyFilters();
                 } else {
                     throw new Error(data.message || 'Failed to load submissions');
@@ -793,6 +810,17 @@
         function openDetail(rowIndex) {
             const submission = allSubmissions.find(sub => sub.rowIndex === rowIndex);
             if (!submission) return;
+
+            console.log('=== OPENING DETAIL FOR ROW:', rowIndex);
+            console.log('=== SUBMISSION DATA ===');
+            console.log('Invoice Process:', submission.invoiceProcess);
+            console.log('Invoice Sent To:', submission.invoiceSentTo);
+            console.log('Invoice Contact Info:', submission.invoiceContactInfo);
+            console.log('Additional Notes:', submission.additionalNotes);
+            console.log('Primary Diagnose:', submission.primaryDiagnose);
+            console.log('Start Service Date:', submission.startServiceDate);
+            console.log('=== ALL KEYS ===');
+            console.log(Object.keys(submission).sort().join(', '));
 
             currentEditingRow = rowIndex;
             const modalBody = document.getElementById('modalBody');
@@ -1066,31 +1094,31 @@
                     <div class="detail-item full-width">
                         <div class="detail-label">Invoice Process</div>
                         <div class="detail-value">
-                            <input type="text" id="edit-invoiceProcess" value="${submission.invoiceProcess || ''}">
+                            <input type="text" id="edit-invoiceProcess" value="${(submission.invoiceProcess || '').replace(/"/g, '&quot;')}">
                         </div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Invoice Sent To</div>
                         <div class="detail-value">
-                            <input type="text" id="edit-invoiceSentTo" value="${submission.invoiceSentTo || ''}">
+                            <input type="text" id="edit-invoiceSentTo" value="${(submission.invoiceSentTo || '').replace(/"/g, '&quot;')}">
                         </div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Invoice Contact Info</div>
                         <div class="detail-value">
-                            <input type="text" id="edit-invoiceContactInfo" value="${submission.invoiceContactInfo || ''}">
+                            <input type="text" id="edit-invoiceContactInfo" value="${(submission.invoiceContactInfo || '').replace(/"/g, '&quot;')}">
                         </div>
                     </div>
                     <div class="detail-item full-width">
                         <div class="detail-label">Additional Notes</div>
                         <div class="detail-value">
-                            <textarea id="edit-additionalNotes">${submission.additionalNotes || ''}</textarea>
+                            <textarea id="edit-additionalNotes">${(submission.additionalNotes || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
                         </div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Primary Diagnose</div>
                         <div class="detail-value">
-                            <input type="text" id="edit-primaryDiagnose" value="${submission.primaryDiagnose || ''}">
+                            <input type="text" id="edit-primaryDiagnose" value="${(submission.primaryDiagnose || '').replace(/"/g, '&quot;')}" placeholder="Enter diagnosis...">
                         </div>
                     </div>
                     <div class="detail-item">
@@ -1167,6 +1195,17 @@
                 invoiceContactInfo: document.getElementById('edit-invoiceContactInfo').value,
                 additionalNotes: document.getElementById('edit-additionalNotes').value
             };
+
+            console.log('=== SAVING CHANGES ===');
+            console.log('Row Index:', updatedData.rowIndex);
+            console.log('Invoice Process:', updatedData.invoiceProcess);
+            console.log('Invoice Sent To:', updatedData.invoiceSentTo);
+            console.log('Invoice Contact Info:', updatedData.invoiceContactInfo);
+            console.log('Additional Notes:', updatedData.additionalNotes);
+            console.log('Primary Diagnose:', updatedData.primaryDiagnose);
+            console.log('Start Service Date:', updatedData.startServiceDate);
+            console.log('=== FULL UPDATE DATA ===');
+            console.log(updatedData);
 
             try {
                 console.log('Sending update request for row:', currentEditingRow);
