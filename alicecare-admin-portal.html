@@ -693,6 +693,43 @@
             applyFilters();
         }
 
+        // Format timestamp for display
+        function formatTimestampDisplay(timestamp) {
+            if (!timestamp) return '-';
+            
+            // If timestamp is already in PST format (contains "PST"), just extract the date part
+            if (typeof timestamp === 'string' && timestamp.includes('PST')) {
+                // Format: "2025-11-02 18:02:06 PST" -> "11/02/2025"
+                const datePart = timestamp.split(' ')[0];
+                const [year, month, day] = datePart.split('-');
+                return `${month}/${day}/${year}`;
+            }
+            
+            // Otherwise, try to parse as Date object (for backwards compatibility)
+            try {
+                return new Date(timestamp).toLocaleDateString();
+            } catch (e) {
+                return timestamp;
+            }
+        }
+
+        // Format timestamp for detailed view
+        function formatTimestampDetailed(timestamp) {
+            if (!timestamp) return '-';
+            
+            // If timestamp is already in PST format, return as-is
+            if (typeof timestamp === 'string' && timestamp.includes('PST')) {
+                return timestamp;
+            }
+            
+            // Otherwise, try to parse as Date object (for backwards compatibility)
+            try {
+                return new Date(timestamp).toLocaleString();
+            } catch (e) {
+                return timestamp;
+            }
+        }
+
         // Render submissions list
         function renderSubmissionsList() {
             const listContainer = document.getElementById('submissionsList');
@@ -711,7 +748,7 @@
             }
 
             listContainer.innerHTML = filteredSubmissions.map((sub, index) => {
-                const date = new Date(sub.timestamp).toLocaleDateString();
+                const date = formatTimestampDisplay(sub.timestamp);
                 const status = sub.eliminationPeriodMet === 'yes' ? 'Active' : 'Pending';
                 
                 return `
@@ -1013,7 +1050,7 @@
                 </div>
 
                 <div style="margin-top: 20px; padding: 15px; background: #E5ECF3; border-radius: 8px; font-size: 13px; color: #1A365C;">
-                    <strong>Submission Date:</strong> ${new Date(submission.timestamp).toLocaleString()}<br>
+                    <strong>Submission Date:</strong> ${formatTimestampDetailed(submission.timestamp)}<br>
                     <strong>Row Number:</strong> ${submission.rowIndex}
                 </div>
             `;
