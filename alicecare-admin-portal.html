@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - Admin Portal v.4_3</title>
+    <title>Alice Care - Admin Portal v.4_4_1</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -1219,14 +1219,33 @@
             } catch (error) {
                 console.error('Error generating Care Plan:', error);
                 
+                // Check if it's a CORS or network error
+                const isCorsError = error.message.includes('Failed to fetch') || 
+                                   error.message.includes('CORS') || 
+                                   error.message.includes('NetworkError');
+                
                 // Show detailed error message
                 let errorMsg = '❌ Failed to generate Care Plan<br><br>';
-                errorMsg += `<strong>Error:</strong> ${error.message}<br><br>`;
-                errorMsg += '<strong>Troubleshooting:</strong><br>';
-                errorMsg += '1. Check Google Apps Script logs (Extensions > Apps Script > View > Logs)<br>';
-                errorMsg += '2. Verify MAIN_FOLDER_ID is correct in the script<br>';
-                errorMsg += '3. Ensure you granted Drive, Docs, and Sheets permissions<br>';
-                errorMsg += '4. Try the testCarePlanGeneration() function in Apps Script<br>';
+                
+                if (isCorsError) {
+                    errorMsg += '<strong>⚠️ CORS/Network Error Detected</strong><br><br>';
+                    errorMsg += '<strong>Most Likely Cause:</strong> Your Google Apps Script needs to be redeployed with correct permissions.<br><br>';
+                    errorMsg += '<strong>Fix:</strong><br>';
+                    errorMsg += '1. Open your Apps Script: <a href="https://script.google.com" target="_blank" style="color: #F57600;">script.google.com</a><br>';
+                    errorMsg += '2. Click <strong>Deploy → Manage deployments</strong><br>';
+                    errorMsg += '3. Click the Edit icon (pencil) ✏️<br>';
+                    errorMsg += '4. Change <strong>"Who has access"</strong> to <strong>"Anyone"</strong> (not "Anyone with Google account")<br>';
+                    errorMsg += '5. Change <strong>"Version"</strong> to <strong>"New version"</strong><br>';
+                    errorMsg += '6. Click <strong>"Deploy"</strong><br><br>';
+                    errorMsg += '<em>This allows your GitHub Pages site to communicate with the script.</em>';
+                } else {
+                    errorMsg += `<strong>Error:</strong> ${error.message}<br><br>`;
+                    errorMsg += '<strong>Troubleshooting:</strong><br>';
+                    errorMsg += '1. Check Google Apps Script logs (Extensions > Apps Script > View > Logs)<br>';
+                    errorMsg += '2. Verify MAIN_FOLDER_ID is correct in the script<br>';
+                    errorMsg += '3. Ensure you granted Drive, Docs, and Sheets permissions<br>';
+                    errorMsg += '4. Try the testCarePlanGeneration() function in Apps Script<br>';
+                }
                 
                 showMessage('error', errorMsg);
             } finally {
