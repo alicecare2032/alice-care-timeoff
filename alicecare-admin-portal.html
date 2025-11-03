@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LTC Admin v.4_7_1</title>
+    <title>LTC Admin v.4_8</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -1028,24 +1028,35 @@
                         </tr>
                     </thead>
                     <tbody>
-                        ${['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map(day => {
-                            const dayData = scheduleData[day] || { slots: [], total: 0 };
-                            const scheduleText = dayData.slots.map(slot => 
-                                `${slot.start}-${slot.end} (${slot.hours.toFixed(2)}hrs)`
-                            ).join(', ') || '-';
+                        ${(() => {
+                            let weeklyTotal = 0;
+                            const rows = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map(day => {
+                                const dayData = scheduleData[day] || { slots: [], total: 0 };
+                                
+                                // Compute daily total by summing slot hours
+                                const dailyTotal = dayData.slots.reduce((sum, slot) => sum + slot.hours, 0);
+                                weeklyTotal += dailyTotal;
+                                
+                                const scheduleText = dayData.slots.map(slot => 
+                                    `${slot.start}-${slot.end} (${slot.hours.toFixed(2)}hrs)`
+                                ).join(', ') || '-';
+                                
+                                return `
+                                    <tr>
+                                        <td style="font-weight: 600;">${day.charAt(0).toUpperCase() + day.slice(1)}</td>
+                                        <td>${scheduleText}</td>
+                                        <td>${dailyTotal.toFixed(2)} hrs</td>
+                                    </tr>
+                                `;
+                            }).join('');
                             
-                            return `
-                                <tr>
-                                    <td style="font-weight: 600;">${day.charAt(0).toUpperCase() + day.slice(1)}</td>
-                                    <td>${scheduleText}</td>
-                                    <td>${dayData.total.toFixed(2)} hrs</td>
+                            return rows + `
+                                <tr style="background: #E5ECF3; font-weight: 600;">
+                                    <td colspan="2">Weekly Total</td>
+                                    <td>${weeklyTotal.toFixed(2)} hrs</td>
                                 </tr>
                             `;
-                        }).join('')}
-                        <tr style="background: #E5ECF3; font-weight: 600;">
-                            <td colspan="2">Weekly Total</td>
-                            <td>${submission.weeklyTotal || '0.00'}</td>
-                        </tr>
+                        })()}
                     </tbody>
                 </table>
 
