@@ -820,7 +820,7 @@
                     <div class="detail-item">
                         <div class="detail-label">Date of Birth</div>
                         <div class="detail-value">
-                            <input type="date" id="edit-dateOfBirth" value="${submission.dateOfBirth || ''}">
+                           <input type="date" id="edit-dateOfBirth" value="${formatDateForInput(submission.dateOfBirth)}">
                         </div>
                     </div>
                     <div class="detail-item">
@@ -852,6 +852,7 @@
                 <!-- Legal Documents -->
                 <div class="section-title">Legal Documents</div>
                 <div class="detail-grid">
+                
                     <div class="detail-item">
                         <div class="detail-label">Power of Attorney</div>
                         <div class="detail-value">
