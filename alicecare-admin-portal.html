@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - Admin Portal v.4_2_internal</title>
+    <title>Alice Care - Admin Portal v.4_3</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -732,6 +732,26 @@
             }).join('');
         }
 
+        // Helper function to format date for HTML date input (yyyy-MM-dd)
+        function formatDateForInput(dateString) {
+            if (!dateString) return '';
+            try {
+                // Handle ISO format dates like "2001-10-10T07:00:00.000Z"
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) return ''; // Invalid date
+                
+                // Format as yyyy-MM-dd
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                
+                return `${year}-${month}-${day}`;
+            } catch (e) {
+                console.error('Error formatting date:', e);
+                return '';
+            }
+        }
+
         // Open detail modal
         function openDetail(rowIndex) {
             const submission = allSubmissions.find(sub => sub.rowIndex === rowIndex);
@@ -820,7 +840,7 @@
                     <div class="detail-item">
                         <div class="detail-label">Date of Birth</div>
                         <div class="detail-value">
-                           <input type="date" id="edit-dateOfBirth" value="${formatDateForInput(submission.dateOfBirth)}">
+                            <input type="date" id="edit-dateOfBirth" value="${formatDateForInput(submission.dateOfBirth)}">
                         </div>
                     </div>
                     <div class="detail-item">
@@ -852,7 +872,6 @@
                 <!-- Legal Documents -->
                 <div class="section-title">Legal Documents</div>
                 <div class="detail-grid">
-                
                     <div class="detail-item">
                         <div class="detail-label">Power of Attorney</div>
                         <div class="detail-value">
