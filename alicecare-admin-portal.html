@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LTC Admin v.4_6</title>
+    <title>LTC Admin v.4_7</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -797,13 +797,42 @@
             currentEditingRow = rowIndex;
             const modalBody = document.getElementById('modalBody');
 
-            // Parse schedule if it exists
+            // Parse schedule data from individual day fields
             let scheduleData = {};
-            try {
-                scheduleData = submission.schedule ? JSON.parse(submission.schedule) : {};
-            } catch (e) {
-                console.error('Error parsing schedule:', e);
-            }
+            const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            
+            days.forEach(day => {
+                const scheduleKey = day + 'Schedule';
+                const totalKey = day + 'Total';
+                const scheduleStr = submission[scheduleKey] || '';
+                const totalStr = submission[totalKey] || '0.00 hrs';
+                
+                // Parse the schedule string (format: "09:00-12:00 (3.00hrs); 14:00-17:00 (3.00hrs)")
+                const slots = [];
+                if (scheduleStr && scheduleStr !== '') {
+                    const slotParts = scheduleStr.split(';').map(s => s.trim()).filter(s => s);
+                    slotParts.forEach(slotStr => {
+                        // Match pattern: "09:00-12:00 (3.00hrs)"
+                        const match = slotStr.match(/(\d{1,2}:\d{2})-(\d{1,2}:\d{2})\s*\((\d+\.?\d*)hrs?\)/);
+                        if (match) {
+                            slots.push({
+                                start: match[1],
+                                end: match[2],
+                                hours: parseFloat(match[3])
+                            });
+                        }
+                    });
+                }
+                
+                // Parse total (format: "6.00 hrs")
+                const totalMatch = totalStr.match(/(\d+\.?\d*)/);
+                const total = totalMatch ? parseFloat(totalMatch[1]) : 0;
+                
+                scheduleData[day] = {
+                    slots: slots,
+                    total: total
+                };
+            });
 
             modalBody.innerHTML = `
                 <!-- Insurance Information -->
