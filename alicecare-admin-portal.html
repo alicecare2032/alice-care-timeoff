@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - Admin Portal v.4_5</title>
+    <title>Alice Care - Admin Portal v.4_6_FIXED</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -834,11 +834,17 @@
                         </div>
                     </div>
                     <div class="detail-item">
+                        <div class="detail-label">Elimination Period (Other)</div>
+                        <div class="detail-value">
+                            <input type="text" id="edit-eliminationPeriodOther" value="${submission.eliminationPeriodOther || ''}" placeholder="e.g., 120 days">
+                        </div>
+                    </div>
+                    <div class="detail-item">
                         <div class="detail-label">Elimination Period Met</div>
                         <div class="detail-value">
                             <select id="edit-eliminationPeriodMet">
-                                <option value="yes" ${submission.eliminationPeriodMet === 'yes' ? 'selected' : ''}>Yes</option>
-                                <option value="no" ${submission.eliminationPeriodMet === 'no' ? 'selected' : ''}>No</option>
+                                <option value="Yes" ${submission.eliminationPeriodMet === 'Yes' ? 'selected' : ''}>Yes</option>
+                                <option value="No" ${submission.eliminationPeriodMet === 'No' ? 'selected' : ''}>No</option>
                             </select>
                         </div>
                     </div>
@@ -886,6 +892,12 @@
                             <input type="text" id="edit-responsibleParty" value="${submission.responsibleParty || ''}">
                         </div>
                     </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Primary Diagnose</div>
+                        <div class="detail-value">
+                            <input type="text" id="edit-primaryDiagnose" value="${submission.primaryDiagnose || ''}">
+                        </div>
+                    </div>
                     <div class="detail-item full-width">
                         <div class="detail-label">Address</div>
                         <div class="detail-value">
@@ -924,6 +936,15 @@
                             <select id="edit-transferOfBenefits">
                                 <option value="yes" ${submission.transferOfBenefits === 'yes' ? 'selected' : ''}>Yes</option>
                                 <option value="no" ${submission.transferOfBenefits === 'no' ? 'selected' : ''}>No</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">1099 Completed</div>
+                        <div class="detail-value">
+                            <select id="edit-form1099">
+                                <option value="yes" ${submission.form1099 === 'yes' ? 'selected' : ''}>Yes</option>
+                                <option value="no" ${submission.form1099 === 'no' ? 'selected' : ''}>No</option>
                             </select>
                         </div>
                     </div>
@@ -1015,7 +1036,7 @@
                         }).join('')}
                         <tr style="background: #E5ECF3; font-weight: 600;">
                             <td colspan="2">Weekly Total</td>
-                            <td>${submission.weeklyTotal || '0.00'}</td>
+                            <td>${submission.weeklyTotal ? parseFloat(submission.weeklyTotal).toFixed(2) + ' hrs' : '0.00 hrs'}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -1087,6 +1108,7 @@
                 policyNumber: document.getElementById('edit-policyNumber').value,
                 claimNumber: document.getElementById('edit-claimNumber').value,
                 eliminationPeriod: document.getElementById('edit-eliminationPeriod').value,
+                eliminationPeriodOther: document.getElementById('edit-eliminationPeriodOther').value,
                 eliminationPeriodMet: document.getElementById('edit-eliminationPeriodMet').value,
                 maxSpendPeriod: document.getElementById('edit-maxSpendPeriod').value,
                 maxSpendAmount: document.getElementById('edit-maxSpendAmount').value,
@@ -1094,11 +1116,13 @@
                 insuredName: document.getElementById('edit-insuredName').value,
                 dateOfBirth: document.getElementById('edit-dateOfBirth').value,
                 responsibleParty: document.getElementById('edit-responsibleParty').value,
+                primaryDiagnose: document.getElementById('edit-primaryDiagnose').value,
                 address: document.getElementById('edit-address').value,
                 email: document.getElementById('edit-email').value,
                 phone: document.getElementById('edit-phone').value,
                 powerOfAttorney: document.getElementById('edit-powerOfAttorney').value,
                 transferOfBenefits: document.getElementById('edit-transferOfBenefits').value,
+                form1099: document.getElementById('edit-form1099').value,
                 adl: document.getElementById('edit-adl').value,
                 supportLevelBathing: document.getElementById('edit-supportLevelBathing').value,
                 supportLevelDressing: document.getElementById('edit-supportLevelDressing').value,
