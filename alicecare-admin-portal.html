@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - Admin Portal v.4_6_FIXED</title>
+    <title>Alice Care - Admin Portal v.4_7_FINAL_CORRECTED</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -887,6 +887,12 @@
                         </div>
                     </div>
                     <div class="detail-item">
+                        <div class="detail-label">Start Service Date</div>
+                        <div class="detail-value">
+                            <input type="date" id="edit-startServiceDate" value="${formatDateForInput(submission.startServiceDate)}">
+                        </div>
+                    </div>
+                    <div class="detail-item">
                         <div class="detail-label">Responsible Party</div>
                         <div class="detail-value">
                             <input type="text" id="edit-responsibleParty" value="${submission.responsibleParty || ''}">
@@ -1115,6 +1121,7 @@
                 maxSpendUnit: document.getElementById('edit-maxSpendUnit').value,
                 insuredName: document.getElementById('edit-insuredName').value,
                 dateOfBirth: document.getElementById('edit-dateOfBirth').value,
+                startServiceDate: document.getElementById('edit-startServiceDate').value,
                 responsibleParty: document.getElementById('edit-responsibleParty').value,
                 primaryDiagnose: document.getElementById('edit-primaryDiagnose').value,
                 address: document.getElementById('edit-address').value,
