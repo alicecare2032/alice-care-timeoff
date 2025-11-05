@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - LTC Insurance Onboarding v.4</title>
+    <title>Alice Care - LTC Insurance Onboarding v.4_1PD</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -597,6 +597,11 @@
                             <label for="responsibleParty">Responsible Party Name</label>
                             <input type="text" id="responsibleParty" name="responsibleParty">
                         </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="primaryDiagnose">Primary Diagnosis</label>
+                        <input type="text" id="primaryDiagnose" name="primaryDiagnose" placeholder="Enter primary diagnosis...">
                     </div>
 
                     <div class="form-group">
@@ -1306,6 +1311,7 @@
                 insuredName: formData.get('insuredName'),
                 dateOfBirth: formData.get('dateOfBirth'),
                 responsibleParty: formData.get('responsibleParty'),
+                primaryDiagnose: formData.get('primaryDiagnose'),
                 address: formData.get('address'),
                 email: formData.get('email'),
                 phone: formData.get('phone'),
