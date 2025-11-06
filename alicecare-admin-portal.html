@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Portal v.5_0_PERSISTENCE_FIXED</title>
+    <title>Admin Portal v.5.1 C_gpt</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -749,7 +749,7 @@
 
             listContainer.innerHTML = filteredSubmissions.map((sub, index) => {
                 const date = formatTimestampDisplay(sub.timestamp);
-                const status = (sub.eliminationPeriodMet || '').toLowerCase() === 'yes' ? 'Active' : 'Pending';
+                const status = ((sub.eliminationPeriodMet || '').toLowerCase() === 'yes') ? 'Active' : 'Pending';
                 
                 return `
                     <div class="list-item" onclick="openDetail(${sub.rowIndex})">
@@ -1107,15 +1107,6 @@
             saveBtn.disabled = true;
             saveBtn.textContent = 'Saving...';
 
-            // Find the original submission to preserve non-editable fields
-            const originalSubmission = allSubmissions.find(sub => sub.rowIndex === currentEditingRow);
-            if (!originalSubmission) {
-                showMessage('error', 'Could not find submission data');
-                saveBtn.disabled = false;
-                saveBtn.textContent = 'Save Changes';
-                return;
-            }
-
             // Collect updated data
             const updatedData = {
                 rowIndex: currentEditingRow,
@@ -1151,23 +1142,7 @@
                 invoiceProcess: document.getElementById('edit-invoiceProcess').value,
                 invoiceSentTo: document.getElementById('edit-invoiceSentTo').value,
                 invoiceContactInfo: document.getElementById('edit-invoiceContactInfo').value,
-                additionalNotes: document.getElementById('edit-additionalNotes').value,
-                // Preserve schedule and daily total fields (not editable in UI)
-                mondaySchedule: originalSubmission.mondaySchedule || '',
-                mondayTotal: originalSubmission.mondayTotal || '',
-                tuesdaySchedule: originalSubmission.tuesdaySchedule || '',
-                tuesdayTotal: originalSubmission.tuesdayTotal || '',
-                wednesdaySchedule: originalSubmission.wednesdaySchedule || '',
-                wednesdayTotal: originalSubmission.wednesdayTotal || '',
-                thursdaySchedule: originalSubmission.thursdaySchedule || '',
-                thursdayTotal: originalSubmission.thursdayTotal || '',
-                fridaySchedule: originalSubmission.fridaySchedule || '',
-                fridayTotal: originalSubmission.fridayTotal || '',
-                saturdaySchedule: originalSubmission.saturdaySchedule || '',
-                saturdayTotal: originalSubmission.saturdayTotal || '',
-                sundaySchedule: originalSubmission.sundaySchedule || '',
-                sundayTotal: originalSubmission.sundayTotal || '',
-                weeklyTotal: originalSubmission.weeklyTotal || ''
+                additionalNotes: document.getElementById('edit-additionalNotes').value
             };
 
             try {
