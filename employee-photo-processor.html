@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Photo Processor - Alice Care</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,22 +15,51 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Poppins', sans-serif;
+            background: #F57600;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Decorative circular graphic elements from brand guidelines */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            border: 40px solid rgba(255, 255, 255, 0.2);
+            top: -100px;
+            left: -100px;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            border: 50px solid rgba(255, 255, 255, 0.15);
+            bottom: -150px;
+            right: -150px;
+            z-index: 0;
         }
 
         .container {
             background: white;
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
             padding: 40px;
-            max-width: 600px;
+            max-width: 650px;
             width: 100%;
+            position: relative;
+            z-index: 1;
         }
 
         .header {
@@ -35,27 +67,54 @@
             margin-bottom: 30px;
         }
 
+        .logo {
+            margin-bottom: 20px;
+        }
+
+        .logo-text {
+            font-size: 42px;
+            font-weight: 400;
+            line-height: 1;
+        }
+
+        .logo-alice {
+            color: #F57600;
+            font-weight: 700;
+        }
+
+        .logo-dot {
+            color: #F57600;
+        }
+
+        .logo-care {
+            color: #1A365C;
+            font-weight: 400;
+        }
+
         .header h1 {
-            color: #333;
-            font-size: 28px;
-            margin-bottom: 10px;
+            color: #1A365C;
+            font-size: 24px;
+            margin-bottom: 8px;
+            font-weight: 600;
         }
 
         .header p {
-            color: #666;
+            color: #3D3D3D;
             font-size: 14px;
+            font-weight: 400;
         }
 
         .api-key-section {
-            background: #f8f9fa;
+            background: #E5ECF3;
             padding: 20px;
             border-radius: 10px;
             margin-bottom: 30px;
+            border-left: 4px solid #1A365C;
         }
 
         .api-key-section label {
             display: block;
-            color: #333;
+            color: #1A365C;
             font-weight: 600;
             margin-bottom: 8px;
             font-size: 14px;
@@ -64,27 +123,29 @@
         .api-key-section input {
             width: 100%;
             padding: 12px;
-            border: 2px solid #e0e0e0;
+            border: 2px solid #D3D7DF;
             border-radius: 8px;
             font-size: 14px;
+            font-family: 'Poppins', sans-serif;
             transition: border-color 0.3s;
         }
 
         .api-key-section input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #F57600;
         }
 
         .api-key-section small {
             display: block;
-            color: #666;
+            color: #3D3D3D;
             margin-top: 8px;
             font-size: 12px;
         }
 
         .api-key-section a {
-            color: #667eea;
+            color: #F57600;
             text-decoration: none;
+            font-weight: 500;
         }
 
         .api-key-section a:hover {
@@ -92,23 +153,24 @@
         }
 
         .upload-area {
-            border: 3px dashed #667eea;
+            border: 3px dashed #F57600;
             border-radius: 10px;
             padding: 40px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
             margin-bottom: 20px;
+            background: #FCECCD;
         }
 
         .upload-area:hover {
-            background: #f8f9ff;
-            border-color: #764ba2;
+            background: #FFE3E3;
+            border-color: #1A365C;
         }
 
         .upload-area.dragover {
-            background: #e8eaff;
-            border-color: #764ba2;
+            background: #E5ECF3;
+            border-color: #1A365C;
         }
 
         .upload-icon {
@@ -117,23 +179,26 @@
         }
 
         .upload-area p {
-            color: #666;
+            color: #3D3D3D;
             margin-bottom: 10px;
+            font-weight: 500;
         }
 
         .upload-area button {
-            background: #667eea;
+            background: #F57600;
             color: white;
             border: none;
             padding: 12px 30px;
             border-radius: 8px;
             font-size: 16px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
             cursor: pointer;
             transition: background 0.3s;
         }
 
         .upload-area button:hover {
-            background: #764ba2;
+            background: #1A365C;
         }
 
         input[type="file"] {
@@ -161,7 +226,7 @@
         }
 
         .preview-box h3 {
-            color: #333;
+            color: #1A365C;
             font-size: 14px;
             margin-bottom: 10px;
             font-weight: 600;
@@ -187,21 +252,22 @@
             border-radius: 8px;
             margin-bottom: 20px;
             font-weight: 600;
+            font-size: 14px;
         }
 
         .status.processing {
-            background: #fff3cd;
-            color: #856404;
+            background: #FCECCD;
+            color: #1A365C;
         }
 
         .status.success {
-            background: #d4edda;
-            color: #155724;
+            background: #E0F1E9;
+            color: #1A365C;
         }
 
         .status.error {
-            background: #f8d7da;
-            color: #721c24;
+            background: #FFE3E3;
+            color: #1A365C;
         }
 
         .action-buttons {
@@ -215,27 +281,28 @@
             border: none;
             border-radius: 8px;
             font-size: 16px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
             cursor: pointer;
             transition: all 0.3s;
-            font-weight: 600;
         }
 
         .btn-primary {
-            background: #28a745;
+            background: #62B790;
             color: white;
         }
 
         .btn-primary:hover {
-            background: #218838;
+            background: #1A365C;
         }
 
         .btn-secondary {
-            background: #6c757d;
+            background: #7EA1C4;
             color: white;
         }
 
         .btn-secondary:hover {
-            background: #5a6268;
+            background: #1A365C;
         }
 
         .btn:disabled {
@@ -244,8 +311,8 @@
         }
 
         .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
+            border: 3px solid #FCECCD;
+            border-top: 3px solid #F57600;
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -259,23 +326,54 @@
         }
 
         .info-box {
-            background: #e7f3ff;
-            border-left: 4px solid #2196F3;
+            background: #E5ECF3;
+            border-left: 4px solid #F57600;
             padding: 15px;
             border-radius: 5px;
             margin-top: 20px;
         }
 
         .info-box p {
-            color: #0c5f96;
+            color: #1A365C;
             font-size: 13px;
             line-height: 1.6;
+        }
+
+        .info-box strong {
+            color: #F57600;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+
+            .logo-text {
+                font-size: 32px;
+            }
+
+            .preview-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
+            <div class="logo">
+                <div class="logo-text">
+                    <span class="logo-alice">alice</span><span class="logo-dot">.</span><span class="logo-care">care</span>
+                </div>
+            </div>
             <h1>📸 Employee Photo Processor</h1>
             <p>Automatic crop, background removal & resize to 200x200</p>
         </div>
