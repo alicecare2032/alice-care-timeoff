@@ -3,10 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Photo Processor - Alice Care</title>
+    <title>Employee Photo Processor - v2</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Face Detection Library -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/dist/face-api.min.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -375,7 +379,7 @@
                 </div>
             </div>
             <h1>📸 Employee Photo Processor</h1>
-            <p>Automatic crop, background removal & resize to 200x200</p>
+            <p>Face detection, auto-crop, background removal & resize to 200x200</p>
         </div>
 
         <div class="api-key-section">
@@ -420,6 +424,7 @@
 
         <div class="info-box">
             <p><strong>Processing Steps:</strong><br>
+            🔍 Face is automatically detected and centered<br>
             1️⃣ Image is automatically cropped to 1:1 ratio (square)<br>
             2️⃣ Background is removed using AI<br>
             3️⃣ Final image is resized to 200x200 pixels<br>
@@ -442,6 +447,27 @@
         const downloadBtn = document.getElementById('downloadBtn');
         const statusMessage = document.getElementById('statusMessage');
         const apiKeyInput = document.getElementById('apiKey');
+
+        // Face detection models loaded flag
+        let modelsLoaded = false;
+
+        // Load face detection models on page load
+        async function loadFaceDetectionModels() {
+            try {
+                const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/model/';
+                await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+                modelsLoaded = true;
+                console.log('Face detection models loaded successfully');
+            } catch (error) {
+                console.warn('Face detection models failed to load:', error);
+                modelsLoaded = false;
+            }
+        }
+
+        // Initialize face detection when page loads
+        window.addEventListener('load', () => {
+            loadFaceDetectionModels();
+        });
 
         // Load API key (permanent key takes priority)
         if (PERMANENT_API_KEY) {
@@ -512,7 +538,8 @@
                 showStatus('⏳ Processing image... This may take a few seconds', 'processing');
                 downloadBtn.disabled = true;
 
-                // Step 1: Load and crop to 1:1 ratio
+                // Step 1: Load and crop to 1:1 ratio (with face detection)
+                showStatus('🔍 Detecting face and cropping...', 'processing');
                 const croppedBlob = await cropImageTo1x1(file);
                 
                 showStatus('⏳ Removing background...', 'processing');
@@ -534,19 +561,57 @@
             }
         }
 
-        function cropImageTo1x1(file) {
-            return new Promise((resolve) => {
+        async function detectFace(img) {
+            if (!modelsLoaded) {
+                console.log('Face detection models not loaded, using center crop');
+                return null;
+            }
+
+            try {
+                const detection = await faceapi.detectSingleFace(img, new faceapi.TinyFaceDetectorOptions());
+                return detection;
+            } catch (error) {
+                console.warn('Face detection failed:', error);
+                return null;
+            }
+        }
+
+        async function cropImageTo1x1(file) {
+            return new Promise(async (resolve) => {
                 const img = new Image();
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
 
-                img.onload = () => {
+                img.onload = async () => {
                     // Determine the size for 1:1 crop (use the smaller dimension)
                     const size = Math.min(img.width, img.height);
                     
-                    // Calculate center crop coordinates
-                    const startX = (img.width - size) / 2;
-                    const startY = (img.height - size) / 2;
+                    // Try to detect face
+                    const detection = await detectFace(img);
+                    
+                    let startX, startY;
+                    
+                    if (detection) {
+                        // Face detected! Center crop around the face
+                        const box = detection.box;
+                        const faceCenterX = box.x + box.width / 2;
+                        const faceCenterY = box.y + box.height / 2;
+                        
+                        // Calculate crop position centered on face
+                        startX = faceCenterX - size / 2;
+                        startY = faceCenterY - size / 2;
+                        
+                        // Ensure crop stays within image bounds
+                        startX = Math.max(0, Math.min(startX, img.width - size));
+                        startY = Math.max(0, Math.min(startY, img.height - size));
+                        
+                        console.log('Face detected and centered!');
+                    } else {
+                        // No face detected, use center crop
+                        startX = (img.width - size) / 2;
+                        startY = (img.height - size) / 2;
+                        console.log('No face detected, using center crop');
+                    }
 
                     // Set canvas to square
                     canvas.width = size;
