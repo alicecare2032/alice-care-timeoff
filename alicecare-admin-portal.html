@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LTC Insurance 2.3</title>
+    <title>Alice Care - LTC Insurance Admin Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -649,7 +649,7 @@
     <div class="header">
         <div class="header-content">
             <div class="header-title">
-                <div class="logo"></div>
+                <div class="logo">🏥</div>
                 <div>
                     <h1>LTC Insurance Admin Portal</h1>
                     <div class="header-subtitle">Long-Term Care Insurance Management System</div>
@@ -776,6 +776,31 @@
         window.addEventListener('DOMContentLoaded', () => {
             loadRecords();
         });
+
+        // Helper function to get value from record with flexible key matching
+        function getRecordValue(record, ...possibleKeys) {
+            for (let key of possibleKeys) {
+                if (record[key] !== undefined && record[key] !== null && record[key] !== '') {
+                    return record[key];
+                }
+            }
+            return '';
+        }
+
+        // Helper function to format date for input field (converts ISO to YYYY-MM-DD)
+        function formatDateForInput(dateValue) {
+            if (!dateValue) return '';
+            try {
+                const date = new Date(dateValue);
+                if (isNaN(date.getTime())) return '';
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            } catch (e) {
+                return '';
+            }
+        }
 
         // Load all records from Google Sheets using JSONP to avoid CORS
         function loadRecords() {
@@ -943,7 +968,7 @@
                     <div><strong>${record.insuredName || 'N/A'}</strong></div>
                     <div>${record.insurance || 'N/A'}</div>
                     <div>${record.policyNumber || 'N/A'}</div>
-                    <div>${record.startServiceDate || 'Not Set'}</div>
+                    <div>${formatDateForInput(getRecordValue(record, 'startServiceDate', 'startservicedate', 'start_service_date')) || 'Not Set'}</div>
                     <div>
                         <button class="btn-view" onclick="event.stopPropagation(); viewDetails(${record.rowIndex})">
                             View
@@ -1026,7 +1051,7 @@
                         </div>
                         <div class="form-group">
                             <label>Max Spend Amount</label>
-                            <input type="number" id="edit-maxSpendAmount" value="${record.maxSpendAmount || ''}">
+                            <input type="number" id="edit-maxSpendAmount" value="${getRecordValue(record, 'maxSpendAmount', 'maxspendamount')}">
                         </div>
                         <div class="form-group">
                             <label>Max Spend Unit</label>
@@ -1051,11 +1076,11 @@
                         </div>
                         <div class="form-group">
                             <label>Date of Birth</label>
-                            <input type="date" id="edit-dateOfBirth" value="${record.dateOfBirth || ''}">
+                            <input type="date" id="edit-dateOfBirth" value="${formatDateForInput(getRecordValue(record, 'dateOfBirth', 'dateofbirth'))}">
                         </div>
                         <div class="form-group">
                             <label>Start Service Date <span class="required">*</span></label>
-                            <input type="date" id="edit-startServiceDate" value="${record.startServiceDate || ''}" required>
+                            <input type="date" id="edit-startServiceDate" value="${formatDateForInput(getRecordValue(record, 'startServiceDate', 'startservicedate', 'start_service_date'))}" required>
                         </div>
                         <div class="form-group">
                             <label>Primary Diagnosis</label>
@@ -1232,45 +1257,45 @@
                         <tbody>
                             <tr>
                                 <td><strong>Monday</strong></td>
-                                <td><input type="text" id="edit-mondaySchedule" value="${record.mondaySchedule || ''}"></td>
-                                <td><input type="number" id="edit-mondayTotal" value="${record.mondayTotal || ''}" step="0.5"></td>
+                                <td><input type="text" id="edit-mondaySchedule" value="${getRecordValue(record, 'mondaySchedule', 'mondayschedule')}"></td>
+                                <td><input type="number" id="edit-mondayTotal" value="${getRecordValue(record, 'mondayTotal', 'mondaytotal')}" step="0.5"></td>
                             </tr>
                             <tr>
                                 <td><strong>Tuesday</strong></td>
-                                <td><input type="text" id="edit-tuesdaySchedule" value="${record.tuesdaySchedule || ''}"></td>
-                                <td><input type="number" id="edit-tuesdayTotal" value="${record.tuesdayTotal || ''}" step="0.5"></td>
+                                <td><input type="text" id="edit-tuesdaySchedule" value="${getRecordValue(record, 'tuesdaySchedule', 'tuesdayschedule')}"></td>
+                                <td><input type="number" id="edit-tuesdayTotal" value="${getRecordValue(record, 'tuesdayTotal', 'tuesdaytotal')}" step="0.5"></td>
                             </tr>
                             <tr>
                                 <td><strong>Wednesday</strong></td>
-                                <td><input type="text" id="edit-wednesdaySchedule" value="${record.wednesdaySchedule || ''}"></td>
-                                <td><input type="number" id="edit-wednesdayTotal" value="${record.wednesdayTotal || ''}" step="0.5"></td>
+                                <td><input type="text" id="edit-wednesdaySchedule" value="${getRecordValue(record, 'wednesdaySchedule', 'wednesdayschedule')}"></td>
+                                <td><input type="number" id="edit-wednesdayTotal" value="${getRecordValue(record, 'wednesdayTotal', 'wednesdaytotal')}" step="0.5"></td>
                             </tr>
                             <tr>
                                 <td><strong>Thursday</strong></td>
-                                <td><input type="text" id="edit-thursdaySchedule" value="${record.thursdaySchedule || ''}"></td>
-                                <td><input type="number" id="edit-thursdayTotal" value="${record.thursdayTotal || ''}" step="0.5"></td>
+                                <td><input type="text" id="edit-thursdaySchedule" value="${getRecordValue(record, 'thursdaySchedule', 'thursdayschedule')}"></td>
+                                <td><input type="number" id="edit-thursdayTotal" value="${getRecordValue(record, 'thursdayTotal', 'thursdaytotal')}" step="0.5"></td>
                             </tr>
                             <tr>
                                 <td><strong>Friday</strong></td>
-                                <td><input type="text" id="edit-fridaySchedule" value="${record.fridaySchedule || ''}"></td>
-                                <td><input type="number" id="edit-fridayTotal" value="${record.fridayTotal || ''}" step="0.5"></td>
+                                <td><input type="text" id="edit-fridaySchedule" value="${getRecordValue(record, 'fridaySchedule', 'fridayschedule')}"></td>
+                                <td><input type="number" id="edit-fridayTotal" value="${getRecordValue(record, 'fridayTotal', 'fridaytotal')}" step="0.5"></td>
                             </tr>
                             <tr>
                                 <td><strong>Saturday</strong></td>
-                                <td><input type="text" id="edit-saturdaySchedule" value="${record.saturdaySchedule || ''}"></td>
-                                <td><input type="number" id="edit-saturdayTotal" value="${record.saturdayTotal || ''}" step="0.5"></td>
+                                <td><input type="text" id="edit-saturdaySchedule" value="${getRecordValue(record, 'saturdaySchedule', 'saturdayschedule')}"></td>
+                                <td><input type="number" id="edit-saturdayTotal" value="${getRecordValue(record, 'saturdayTotal', 'saturdaytotal')}" step="0.5"></td>
                             </tr>
                             <tr>
                                 <td><strong>Sunday</strong></td>
-                                <td><input type="text" id="edit-sundaySchedule" value="${record.sundaySchedule || ''}"></td>
-                                <td><input type="number" id="edit-sundayTotal" value="${record.sundayTotal || ''}" step="0.5"></td>
+                                <td><input type="text" id="edit-sundaySchedule" value="${getRecordValue(record, 'sundaySchedule', 'sundayschedule')}"></td>
+                                <td><input type="number" id="edit-sundayTotal" value="${getRecordValue(record, 'sundayTotal', 'sundaytotal')}" step="0.5"></td>
                             </tr>
                         </tbody>
                     </table>
                     <div class="form-grid" style="margin-top: 15px;">
                         <div class="form-group">
                             <label>Weekly Total Hours</label>
-                            <input type="number" id="edit-weeklyTotal" value="${record.weeklyTotal || ''}" step="0.5">
+                            <input type="number" id="edit-weeklyTotal" value="${getRecordValue(record, 'weeklyTotal', 'weeklytotal')}" step="0.5">
                         </div>
                     </div>
                 </div>
@@ -1285,19 +1310,19 @@
                         <div class="form-group">
                             <label>Invoice Process</label>
                             <select id="edit-invoiceProcess">
-                                <option value="Email" ${record.invoiceProcess === 'Email' ? 'selected' : ''}>Email</option>
-                                <option value="Fax" ${record.invoiceProcess === 'Fax' ? 'selected' : ''}>Fax</option>
-                                <option value="Mail" ${record.invoiceProcess === 'Mail' ? 'selected' : ''}>Mail</option>
-                                <option value="Portal" ${record.invoiceProcess === 'Portal' ? 'selected' : ''}>Portal</option>
+                                <option value="Email" ${getRecordValue(record, 'invoiceProcess', 'invoiceprocess') === 'Email' ? 'selected' : ''}>Email</option>
+                                <option value="Fax" ${getRecordValue(record, 'invoiceProcess', 'invoiceprocess') === 'Fax' ? 'selected' : ''}>Fax</option>
+                                <option value="Mail" ${getRecordValue(record, 'invoiceProcess', 'invoiceprocess') === 'Mail' ? 'selected' : ''}>Mail</option>
+                                <option value="Portal" ${getRecordValue(record, 'invoiceProcess', 'invoiceprocess') === 'Portal' ? 'selected' : ''}>Portal</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label>Invoice Sent To</label>
-                            <input type="text" id="edit-invoiceSentTo" value="${record.invoiceSentTo || ''}">
+                            <input type="text" id="edit-invoiceSentTo" value="${getRecordValue(record, 'invoiceSentTo', 'invoicesenttoemailorfax', 'invoiceSentToEmailOrFax')}">
                         </div>
                         <div class="form-group full-width">
                             <label>Invoice Contact Info</label>
-                            <input type="text" id="edit-invoiceContactInfo" value="${record.invoiceContactInfo || ''}">
+                            <input type="text" id="edit-invoiceContactInfo" value="${getRecordValue(record, 'invoiceContactInfo', 'invoicecontactinfo')}">
                         </div>
                     </div>
                 </div>
@@ -1311,7 +1336,7 @@
                     <div class="form-grid">
                         <div class="form-group full-width">
                             <label>Notes</label>
-                            <textarea id="edit-additionalNotes" rows="4">${record.additionalNotes || ''}</textarea>
+                            <textarea id="edit-additionalNotes" rows="4">${getRecordValue(record, 'additionalNotes', 'additionalnotes')}</textarea>
                         </div>
                     </div>
                 </div>
@@ -1413,6 +1438,9 @@
                 invoiceContactInfo: document.getElementById('edit-invoiceContactInfo').value,
                 additionalNotes: document.getElementById('edit-additionalNotes').value
             };
+            
+            console.log('Saving data for row:', currentEditingRow);
+            console.log('Updated data:', updatedData);
 
             console.log('Saving data for row:', currentEditingRow);
             console.log('Updated data:', updatedData);
