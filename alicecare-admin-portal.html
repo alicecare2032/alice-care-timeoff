@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AC: ADMIN PORTAL 2.1</title>
+    <title>LTC Insurance 2.3</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -649,7 +649,7 @@
     <div class="header">
         <div class="header-content">
             <div class="header-title">
-                <div class="logo">🏥</div>
+                <div class="logo"></div>
                 <div>
                     <h1>LTC Insurance Admin Portal</h1>
                     <div class="header-subtitle">Long-Term Care Insurance Management System</div>
@@ -777,36 +777,61 @@
             loadRecords();
         });
 
-        // Load all records from Google Sheets
-        async function loadRecords() {
-            try {
-                const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getAll`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                const data = await response.json();
-                console.log('Response from server:', data);
-                
-                if (data.result === 'success' && data.submissions) {
-                    allRecords = data.submissions;
-                    filteredRecords = [...allRecords];
+        // Load all records from Google Sheets using JSONP to avoid CORS
+        function loadRecords() {
+            return new Promise((resolve, reject) => {
+                try {
+                    // Create unique callback name
+                    const callbackName = 'jsonpCallback_' + Date.now();
                     
-                    console.log('Loaded records:', allRecords.length);
+                    // Define the callback function
+                    window[callbackName] = function(data) {
+                        console.log('Response from server:', data);
+                        
+                        try {
+                            if (data.result === 'success' && data.submissions) {
+                                allRecords = data.submissions;
+                                filteredRecords = [...allRecords];
+                                
+                                console.log('Loaded records:', allRecords.length);
+                                
+                                populateInsuranceFilter();
+                                updateStats();
+                                displayRecords();
+                                showMessage('success', '✅ Data loaded successfully! ' + allRecords.length + ' records found.');
+                                resolve();
+                            } else {
+                                throw new Error(data.message || 'Failed to load data');
+                            }
+                        } catch (error) {
+                            console.error('Error processing data:', error);
+                            showMessage('error', '❌ Failed to process data: ' + error.message);
+                            reject(error);
+                        } finally {
+                            // Cleanup
+                            delete window[callbackName];
+                            document.body.removeChild(script);
+                        }
+                    };
                     
-                    populateInsuranceFilter();
-                    updateStats();
-                    displayRecords();
-                    showMessage('success', '✅ Data loaded successfully! ' + allRecords.length + ' records found.');
-                } else {
-                    throw new Error(data.message || 'Failed to load data');
+                    // Create script tag for JSONP
+                    const script = document.createElement('script');
+                    script.src = `${GOOGLE_SCRIPT_URL}?action=getAll&callback=${callbackName}`;
+                    script.onerror = function() {
+                        console.error('Failed to load script');
+                        showMessage('error', '❌ Failed to connect to server. Please check your Google Script URL.');
+                        delete window[callbackName];
+                        reject(new Error('Failed to load script'));
+                    };
+                    
+                    document.body.appendChild(script);
+                    
+                } catch (error) {
+                    console.error('Error loading records:', error);
+                    showMessage('error', '❌ Failed to load data: ' + error.message);
+                    reject(error);
                 }
-            } catch (error) {
-                console.error('Error loading records:', error);
-                showMessage('error', '❌ Failed to load data: ' + error.message);
-            }
+            });
         }
 
         // Populate insurance filter dropdown
