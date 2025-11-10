@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AC:LTC Admin Portal v.2</title>
+    <title>AC: ADMIN PORTAL 2.1</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -788,21 +788,24 @@
                 });
 
                 const data = await response.json();
+                console.log('Response from server:', data);
                 
-                if (data.status === 'success' && data.data) {
-                    allRecords = data.data;
+                if (data.result === 'success' && data.submissions) {
+                    allRecords = data.submissions;
                     filteredRecords = [...allRecords];
+                    
+                    console.log('Loaded records:', allRecords.length);
                     
                     populateInsuranceFilter();
                     updateStats();
                     displayRecords();
-                    showMessage('success', '✅ Data loaded successfully!');
+                    showMessage('success', '✅ Data loaded successfully! ' + allRecords.length + ' records found.');
                 } else {
-                    throw new Error('Failed to load data');
+                    throw new Error(data.message || 'Failed to load data');
                 }
             } catch (error) {
                 console.error('Error loading records:', error);
-                showMessage('error', '❌ Failed to load data. Please refresh the page.');
+                showMessage('error', '❌ Failed to load data: ' + error.message);
             }
         }
 
@@ -1386,6 +1389,9 @@
                 additionalNotes: document.getElementById('edit-additionalNotes').value
             };
 
+            console.log('Saving data for row:', currentEditingRow);
+            console.log('Updated data:', updatedData);
+
             try {
                 const response = await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
@@ -1399,17 +1405,18 @@
                     })
                 });
 
+                console.log('Save request sent (no-cors mode)');
                 showMessage('success', '✅ Changes saved successfully!');
                 closeModal();
                 
                 // Reload records after a brief delay
                 setTimeout(() => {
                     loadRecords();
-                }, 1000);
+                }, 1500);
 
             } catch (error) {
                 console.error('Error saving changes:', error);
-                showMessage('error', '❌ Failed to save changes. Please try again.');
+                showMessage('error', '❌ Failed to save changes: ' + error.message);
             } finally {
                 saveBtn.disabled = false;
                 saveBtn.textContent = originalText;
