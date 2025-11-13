@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LTC Insurance Admin 2.6.1c</title>
+    <title>LTC Insurance Admin 2.6.2</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -637,35 +637,41 @@
         });
 
         // Load records from Google Sheets
-        async function loadRecords() {
+        function loadRecords() {
             console.log('Loading records...');
             
             // Show loading state
             const recordsList = document.getElementById('recordsList');
             recordsList.innerHTML = '<div class="no-records"><div class="loading"></div><p style="margin-top: 15px;">Loading records...</p></div>';
             
-            try {
-                const response = await fetch(`${CONFIG.ADMIN_SCRIPT_URL}?action=getAll`);
-                const data = await response.json();
-
-                console.log('Received response:', data);
-
-                if (data.result === 'success') {
-                    allRecords = data.records;
-                    console.log(`Loaded ${allRecords.length} records`);
-                    displayRecords(allRecords);
-                    updateStats(allRecords);
-                } else {
-                    console.error('Error from server:', data.message);
-                    showMessage('error', 'Failed to load records: ' + data.message);
-                    recordsList.innerHTML = '<div class="no-records">Failed to load records. Please try again.</div>';
-                }
-            } catch (error) {
-                console.error('Error loading records:', error);
-                showMessage('error', 'Error loading records: ' + error.message);
-                recordsList.innerHTML = '<div class="no-records">Error loading records. Please check your connection and try again.</div>';
-            }
+            // Use JSONP for cross-origin requests
+            const script = document.createElement('script');
+            script.src = `${CONFIG.ADMIN_SCRIPT_URL}?action=getAllSubmissions&callback=handleRecordsLoaded`;
+            script.onerror = function() {
+                console.error('Failed to load records');
+                showMessage('error', 'Failed to load records. Please check your script URL.');
+                recordsList.innerHTML = '<div class="no-records">Failed to load records. Please try again.</div>';
+            };
+            document.body.appendChild(script);
         }
+
+        // Callback for JSONP data loading
+        window.handleRecordsLoaded = function(data) {
+            const recordsList = document.getElementById('recordsList');
+            
+            console.log('Received response:', data);
+
+            if (data.result === 'success') {
+                allRecords = data.records || [];
+                console.log(`Loaded ${allRecords.length} records`);
+                displayRecords(allRecords);
+                updateStats(allRecords);
+            } else {
+                console.error('Error from server:', data.message);
+                showMessage('error', 'Failed to load records: ' + data.message);
+                recordsList.innerHTML = '<div class="no-records">Failed to load records. Please try again.</div>';
+            }
+        };
 
         // Display records
         function displayRecords(records) {
@@ -1195,7 +1201,30 @@
 //     }
 // }
         async function generateCarePlan() {
-            if (!currentEditingRow) return;
+            if (!currentEditingRow) {
+                alert('No record selected');
+                return;
+            }
+
+            // Find the current record
+            const record = allRecords.find(r => r.rowIndex === currentEditingRow);
+            
+            if (!record) {
+                alert('Record not found');
+                return;
+            }
+
+            const requestNumber = getRecordValue(record, 'Request_Number');
+            
+            if (!requestNumber) {
+                alert('Request number is missing');
+                return;
+            }
+
+            if (!CONFIG.CAREPLAN_SCRIPT_URL || CONFIG.CAREPLAN_SCRIPT_URL === 'YOUR_CAREPLAN_GENERATOR_URL_HERE') {
+                alert('⚠️ Care Plan Generator not configured!\n\nPlease update CONFIG.CAREPLAN_SCRIPT_URL with your deployed careplan generator script URL.');
+                return;
+            }
 
             const generateBtn = document.querySelector('.btn-care-plan');
             const originalText = generateBtn.textContent;
@@ -1203,64 +1232,72 @@
             generateBtn.innerHTML = '<span class="loading"></span> Generating...';
 
             try {
-                const record = allRecords.find(r => r.rowIndex === currentEditingRow);
-
-                if (!record) {
-                    throw new Error('Record not found');
-                }
-
-                await fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'generateCarePlan',
-                        data: {
-                            rowIndex: currentEditingRow,
-                            timestamp: Date.now()
+                // Use JSONP for cross-origin request
+                const script = document.createElement('script');
+                const callbackName = 'handleCarePlanResult_' + Date.now();
+                
+                window[callbackName] = function(result) {
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    
+                    generateBtn.disabled = false;
+                    generateBtn.innerHTML = originalText;
+                    
+                    if (result.result === 'success') {
+                        showMessage('success', '✅ Care plan generated successfully!');
+                        if (result.data && result.data.documentUrl) {
+                            setTimeout(() => {
+                                window.open(result.data.documentUrl, '_blank');
+                            }, 500);
                         }
-                    })
-                });
-
-                 await new Promise(resolve => setTimeout(resolve, 3000));
-
-                const fullName = record.insuredName || 'Unknown';
-                const nameParts = fullName.trim().split(' ');
-                const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : nameParts[0];
-                const firstName = nameParts.length > 1 ? nameParts[0] : '';
-                const insurance = record.insurance || 'NoInsurance';
-
-                const cleanLastName = lastName.replace(/[^a-zA-Z0-9]/g, '');
-                const cleanFirstName = firstName.replace(/[^a-zA-Z0-9]/g, '');
-                const cleanInsurance = insurance.replace(/[^a-zA-Z0-9]/g, '');
-
-                const folderName = `${cleanLastName}_${cleanFirstName}_${cleanInsurance}`;
-                const driveSearchUrl = `https://drive.google.com/drive/search?q=${encodeURIComponent(folderName)}`;
-
-                showMessage('success',
-                    `✅ Care Plan generated successfully!<br><br>` +
-                    `<strong>Client:</strong> ${record.insuredName}<br>` +
-                    `<strong>Folder:</strong> ${folderName}<br><br>` +
-                    `<a href="${driveSearchUrl}" target="_blank" style="color: #F57600; text-decoration: underline; font-weight: 500;">` +
-                    `🔍 Open in Google Drive →</a>`
-                );
-
-                setTimeout(() => {
-                    window.open(driveSearchUrl, '_blank');
-                }, 500);
-
+                    } else {
+                        showMessage('error', '❌ Error: ' + result.message);
+                    }
+                };
+                
+                script.src = `${CONFIG.CAREPLAN_SCRIPT_URL}?requestNumber=${encodeURIComponent(requestNumber)}&callback=${callbackName}`;
+                script.onerror = function() {
+                    delete window[callbackName];
+                    generateBtn.disabled = false;
+                    generateBtn.innerHTML = originalText;
+                    showMessage('error', '❌ Failed to generate care plan. Please check your careplan generator script URL.');
+                };
+                
+                document.body.appendChild(script);
+                
             } catch (error) {
-                console.error('Error generating Care Plan:', error);
-                showMessage('error', `❌ Failed to generate Care Plan: ${error.message}`);
-            } finally {
+                console.error('Error generating care plan:', error);
                 generateBtn.disabled = false;
                 generateBtn.innerHTML = originalText;
+                showMessage('error', '❌ Error generating care plan: ' + error.message);
             }
         }
 
-        Show message
+        // Helper function to get record value with flexible key matching
+        function getRecordValue(record, key) {
+            // Try exact match first
+            if (record[key] !== undefined) {
+                return record[key];
+            }
+            
+            // Try lowercase
+            const lowerKey = key.toLowerCase();
+            if (record[lowerKey] !== undefined) {
+                return record[lowerKey];
+            }
+            
+            // Try removing underscores and lowercase
+            const noUnderscoreKey = key.replace(/_/g, '').toLowerCase();
+            for (const recordKey in record) {
+                if (recordKey.replace(/_/g, '').toLowerCase() === noUnderscoreKey) {
+                    return record[recordKey];
+                }
+            }
+            
+            return null;
+        }
+
+        // Show message
         function showMessage(type, message) {
             const messageDiv = document.getElementById(type === 'success' ? 'successMessage' : 'errorMessage');
             messageDiv.innerHTML = message;
