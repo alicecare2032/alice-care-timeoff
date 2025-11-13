@@ -1156,42 +1156,42 @@
 
         // Generate Care Plan
 
-//         async function generateCarePlan(requestNumber) {
-//     try {
-//         showLoading('Generating care plan...');
+        async function generateCarePlan(requestNumber) {
+    try {
+        showLoading('Generating care plan...');
         
-//         // Call the SEPARATE careplan generator script
-//         const response = await fetch(
-//             `${CONFIG.CAREPLAN_SCRIPT_URL}?requestNumber=${encodeURIComponent(requestNumber)}`,
-//             {
-//                 method: 'GET',
-//                 mode: 'no-cors'
-//             }
-//         );
+        // Call the SEPARATE careplan generator script
+        const response = await fetch(
+            `${CONFIG.CAREPLAN_SCRIPT_URL}?requestNumber=${encodeURIComponent(requestNumber)}`,
+            {
+                method: 'GET',
+                mode: 'no-cors'
+            }
+        );
         
-//         // Use JSONP for better compatibility
-//         const script = document.createElement('script');
-//         script.src = `${CONFIG.CAREPLAN_SCRIPT_URL}?requestNumber=${encodeURIComponent(requestNumber)}&callback=handleCarePlanResult`;
-//         document.body.appendChild(script);
+        // Use JSONP for better compatibility
+        const script = document.createElement('script');
+        script.src = `${CONFIG.CAREPLAN_SCRIPT_URL}?requestNumber=${encodeURIComponent(requestNumber)}&callback=handleCarePlanResult`;
+        document.body.appendChild(script);
         
-//     } catch (error) {
-//         console.error('Error generating care plan:', error);
-//         alert('Error generating care plan: ' + error.message);
-//         hideLoading();
-//     }
-// }
+    } catch (error) {
+        console.error('Error generating care plan:', error);
+        alert('Error generating care plan: ' + error.message);
+        hideLoading();
+    }
+}
 
-// // Add callback handler
-// function handleCarePlanResult(result) {
-//     hideLoading();
+// Add callback handler
+function handleCarePlanResult(result) {
+    hideLoading();
     
-//     if (result.result === 'success') {
-//         alert('Care plan generated successfully!');
-//         if (result.data && result.data.documentUrl) {
-//             window.open(result.data.documentUrl, '_blank');
-//         }
-//     } else {
-//         alert('Error: ' + result.message);
+    if (result.result === 'success') {
+        alert('Care plan generated successfully!');
+        if (result.data && result.data.documentUrl) {
+            window.open(result.data.documentUrl, '_blank');
+        }
+    } else {
+        alert('Error: ' + result.message);
     }
 }
         // async function generateCarePlan() {
