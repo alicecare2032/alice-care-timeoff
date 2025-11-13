@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alice Care - LTC Insurance Admin Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+            color: #2c3e50;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1A365C 0%, #2D5A8C 100%);
+            color: white;
+            padding: 25px 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .header-subtitle {
+            font-size: 13px;
+            opacity: 0.85;
+            margin-top: 4px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #1A365C;
+        }
+
+        .btn-primary:hover {
+            background: #f0f4f8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-secondary {
+            background: #F57600;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #D66600;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 118, 0, 0.3);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 30px 40px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid #F57600;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1A365C;
+            margin-top: 8px;
+        }
+
+        /* Filters Section */
+        .filters-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 25px;
+        }
+
+        .filters-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .filters-header h2 {
+            font-size: 18px;
+            color: #1A365C;
+            font-weight: 600;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 18px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 6px;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 10px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: #F57600;
+            box-shadow: 0 0 0 3px rgba(245, 118, 0, 0.1);
+        }
+
+        /* Records Section */
+        .records-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .records-header {
+            background: linear-gradient(135deg, #1A365C 0%, #2D5A8C 100%);
+            color: white;
+            padding: 18px 25px;
+            display: grid;
+            grid-template-columns: 50px 150px 200px 150px 150px 150px 120px;
+            gap: 15px;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .record-row {
+            padding: 18px 25px;
+            display: grid;
+            grid-template-columns: 50px 150px 200px 150px 150px 150px 120px;
+            gap: 15px;
+            align-items: center;
+            border-bottom: 1px solid #f1f5f9;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .record-row:hover {
+            background: #f8fafc;
+            transform: translateX(4px);
+        }
+
+        .record-row:last-child {
+            border-bottom: none;
+        }
+
+        .record-id {
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .btn-view {
+            padding: 8px 16px;
+            background: #F57600;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-view:hover {
+            background: #D66600;
+            transform: scale(1.05);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            overflow-y: auto;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            margin: 40px auto;
+            max-width: 1200px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(40px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #1A365C 0%, #2D5A8C 100%);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 30px;
+            max-height: calc(100vh - 300px);
+            overflow-y: auto;
+        }
+
+        /* Form Sections */
+        .form-section {
+            margin-bottom: 35px;
+            padding: 25px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border-left: 4px solid #F57600;
+        }
+
+        .form-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1A365C;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-section-icon {
+            font-size: 24px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .required {
+            color: #ef4444;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #F57600;
+            box-shadow: 0 0 0 3px rgba(245, 118, 0, 0.1);
+        }
+
+        .form-group input[readonly] {
+            background: #f1f5f9;
+            cursor: not-allowed;
+        }
+
+        /* Schedule Table */
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .schedule-table th,
+        .schedule-table td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #e2e8f0;
+        }
+
+        .schedule-table th {
+            background: #1A365C;
+            color: white;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        .schedule-table td input {
+            width: 100%;
+            border: 1px solid #e2e8f0;
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        .schedule-table tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        /* Modal Footer */
+        .modal-footer {
+            padding: 25px 30px;
+            background: #f8fafc;
+            border-radius: 0 0 16px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .modal-footer-left {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-footer-right {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-care-plan {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-care-plan:hover {
+            background: #059669;
+        }
+
+        .btn-cancel {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-cancel:hover {
+            background: #cbd5e1;
+        }
+
+        /* Messages */
+        .message {
+            display: none;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .message-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .message-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            color: #475569;
+            margin-bottom: 10px;
+        }
+
+        /* Loading Spinner */
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Info Badge */
+        .info-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #dbeafe;
+            color: #1e40af;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .records-header,
+            .record-row {
+                grid-template-columns: 50px 120px 180px 120px 120px 120px 100px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .records-header {
+                display: none;
+            }
+
+            .record-row {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                padding: 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-footer {
+                flex-direction: column;
+            }
+
+            .modal-footer-left,
+            .modal-footer-right {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div class="header-title">
+                <div class="logo">🏥</div>
+                <div>
+                    <h1>LTC Insurance Admin Portal</h1>
+                    <div class="header-subtitle">Long-Term Care Insurance Management System</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="loadRecords()">
+                    <span>🔄</span> Refresh Data
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Messages -->
+        <div id="successMessage" class="message message-success"></div>
+        <div id="errorMessage" class="message message-error"></div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Records</div>
+                <div class="stat-value" id="totalRecords">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Active Clients</div>
+                <div class="stat-value" id="activeClients">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Pending Reviews</div>
+                <div class="stat-value" id="pendingReviews">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">This Month</div>
+                <div class="stat-value" id="thisMonth">0</div>
+            </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="filters-section">
+            <div class="filters-header">
+                <h2>🔍 Search & Filter</h2>
+                <button class="btn btn-secondary" onclick="clearFilters()">Clear Filters</button>
+            </div>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label>Client Name</label>
+                    <input type="text" id="filterName" placeholder="Search by name..." onkeyup="applyFilters()">
+                </div>
+                <div class="filter-group">
+                    <label>Insurance Provider</label>
+                    <select id="filterInsurance" onchange="applyFilters()">
+                        <option value="">All Providers</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Elimination Period Status</label>
+                    <select id="filterEliminationMet" onchange="applyFilters()">
+                        <option value="">All Status</option>
+                        <option value="Yes">Met</option>
+                        <option value="No">Not Met</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Date Range (From)</label>
+                    <input type="date" id="filterDateFrom" onchange="applyFilters()">
+                </div>
+            </div>
+        </div>
+
+        <!-- Records Section -->
+        <div class="records-section">
+            <div class="records-header">
+                <div>#</div>
+                <div>Date</div>
+                <div>Client Name</div>
+                <div>Insurance</div>
+                <div>Policy Number</div>
+                <div>Start Service</div>
+                <div>Actions</div>
+            </div>
+            <div id="recordsList">
+                <!-- Records will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📋 Client Record Details</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Form will be populated here -->
+            </div>
+            <div class="modal-footer">
+                <div class="modal-footer-left">
+                    <button class="btn btn-care-plan" onclick="generateCarePlan()">
+                        📄 Generate Care Plan
+                    </button>
+                </div>
+                <div class="modal-footer-right">
+                    <button class="btn btn-cancel" onclick="closeModal()">Cancel</button>
+                    <button class="btn btn-secondary" id="saveBtn" onclick="saveChanges()">
+                        💾 Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwZDLRRqXgdgRUxbE35cf0Q9PAiZ8Nf-k6URe2fU8ISj35Wg1FcUGq3dRfbSw432WcnMg/exec';
+        
+        let allRecords = [];
+        let filteredRecords = [];
+        let currentEditingRow = null;
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadRecords();
+        });
+
+        // Helper function to get value from record with flexible key matching
+        function getRecordValue(record, ...possibleKeys) {
+            for (let key of possibleKeys) {
+                if (record[key] !== undefined && record[key] !== null && record[key] !== '') {
+                    return record[key];
+                }
+            }
+            return '';
+        }
+
+        // Helper function to format date for input field (converts ISO to YYYY-MM-DD)
+        function formatDateForInput(dateValue) {
+            if (!dateValue) return '';
+            try {
+                const date = new Date(dateValue);
+                if (isNaN(date.getTime())) return '';
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            } catch (e) {
+                return '';
+            }
+        }
+
+        // Load all records from Google Sheets using JSONP to avoid CORS
+        function loadRecords() {
+            return new Promise((resolve, reject) => {
+                try {
+                    // Create unique callback name
+                    const callbackName = 'jsonpCallback_' + Date.now();
+                    
+                    // Define the callback function
+                    window[callbackName] = function(data) {
+                        console.log('Response from server:', data);
+                        
+                        try {
+                            if (data.result === 'success' && data.submissions) {
+                                allRecords = data.submissions;
+                                filteredRecords = [...allRecords];
+                                
+                                console.log('Loaded records:', allRecords.length);
+                                
+                                populateInsuranceFilter();
+                                updateStats();
+                                displayRecords();
+                                showMessage('success', '✅ Data loaded successfully! ' + allRecords.length + ' records found.');
+                                resolve();
+                            } else {
+                                throw new Error(data.message || 'Failed to load data');
+                            }
+                        } catch (error) {
+                            console.error('Error processing data:', error);
+                            showMessage('error', '❌ Failed to process data: ' + error.message);
+                            reject(error);
+                        } finally {
+                            // Cleanup
+                            delete window[callbackName];
+                            document.body.removeChild(script);
+                        }
+                    };
+                    
+                    // Create script tag for JSONP
+                    const script = document.createElement('script');
+                    script.src = `${GOOGLE_SCRIPT_URL}?action=getAll&callback=${callbackName}`;
+                    script.onerror = function() {
+                        console.error('Failed to load script');
+                        showMessage('error', '❌ Failed to connect to server. Please check your Google Script URL.');
+                        delete window[callbackName];
+                        reject(new Error('Failed to load script'));
+                    };
+                    
+                    document.body.appendChild(script);
+                    
+                } catch (error) {
+                    console.error('Error loading records:', error);
+                    showMessage('error', '❌ Failed to load data: ' + error.message);
+                    reject(error);
+                }
+            });
+        }
+
+        // Populate insurance filter dropdown
+        function populateInsuranceFilter() {
+            const insuranceSet = new Set();
+            allRecords.forEach(record => {
+                if (record.insurance) {
+                    insuranceSet.add(record.insurance);
+                }
+            });
+
+            const filterSelect = document.getElementById('filterInsurance');
+            filterSelect.innerHTML = '<option value="">All Providers</option>';
+            
+            Array.from(insuranceSet).sort().forEach(insurance => {
+                const option = document.createElement('option');
+                option.value = insurance;
+                option.textContent = insurance;
+                filterSelect.appendChild(option);
+            });
+        }
+
+        // Update statistics
+        function updateStats() {
+            document.getElementById('totalRecords').textContent = allRecords.length;
+            document.getElementById('activeClients').textContent = allRecords.length;
+            document.getElementById('pendingReviews').textContent = 
+                allRecords.filter(r => r.eliminationPeriodMet === 'No').length;
+            
+            const thisMonth = allRecords.filter(record => {
+                if (!record.timestamp) return false;
+                const recordDate = new Date(record.timestamp);
+                const now = new Date();
+                return recordDate.getMonth() === now.getMonth() && 
+                       recordDate.getFullYear() === now.getFullYear();
+            }).length;
+            
+            document.getElementById('thisMonth').textContent = thisMonth;
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const nameFilter = document.getElementById('filterName').value.toLowerCase();
+            const insuranceFilter = document.getElementById('filterInsurance').value;
+            const eliminationFilter = document.getElementById('filterEliminationMet').value;
+            const dateFromFilter = document.getElementById('filterDateFrom').value;
+
+            filteredRecords = allRecords.filter(record => {
+                // Name filter
+                if (nameFilter && !record.insuredName.toLowerCase().includes(nameFilter)) {
+                    return false;
+                }
+
+                // Insurance filter
+                if (insuranceFilter && record.insurance !== insuranceFilter) {
+                    return false;
+                }
+
+                // Elimination period filter
+                if (eliminationFilter && record.eliminationPeriodMet !== eliminationFilter) {
+                    return false;
+                }
+
+                // Date range filter
+                if (dateFromFilter) {
+                    const recordDate = new Date(record.timestamp);
+                    const filterDate = new Date(dateFromFilter);
+                    if (recordDate < filterDate) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+
+            displayRecords();
+        }
+
+        // Clear all filters
+        function clearFilters() {
+            document.getElementById('filterName').value = '';
+            document.getElementById('filterInsurance').value = '';
+            document.getElementById('filterEliminationMet').value = '';
+            document.getElementById('filterDateFrom').value = '';
+            
+            filteredRecords = [...allRecords];
+            displayRecords();
+        }
+
+        // Display records in the table
+        function displayRecords() {
+            const recordsList = document.getElementById('recordsList');
+            
+            if (filteredRecords.length === 0) {
+                recordsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <h3>No Records Found</h3>
+                        <p>Try adjusting your filters or refresh the data.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            recordsList.innerHTML = filteredRecords.map((record, index) => `
+                <div class="record-row" onclick="viewDetails(${record.rowIndex})">
+                    <div class="record-id">#${record.rowIndex}</div>
+                    <div>${formatDate(record.timestamp)}</div>
+                    <div><strong>${record.insuredName || 'N/A'}</strong></div>
+                    <div>${record.insurance || 'N/A'}</div>
+                    <div>${record.policyNumber || 'N/A'}</div>
+                    <div>${formatDateForInput(getRecordValue(record, 'startServiceDate', 'startservicedate', 'start_service_date')) || 'Not Set'}</div>
+                    <div>
+                        <button class="btn-view" onclick="event.stopPropagation(); viewDetails(${record.rowIndex})">
+                            View
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Format date
+        function formatDate(timestamp) {
+            if (!timestamp) return 'N/A';
+            const date = new Date(timestamp);
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric', 
+                year: 'numeric' 
+            });
+        }
+
+        // View record details
+        function viewDetails(rowIndex) {
+            currentEditingRow = rowIndex;
+            const record = allRecords.find(r => r.rowIndex === rowIndex);
+            
+            if (!record) {
+                showMessage('error', '❌ Record not found');
+                return;
+            }
+
+            const modalBody = document.getElementById('modalBody');
+            modalBody.innerHTML = `
+                <!-- Insurance Information -->
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <span class="form-section-icon">🏥</span>
+                        Insurance Information
+                    </h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Insurance Provider <span class="required">*</span></label>
+                            <input type="text" id="edit-insurance" value="${record.insurance || ''}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Policy Number</label>
+                            <input type="text" id="edit-policyNumber" value="${record.policyNumber || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label>Claim Number</label>
+                            <input type="text" id="edit-claimNumber" value="${record.claimNumber || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label>Elimination Period</label>
+                            <select id="edit-eliminationPeriod">
+                                <option value="30 days" ${record.eliminationPeriod === '30 days' ? 'selected' : ''}>30 days</option>
+                                <option value="60 days" ${record.eliminationPeriod === '60 days' ? 'selected' : ''}>60 days</option>
+                                <option value="90 days" ${record.eliminationPeriod === '90 days' ? 'selected' : ''}>90 days</option>
+                                <option value="100 days" ${record.eliminationPeriod === '100 days' ? 'selected' : ''}>100 days</option>
+                                <option value="Other" ${record.eliminationPeriod === 'Other' ? 'selected' : ''}>Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Elimination Period (Other)</label>
+                            <input type="text" id="edit-eliminationPeriodOther" value="${record.eliminationPeriodOther || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label>Elimination Period Met</label>
+                            <select id="edit-eliminationPeriodMet">
+                                <option value="Yes" ${record.eliminationPeriodMet === 'Yes' ? 'selected' : ''}>Yes</option>
+                                <option value="No" ${record.eliminationPeriodMet === 'No' ? 'selected' : ''}>No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Max Spend Period</label>
+                            <select id="edit-maxSpendPeriod">
+                                <option value="per day" ${record.maxSpendPeriod === 'per day' ? 'selected' : ''}>Per Day</option>
+                                <option value="per week" ${record.maxSpendPeriod === 'per week' ? 'selected' : ''}>Per Week</option>
+                                <option value="per month" ${record.maxSpendPeriod === 'per month' ? 'selected' : ''}>Per Month</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Max Spend Amount</label>
+                            <input type="number" id="edit-maxSpendAmount" value="${getRecordValue(record, 'maxSpendAmount', 'maxspendamount')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Max Spend Unit</label>
+                            <select id="edit-maxSpendUnit">
+                                <option value="dollars" ${record.maxSpendUnit === 'dollars' ? 'selected' : ''}>Dollars</option>
+                                <option value="hours" ${record.maxSpendUnit === 'hours' ? 'selected' : ''}>Hours</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Client Information -->
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <span class="form-section-icon">👤</span>
+                        Client Information
+                    </h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Full Name <span class="required">*</span></label>
+                            <input type="text" id="edit-insuredName" value="${record.insuredName || ''}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Date of Birth</label>
+                            <input type="date" id="edit-dateOfBirth" value="${formatDateForInput(getRecordValue(record, 'dateOfBirth', 'dateofbirth'))}">
+                        </div>
+                        <div class="form-group">
+                            <label>Start Service Date <span class="required">*</span></label>
+                            <input type="date" id="edit-startServiceDate" value="${formatDateForInput(getRecordValue(record, 'startServiceDate', 'startservicedate', 'start_service_date'))}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Primary Diagnosis</label>
+                            <input type="text" id="edit-primaryDiagnose" value="${record.primaryDiagnose || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label>Responsible Party</label>
+                            <input type="text" id="edit-responsibleParty" value="${record.responsibleParty || ''}">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Address</label>
+                            <input type="text" id="edit-address" value="${record.address || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="edit-email" value="${record.email || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="tel" id="edit-phone" value="${record.phone || ''}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Legal Documents -->
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <span class="form-section-icon">📑</span>
+                        Legal Documents & Forms
+                    </h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Power of Attorney</label>
+                            <select id="edit-powerOfAttorney">
+                                <option value="Yes" ${record.powerOfAttorney === 'Yes' ? 'selected' : ''}>Yes</option>
+                                <option value="No" ${record.powerOfAttorney === 'No' ? 'selected' : ''}>No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Transfer of Benefits</label>
+                            <select id="edit-transferOfBenefits">
+                                <option value="Yes" ${record.transferOfBenefits === 'Yes' ? 'selected' : ''}>Yes</option>
+                                <option value="No" ${record.transferOfBenefits === 'No' ? 'selected' : ''}>No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>1099 Completed</label>
+                            <select id="edit-form1099">
+                                <option value="Yes" ${record.form1099 === 'Yes' ? 'selected' : ''}>Yes</option>
+                                <option value="No" ${record.form1099 === 'No' ? 'selected' : ''}>No</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ADL Services -->
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <span class="form-section-icon">🩺</span>
+                        Activities of Daily Living (ADL)
+                    </h3>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>ADL Services Required</label>
+                            <textarea id="edit-adl" rows="2">${record.adl || ''}</textarea>
+                        </div>
+                    </div>
+                    <div class="form-grid" style="margin-top: 15px;">
+                        <div class="form-group">
+                            <label>Bathing Support Level</label>
+                            <select id="edit-supportLevelBathing">
+                                <option value="">Select Level</option>
+                                <option value="Independent" ${record.supportLevelBathing === 'Independent' ? 'selected' : ''}>Independent</option>
+                                <option value="Supervision" ${record.supportLevelBathing === 'Supervision' ? 'selected' : ''}>Supervision</option>
+                                <option value="Limited Assistance" ${record.supportLevelBathing === 'Limited Assistance' ? 'selected' : ''}>Limited Assistance</option>
+                                <option value="Extensive Assistance" ${record.supportLevelBathing === 'Extensive Assistance' ? 'selected' : ''}>Extensive Assistance</option>
+                                <option value="Total Dependence" ${record.supportLevelBathing === 'Total Dependence' ? 'selected' : ''}>Total Dependence</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Dressing Support Level</label>
+                            <select id="edit-supportLevelDressing">
+                                <option value="">Select Level</option>
+                                <option value="Independent" ${record.supportLevelDressing === 'Independent' ? 'selected' : ''}>Independent</option>
+                                <option value="Supervision" ${record.supportLevelDressing === 'Supervision' ? 'selected' : ''}>Supervision</option>
+                                <option value="Limited Assistance" ${record.supportLevelDressing === 'Limited Assistance' ? 'selected' : ''}>Limited Assistance</option>
+                                <option value="Extensive Assistance" ${record.supportLevelDressing === 'Extensive Assistance' ? 'selected' : ''}>Extensive Assistance</option>
+                                <option value="Total Dependence" ${record.supportLevelDressing === 'Total Dependence' ? 'selected' : ''}>Total Dependence</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Bed/Chair Support Level</label>
+                            <select id="edit-supportLevelBedChair">
+                                <option value="">Select Level</option>
+                                <option value="Independent" ${record.supportLevelBedChair === 'Independent' ? 'selected' : ''}>Independent</option>
+                                <option value="Supervision" ${record.supportLevelBedChair === 'Supervision' ? 'selected' : ''}>Supervision</option>
+                                <option value="Limited Assistance" ${record.supportLevelBedChair === 'Limited Assistance' ? 'selected' : ''}>Limited Assistance</option>
+                                <option value="Extensive Assistance" ${record.supportLevelBedChair === 'Extensive Assistance' ? 'selected' : ''}>Extensive Assistance</option>
+                                <option value="Total Dependence" ${record.supportLevelBedChair === 'Total Dependence' ? 'selected' : ''}>Total Dependence</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Walking Support Level</label>
+                            <select id="edit-supportLevelWalking">
+                                <option value="">Select Level</option>
+                                <option value="Independent" ${record.supportLevelWalking === 'Independent' ? 'selected' : ''}>Independent</option>
+                                <option value="Supervision" ${record.supportLevelWalking === 'Supervision' ? 'selected' : ''}>Supervision</option>
+                                <option value="Limited Assistance" ${record.supportLevelWalking === 'Limited Assistance' ? 'selected' : ''}>Limited Assistance</option>
+                                <option value="Extensive Assistance" ${record.supportLevelWalking === 'Extensive Assistance' ? 'selected' : ''}>Extensive Assistance</option>
+                                <option value="Total Dependence" ${record.supportLevelWalking === 'Total Dependence' ? 'selected' : ''}>Total Dependence</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Toilet Support Level</label>
+                            <select id="edit-supportLevelToilet">
+                                <option value="">Select Level</option>
+                                <option value="Independent" ${record.supportLevelToilet === 'Independent' ? 'selected' : ''}>Independent</option>
+                                <option value="Supervision" ${record.supportLevelToilet === 'Supervision' ? 'selected' : ''}>Supervision</option>
+                                <option value="Limited Assistance" ${record.supportLevelToilet === 'Limited Assistance' ? 'selected' : ''}>Limited Assistance</option>
+                                <option value="Extensive Assistance" ${record.supportLevelToilet === 'Extensive Assistance' ? 'selected' : ''}>Extensive Assistance</option>
+                                <option value="Total Dependence" ${record.supportLevelToilet === 'Total Dependence' ? 'selected' : ''}>Total Dependence</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Eating Support Level</label>
+                            <select id="edit-supportLevelEating">
+                                <option value="">Select Level</option>
+                                <option value="Independent" ${record.supportLevelEating === 'Independent' ? 'selected' : ''}>Independent</option>
+                                <option value="Supervision" ${record.supportLevelEating === 'Supervision' ? 'selected' : ''}>Supervision</option>
+                                <option value="Limited Assistance" ${record.supportLevelEating === 'Limited Assistance' ? 'selected' : ''}>Limited Assistance</option>
+                                <option value="Extensive Assistance" ${record.supportLevelEating === 'Extensive Assistance' ? 'selected' : ''}>Extensive Assistance</option>
+                                <option value="Total Dependence" ${record.supportLevelEating === 'Total Dependence' ? 'selected' : ''}>Total Dependence</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Transferring Support Level</label>
+                            <select id="edit-supportLevelTransferring">
+                                <option value="">Select Level</option>
+                                <option value="Independent" ${record.supportLevelTransferring === 'Independent' ? 'selected' : ''}>Independent</option>
+                                <option value="Supervision" ${record.supportLevelTransferring === 'Supervision' ? 'selected' : ''}>Supervision</option>
+                                <option value="Limited Assistance" ${record.supportLevelTransferring === 'Limited Assistance' ? 'selected' : ''}>Limited Assistance</option>
+                                <option value="Extensive Assistance" ${record.supportLevelTransferring === 'Extensive Assistance' ? 'selected' : ''}>Extensive Assistance</option>
+                                <option value="Total Dependence" ${record.supportLevelTransferring === 'Total Dependence' ? 'selected' : ''}>Total Dependence</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Cognitive Support Level</label>
+                            <select id="edit-supportLevelCognitive">
+                                <option value="">Select Level</option>
+                                <option value="Independent" ${record.supportLevelCognitive === 'Independent' ? 'selected' : ''}>Independent</option>
+                                <option value="Supervision" ${record.supportLevelCognitive === 'Supervision' ? 'selected' : ''}>Supervision</option>
+                                <option value="Limited Assistance" ${record.supportLevelCognitive === 'Limited Assistance' ? 'selected' : ''}>Limited Assistance</option>
+                                <option value="Extensive Assistance" ${record.supportLevelCognitive === 'Extensive Assistance' ? 'selected' : ''}>Extensive Assistance</option>
+                                <option value="Total Dependence" ${record.supportLevelCognitive === 'Total Dependence' ? 'selected' : ''}>Total Dependence</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weekly Schedule -->
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <span class="form-section-icon">📅</span>
+                        Weekly Care Schedule
+                    </h3>
+                    <table class="schedule-table">
+                        <thead>
+                            <tr>
+                                <th>Day</th>
+                                <th>Schedule Details</th>
+                                <th>Total Hours</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Monday</strong></td>
+                                <td><input type="text" id="edit-mondaySchedule" value="${getRecordValue(record, 'mondaySchedule', 'mondayschedule')}"></td>
+                                <td><input type="number" id="edit-mondayTotal" value="${getRecordValue(record, 'mondayTotal', 'mondaytotal')}" step="0.5"></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tuesday</strong></td>
+                                <td><input type="text" id="edit-tuesdaySchedule" value="${getRecordValue(record, 'tuesdaySchedule', 'tuesdayschedule')}"></td>
+                                <td><input type="number" id="edit-tuesdayTotal" value="${getRecordValue(record, 'tuesdayTotal', 'tuesdaytotal')}" step="0.5"></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Wednesday</strong></td>
+                                <td><input type="text" id="edit-wednesdaySchedule" value="${getRecordValue(record, 'wednesdaySchedule', 'wednesdayschedule')}"></td>
+                                <td><input type="number" id="edit-wednesdayTotal" value="${getRecordValue(record, 'wednesdayTotal', 'wednesdaytotal')}" step="0.5"></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Thursday</strong></td>
+                                <td><input type="text" id="edit-thursdaySchedule" value="${getRecordValue(record, 'thursdaySchedule', 'thursdayschedule')}"></td>
+                                <td><input type="number" id="edit-thursdayTotal" value="${getRecordValue(record, 'thursdayTotal', 'thursdaytotal')}" step="0.5"></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Friday</strong></td>
+                                <td><input type="text" id="edit-fridaySchedule" value="${getRecordValue(record, 'fridaySchedule', 'fridayschedule')}"></td>
+                                <td><input type="number" id="edit-fridayTotal" value="${getRecordValue(record, 'fridayTotal', 'fridaytotal')}" step="0.5"></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Saturday</strong></td>
+                                <td><input type="text" id="edit-saturdaySchedule" value="${getRecordValue(record, 'saturdaySchedule', 'saturdayschedule')}"></td>
+                                <td><input type="number" id="edit-saturdayTotal" value="${getRecordValue(record, 'saturdayTotal', 'saturdaytotal')}" step="0.5"></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Sunday</strong></td>
+                                <td><input type="text" id="edit-sundaySchedule" value="${getRecordValue(record, 'sundaySchedule', 'sundayschedule')}"></td>
+                                <td><input type="number" id="edit-sundayTotal" value="${getRecordValue(record, 'sundayTotal', 'sundaytotal')}" step="0.5"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="form-grid" style="margin-top: 15px;">
+                        <div class="form-group">
+                            <label>Weekly Total Hours</label>
+                            <input type="number" id="edit-weeklyTotal" value="${getRecordValue(record, 'weeklyTotal', 'weeklytotal')}" step="0.5">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Invoice Information -->
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <span class="form-section-icon">💰</span>
+                        Invoice & Billing
+                    </h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Invoice Process</label>
+                            <select id="edit-invoiceProcess">
+                                <option value="Email" ${getRecordValue(record, 'invoiceProcess', 'invoiceprocess') === 'Email' ? 'selected' : ''}>Email</option>
+                                <option value="Fax" ${getRecordValue(record, 'invoiceProcess', 'invoiceprocess') === 'Fax' ? 'selected' : ''}>Fax</option>
+                                <option value="Mail" ${getRecordValue(record, 'invoiceProcess', 'invoiceprocess') === 'Mail' ? 'selected' : ''}>Mail</option>
+                                <option value="Portal" ${getRecordValue(record, 'invoiceProcess', 'invoiceprocess') === 'Portal' ? 'selected' : ''}>Portal</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Invoice Sent To</label>
+                            <input type="text" id="edit-invoiceSentTo" value="${getRecordValue(record, 'invoiceSentTo', 'invoicesenttoemailorfax', 'invoiceSentToEmailOrFax')}">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Invoice Contact Info</label>
+                            <input type="text" id="edit-invoiceContactInfo" value="${getRecordValue(record, 'invoiceContactInfo', 'invoicecontactinfo')}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Notes -->
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <span class="form-section-icon">📝</span>
+                        Additional Notes
+                    </h3>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>Notes</label>
+                            <textarea id="edit-additionalNotes" rows="4">${getRecordValue(record, 'additionalNotes', 'additionalnotes')}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Metadata -->
+                <div class="form-section" style="background: #e0f2fe; border-left-color: #0284c7;">
+                    <h3 class="form-section-title">
+                        <span class="form-section-icon">ℹ️</span>
+                        Record Information
+                    </h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Submission Date</label>
+                            <input type="text" value="${formatDate(record.timestamp)}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Row Number</label>
+                            <input type="text" value="${record.rowIndex}" readonly>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('detailModal').style.display = 'block';
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('detailModal').style.display = 'none';
+            currentEditingRow = null;
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('detailModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Save changes
+        async function saveChanges() {
+            if (!currentEditingRow) return;
+
+            const saveBtn = document.getElementById('saveBtn');
+            const originalText = saveBtn.textContent;
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<span class="loading"></span> Saving...';
+
+            // Collect all form data
+            const updatedData = {
+                rowIndex: currentEditingRow,
+                insurance: document.getElementById('edit-insurance').value,
+                policyNumber: document.getElementById('edit-policyNumber').value,
+                claimNumber: document.getElementById('edit-claimNumber').value,
+                eliminationPeriod: document.getElementById('edit-eliminationPeriod').value,
+                eliminationPeriodOther: document.getElementById('edit-eliminationPeriodOther').value,
+                eliminationPeriodMet: document.getElementById('edit-eliminationPeriodMet').value,
+                maxSpendPeriod: document.getElementById('edit-maxSpendPeriod').value,
+                maxSpendAmount: document.getElementById('edit-maxSpendAmount').value,
+                maxSpendUnit: document.getElementById('edit-maxSpendUnit').value,
+                insuredName: document.getElementById('edit-insuredName').value,
+                dateOfBirth: document.getElementById('edit-dateOfBirth').value,
+                startServiceDate: document.getElementById('edit-startServiceDate').value,
+                primaryDiagnose: document.getElementById('edit-primaryDiagnose').value,
+                responsibleParty: document.getElementById('edit-responsibleParty').value,
+                address: document.getElementById('edit-address').value,
+                email: document.getElementById('edit-email').value,
+                phone: document.getElementById('edit-phone').value,
+                powerOfAttorney: document.getElementById('edit-powerOfAttorney').value,
+                transferOfBenefits: document.getElementById('edit-transferOfBenefits').value,
+                form1099: document.getElementById('edit-form1099').value,
+                adl: document.getElementById('edit-adl').value,
+                supportLevelBathing: document.getElementById('edit-supportLevelBathing').value,
+                supportLevelDressing: document.getElementById('edit-supportLevelDressing').value,
+                supportLevelBedChair: document.getElementById('edit-supportLevelBedChair').value,
+                supportLevelWalking: document.getElementById('edit-supportLevelWalking').value,
+                supportLevelToilet: document.getElementById('edit-supportLevelToilet').value,
+                supportLevelEating: document.getElementById('edit-supportLevelEating').value,
+                supportLevelTransferring: document.getElementById('edit-supportLevelTransferring').value,
+                supportLevelCognitive: document.getElementById('edit-supportLevelCognitive').value,
+                mondaySchedule: document.getElementById('edit-mondaySchedule').value,
+                mondayTotal: document.getElementById('edit-mondayTotal').value,
+                tuesdaySchedule: document.getElementById('edit-tuesdaySchedule').value,
+                tuesdayTotal: document.getElementById('edit-tuesdayTotal').value,
+                wednesdaySchedule: document.getElementById('edit-wednesdaySchedule').value,
+                wednesdayTotal: document.getElementById('edit-wednesdayTotal').value,
+                thursdaySchedule: document.getElementById('edit-thursdaySchedule').value,
+                thursdayTotal: document.getElementById('edit-thursdayTotal').value,
+                fridaySchedule: document.getElementById('edit-fridaySchedule').value,
+                fridayTotal: document.getElementById('edit-fridayTotal').value,
+                saturdaySchedule: document.getElementById('edit-saturdaySchedule').value,
+                saturdayTotal: document.getElementById('edit-saturdayTotal').value,
+                sundaySchedule: document.getElementById('edit-sundaySchedule').value,
+                sundayTotal: document.getElementById('edit-sundayTotal').value,
+                weeklyTotal: document.getElementById('edit-weeklyTotal').value,
+                invoiceProcess: document.getElementById('edit-invoiceProcess').value,
+                invoiceSentTo: document.getElementById('edit-invoiceSentTo').value,
+                invoiceContactInfo: document.getElementById('edit-invoiceContactInfo').value,
+                additionalNotes: document.getElementById('edit-additionalNotes').value
+            };
+            
+            console.log('Saving data for row:', currentEditingRow);
+            console.log('Updated data:', updatedData);
+
+            console.log('Saving data for row:', currentEditingRow);
+            console.log('Updated data:', updatedData);
+
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'update',
+                        data: updatedData
+                    })
+                });
+
+                console.log('Save request sent (no-cors mode)');
+                showMessage('success', '✅ Changes saved successfully!');
+                closeModal();
+                
+                // Reload records after a brief delay
+                setTimeout(() => {
+                    loadRecords();
+                }, 1500);
+
+            } catch (error) {
+                console.error('Error saving changes:', error);
+                showMessage('error', '❌ Failed to save changes: ' + error.message);
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.textContent = originalText;
+            }
+        }
+
+        // Generate Care Plan
+        async function generateCarePlan() {
+            if (!currentEditingRow) return;
+
+            const generateBtn = document.querySelector('.btn-care-plan');
+            const originalText = generateBtn.textContent;
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<span class="loading"></span> Generating...';
+
+            try {
+                const record = allRecords.find(r => r.rowIndex === currentEditingRow);
+                
+                if (!record) {
+                    throw new Error('Record not found');
+                }
+
+                console.log('Generating Care Plan for row:', currentEditingRow);
+
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'generateCarePlan',
+                        data: {
+                            rowIndex: currentEditingRow,
+                            timestamp: Date.now()
+                        }
+                    })
+                });
+
+                // Wait for the script to complete
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                
+                // Construct folder name
+                const fullName = record.insuredName || 'Unknown';
+                const nameParts = fullName.trim().split(' ');
+                const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : nameParts[0];
+                const firstName = nameParts.length > 1 ? nameParts[0] : '';
+                const insurance = record.insurance || 'NoInsurance';
+                
+                const cleanLastName = lastName.replace(/[^a-zA-Z0-9]/g, '');
+                const cleanFirstName = firstName.replace(/[^a-zA-Z0-9]/g, '');
+                const cleanInsurance = insurance.replace(/[^a-zA-Z0-9]/g, '');
+                
+                const folderName = `${cleanLastName}_${cleanFirstName}_${cleanInsurance}`;
+                const driveSearchUrl = `https://drive.google.com/drive/search?q=${encodeURIComponent(folderName)}`;
+                
+                showMessage('success', 
+                    `✅ Care Plan generated successfully!<br><br>` +
+                    `<strong>Client:</strong> ${record.insuredName}<br>` +
+                    `<strong>Folder:</strong> ${folderName}<br><br>` +
+                    `<a href="${driveSearchUrl}" target="_blank" style="color: #F57600; text-decoration: underline; font-weight: 500;">` +
+                    `🔍 Open in Google Drive →</a>`
+                );
+                
+                // Open Google Drive
+                setTimeout(() => {
+                    window.open(driveSearchUrl, '_blank');
+                }, 500);
+
+            } catch (error) {
+                console.error('Error generating Care Plan:', error);
+                showMessage('error', `❌ Failed to generate Care Plan: ${error.message}`);
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = originalText;
+            }
+        }
+
+        // Show message
+        function showMessage(type, message) {
+            const messageDiv = document.getElementById(type === 'success' ? 'successMessage' : 'errorMessage');
+            messageDiv.innerHTML = message;
+            messageDiv.style.display = 'block';
+
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 10000);
+
+            messageDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // ESC key to close modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.getElementById('detailModal').style.display === 'block') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
