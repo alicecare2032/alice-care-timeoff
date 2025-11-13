@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LTC Insurance Admin 2.3</title>
+    <title>LTC Insurance Admin 2.6.1</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -615,11 +615,11 @@
 
     <script>
         // IMPORTANT: Replace this URL with your deployed Google Apps Script Web App URL
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1bFHyc7Ddu5P_deTpjsAvpGYdpI2OeT44j3isio7oypyIHQwQLk0nSLV2K8Y6C-0/exec';
+       // const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1bFHyc7Ddu5P_deTpjsAvpGYdpI2OeT44j3isio7oypyIHQwQLk0nSLV2K8Y6C-0/exec';
 
-    //    const CONFIG = {
-    //ADMIN_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbx1bFHyc7Ddu5P_deTpjsAvpGYdpI2OeT44j3isio7oypyIHQwQLk0nSLV2K8Y6C-0/exec',
-    //CAREPLAN_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxWrYEwzPEgd-eVf8BNpcZ_TGFyymAQ2EXbk0ZPq7ndhjmUGyBNvVbtP8AbKYWlFggBsg/exec' // ⚠️ ADD THIS LINE
+        const CONFIG = {
+    ADMIN_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbx1bFHyc7Ddu5P_deTpjsAvpGYdpI2OeT44j3isio7oypyIHQwQLk0nSLV2K8Y6C-0/exec',
+    CAREPLAN_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxWrYEwzPEgd-eVf8BNpcZ_TGFyymAQ2EXbk0ZPq7ndhjmUGyBNvVbtP8AbKYWlFggBsg/exec' // ⚠️ ADD THIS LINE
 };
 
         let allRecords = [];
@@ -645,7 +645,7 @@
             recordsList.innerHTML = '<div class="no-records"><div class="loading"></div><p style="margin-top: 15px;">Loading records...</p></div>';
             
             try {
-                const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getAll`);
+                const response = await fetch(`${CONFIG.ADMIN_SCRIPT_URL}?action=getAll`);
                 const data = await response.json();
 
                 console.log('Received response:', data);
@@ -1117,7 +1117,7 @@
             console.log('Saving data:', updatedData);
 
             try {
-                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                const response = await fetch(CONFIG.ADMIN_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: {
@@ -1155,37 +1155,76 @@
         }
 
         // Generate Care Plan
-        async function generateCarePlan() {
-            if (!currentEditingRow) return;
 
-            const generateBtn = document.querySelector('.btn-care-plan');
-            const originalText = generateBtn.textContent;
-            generateBtn.disabled = true;
-            generateBtn.innerHTML = '<span class="loading"></span> Generating...';
+        async function generateCarePlan(requestNumber) {
+    try {
+        showLoading('Generating care plan...');
+        
+        // Call the SEPARATE careplan generator script
+        const response = await fetch(
+            `${CONFIG.CAREPLAN_SCRIPT_URL}?requestNumber=${encodeURIComponent(requestNumber)}`,
+            {
+                method: 'GET',
+                mode: 'no-cors'
+            }
+        );
+        
+        // Use JSONP for better compatibility
+        const script = document.createElement('script');
+        script.src = `${CONFIG.CAREPLAN_SCRIPT_URL}?requestNumber=${encodeURIComponent(requestNumber)}&callback=handleCarePlanResult`;
+        document.body.appendChild(script);
+        
+    } catch (error) {
+        console.error('Error generating care plan:', error);
+        alert('Error generating care plan: ' + error.message);
+        hideLoading();
+    }
+}
 
-            try {
-                const record = allRecords.find(r => r.rowIndex === currentEditingRow);
+// Add callback handler
+function handleCarePlanResult(result) {
+    hideLoading();
+    
+    if (result.result === 'success') {
+        alert('Care plan generated successfully!');
+        if (result.data && result.data.documentUrl) {
+            window.open(result.data.documentUrl, '_blank');
+        }
+    } else {
+        alert('Error: ' + result.message);
+    }
+}
+        // async function generateCarePlan() {
+        //     if (!currentEditingRow) return;
 
-                if (!record) {
-                    throw new Error('Record not found');
-                }
+        //     const generateBtn = document.querySelector('.btn-care-plan');
+        //     const originalText = generateBtn.textContent;
+        //     generateBtn.disabled = true;
+        //     generateBtn.innerHTML = '<span class="loading"></span> Generating...';
 
-                await fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'generateCarePlan',
-                        data: {
-                            rowIndex: currentEditingRow,
-                            timestamp: Date.now()
-                        }
-                    })
-                });
+        //     try {
+        //         const record = allRecords.find(r => r.rowIndex === currentEditingRow);
 
-                await new Promise(resolve => setTimeout(resolve, 3000));
+        //         if (!record) {
+        //             throw new Error('Record not found');
+        //         }
+
+        //         await fetch(GOOGLE_SCRIPT_URL, {
+        //             method: 'POST',
+        //             mode: 'no-cors',
+        //             headers: {
+        //                 'Content-Type': 'application/json',
+        //             },
+        //             body: JSON.stringify({
+        //                 action: 'generateCarePlan',
+        //                 data: {
+        //                     rowIndex: currentEditingRow,
+        //                     timestamp: Date.now()
+        //                 }
+        //             })
+        //         });
+
+                 await new Promise(resolve => setTimeout(resolve, 3000));
 
                 const fullName = record.insuredName || 'Unknown';
                 const nameParts = fullName.trim().split(' ');
@@ -1221,7 +1260,7 @@
             }
         }
 
-        // Show message
+        Show message
         function showMessage(type, message) {
             const messageDiv = document.getElementById(type === 'success' ? 'successMessage' : 'errorMessage');
             messageDiv.innerHTML = message;
