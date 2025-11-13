@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LTC Insurance Admin 2.6.1b</title>
+    <title>LTC Insurance Admin 2.6.1c</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -1156,73 +1156,73 @@
 
         // Generate Care Plan
 
-        async function generateCarePlan(requestNumber) {
-    try {
-        showLoading('Generating care plan...');
+//         async function generateCarePlan(requestNumber) {
+//     try {
+//         showLoading('Generating care plan...');
         
-        // Call the SEPARATE careplan generator script
-        const response = await fetch(
-            `${CONFIG.CAREPLAN_SCRIPT_URL}?requestNumber=${encodeURIComponent(requestNumber)}`,
-            {
-                method: 'GET',
-                mode: 'no-cors'
-            }
-        );
+//         // Call the SEPARATE careplan generator script
+//         const response = await fetch(
+//             `${CONFIG.CAREPLAN_SCRIPT_URL}?requestNumber=${encodeURIComponent(requestNumber)}`,
+//             {
+//                 method: 'GET',
+//                 mode: 'no-cors'
+//             }
+//         );
         
-        // Use JSONP for better compatibility
-        const script = document.createElement('script');
-        script.src = `${CONFIG.CAREPLAN_SCRIPT_URL}?requestNumber=${encodeURIComponent(requestNumber)}&callback=handleCarePlanResult`;
-        document.body.appendChild(script);
+//         // Use JSONP for better compatibility
+//         const script = document.createElement('script');
+//         script.src = `${CONFIG.CAREPLAN_SCRIPT_URL}?requestNumber=${encodeURIComponent(requestNumber)}&callback=handleCarePlanResult`;
+//         document.body.appendChild(script);
         
-    } catch (error) {
-        console.error('Error generating care plan:', error);
-        alert('Error generating care plan: ' + error.message);
-        hideLoading();
-    }
-}
+//     } catch (error) {
+//         console.error('Error generating care plan:', error);
+//         alert('Error generating care plan: ' + error.message);
+//         hideLoading();
+//     }
+// }
 
-// Add callback handler
-function handleCarePlanResult(result) {
-    hideLoading();
+// // Add callback handler
+// function handleCarePlanResult(result) {
+//     hideLoading();
     
-    if (result.result === 'success') {
-        alert('Care plan generated successfully!');
-        if (result.data && result.data.documentUrl) {
-            window.open(result.data.documentUrl, '_blank');
-        }
-    } else {
-        alert('Error: ' + result.message);
-    }
-}
-        // async function generateCarePlan() {
-        //     if (!currentEditingRow) return;
+//     if (result.result === 'success') {
+//         alert('Care plan generated successfully!');
+//         if (result.data && result.data.documentUrl) {
+//             window.open(result.data.documentUrl, '_blank');
+//         }
+//     } else {
+//         alert('Error: ' + result.message);
+//     }
+// }
+        async function generateCarePlan() {
+            if (!currentEditingRow) return;
 
-        //     const generateBtn = document.querySelector('.btn-care-plan');
-        //     const originalText = generateBtn.textContent;
-        //     generateBtn.disabled = true;
-        //     generateBtn.innerHTML = '<span class="loading"></span> Generating...';
+            const generateBtn = document.querySelector('.btn-care-plan');
+            const originalText = generateBtn.textContent;
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<span class="loading"></span> Generating...';
 
-        //     try {
-        //         const record = allRecords.find(r => r.rowIndex === currentEditingRow);
+            try {
+                const record = allRecords.find(r => r.rowIndex === currentEditingRow);
 
-        //         if (!record) {
-        //             throw new Error('Record not found');
-        //         }
+                if (!record) {
+                    throw new Error('Record not found');
+                }
 
-        //         await fetch(GOOGLE_SCRIPT_URL, {
-        //             method: 'POST',
-        //             mode: 'no-cors',
-        //             headers: {
-        //                 'Content-Type': 'application/json',
-        //             },
-        //             body: JSON.stringify({
-        //                 action: 'generateCarePlan',
-        //                 data: {
-        //                     rowIndex: currentEditingRow,
-        //                     timestamp: Date.now()
-        //                 }
-        //             })
-        //         });
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'generateCarePlan',
+                        data: {
+                            rowIndex: currentEditingRow,
+                            timestamp: Date.now()
+                        }
+                    })
+                });
 
                  await new Promise(resolve => setTimeout(resolve, 3000));
 
