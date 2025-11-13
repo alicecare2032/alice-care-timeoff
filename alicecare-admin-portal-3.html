@@ -633,20 +633,32 @@
 
         // Load records from Google Sheets
         async function loadRecords() {
+            console.log('Loading records...');
+            
+            // Show loading state
+            const recordsList = document.getElementById('recordsList');
+            recordsList.innerHTML = '<div class="no-records"><div class="loading"></div><p style="margin-top: 15px;">Loading records...</p></div>';
+            
             try {
                 const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getAll`);
                 const data = await response.json();
 
+                console.log('Received response:', data);
+
                 if (data.result === 'success') {
                     allRecords = data.records;
+                    console.log(`Loaded ${allRecords.length} records`);
                     displayRecords(allRecords);
                     updateStats(allRecords);
                 } else {
+                    console.error('Error from server:', data.message);
                     showMessage('error', 'Failed to load records: ' + data.message);
+                    recordsList.innerHTML = '<div class="no-records">Failed to load records. Please try again.</div>';
                 }
             } catch (error) {
                 console.error('Error loading records:', error);
                 showMessage('error', 'Error loading records: ' + error.message);
+                recordsList.innerHTML = '<div class="no-records">Error loading records. Please check your connection and try again.</div>';
             }
         }
 
@@ -1097,6 +1109,8 @@
                 notes: document.getElementById('edit-notes').value
             };
 
+            console.log('Saving data:', updatedData);
+
             try {
                 const response = await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
@@ -1110,19 +1124,28 @@
                     })
                 });
 
-                showMessage('success', '✅ Changes saved successfully!');
+                console.log('Save request sent successfully');
+                
+                // Close modal first
                 closeModal();
-
+                
+                // Show success message
+                showMessage('success', '✅ Changes saved successfully! Reloading data...');
+                
+                // Reload records immediately to show updated data
+                await loadRecords();
+                
+                // Hide success message after 5 seconds
                 setTimeout(() => {
-                    loadRecords();
-                }, 1500);
+                    document.getElementById('successMessage').style.display = 'none';
+                }, 5000);
 
             } catch (error) {
                 console.error('Error saving changes:', error);
                 showMessage('error', '❌ Failed to save changes: ' + error.message);
             } finally {
                 saveBtn.disabled = false;
-                saveBtn.textContent = originalText;
+                saveBtn.innerHTML = originalText;
             }
         }
 
