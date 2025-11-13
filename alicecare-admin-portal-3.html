@@ -899,36 +899,99 @@
                     <div class="field-row">
                         <div class="field-group">
                             <div class="field-label">Bathing Support</div>
-                            <div class="field-value"><input type="text" id="edit-supportBathing" value="${record.bathing || ''}"></div>
+                            <div class="field-value">
+                                <select id="edit-supportBathing">
+                                    <option value="">Select support level...</option>
+                                    <option value="Independent" ${record.bathing === 'Independent' ? 'selected' : ''}>Independent</option>
+                                    <option value="Requires Supervision" ${record.bathing === 'Requires Supervision' ? 'selected' : ''}>Requires Supervision</option>
+                                    <option value="Requires limited assistance (Prompting)" ${record.bathing === 'Requires limited assistance (Prompting)' ? 'selected' : ''}>Requires limited assistance (Prompting)</option>
+                                    <option value="Extensive assist" ${record.bathing === 'Extensive assist' ? 'selected' : ''}>Extensive assist</option>
+                                    <option value="Total Dependence" ${record.bathing === 'Total Dependence' ? 'selected' : ''}>Total Dependence</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="field-group">
                             <div class="field-label">Dressing Support</div>
-                            <div class="field-value"><input type="text" id="edit-supportDressing" value="${record.dressing || ''}"></div>
+                            <div class="field-value">
+                                <select id="edit-supportDressing">
+                                    <option value="">Select support level...</option>
+                                    <option value="Independent" ${record.dressing === 'Independent' ? 'selected' : ''}>Independent</option>
+                                    <option value="Requires Supervision" ${record.dressing === 'Requires Supervision' ? 'selected' : ''}>Requires Supervision</option>
+                                    <option value="Requires limited assistance (Prompting)" ${record.dressing === 'Requires limited assistance (Prompting)' ? 'selected' : ''}>Requires limited assistance (Prompting)</option>
+                                    <option value="Extensive assist" ${record.dressing === 'Extensive assist' ? 'selected' : ''}>Extensive assist</option>
+                                    <option value="Total Dependence" ${record.dressing === 'Total Dependence' ? 'selected' : ''}>Total Dependence</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <div class="field-row">
                         <div class="field-group">
                             <div class="field-label">Walking Support</div>
-                            <div class="field-value"><input type="text" id="edit-supportWalking" value="${record.walking || ''}"></div>
+                            <div class="field-value">
+                                <select id="edit-supportWalking">
+                                    <option value="">Select support level...</option>
+                                    <option value="Independent" ${record.walking === 'Independent' ? 'selected' : ''}>Independent</option>
+                                    <option value="Requires Supervision" ${record.walking === 'Requires Supervision' ? 'selected' : ''}>Requires Supervision</option>
+                                    <option value="Requires limited assistance (Prompting)" ${record.walking === 'Requires limited assistance (Prompting)' ? 'selected' : ''}>Requires limited assistance (Prompting)</option>
+                                    <option value="Extensive assist" ${record.walking === 'Extensive assist' ? 'selected' : ''}>Extensive assist</option>
+                                    <option value="Total Dependence" ${record.walking === 'Total Dependence' ? 'selected' : ''}>Total Dependence</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="field-group">
                             <div class="field-label">Toileting Support</div>
-                            <div class="field-value"><input type="text" id="edit-supportToileting" value="${record.toileting || ''}"></div>
+                            <div class="field-value">
+                                <select id="edit-supportToileting">
+                                    <option value="">Select support level...</option>
+                                    <option value="Independent" ${record.toileting === 'Independent' ? 'selected' : ''}>Independent</option>
+                                    <option value="Requires Supervision" ${record.toileting === 'Requires Supervision' ? 'selected' : ''}>Requires Supervision</option>
+                                    <option value="Requires limited assistance (Prompting)" ${record.toileting === 'Requires limited assistance (Prompting)' ? 'selected' : ''}>Requires limited assistance (Prompting)</option>
+                                    <option value="Extensive assist" ${record.toileting === 'Extensive assist' ? 'selected' : ''}>Extensive assist</option>
+                                    <option value="Total Dependence" ${record.toileting === 'Total Dependence' ? 'selected' : ''}>Total Dependence</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <div class="field-row">
                         <div class="field-group">
                             <div class="field-label">Eating Support</div>
-                            <div class="field-value"><input type="text" id="edit-supportEating" value="${record.eating || ''}"></div>
+                            <div class="field-value">
+                                <select id="edit-supportEating">
+                                    <option value="">Select support level...</option>
+                                    <option value="Independent" ${record.eating === 'Independent' ? 'selected' : ''}>Independent</option>
+                                    <option value="Requires Supervision" ${record.eating === 'Requires Supervision' ? 'selected' : ''}>Requires Supervision</option>
+                                    <option value="Requires limited assistance (Prompting)" ${record.eating === 'Requires limited assistance (Prompting)' ? 'selected' : ''}>Requires limited assistance (Prompting)</option>
+                                    <option value="Extensive assist" ${record.eating === 'Extensive assist' ? 'selected' : ''}>Extensive assist</option>
+                                    <option value="Total Dependence" ${record.eating === 'Total Dependence' ? 'selected' : ''}>Total Dependence</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="field-group">
                             <div class="field-label">Transferring Support</div>
-                            <div class="field-value"><input type="text" id="edit-supportTransferring" value="${record.transferring || ''}"></div>
+                            <div class="field-value">
+                                <select id="edit-supportTransferring">
+                                    <option value="">Select support level...</option>
+                                    <option value="Independent" ${record.transferring === 'Independent' ? 'selected' : ''}>Independent</option>
+                                    <option value="Requires Supervision" ${record.transferring === 'Requires Supervision' ? 'selected' : ''}>Requires Supervision</option>
+                                    <option value="Requires limited assistance (Prompting)" ${record.transferring === 'Requires limited assistance (Prompting)' ? 'selected' : ''}>Requires limited assistance (Prompting)</option>
+                                    <option value="Extensive assist" ${record.transferring === 'Extensive assist' ? 'selected' : ''}>Extensive assist</option>
+                                    <option value="Total Dependence" ${record.transferring === 'Total Dependence' ? 'selected' : ''}>Total Dependence</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <div class="field-group">
                         <div class="field-label">Cognitive Support</div>
-                        <div class="field-value"><input type="text" id="edit-supportCognitive" value="${record.cognitive || ''}"></div>
+                        <div class="field-value">
+                            <select id="edit-supportCognitive">
+                                <option value="">Select support level...</option>
+                                <option value="Independent" ${record.cognitive === 'Independent' ? 'selected' : ''}>Independent</option>
+                                <option value="Requires Supervision" ${record.cognitive === 'Requires Supervision' ? 'selected' : ''}>Requires Supervision</option>
+                                <option value="Requires limited assistance (Prompting)" ${record.cognitive === 'Requires limited assistance (Prompting)' ? 'selected' : ''}>Requires limited assistance (Prompting)</option>
+                                <option value="Extensive assist" ${record.cognitive === 'Extensive assist' ? 'selected' : ''}>Extensive assist</option>
+                                <option value="Total Dependence" ${record.cognitive === 'Total Dependence' ? 'selected' : ''}>Total Dependence</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
