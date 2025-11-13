@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LTC Insurance Admin 2.6.1</title>
+    <title>LTC Insurance Admin 2.6.2</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -645,7 +645,7 @@
             recordsList.innerHTML = '<div class="no-records"><div class="loading"></div><p style="margin-top: 15px;">Loading records...</p></div>';
             
             try {
-                const response = await fetch(`${CONFIG.ADMIN_SCRIPT_URL}?action=getAll`);
+                const response = await fetch(`${CONFIG.ADMIN_SCRIPT_URL}?action=getAllSubmissions`);
                 const data = await response.json();
 
                 console.log('Received response:', data);
