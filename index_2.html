@@ -1384,11 +1384,11 @@
                         '<div class="value" style="color: #FF7475;">✗ Rejected</div>' +
                         '<div style="font-size: 12px; color: #3D3D3D; margin-top: 5px;">By: ' + (request.rejectedBy || 'N/A') + '</div>' +
                         '<div style="font-size: 11px; color: #3D3D3D;">' + rejectionDate + '</div>';
-                    if (request.rejectionComments) {
-                        reviewStatusHtml += '<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #D3D7DF;">' +
-                            '<div style="font-size: 11px; color: #3D3D3D; margin-bottom: 4px;">Reason:</div>' +
-                            '<div style="font-size: 12px; color: #1A365C;">' + request.rejectionComments + '</div>' +
-                            '</div>';
+                 //   if (request.rejectionComments) {
+                 //       reviewStatusHtml += '<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #D3D7DF;">' +
+                 //           '<div style="font-size: 11px; color: #3D3D3D; margin-bottom: 4px;">Reason:</div>' +
+                 //           '<div style="font-size: 12px; color: #1A365C;">' + request.rejectionComments + '</div>' +
+                 //           '</div>';
                     }
                     reviewStatusHtml += '</div>';
                 } else if (request.approvalStatus === 'approved') {
