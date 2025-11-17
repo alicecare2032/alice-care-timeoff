@@ -543,32 +543,6 @@
             animation: dots 1.5s steps(4, end) infinite;
         }
         
-        .notice-box {
-            background: #E5ECF3;
-            border-left: 4px solid #F57600;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 30px;
-        }
-        
-        .notice-box h3 {
-            color: #1A365C;
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-        
-        .notice-box p {
-            color: #3D3D3D;
-            font-size: 13px;
-            line-height: 1.6;
-            margin-bottom: 10px;
-        }
-        
-        .notice-box p:last-child {
-            margin-bottom: 0;
-        }
-        
         @keyframes dots {
             0%, 20% { content: '.'; }
             40% { content: '..'; }
@@ -631,16 +605,9 @@
                 <div class="number" id="approvedRequests">0</div>
             </div>
             <div class="stat-card">
-                <h3>Not Eligible</h3>
+                <h3>Rejected</h3>
                 <div class="number" id="rejectedRequests">0</div>
             </div>
-        </div>
-        
-        <div class="notice-box">
-            <h3>Status Definitions</h3>
-            <p><strong>Reviewed:</strong> Time off Approved</p>
-            <p><strong>Not Eligible:</strong> Not eligible for sick/vacation hours</p>
-            <p><strong>Approved:</strong> Vacation/sick hours will be paid based on accrued available hours and company policy.</p>
         </div>
         
         <div class="filters-section">
@@ -678,7 +645,7 @@
                         <option value="pending">Pending Review</option>
                         <option value="reviewed">Reviewed</option>
                         <option value="approved">Approved</option>
-                        <option value="rejected">Not Eligible</option>
+                        <option value="rejected">Rejected</option>
                     </select>
                 </div>
                 <div class="filter-actions">
@@ -855,7 +822,7 @@
                 statusBadges += '<span class="badge badge-' + req.requestType + '">' + req.requestType.toUpperCase() + '</span>';
                 
                 if (req.rejectionStatus === 'rejected') {
-                    statusBadges += '<span class="badge badge-rejected">NOT_ELIGIBLE</span>';
+                    statusBadges += '<span class="badge badge-rejected">REJECTED</span>';
                 } else if (req.approvalStatus === 'approved') {
                     statusBadges += '<span class="badge badge-approved">APPROVED</span>';
                 } else if (req.reviewStatus === 'reviewed') {
@@ -913,7 +880,7 @@
                     }) : 'N/A';
                     reviewStatusHtml += '<div class="status-box" style="border-left-color: #FF7475; background: #FFE3E3;">' +
                         '<h5>Rejection Status</h5>' +
-                        '<div class="value" style="color: #FF7475;">✗ Not Eligible</div>' +
+                        '<div class="value" style="color: #FF7475;">✗ Rejected</div>' +
                         '<div style="font-size: 12px; color: #3D3D3D; margin-top: 5px;">By: ' + (req.rejectedBy || 'N/A') + '</div>' +
                         '<div style="font-size: 11px; color: #3D3D3D;">' + rejectionDate + '</div>';
                     if (req.rejectionComments) {

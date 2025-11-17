@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AC:Time Off Request v11.4x</title>
+    <title>Alice Care - Time Off Request v11.4</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <style>
@@ -538,96 +538,6 @@
             font-weight: 600;
         }
         
-        /* Status Display Styles */
-        .request-badges {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        
-        .badge {
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        
-        .badge-pending {
-            background: #FFF3E0;
-            color: #F57600;
-        }
-        
-        .badge-reviewed {
-            background: #E3F2FD;
-            color: #2196F3;
-        }
-        
-        .badge-approved {
-            background: #E0F1E9;
-            color: #62B790;
-        }
-        
-        .badge-rejected {
-            background: #FFE3E3;
-            color: #FF7475;
-        }
-        
-        .review-section {
-            border-top: 2px solid #E5ECF3;
-            padding-top: 20px;
-            margin-top: 20px;
-        }
-        
-        .review-section h4 {
-            font-size: 16px;
-            color: #1A365C;
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-        
-        .review-status {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-        
-        .status-box {
-            background: #F9F9F9;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #D3D7DF;
-        }
-        
-        .status-box.reviewed {
-            border-left-color: #2196F3;
-            background: #E3F2FD;
-        }
-        
-        .status-box.approved {
-            border-left-color: #62B790;
-            background: #E0F1E9;
-        }
-        
-        .status-box.rejected {
-            border-left-color: #FF7475;
-            background: #FFE3E3;
-        }
-        
-        .status-box h5 {
-            font-size: 12px;
-            color: #3D3D3D;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            font-weight: 500;
-        }
-        
-        .status-box .value {
-            font-size: 14px;
-            color: #1A365C;
-            font-weight: 600;
-        }
-        
         .day-total-container {
             margin: 20px 0;
             padding: 0 24px;
@@ -845,7 +755,7 @@
                 
                 <div id="successMessage" class="success-message">
                     ✓ Your request has been submitted successfully! Request ID: <span id="generatedId"></span><br>
-                    You and <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="8afaebf3f8e5e6e6caebe6e3e9efe9ebf8efa4e9e5e7">[email&#160;protected]</a> will receive confirmation emails shortly.
+                    You and payroll@alicecare.com will receive confirmation emails shortly.
                 </div>
             </form>
         </div>
@@ -874,13 +784,6 @@
                 <h3>My Sick Time Requests</h3>
                 <div class="number" id="mySickRequests">0</div>
             </div>
-        </div>
-        
-        <div class="notice-box" style="max-width: 800px; margin: 20px auto;">
-            <h3>Status Definitions</h3>
-            <p><strong>Reviewed:</strong> Time off Approved</p>
-            <p><strong>Not Eligible:</strong> Not eligible for sick/vacation hours</p>
-            <p><strong>Approved:</strong> Vacation/sick hours will be paid based on accrued available hours and company policy.</p>
         </div>
         
         <div class="requests-list">
@@ -948,7 +851,7 @@
         </div>
     </div>
     
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    <script>
         var serviceCount = 1;
         var requests = [];
         // IMPORTANT: Replace with your Google Apps Script URL
@@ -1335,80 +1238,13 @@
                     totalHours += parseFloat(request.services[s].hoursMissed);
                 }
                 
-                // Status Badges
-                var statusBadges = '<div class="request-badges">';
-                if (request.rejectionStatus === 'rejected') {
-                    statusBadges += '<span class="badge badge-rejected">NOT_ELIGIBLE</span>';
-                } else if (request.approvalStatus === 'approved') {
-                    statusBadges += '<span class="badge badge-approved">APPROVED</span>';
-                } else if (request.reviewStatus === 'reviewed') {
-                    statusBadges += '<span class="badge badge-reviewed">REVIEWED</span>';
-                } else {
-                    statusBadges += '<span class="badge badge-pending">PENDING REVIEW</span>';
-                }
-                statusBadges += '</div>';
-                
                 var servicesHtml = '';
                 for (var s = 0; s < request.services.length; s++) {
                     var service = request.services[s];
                     servicesHtml += '<div class="service-item"><div class="service-main"><strong>Service ' + (s + 1) + ':</strong> ' + service.client + '</div><div class="service-details"><span>Start: ' + service.startTime + '</span><span>Hours: ' + service.hoursMissed + '</span></div></div>';
                 }
                 
-                // Review Status Section - Simplified
-                var reviewStatusHtml = '<div class="review-section"><h4>Request Status</h4><div class="review-status">';
-                
-                // Review Box - Only show status
-                if (request.reviewStatus === 'reviewed') {
-                    reviewStatusHtml += '<div class="status-box reviewed">' +
-                        '<h5>Review Status</h5>' +
-                        '<div class="value">✓ Reviewed</div>' +
-                        '</div>';
-                } else {
-                    reviewStatusHtml += '<div class="status-box">' +
-                        '<h5>Review Status</h5>' +
-                        '<div class="value">Pending</div>' +
-                        '</div>';
-                }
-                
-                // Approval Box - Only show status and approved hours
-                if (request.rejectionStatus === 'rejected') {
-                    reviewStatusHtml += '<div class="status-box rejected">' +
-                        '<h5>Approval Status</h5>' +
-                        '<div class="value" style="color: #FF7475;">✗ Not Eligible</div>' +
-                        '</div>';
-                } else if (request.approvalStatus === 'approved') {
-                    reviewStatusHtml += '<div class="status-box approved">' +
-                        '<h5>Approval Status</h5>' +
-                        '<div class="value" style="color: #62B790;">✓ Approved</div>' +
-                        '<div style="font-size: 14px; color: #1A365C; margin-top: 10px; font-weight: 600;">Approved Hours: ' + (request.approvedHours || '0.00') + '</div>' +
-                        '</div>';
-                } else {
-                    reviewStatusHtml += '<div class="status-box">' +
-                        '<h5>Approval Status</h5>' +
-                        '<div class="value">Pending</div>' +
-                        '</div>';
-                }
-                
-                reviewStatusHtml += '</div></div>';
-                
-                html += '<div class="request-card">' +
-                    '<div class="request-header">' +
-                    '<div><div class="request-id">' + request.requestId + '</div></div>' +
-                    statusBadges +
-                    '</div>' +
-                    '<div class="request-info">' +
-                    '<div class="info-item"><div class="info-label">Request Date</div><div class="info-value">' + date + '</div></div>' +
-                    '<div class="info-item"><div class="info-label">Total Services</div><div class="info-value">' + request.services.length + '</div></div>' +
-                    '<div class="info-item"><div class="info-label">Total Hours</div><div class="info-value">' + totalHours.toFixed(2) + ' hrs</div></div>' +
-                     '<div class="info-item"><div class="info-label">Submitted</div><div class="info-value">' + submittedDate + '</div></div>' +
-                    '</div>' +
-                    '<div class="services-list">' +
-                    '<h4>Services Missed (' + request.services.length + ')</h4>' +
-                    servicesHtml +
-                    '<div class="services-total"><span>Total Hours for the Day</span><span>' + totalHours.toFixed(2) + ' hours</span></div>' +
-                    '</div>' +
-                    reviewStatusHtml +
-                    '</div>';
+                html += '<div class="request-card"><div class="request-header"><div><div class="request-id">' + request.requestId + '</div></div><div class="request-type ' + request.requestType + '">' + request.requestType.toUpperCase() + '</div></div><div class="request-info"><div class="info-item"><div class="info-label">Request Date</div><div class="info-value">' + date + '</div></div><div class="info-item"><div class="info-label">Submitted</div><div class="info-value">' + submittedDate + '</div></div><div class="info-item"><div class="info-label">Total Services</div><div class="info-value">' + request.services.length + '</div></div><div class="info-item"><div class="info-label">Total Hours</div><div class="info-value">' + totalHours.toFixed(2) + ' hrs</div></div></div><div class="services-list"><h4>Services Missed (' + request.services.length + ')</h4>' + servicesHtml + '<div class="services-total"><span>Total Hours for the Day</span><span>' + totalHours.toFixed(2) + ' hours</span></div></div></div>';
             }
             
             myRequestsList.innerHTML = html;
@@ -1452,11 +1288,13 @@
                         temp.push(r);
                     }
                 }
-                         filtered = temp;
+                filtered = temp;
             }
             
+            var tempRequests = requests;
+            requests = filtered;
             displayRequests();
-            updateStats();
+            requests = tempRequests;
         }
     </script>
 </body>
