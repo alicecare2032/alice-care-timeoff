@@ -876,6 +876,13 @@
             </div>
         </div>
         
+        <div class="notice-box" style="max-width: 800px; margin: 20px auto;">
+            <h3>Status Definitions</h3>
+            <p><strong>Reviewed:</strong> Time off Approved</p>
+            <p><strong>Not Eligible:</strong> Not eligible for sick/vacation hours</p>
+            <p><strong>Approved:</strong> Vacation/sick hours will be paid based on accrued available hours and company policy.</p>
+        </div>
+        
         <div class="requests-list">
             <div style="max-width: 600px; margin-bottom: 30px;">
                 <h3 style="color: #1A365C; margin-bottom: 15px; font-size: 16px;">Enter Your Information to View Your Requests</h3>
@@ -1331,7 +1338,7 @@
                 // Status Badges
                 var statusBadges = '<div class="request-badges">';
                 if (request.rejectionStatus === 'rejected') {
-                    statusBadges += '<span class="badge badge-rejected">REJECTED</span>';
+                    statusBadges += '<span class="badge badge-rejected">NOT_ELIGIBLE</span>';
                 } else if (request.approvalStatus === 'approved') {
                     statusBadges += '<span class="badge badge-approved">APPROVED</span>';
                 } else if (request.reviewStatus === 'reviewed') {
@@ -1367,7 +1374,7 @@
                 if (request.rejectionStatus === 'rejected') {
                     reviewStatusHtml += '<div class="status-box rejected">' +
                         '<h5>Approval Status</h5>' +
-                        '<div class="value" style="color: #FF7475;">✗ Rejected</div>' +
+                        '<div class="value" style="color: #FF7475;">✗ Not Eligible</div>' +
                         '</div>';
                 } else if (request.approvalStatus === 'approved') {
                     reviewStatusHtml += '<div class="status-box approved">' +
