@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - Mileage v2.4.1</title>
+    <title>Alice Care - Mileage v2.4.2</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -712,7 +712,7 @@
             document.getElementById('adjustedMileage').textContent = adjustedTotal.toFixed(1);
             
             // Update the table footer as well
-            const footerCell = document.querySelector('tfoot td:nth-child(5)');
+            const footerCell = document.querySelector('tfoot td:nth-child(3)');
             if (footerCell) {
                 footerCell.textContent = adjustedTotal.toFixed(1) + ' mi';
             }
