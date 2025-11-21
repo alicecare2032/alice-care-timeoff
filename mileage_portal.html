@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - Mileage Report Portal v2.0</title>
+    <title>Alice Care - Mileage v2.3</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -460,7 +460,8 @@
             document.getElementById('reportSection').classList.add('hidden');
             document.getElementById('emptyState').classList.add('hidden');
 
-            // Use JSONP to bypass CORS (same approach as working systems)
+            // Use JSONP for GET requests (works with Google Workspace Scripts)
+            // This bypasses CORS issues that affect fetch() with Workspace domains
             const callbackName = 'mileageCallback_' + Date.now();
             
             window[callbackName] = function(data) {
@@ -468,8 +469,9 @@
                 
                 // Clean up
                 delete window[callbackName];
-                if (document.getElementById('jsonp_script')) {
-                    document.getElementById('jsonp_script').remove();
+                const scriptElement = document.getElementById('jsonp_script');
+                if (scriptElement) {
+                    scriptElement.remove();
                 }
                 
                 // Process data
@@ -494,6 +496,7 @@
             // Create script tag for JSONP request
             const script = document.createElement('script');
             script.id = 'jsonp_script';
+            script.type = 'text/javascript'; // Explicitly set type
             script.src = GOOGLE_SCRIPT_URL + 
                 '?action=getReport' +
                 '&employeeId=' + encodeURIComponent(employeeId) +
@@ -510,7 +513,7 @@
             };
             
             console.log('Loading via JSONP:', script.src);
-            document.body.appendChild(script);
+            document.head.appendChild(script);
         }
 
         function displayReport(data) {
