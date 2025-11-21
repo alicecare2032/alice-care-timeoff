@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - Mileage Report Portal v1.5</title>
+    <title>Alice Care - Mileage Report Portal v1.6</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -519,15 +519,22 @@
             document.getElementById('statsSection').classList.remove('hidden');
             document.getElementById('reportSection').classList.remove('hidden');
 
-            // Update stats
+            // Calculate totals
             let originalTotal = 0;
+            let adjustedTotal = 0;
+            
             for (let i = 0; i < data.services.length; i++) {
-                originalTotal += parseFloat(data.services[i].Mileage || 0);
+                const originalMileage = parseFloat(data.services[i].Mileage || 0);
+                const adjustedMileage = data.services[i].Adjusted_Mileage ? parseFloat(data.services[i].Adjusted_Mileage) : originalMileage;
+                
+                originalTotal += originalMileage;
+                adjustedTotal += adjustedMileage;
             }
 
+            // Update stats
             document.getElementById('totalServices').textContent = data.services.length;
             document.getElementById('originalMileage').textContent = originalTotal.toFixed(1);
-            document.getElementById('adjustedMileage').textContent = originalTotal.toFixed(1);
+            document.getElementById('adjustedMileage').textContent = adjustedTotal.toFixed(1);
             document.getElementById('reportStatus').textContent = data.approved ? 'Approved ✓' : 'Pending';
 
             // Display services as a table
@@ -555,6 +562,11 @@
                 const bgColor = i % 2 === 0 ? '#FFFFFF' : '#F9FAFB';
                 const isDisabled = data.approved;
                 
+                const originalMileage = parseFloat(service.Mileage);
+                const adjustedMileage = service.Adjusted_Mileage ? parseFloat(service.Adjusted_Mileage) : null;
+                const adjustmentReason = service.Adjustment_Reason || '';
+                const hasFile = service.Has_Reference_File || '';
+                
                 servicesHtml += `
                     <tr style="background: ${bgColor}; border-bottom: 1px solid #E5ECF3;">
                         <td style="padding: 12px; font-size: 14px; color: #1A365C; font-weight: 600;">
@@ -567,27 +579,29 @@
                             ${service.Service_Provider_First_Name} ${service.Service_Provider_Last_Name}
                         </td>
                         <td style="padding: 12px; font-size: 14px; color: #1A365C; font-weight: 600; text-align: right;">
-                            ${parseFloat(service.Mileage).toFixed(1)} mi
+                            ${originalMileage.toFixed(1)} mi
                         </td>
                         <td style="padding: 8px; text-align: center;">
                             <input type="number" 
                                    id="adj_${i}" 
                                    step="0.1" 
-                                   placeholder="${parseFloat(service.Mileage).toFixed(1)}"
+                                   value="${adjustedMileage !== null ? adjustedMileage.toFixed(1) : ''}"
+                                   placeholder="${originalMileage.toFixed(1)}"
                                    onchange="updateAdjustment(${i}, this.value)"
                                    ${isDisabled ? 'disabled' : ''}
-                                   style="width: 80px; padding: 6px 8px; border: 2px solid #D3D7DF; border-radius: 6px; font-size: 14px; text-align: center; font-family: 'Poppins', sans-serif;">
+                                   style="width: 80px; padding: 6px 8px; border: 2px solid ${adjustedMileage !== null ? '#62B790' : '#D3D7DF'}; border-radius: 6px; font-size: 14px; text-align: center; font-family: 'Poppins', sans-serif; background: ${adjustedMileage !== null ? '#F0FDF4' : 'white'};">
                         </td>
                         <td style="padding: 8px;">
                             <input type="text" 
                                    id="reason_${i}" 
+                                   value="${adjustmentReason}"
                                    placeholder="Optional"
                                    ${isDisabled ? 'disabled' : ''}
                                    style="width: 100%; padding: 6px 8px; border: 2px solid #D3D7DF; border-radius: 6px; font-size: 13px; font-family: 'Poppins', sans-serif;">
                         </td>
                         <td style="padding: 8px; text-align: center;">
-                            <label for="file_${i}" style="cursor: pointer; display: inline-block; padding: 6px 12px; background: #E5ECF3; border: 2px solid #D3D7DF; border-radius: 6px; font-size: 12px; color: #1A365C; font-weight: 500; transition: all 0.3s;">
-                                📎 File
+                            <label for="file_${i}" style="cursor: ${isDisabled ? 'not-allowed' : 'pointer'}; display: inline-block; padding: 6px 12px; background: ${hasFile === 'Yes' ? '#D4F4E2' : '#E5ECF3'}; border: 2px solid ${hasFile === 'Yes' ? '#62B790' : '#D3D7DF'}; border-radius: 6px; font-size: 12px; color: #1A365C; font-weight: 500; transition: all 0.3s;">
+                                ${hasFile === 'Yes' ? '✓ File' : '📎 File'}
                             </label>
                             <input type="file" 
                                    id="file_${i}" 
@@ -609,10 +623,13 @@
                         <td colspan="3" style="padding: 12px; font-weight: 600; font-size: 14px; color: #1A365C; text-align: right;">
                             TOTAL:
                         </td>
-                        <td style="padding: 12px; font-weight: 700; font-size: 16px; color: #F57600; text-align: right;">
+                        <td style="padding: 12px; font-weight: 700; font-size: 16px; color: #1A365C; text-align: right;">
                             ${originalTotal.toFixed(1)} mi
                         </td>
-                        <td colspan="3" style="padding: 12px; font-size: 12px; color: #3D3D3D; text-align: center;">
+                        <td style="padding: 12px; font-weight: 700; font-size: 16px; color: #F57600; text-align: center;">
+                            ${adjustedTotal.toFixed(1)} mi
+                        </td>
+                        <td colspan="2" style="padding: 12px; font-size: 12px; color: #3D3D3D; text-align: center;">
                             ${data.services.length} service${data.services.length !== 1 ? 's' : ''}
                         </td>
                     </tr>
@@ -620,12 +637,29 @@
             </table>`;
 
             document.getElementById('servicesList').innerHTML = servicesHtml;
+            
+            // Pre-populate adjustments object with existing values
+            adjustments = {};
+            for (let i = 0; i < data.services.length; i++) {
+                if (data.services[i].Adjusted_Mileage) {
+                    adjustments[i] = {
+                        adjustedMileage: parseFloat(data.services[i].Adjusted_Mileage)
+                    };
+                }
+            }
 
             // Disable approve button if already approved
             if (data.approved) {
                 document.getElementById('approveBtn').disabled = true;
                 document.getElementById('approveBtn').textContent = 'Report Already Approved';
-                document.querySelector('.approval-section p').textContent = 'This report has been approved and submitted.';
+                document.getElementById('approveBtn').style.background = '#9CA3AF';
+                document.getElementById('approveBtn').style.cursor = 'not-allowed';
+                document.querySelector('.approval-section p').textContent = 'This report has been approved and submitted. No further changes can be made.';
+            } else {
+                document.getElementById('approveBtn').disabled = false;
+                document.getElementById('approveBtn').textContent = 'Approve Report';
+                document.getElementById('approveBtn').style.background = '#62B790';
+                document.getElementById('approveBtn').style.cursor = 'pointer';
             }
         }
 
@@ -649,6 +683,12 @@
                 }
             }
             document.getElementById('adjustedMileage').textContent = adjustedTotal.toFixed(1);
+            
+            // Update the table footer as well
+            const footerCell = document.querySelector('tfoot td:nth-child(2)');
+            if (footerCell) {
+                footerCell.textContent = adjustedTotal.toFixed(1) + ' mi';
+            }
         }
 
         function handleFileSelect(index, input) {
