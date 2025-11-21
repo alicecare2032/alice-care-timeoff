@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - Mileage Report Portal v1.6</title>
+    <title>Alice Care - Mileage v1.7</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -546,7 +546,7 @@
                     <tr style="background: #1A365C; color: white;">
                         <th style="padding: 12px; text-align: left; font-weight: 600; font-size: 13px;">Date</th>
                         <th style="padding: 12px; text-align: left; font-weight: 600; font-size: 13px;">Time</th>
-                        <th style="padding: 12px; text-align: left; font-weight: 600; font-size: 13px;">Service Provider</th>
+                        <th style="padding: 12px; text-align: left; font-weight: 600; font-size: 13px;">Client Name</th>
                         <th style="padding: 12px; text-align: right; font-weight: 600; font-size: 13px;">Original Miles</th>
                         <th style="padding: 12px; text-align: center; font-weight: 600; font-size: 13px;">Adjusted Miles</th>
                         <th style="padding: 12px; text-align: left; font-weight: 600; font-size: 13px;">Reason</th>
@@ -576,7 +576,7 @@
                             ${formatTime(service.Scheduled_Time)}
                         </td>
                         <td style="padding: 12px; font-size: 14px; color: #3D3D3D;">
-                            ${service.Service_Provider_First_Name} ${service.Service_Provider_Last_Name}
+                            ${service.Service_Recipient_First_Name || 'N/A'}
                         </td>
                         <td style="padding: 12px; font-size: 14px; color: #1A365C; font-weight: 600; text-align: right;">
                             ${originalMileage.toFixed(1)} mi
