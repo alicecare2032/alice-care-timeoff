@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - Mileage v2.4</title>
+    <title>Alice Care - Mileage v2.3</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -697,43 +697,12 @@
         function handleFileSelect(index, input) {
             if (input.files && input.files[0]) {
                 const file = input.files[0];
-                
-                // Validate file size (max 5MB)
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('File size must be less than 5MB');
-                    input.value = '';
-                    return;
-                }
-                
-                // Validate file type
-                const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
-                if (!allowedTypes.includes(file.type)) {
-                    alert('Only PDF, JPG, and PNG files are allowed');
-                    input.value = '';
-                    return;
-                }
-                
                 document.getElementById('filename_' + index).textContent = file.name;
                 
                 if (!adjustments[index]) {
                     adjustments[index] = {};
                 }
-                
-                // Convert file to base64 for upload
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    adjustments[index].file = {
-                        name: file.name,
-                        mimeType: file.type,
-                        data: e.target.result.split(',')[1] // Get base64 data without prefix
-                    };
-                    console.log('File converted for index', index, ':', file.name);
-                };
-                reader.onerror = function() {
-                    alert('Error reading file');
-                    input.value = '';
-                };
-                reader.readAsDataURL(file);
+                adjustments[index].file = file;
             }
         }
 
@@ -752,30 +721,21 @@
             const weekNumber = document.getElementById('weekNumber').value.trim();
             const year = document.getElementById('year').value.trim();
 
-            // Prepare adjustment data with file uploads
+            // Prepare adjustment data
             const adjustmentData = [];
             for (let i = 0; i < currentReport.services.length; i++) {
                 const service = currentReport.services[i];
                 const adj = adjustments[i] || {};
                 const reason = document.getElementById('reason_' + i).value.trim();
                 
-                const adjustmentEntry = {
+                adjustmentData.push({
                     scheduledDate: service.Scheduled_Date,
                     scheduledTime: service.Scheduled_Time,
                     originalMileage: service.Mileage,
                     adjustedMileage: adj.adjustedMileage || service.Mileage,
                     adjustmentReason: reason,
                     hasFile: !!adj.file
-                };
-                
-                // Include file data if present
-                if (adj.file) {
-                    adjustmentEntry.fileData = adj.file.data;
-                    adjustmentEntry.fileName = adj.file.name;
-                    adjustmentEntry.fileMimeType = adj.file.mimeType;
-                }
-                
-                adjustmentData.push(adjustmentEntry);
+                });
             }
 
             const data = {
@@ -788,8 +748,8 @@
                 approvalDate: new Date().toISOString()
             };
 
-            console.log('=== SUBMITTING APPROVAL WITH FILES ===');
-            console.log('Adjustments with files:', adjustmentData.filter(a => a.hasFile).length);
+            console.log('=== SUBMITTING APPROVAL ===');
+            console.log('Data:', JSON.stringify(data, null, 2));
 
             // Use no-cors mode for POST (same as time-off system)
             fetch(GOOGLE_SCRIPT_URL, {
@@ -802,7 +762,7 @@
             })
             .then(function() {
                 console.log('POST request completed (no-cors mode)');
-                alert('Report approved successfully! Files uploaded to Google Drive.');
+                alert('Report approved successfully!');
                 
                 // Reload report to show approved status
                 loadReport();
@@ -811,10 +771,8 @@
                 console.error('POST request error:', error);
                 // In no-cors mode, we can't distinguish success from failure
                 // Assume success and reload
-                alert('Report approved successfully! Files uploaded to Google Drive.');
+                alert('Report approved successfully!');
                 loadReport();
-            });
-        }
             });
         }
 
