@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - Mileage Report Portal v1.3</title>
+    <title>Alice Care - Mileage Report Portal v1.5</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -561,7 +561,7 @@
                             ${formatDate(service.Scheduled_Date)}
                         </td>
                         <td style="padding: 12px; font-size: 14px; color: #3D3D3D;">
-                            ${service.Scheduled_Time}
+                            ${formatTime(service.Scheduled_Time)}
                         </td>
                         <td style="padding: 12px; font-size: 14px; color: #3D3D3D;">
                             ${service.Service_Provider_First_Name} ${service.Service_Provider_Last_Name}
@@ -741,6 +741,42 @@
                 month: 'short', 
                 day: 'numeric' 
             });
+        }
+        
+        function formatTime(timeValue) {
+            // Handle Google Sheets time format (serial number or datetime string)
+            if (!timeValue) return '';
+            
+            try {
+                // If it's already a string in HH:MM format, return it
+                if (typeof timeValue === 'string' && /^\d{1,2}:\d{2}/.test(timeValue)) {
+                    return timeValue;
+                }
+                
+                // Convert to Date object
+                let date;
+                if (typeof timeValue === 'string') {
+                    date = new Date(timeValue);
+                } else if (typeof timeValue === 'number') {
+                    // Google Sheets serial time (fraction of a day)
+                    const hours = Math.floor(timeValue * 24);
+                    const minutes = Math.floor((timeValue * 24 * 60) % 60);
+                    return String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0');
+                } else if (timeValue instanceof Date) {
+                    date = timeValue;
+                } else {
+                    return String(timeValue);
+                }
+                
+                // Extract time in HH:MM format
+                const hours = date.getHours();
+                const minutes = date.getMinutes();
+                return String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0');
+                
+            } catch (error) {
+                console.error('Error formatting time:', error, timeValue);
+                return String(timeValue);
+            }
         }
 
         // Set current year as default
