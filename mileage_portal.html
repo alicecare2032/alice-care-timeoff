@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - Mileage v2.0</title>
+    <title>Alice Care - Mileage v2.1</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -460,17 +460,30 @@
             document.getElementById('reportSection').classList.add('hidden');
             document.getElementById('emptyState').classList.add('hidden');
 
-            // Use JSONP to bypass CORS (same approach as working systems)
-            const callbackName = 'mileageCallback_' + Date.now();
+            // Build URL with parameters
+            const url = GOOGLE_SCRIPT_URL + 
+                '?action=getReport' +
+                '&employeeId=' + encodeURIComponent(employeeId) +
+                '&lastName=' + encodeURIComponent(lastName) +
+                '&week=' + encodeURIComponent(weekNumber) +
+                '&year=' + encodeURIComponent(year);
             
-            window[callbackName] = function(data) {
-                console.log('Report data received via JSONP:', data);
-                
-                // Clean up
-                delete window[callbackName];
-                if (document.getElementById('jsonp_script')) {
-                    document.getElementById('jsonp_script').remove();
+            console.log('Loading via fetch:', url);
+            
+            // Use fetch instead of JSONP (Safari-compatible)
+            fetch(url, {
+                method: 'GET',
+                redirect: 'follow'
+            })
+            .then(function(response) {
+                console.log('Fetch response received:', response.status);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.status);
                 }
+                return response.json();
+            })
+            .then(function(data) {
+                console.log('Report data received:', data);
                 
                 // Process data
                 currentReport = data;
@@ -489,28 +502,12 @@
                     document.getElementById('loadingState').classList.add('hidden');
                     document.getElementById('emptyState').classList.remove('hidden');
                 }
-            };
-            
-            // Create script tag for JSONP request
-            const script = document.createElement('script');
-            script.id = 'jsonp_script';
-            script.src = GOOGLE_SCRIPT_URL + 
-                '?action=getReport' +
-                '&employeeId=' + encodeURIComponent(employeeId) +
-                '&lastName=' + encodeURIComponent(lastName) +
-                '&week=' + encodeURIComponent(weekNumber) +
-                '&year=' + encodeURIComponent(year) +
-                '&callback=' + callbackName;
-            
-            script.onerror = function() {
-                console.error('JSONP request failed');
+            })
+            .catch(function(error) {
+                console.error('Fetch request error:', error);
                 document.getElementById('loadingState').classList.add('hidden');
-                alert('Error loading report. Please check:\n1. Web App URL is correct\n2. Apps Script is deployed\n3. Your internet connection');
-                delete window[callbackName];
-            };
-            
-            console.log('Loading via JSONP:', script.src);
-            document.body.appendChild(script);
+                alert('Error loading report. Please check:\n1. Web App URL is correct\n2. Apps Script is deployed\n3. Your internet connection\n\nError: ' + error.message);
+            });
         }
 
         function displayReport(data) {
