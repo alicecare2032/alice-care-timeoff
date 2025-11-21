@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - Mileage Report Portal v1.2</title>
+    <title>Alice Care - Mileage Report Portal v1.3</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -229,107 +229,61 @@
             box-shadow: 0 4px 12px rgba(245, 118, 0, 0.1);
         }
         
-        .service-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #E5ECF3;
+        /* Table Styles */
+        table {
+            font-family: 'Poppins', sans-serif;
         }
         
-        .service-date {
-            font-size: 16px;
-            color: #1A365C;
-            font-weight: 600;
+        table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
         
-        .service-time {
-            font-size: 14px;
-            color: #3D3D3D;
-            background: #E5ECF3;
-            padding: 6px 12px;
-            border-radius: 6px;
+        table tbody tr {
+            transition: all 0.2s;
         }
         
-        .service-info {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 15px;
+        table tbody tr:hover {
+            background: #FFF4E5 !important;
+            box-shadow: 0 2px 8px rgba(245, 118, 0, 0.1);
         }
         
-        .info-item {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .info-label {
-            font-size: 12px;
-            color: #3D3D3D;
-            font-weight: 500;
-            margin-bottom: 4px;
-        }
-        
-        .info-value {
-            font-size: 14px;
-            color: #1A365C;
-            font-weight: 600;
-        }
-        
-        .mileage-adjustment {
-            background: #E5ECF3;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-        }
-        
-        .adjustment-row {
-            display: flex;
-            gap: 15px;
-            align-items: flex-end;
-        }
-        
-        .adjustment-row .form-group {
-            flex: 1;
-        }
-        
-        .adjustment-input {
-            background: white;
-        }
-        
-        .file-upload {
-            margin-top: 15px;
-        }
-        
-        .file-upload label {
-            display: inline-block;
-            padding: 8px 16px;
-            background: white;
-            border: 2px solid #D3D7DF;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 13px;
-            font-weight: 500;
-            color: #1A365C;
-        }
-        
-        .file-upload label:hover {
+        table input[type="number"]:focus,
+        table input[type="text"]:focus {
+            outline: none;
             border-color: #F57600;
+            box-shadow: 0 0 0 3px rgba(245, 118, 0, 0.1);
+        }
+        
+        table input[type="number"]:disabled,
+        table input[type="text"]:disabled {
+            background: #F5F5F5;
+            cursor: not-allowed;
+        }
+        
+        table label:hover {
             background: #FFF4E5;
+            border-color: #F57600;
         }
         
-        .file-upload input[type="file"] {
-            display: none;
+        /* Responsive table */
+        @media (max-width: 768px) {
+            table {
+                font-size: 12px;
+            }
+            
+            table th,
+            table td {
+                padding: 8px 4px !important;
+            }
+            
+            table input {
+                font-size: 12px;
+                padding: 4px 6px !important;
+            }
         }
         
-        .file-name {
-            display: inline-block;
-            margin-left: 10px;
-            font-size: 12px;
-            color: #3D3D3D;
-        }
         
         .approval-section {
             background: #E5ECF3;
@@ -454,7 +408,7 @@
 
         <div id="reportSection" class="report-section hidden">
             <div class="notice-box">
-                <p><strong>Note:</strong> This report shows only on-call services (where commute has been removed). You can adjust the mileage for each service if needed and upload supporting documents.</p>
+                <p><strong>Note:</strong> This report shows only on-call services where commute has been removed. Review each entry, make adjustments if needed, and approve when ready.</p>
             </div>
 
             <div id="servicesList"></div>
@@ -576,64 +530,94 @@
             document.getElementById('adjustedMileage').textContent = originalTotal.toFixed(1);
             document.getElementById('reportStatus').textContent = data.approved ? 'Approved ✓' : 'Pending';
 
-            // Display services
-            let servicesHtml = '';
+            // Display services as a table
+            let servicesHtml = '<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">';
+            
+            // Table header
+            servicesHtml += `
+                <thead>
+                    <tr style="background: #1A365C; color: white;">
+                        <th style="padding: 12px; text-align: left; font-weight: 600; font-size: 13px;">Date</th>
+                        <th style="padding: 12px; text-align: left; font-weight: 600; font-size: 13px;">Time</th>
+                        <th style="padding: 12px; text-align: left; font-weight: 600; font-size: 13px;">Service Provider</th>
+                        <th style="padding: 12px; text-align: right; font-weight: 600; font-size: 13px;">Original Miles</th>
+                        <th style="padding: 12px; text-align: center; font-weight: 600; font-size: 13px;">Adjusted Miles</th>
+                        <th style="padding: 12px; text-align: left; font-weight: 600; font-size: 13px;">Reason</th>
+                        <th style="padding: 12px; text-align: center; font-weight: 600; font-size: 13px;">Reference</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+            
+            // Table rows - one per service
             for (let i = 0; i < data.services.length; i++) {
                 const service = data.services[i];
-                const serviceId = 'service_' + i;
+                const bgColor = i % 2 === 0 ? '#FFFFFF' : '#F9FAFB';
+                const isDisabled = data.approved;
                 
                 servicesHtml += `
-                    <div class="service-card" id="${serviceId}">
-                        <div class="service-header">
-                            <div class="service-date">${formatDate(service.Scheduled_Date)}</div>
-                            <div class="service-time">${service.Scheduled_Time}</div>
-                        </div>
-                        <div class="service-info">
-                            <div class="info-item">
-                                <div class="info-label">Service Provider</div>
-                                <div class="info-value">${service.Service_Provider_First_Name} ${service.Service_Provider_Last_Name}</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Original Mileage</div>
-                                <div class="info-value">${parseFloat(service.Mileage).toFixed(1)} miles</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Status</div>
-                                <div class="info-value"><span class="badge badge-oncall">On-Call</span></div>
-                            </div>
-                        </div>
-                        <div class="mileage-adjustment">
-                            <div class="adjustment-row">
-                                <div class="form-group">
-                                    <label>Adjusted Mileage (if different)</label>
-                                    <input type="number" class="adjustment-input" 
-                                           id="adj_${i}" 
-                                           step="0.1" 
-                                           placeholder="${parseFloat(service.Mileage).toFixed(1)}"
-                                           onchange="updateAdjustment(${i}, this.value)"
-                                           ${data.approved ? 'disabled' : ''}>
-                                </div>
-                                <div class="form-group">
-                                    <label>Reason for Adjustment</label>
-                                    <input type="text" class="adjustment-input" 
-                                           id="reason_${i}" 
-                                           placeholder="Optional"
-                                           ${data.approved ? 'disabled' : ''}>
-                                </div>
-                            </div>
-                            <div class="file-upload">
-                                <label for="file_${i}">
-                                    📎 Upload Reference Document
-                                </label>
-                                <input type="file" id="file_${i}" accept=".pdf,.jpg,.jpeg,.png" 
-                                       onchange="handleFileSelect(${i}, this)"
-                                       ${data.approved ? 'disabled' : ''}>
-                                <span class="file-name" id="filename_${i}"></span>
-                            </div>
-                        </div>
-                    </div>
+                    <tr style="background: ${bgColor}; border-bottom: 1px solid #E5ECF3;">
+                        <td style="padding: 12px; font-size: 14px; color: #1A365C; font-weight: 600;">
+                            ${formatDate(service.Scheduled_Date)}
+                        </td>
+                        <td style="padding: 12px; font-size: 14px; color: #3D3D3D;">
+                            ${service.Scheduled_Time}
+                        </td>
+                        <td style="padding: 12px; font-size: 14px; color: #3D3D3D;">
+                            ${service.Service_Provider_First_Name} ${service.Service_Provider_Last_Name}
+                        </td>
+                        <td style="padding: 12px; font-size: 14px; color: #1A365C; font-weight: 600; text-align: right;">
+                            ${parseFloat(service.Mileage).toFixed(1)} mi
+                        </td>
+                        <td style="padding: 8px; text-align: center;">
+                            <input type="number" 
+                                   id="adj_${i}" 
+                                   step="0.1" 
+                                   placeholder="${parseFloat(service.Mileage).toFixed(1)}"
+                                   onchange="updateAdjustment(${i}, this.value)"
+                                   ${isDisabled ? 'disabled' : ''}
+                                   style="width: 80px; padding: 6px 8px; border: 2px solid #D3D7DF; border-radius: 6px; font-size: 14px; text-align: center; font-family: 'Poppins', sans-serif;">
+                        </td>
+                        <td style="padding: 8px;">
+                            <input type="text" 
+                                   id="reason_${i}" 
+                                   placeholder="Optional"
+                                   ${isDisabled ? 'disabled' : ''}
+                                   style="width: 100%; padding: 6px 8px; border: 2px solid #D3D7DF; border-radius: 6px; font-size: 13px; font-family: 'Poppins', sans-serif;">
+                        </td>
+                        <td style="padding: 8px; text-align: center;">
+                            <label for="file_${i}" style="cursor: pointer; display: inline-block; padding: 6px 12px; background: #E5ECF3; border: 2px solid #D3D7DF; border-radius: 6px; font-size: 12px; color: #1A365C; font-weight: 500; transition: all 0.3s;">
+                                📎 File
+                            </label>
+                            <input type="file" 
+                                   id="file_${i}" 
+                                   accept=".pdf,.jpg,.jpeg,.png" 
+                                   onchange="handleFileSelect(${i}, this)"
+                                   ${isDisabled ? 'disabled' : ''}
+                                   style="display: none;">
+                            <div id="filename_${i}" style="font-size: 10px; color: #3D3D3D; margin-top: 4px;"></div>
+                        </td>
+                    </tr>
                 `;
             }
+            
+            // Table footer with totals
+            servicesHtml += `
+                </tbody>
+                <tfoot>
+                    <tr style="background: #E5ECF3; border-top: 2px solid #1A365C;">
+                        <td colspan="3" style="padding: 12px; font-weight: 600; font-size: 14px; color: #1A365C; text-align: right;">
+                            TOTAL:
+                        </td>
+                        <td style="padding: 12px; font-weight: 700; font-size: 16px; color: #F57600; text-align: right;">
+                            ${originalTotal.toFixed(1)} mi
+                        </td>
+                        <td colspan="3" style="padding: 12px; font-size: 12px; color: #3D3D3D; text-align: center;">
+                            ${data.services.length} service${data.services.length !== 1 ? 's' : ''}
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>`;
 
             document.getElementById('servicesList').innerHTML = servicesHtml;
 
