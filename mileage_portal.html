@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - Mileage v2.3</title>
+    <title>Alice Care - Mileage v2.4</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -408,7 +408,7 @@
 
         <div id="reportSection" class="report-section hidden">
             <div class="notice-box">
-                <p><strong>Note:</strong> This report shows only on-call services where commute has been removed. Review each entry, make adjustments if needed, and approve when ready.</p>
+                <p><strong>Note:</strong> This report displays all on-call services, including your first service (commute). Commute mileage is shown for reference but is <strong>not included in billable totals</strong> and cannot be adjusted. Only review and adjust billable services as needed, then approve when ready.</p>
             </div>
 
             <div id="servicesList"></div>
@@ -522,20 +522,30 @@
             document.getElementById('statsSection').classList.remove('hidden');
             document.getElementById('reportSection').classList.remove('hidden');
 
-            // Calculate totals
+            // Calculate totals (excluding commute services)
             let originalTotal = 0;
             let adjustedTotal = 0;
+            let commuteServices = 0;
             
             for (let i = 0; i < data.services.length; i++) {
-                const originalMileage = parseFloat(data.services[i].Mileage || 0);
-                const adjustedMileage = data.services[i].Adjusted_Mileage ? parseFloat(data.services[i].Adjusted_Mileage) : originalMileage;
+                const service = data.services[i];
+                const isCommute = service.isCommute === true;
                 
-                originalTotal += originalMileage;
-                adjustedTotal += adjustedMileage;
+                // Only include non-commute services in totals
+                if (!isCommute) {
+                    const originalMileage = parseFloat(service.Mileage || 0);
+                    const adjustedMileage = service.Adjusted_Mileage ? parseFloat(service.Adjusted_Mileage) : originalMileage;
+                    
+                    originalTotal += originalMileage;
+                    adjustedTotal += adjustedMileage;
+                } else {
+                    commuteServices++;
+                }
             }
 
             // Update stats
-            document.getElementById('totalServices').textContent = data.services.length;
+            const billableServices = data.services.length - commuteServices;
+            document.getElementById('totalServices').textContent = billableServices + (commuteServices > 0 ? ' (+' + commuteServices + ' commute)' : '');
             document.getElementById('originalMileage').textContent = originalTotal.toFixed(1);
             document.getElementById('adjustedMileage').textContent = adjustedTotal.toFixed(1);
             document.getElementById('reportStatus').textContent = data.approved ? 'Approved ✓' : 'Pending';
@@ -562,8 +572,12 @@
             // Table rows - one per service
             for (let i = 0; i < data.services.length; i++) {
                 const service = data.services[i];
-                const bgColor = i % 2 === 0 ? '#FFFFFF' : '#F9FAFB';
-                const isDisabled = data.approved;
+                const isCommute = service.isCommute === true;
+                
+                // Commute rows get a distinct gray background and italic style
+                const bgColor = isCommute ? '#F3F4F6' : (i % 2 === 0 ? '#FFFFFF' : '#F9FAFB');
+                // Disable inputs if approved OR if it's a commute
+                const isDisabled = data.approved || isCommute;
                 
                 const originalMileage = parseFloat(service.Mileage);
                 const adjustedMileage = service.Adjusted_Mileage ? parseFloat(service.Adjusted_Mileage) : null;
@@ -571,9 +585,10 @@
                 const hasFile = service.Has_Reference_File || '';
                 
                 servicesHtml += `
-                    <tr style="background: ${bgColor}; border-bottom: 1px solid #E5ECF3;">
+                    <tr style="background: ${bgColor}; border-bottom: 1px solid #E5ECF3; ${isCommute ? 'opacity: 0.7;' : ''}">
                         <td style="padding: 12px; font-size: 14px; color: #1A365C; font-weight: 600;">
                             ${formatDate(service.Scheduled_Date)}
+                            ${isCommute ? '<span style="display: inline-block; margin-left: 8px; padding: 2px 8px; background: #9CA3AF; color: white; font-size: 10px; font-weight: 600; border-radius: 4px; text-transform: uppercase;">Commute</span>' : ''}
                         </td>
                         <td style="padding: 12px; font-size: 14px; color: #3D3D3D;">
                             ${formatTime(service.Scheduled_Time)}
@@ -589,20 +604,21 @@
                                    id="adj_${i}" 
                                    step="0.1" 
                                    value="${adjustedMileage !== null ? adjustedMileage.toFixed(1) : ''}"
-                                   placeholder="${originalMileage.toFixed(1)}"
+                                   placeholder="${isCommute ? 'Not billable' : originalMileage.toFixed(1)}"
                                    onchange="updateAdjustment(${i}, this.value)"
                                    ${isDisabled ? 'disabled' : ''}
-                                   style="width: 80px; padding: 6px 8px; border: 2px solid ${adjustedMileage !== null ? '#62B790' : '#D3D7DF'}; border-radius: 6px; font-size: 14px; text-align: center; font-family: 'Poppins', sans-serif; background: ${adjustedMileage !== null ? '#F0FDF4' : 'white'};">
+                                   style="width: 80px; padding: 6px 8px; border: 2px solid ${adjustedMileage !== null ? '#62B790' : '#D3D7DF'}; border-radius: 6px; font-size: 14px; text-align: center; font-family: 'Poppins', sans-serif; background: ${adjustedMileage !== null ? '#F0FDF4' : (isCommute ? '#F3F4F6' : 'white')};">
                         </td>
                         <td style="padding: 8px;">
                             <input type="text" 
                                    id="reason_${i}" 
                                    value="${adjustmentReason}"
-                                   placeholder="Optional"
+                                   placeholder="${isCommute ? 'N/A' : 'Optional'}"
                                    ${isDisabled ? 'disabled' : ''}
-                                   style="width: 100%; padding: 6px 8px; border: 2px solid #D3D7DF; border-radius: 6px; font-size: 13px; font-family: 'Poppins', sans-serif;">
+                                   style="width: 100%; padding: 6px 8px; border: 2px solid #D3D7DF; border-radius: 6px; font-size: 13px; font-family: 'Poppins', sans-serif; background: ${isCommute ? '#F3F4F6' : 'white'};">
                         </td>
                         <td style="padding: 8px; text-align: center;">
+                            ${isCommute ? '<span style="color: #9CA3AF; font-size: 12px; font-style: italic;">N/A</span>' : `
                             <label for="file_${i}" style="cursor: ${isDisabled ? 'not-allowed' : 'pointer'}; display: inline-block; padding: 6px 12px; background: ${hasFile === 'Yes' ? '#D4F4E2' : '#E5ECF3'}; border: 2px solid ${hasFile === 'Yes' ? '#62B790' : '#D3D7DF'}; border-radius: 6px; font-size: 12px; color: #1A365C; font-weight: 500; transition: all 0.3s;">
                                 ${hasFile === 'Yes' ? '✓ File' : '📎 File'}
                             </label>
@@ -613,18 +629,20 @@
                                    ${isDisabled ? 'disabled' : ''}
                                    style="display: none;">
                             <div id="filename_${i}" style="font-size: 10px; color: #3D3D3D; margin-top: 4px;"></div>
+                            `}
                         </td>
                     </tr>
                 `;
             }
             
-            // Table footer with totals
+            // Table footer with totals (excludes commute services)
+            const billableServices = data.services.length - commuteServices;
             servicesHtml += `
                 </tbody>
                 <tfoot>
                     <tr style="background: #E5ECF3; border-top: 2px solid #1A365C;">
                         <td colspan="3" style="padding: 12px; font-weight: 600; font-size: 14px; color: #1A365C; text-align: right;">
-                            TOTAL:
+                            TOTAL BILLABLE:
                         </td>
                         <td style="padding: 12px; font-weight: 700; font-size: 16px; color: #1A365C; text-align: right;">
                             ${originalTotal.toFixed(1)} mi
@@ -633,7 +651,8 @@
                             ${adjustedTotal.toFixed(1)} mi
                         </td>
                         <td colspan="2" style="padding: 12px; font-size: 12px; color: #3D3D3D; text-align: center;">
-                            ${data.services.length} service${data.services.length !== 1 ? 's' : ''}
+                            ${billableServices} billable service${billableServices !== 1 ? 's' : ''}
+                            ${commuteServices > 0 ? '<br><span style="color: #9CA3AF; font-size: 11px;">(' + commuteServices + ' commute excluded)</span>' : ''}
                         </td>
                     </tr>
                 </tfoot>
@@ -676,19 +695,25 @@
                 adjustments[index].adjustedMileage = parseFloat(value);
             }
             
-            // Recalculate total adjusted mileage
+            // Recalculate total adjusted mileage (excluding commute services)
             let adjustedTotal = 0;
             for (let i = 0; i < currentReport.services.length; i++) {
-                if (adjustments[i] && adjustments[i].adjustedMileage) {
-                    adjustedTotal += adjustments[i].adjustedMileage;
-                } else {
-                    adjustedTotal += parseFloat(currentReport.services[i].Mileage || 0);
+                const service = currentReport.services[i];
+                const isCommute = service.isCommute === true;
+                
+                // Skip commute services in total calculation
+                if (!isCommute) {
+                    if (adjustments[i] && adjustments[i].adjustedMileage) {
+                        adjustedTotal += adjustments[i].adjustedMileage;
+                    } else {
+                        adjustedTotal += parseFloat(service.Mileage || 0);
+                    }
                 }
             }
             document.getElementById('adjustedMileage').textContent = adjustedTotal.toFixed(1);
             
             // Update the table footer as well
-            const footerCell = document.querySelector('tfoot td:nth-child(3)');
+            const footerCell = document.querySelector('tfoot td:nth-child(5)');
             if (footerCell) {
                 footerCell.textContent = adjustedTotal.toFixed(1) + ' mi';
             }
@@ -721,10 +746,17 @@
             const weekNumber = document.getElementById('weekNumber').value.trim();
             const year = document.getElementById('year').value.trim();
 
-            // Prepare adjustment data
+            // Prepare adjustment data (only for non-commute services)
             const adjustmentData = [];
             for (let i = 0; i < currentReport.services.length; i++) {
                 const service = currentReport.services[i];
+                const isCommute = service.isCommute === true;
+                
+                // Skip commute services - they don't get saved to the sheet
+                if (isCommute) {
+                    continue;
+                }
+                
                 const adj = adjustments[i] || {};
                 const reason = document.getElementById('reason_' + i).value.trim();
                 
