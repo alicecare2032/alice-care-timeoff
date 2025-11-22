@@ -420,6 +420,101 @@
         .text-center {
             text-align: center;
         }
+        
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .nav-bar {
+                padding: 12px 15px;
+                margin-bottom: 15px;
+            }
+            
+            .logo {
+                font-size: 20px;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 22px;
+            }
+            
+            .lookup-section {
+                padding: 20px 15px;
+            }
+            
+            .lookup-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .stats-row {
+                grid-template-columns: 1fr;
+                padding: 15px;
+                gap: 12px;
+            }
+            
+            .review-section {
+                padding: 20px 15px;
+            }
+            
+            .export-section {
+                padding: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+                padding: 14px 20px;
+                margin-left: 0 !important;
+                margin-top: 10px;
+            }
+            
+            /* Make tables scrollable on mobile */
+            .review-table, .services-table {
+                display: block;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .review-table td, .review-table th,
+            .services-table td, .services-table th {
+                min-width: 80px;
+                white-space: nowrap;
+            }
+            
+            /* Adjust detail rows for mobile */
+            .detail-row td {
+                padding: 10px !important;
+            }
+            
+            .text-preview {
+                font-size: 11px;
+                max-height: 200px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 18px;
+            }
+            
+            .lookup-title {
+                font-size: 16px;
+            }
+            
+            .stat-card .number {
+                font-size: 22px;
+            }
+            
+            .expand-icon {
+                font-size: 18px;
+            }
+        }
     </style>
 </head>
 <body>
