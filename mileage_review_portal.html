@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - Mileage Review Portal</title>
+    <title>Alice Care - Mileage Review Portal v3.7</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -20,7 +20,7 @@
         }
         
         .nav-bar {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto 20px;
             background: white;
             padding: 15px 30px;
@@ -53,7 +53,7 @@
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             background: white;
             border-radius: 12px;
@@ -152,12 +152,6 @@
             box-shadow: 0 4px 12px rgba(245, 118, 0, 0.3);
         }
         
-        .btn-primary:disabled {
-            background: #D3D7DF;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
         .btn-success {
             background: #62B790;
             color: white;
@@ -167,12 +161,6 @@
         .btn-success:hover {
             background: #52a780;
             transform: translateY(-2px);
-        }
-        
-        .btn-success:disabled {
-            background: #D3D7DF;
-            cursor: not-allowed;
-            transform: none;
         }
         
         .stats-row {
@@ -206,55 +194,6 @@
         
         .review-section {
             padding: 30px;
-        }
-        
-        .employee-card {
-            background: white;
-            border: 2px solid #E5ECF3;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-            transition: all 0.3s;
-        }
-        
-        .employee-card:hover {
-            border-color: #F57600;
-            box-shadow: 0 4px 12px rgba(245, 118, 0, 0.1);
-        }
-        
-        .employee-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .employee-info h3 {
-            font-size: 18px;
-            color: #1A365C;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-        
-        .employee-info p {
-            font-size: 13px;
-            color: #3D3D3D;
-        }
-        
-        .employee-stats {
-            text-align: right;
-        }
-        
-        .employee-stats .miles {
-            font-size: 24px;
-            color: #F57600;
-            font-weight: 700;
-        }
-        
-        .employee-stats .amount {
-            font-size: 20px;
-            color: #62B790;
-            font-weight: 600;
         }
         
         .loading {
@@ -292,6 +231,160 @@
             line-height: 1.6;
         }
         
+        /* Table Styles */
+        .review-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .review-table thead tr {
+            background: #1A365C;
+            color: white;
+        }
+        
+        .review-table th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        
+        .review-table tbody tr {
+            border-bottom: 1px solid #E5ECF3;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .review-table tbody tr:hover {
+            background: #F9FAFB;
+        }
+        
+        .review-table tbody tr.expanded {
+            background: #E5ECF3;
+        }
+        
+        .review-table td {
+            padding: 15px 12px;
+            font-size: 14px;
+            color: #3D3D3D;
+        }
+        
+        .employee-id {
+            font-weight: 600;
+            color: #1A365C;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-submitted {
+            background: #D4F4E2;
+            color: #0A7D4A;
+        }
+        
+        .status-pending {
+            background: #FFF4E5;
+            color: #D97706;
+        }
+        
+        .expand-icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            line-height: 18px;
+            text-align: center;
+            border: 2px solid #1A365C;
+            border-radius: 4px;
+            color: #1A365C;
+            font-weight: 700;
+            font-size: 16px;
+            margin-right: 8px;
+            transition: all 0.2s;
+        }
+        
+        tr.expanded .expand-icon {
+            background: #1A365C;
+            color: white;
+        }
+        
+        /* Detail Row Styles */
+        .detail-row {
+            display: none;
+        }
+        
+        .detail-row.show {
+            display: table-row;
+        }
+        
+        .detail-cell {
+            padding: 0 !important;
+            background: #F9FAFB;
+        }
+        
+        .detail-content {
+            padding: 20px 30px;
+        }
+        
+        .services-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .services-table thead tr {
+            background: #E5ECF3;
+            color: #1A365C;
+        }
+        
+        .services-table th {
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+        }
+        
+        .services-table td {
+            padding: 10px 12px;
+            font-size: 13px;
+            border-bottom: 1px solid #E5ECF3;
+        }
+        
+        .services-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .commute-badge {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 2px 8px;
+            background: #9CA3AF;
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+        
+        .services-table tfoot {
+            background: #E5ECF3;
+            font-weight: 600;
+        }
+        
+        .services-table tfoot td {
+            padding: 12px;
+            border-top: 2px solid #1A365C;
+        }
+        
         .export-section {
             background: #E5ECF3;
             padding: 25px 30px;
@@ -319,6 +412,14 @@
             margin-bottom: 15px;
             white-space: pre;
         }
+        
+        .text-right {
+            text-align: right;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -331,7 +432,7 @@
     <div class="container">
         <div class="header">
             <h1>Mileage Review Portal</h1>
-            <p>Review submitted reports and generate reimbursement files</p>
+            <p>Review all on-call reports and generate reimbursement files</p>
         </div>
 
         <div class="lookup-section">
@@ -346,7 +447,7 @@
                     <input type="number" id="year" min="2020" max="2030" placeholder="2025">
                 </div>
             </div>
-            <button class="btn btn-primary" onclick="loadSubmissions()">Load Submissions</button>
+            <button class="btn btn-primary" onclick="loadSubmissions()">Load Reports</button>
         </div>
 
         <div id="statsSection" style="display: none;">
@@ -356,7 +457,11 @@
                     <div class="number" id="totalEmployees">0</div>
                 </div>
                 <div class="stat-card">
-                    <h3>Total Miles</h3>
+                    <h3>Submitted Reports</h3>
+                    <div class="number" id="submittedReports">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Reimbursable Miles</h3>
                     <div class="number" id="totalMiles">0.0</div>
                 </div>
                 <div class="stat-card">
@@ -370,18 +475,19 @@
             <div id="loadingIndicator" style="display: none;">
                 <div class="loading">
                     <div class="loading-spinner"></div>
-                    <p>Loading submissions...</p>
+                    <p>Loading reports...</p>
                 </div>
             </div>
 
-            <div id="submissionsList"></div>
+            <div id="reportsTable"></div>
 
             <div id="exportSection" style="display: none;">
                 <div class="export-section">
-                    <h3>Export Text File</h3>
+                    <h3>Export Text File (Submitted Reports Only)</h3>
                     <div class="notice-box">
                         <p><strong>Format:</strong> Each line will be formatted as: EMPLOYEE_ID,MLE,AMOUNT,,,,,</p>
                         <p><strong>Rate:</strong> $0.70 per mile (federal reimbursement rate)</p>
+                        <p><strong>Note:</strong> Only employees with SUBMITTED reports will be included in the export.</p>
                     </div>
                     <div class="text-preview" id="textPreview"></div>
                     <button class="btn btn-success" onclick="downloadTextFile()">
@@ -415,7 +521,7 @@
             currentYear = year;
 
             document.getElementById('loadingIndicator').style.display = 'block';
-            document.getElementById('submissionsList').innerHTML = '';
+            document.getElementById('reportsTable').innerHTML = '';
             document.getElementById('statsSection').style.display = 'none';
             document.getElementById('exportSection').style.display = 'none';
 
@@ -433,7 +539,7 @@
                 }
                 
                 currentSubmissions = data;
-                displaySubmissions(data);
+                displayReports(data);
                 
                 // Clean up
                 delete window[callbackName];
@@ -453,18 +559,18 @@
             script.src = url;
             script.onerror = function() {
                 document.getElementById('loadingIndicator').style.display = 'none';
-                alert('Failed to load submissions. Please check your script URL.');
+                alert('Failed to load reports. Please check your script URL.');
                 delete window[callbackName];
             };
             document.body.appendChild(script);
         }
 
-        function displaySubmissions(data) {
+        function displayReports(data) {
             if (!data.submissions || data.submissions.length === 0) {
-                document.getElementById('submissionsList').innerHTML = `
+                document.getElementById('reportsTable').innerHTML = `
                     <div class="notice-box">
-                        <p><strong>No submissions found for Week ${currentWeek}, ${currentYear}</strong></p>
-                        <p>There are no submitted mileage reports for this week.</p>
+                        <p><strong>No reports found for Week ${currentWeek}, ${currentYear}</strong></p>
+                        <p>There are no on-call services for this week.</p>
                     </div>
                 `;
                 return;
@@ -472,44 +578,171 @@
 
             // Calculate totals
             let totalEmployees = data.submissions.length;
+            let submittedCount = 0;
             let totalMiles = 0;
             let totalAmount = 0;
 
             data.submissions.forEach(emp => {
-                totalMiles += emp.totalMiles;
-                totalAmount += emp.reimbursementAmount;
+                if (emp.isSubmitted) {
+                    submittedCount++;
+                    totalMiles += emp.totalReimbursableMiles;
+                    totalAmount += emp.reimbursementAmount;
+                }
             });
 
             // Update stats
             document.getElementById('totalEmployees').textContent = totalEmployees;
+            document.getElementById('submittedReports').textContent = submittedCount;
             document.getElementById('totalMiles').textContent = totalMiles.toFixed(1);
             document.getElementById('totalAmount').textContent = '$' + totalAmount.toFixed(2);
             document.getElementById('statsSection').style.display = 'block';
 
-            // Display employee cards
-            let html = '';
-            data.submissions.forEach(emp => {
+            // Build table
+            let html = `
+                <table class="review-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;"></th>
+                            <th>Employee ID</th>
+                            <th>Name</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-right">Total Services</th>
+                            <th class="text-right">Reimbursable Miles</th>
+                            <th class="text-right">Reimbursement</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            data.submissions.forEach((emp, index) => {
+                const statusClass = emp.isSubmitted ? 'status-submitted' : 'status-pending';
+                const statusText = emp.isSubmitted ? 'Submitted' : 'Pending';
+                
                 html += `
-                    <div class="employee-card">
-                        <div class="employee-header">
-                            <div class="employee-info">
-                                <h3>${emp.employeeId} - ${emp.lastName}, ${emp.firstName}</h3>
-                                <p>${emp.serviceCount} services submitted</p>
+                    <tr onclick="toggleDetails(${index})">
+                        <td>
+                            <span class="expand-icon" id="icon_${index}">+</span>
+                        </td>
+                        <td class="employee-id">${emp.employeeId}</td>
+                        <td>${emp.lastName}, ${emp.firstName}</td>
+                        <td class="text-center">
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                        </td>
+                        <td class="text-right">${emp.serviceCount}</td>
+                        <td class="text-right">${emp.totalReimbursableMiles.toFixed(1)} mi</td>
+                        <td class="text-right">$${emp.reimbursementAmount.toFixed(2)}</td>
+                    </tr>
+                    <tr class="detail-row" id="detail_${index}">
+                        <td colspan="7" class="detail-cell">
+                            <div class="detail-content">
+                                ${generateServiceDetails(emp)}
                             </div>
-                            <div class="employee-stats">
-                                <div class="miles">${emp.totalMiles.toFixed(1)} mi</div>
-                                <div class="amount">$${emp.reimbursementAmount.toFixed(2)}</div>
-                            </div>
-                        </div>
-                    </div>
+                        </td>
+                    </tr>
                 `;
             });
 
-            document.getElementById('submissionsList').innerHTML = html;
+            html += `
+                    </tbody>
+                </table>
+            `;
 
-            // Generate text preview
-            generateTextPreview(data.submissions);
-            document.getElementById('exportSection').style.display = 'block';
+            document.getElementById('reportsTable').innerHTML = html;
+
+            // Generate text preview (only submitted reports)
+            const submittedReports = data.submissions.filter(emp => emp.isSubmitted);
+            if (submittedReports.length > 0) {
+                generateTextPreview(submittedReports);
+                document.getElementById('exportSection').style.display = 'block';
+            }
+        }
+
+        function generateServiceDetails(employee) {
+            let html = `
+                <table class="services-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Client</th>
+                            <th class="text-right">Original Miles</th>
+                            <th class="text-right">Adjusted Miles</th>
+                            <th>Reason</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            let originalTotal = 0;
+            let adjustedTotal = 0;
+            let reimbursableCount = 0;
+            let commuteCount = 0;
+
+            employee.services.forEach(service => {
+                const isCommute = service.isCommute === true;
+                const originalMileage = parseFloat(service.Mileage || 0);
+                const adjustedMileage = service.Adjusted_Mileage ? parseFloat(service.Adjusted_Mileage) : null;
+                const reason = service.Adjustment_Reason || '';
+                
+                // Only count non-commute in totals
+                if (!isCommute) {
+                    originalTotal += originalMileage;
+                    adjustedTotal += (adjustedMileage !== null ? adjustedMileage : originalMileage);
+                    reimbursableCount++;
+                } else {
+                    commuteCount++;
+                }
+
+                html += `
+                    <tr style="${isCommute ? 'opacity: 0.6; background: #F9FAFB;' : ''}">
+                        <td>
+                            ${formatDate(service.Scheduled_Date)}
+                            ${isCommute ? '<span class="commute-badge">Commute</span>' : ''}
+                        </td>
+                        <td>${formatTime(service.Scheduled_Time)}</td>
+                        <td>${service.Service_Recipient_First_Name || 'N/A'}</td>
+                        <td class="text-right">${originalMileage.toFixed(1)} mi</td>
+                        <td class="text-right" style="${adjustedMileage !== null ? 'color: #F57600; font-weight: 600;' : ''}">
+                            ${adjustedMileage !== null ? adjustedMileage.toFixed(1) + ' mi' : '-'}
+                        </td>
+                        <td style="font-size: 12px; color: #3D3D3D;">${reason || (isCommute ? 'N/A' : '-')}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-right">TOTAL REIMBURSABLE:</td>
+                            <td class="text-right">${originalTotal.toFixed(1)} mi</td>
+                            <td class="text-right" style="color: #F57600;">${adjustedTotal.toFixed(1)} mi</td>
+                            <td style="font-size: 12px;">
+                                ${reimbursableCount} service${reimbursableCount !== 1 ? 's' : ''}
+                                ${commuteCount > 0 ? '<br><span style="color: #9CA3AF;">(' + commuteCount + ' commute excluded)</span>' : ''}
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            `;
+
+            return html;
+        }
+
+        function toggleDetails(index) {
+            const detailRow = document.getElementById('detail_' + index);
+            const icon = document.getElementById('icon_' + index);
+            const mainRow = detailRow.previousElementSibling;
+            
+            if (detailRow.classList.contains('show')) {
+                detailRow.classList.remove('show');
+                icon.textContent = '+';
+                mainRow.classList.remove('expanded');
+            } else {
+                detailRow.classList.add('show');
+                icon.textContent = '−';
+                mainRow.classList.add('expanded');
+            }
         }
 
         function generateTextPreview(submissions) {
@@ -549,6 +782,52 @@
             window.URL.revokeObjectURL(url);
 
             console.log('Downloaded:', filename);
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', { 
+                weekday: 'short',
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+        
+        function formatTime(timeValue) {
+            // Handle Google Sheets time format
+            if (!timeValue) return '';
+            
+            try {
+                // If it's already a string in HH:MM format, return it
+                if (typeof timeValue === 'string' && /^\d{1,2}:\d{2}/.test(timeValue)) {
+                    return timeValue;
+                }
+                
+                // Convert to Date object
+                let date;
+                if (typeof timeValue === 'string') {
+                    date = new Date(timeValue);
+                } else if (typeof timeValue === 'number') {
+                    // Google Sheets serial time (fraction of a day)
+                    const hours = Math.floor(timeValue * 24);
+                    const minutes = Math.floor((timeValue * 24 * 60) % 60);
+                    return String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0');
+                } else if (timeValue instanceof Date) {
+                    date = timeValue;
+                } else {
+                    return String(timeValue);
+                }
+                
+                // Extract time in HH:MM format
+                const hours = date.getHours();
+                const minutes = date.getMinutes();
+                return String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0');
+                
+            } catch (error) {
+                console.error('Error formatting time:', error, timeValue);
+                return String(timeValue);
+            }
         }
 
         // Set current year as default
