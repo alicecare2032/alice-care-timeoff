@@ -548,7 +548,7 @@
             document.getElementById('totalServices').textContent = reimbursableServices + (commuteServices > 0 ? ' (+' + commuteServices + ' commute)' : '');
             document.getElementById('originalMileage').textContent = originalTotal.toFixed(1);
             document.getElementById('adjustedMileage').textContent = adjustedTotal.toFixed(1);
-            document.getElementById('reportStatus').textContent = data.approved ? 'Approved ✓' : 'Pending';
+            document.getElementById('reportStatus').textContent = data.approved ? 'Submitted ✓' : 'Pending';
 
             // Display services as a table
             let servicesHtml = '<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">';
