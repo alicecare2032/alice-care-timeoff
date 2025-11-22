@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alice.care - Week Number Reference</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #E5ECF3;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .nav-bar {
+            max-width: 900px;
+            margin: 0 auto 20px;
+            background: white;
+            padding: 15px 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(26, 54, 92, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .logo .alice {
+            color: #F57600;
+            font-weight: 700;
+        }
+        
+        .logo .dot {
+            color: #F57600;
+            font-weight: 700;
+            margin: 0 -2px;
+        }
+        
+        .logo .care {
+            color: #1A365C;
+            font-weight: 400;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(26, 54, 92, 0.15);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #1A365C;
+            color: white;
+            padding: 30px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .three-weeks {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            padding: 30px;
+            background: #E5ECF3;
+        }
+        
+        .week-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid #D3D7DF;
+            transition: all 0.3s;
+        }
+        
+        .week-card.current {
+            background: #FFF4E5;
+            border: 3px solid #F57600;
+            box-shadow: 0 4px 12px rgba(245, 118, 0, 0.2);
+        }
+        
+        .week-card-header {
+            font-size: 12px;
+            color: #9CA3AF;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        
+        .week-card.current .week-card-header {
+            color: #F57600;
+        }
+        
+        .week-card-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1A365C;
+            margin-bottom: 12px;
+        }
+        
+        .week-card.current .week-card-number {
+            color: #F57600;
+        }
+        
+        .week-card-dates {
+            font-size: 13px;
+            color: #3D3D3D;
+            line-height: 1.5;
+        }
+        
+        .week-card-day-range {
+            font-size: 11px;
+            color: #9CA3AF;
+            font-weight: 500;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #E5ECF3;
+        }
+        
+        .date-lookup {
+            padding: 30px;
+            border-top: 2px solid #E5ECF3;
+        }
+        
+        .date-lookup-title {
+            font-size: 18px;
+            color: #1A365C;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .date-input-group {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+            margin-bottom: 20px;
+        }
+        
+        .date-input-wrapper {
+            flex: 1;
+        }
+        
+        .date-input-wrapper label {
+            display: block;
+            font-size: 13px;
+            color: #1A365C;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        
+        .date-input-wrapper input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #D3D7DF;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .date-input-wrapper input:focus {
+            outline: none;
+            border-color: #F57600;
+            box-shadow: 0 0 0 3px rgba(245, 118, 0, 0.1);
+        }
+        
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #F57600;
+            color: white;
+        }
+        
+        .btn:hover {
+            background: #e06d00;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 118, 0, 0.3);
+        }
+        
+        .result-box {
+            background: #1A365C;
+            border-radius: 12px;
+            padding: 25px;
+            color: white;
+            display: none;
+        }
+        
+        .result-box.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .result-label {
+            font-size: 13px;
+            opacity: 0.8;
+            margin-bottom: 8px;
+        }
+        
+        .result-week {
+            font-size: 36px;
+            font-weight: 700;
+            color: #F57600;
+            margin-bottom: 12px;
+        }
+        
+        .result-dates {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        
+        .result-day-range {
+            font-size: 13px;
+            opacity: 0.7;
+        }
+        
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .nav-bar {
+                padding: 12px 15px;
+            }
+            
+            .logo {
+                font-size: 20px;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 22px;
+            }
+            
+            .three-weeks {
+                grid-template-columns: 1fr;
+                padding: 20px 15px;
+                gap: 12px;
+            }
+            
+            .week-card {
+                padding: 15px;
+            }
+            
+            .week-card-number {
+                font-size: 28px;
+            }
+            
+            .date-lookup {
+                padding: 20px 15px;
+            }
+            
+            .date-input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .result-week {
+                font-size: 32px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 18px;
+            }
+            
+            .week-card-number {
+                font-size: 24px;
+            }
+            
+            .result-week {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <div class="logo">
+            <span class="alice">Alice</span><span class="dot">.</span><span class="care">care</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>Week Number Reference</h1>
+            <p>Find your week number (weeks start Monday, end Sunday)</p>
+        </div>
+
+        <div class="three-weeks">
+            <div class="week-card" id="pastWeek">
+                <div class="week-card-header">Past Week</div>
+                <div class="week-card-number">Week --</div>
+                <div class="week-card-dates">
+                    <div>---</div>
+                    <div>---</div>
+                </div>
+                <div class="week-card-day-range">Monday - Sunday</div>
+            </div>
+
+            <div class="week-card current" id="currentWeek">
+                <div class="week-card-header">Current Week</div>
+                <div class="week-card-number">Week --</div>
+                <div class="week-card-dates">
+                    <div>---</div>
+                    <div>---</div>
+                </div>
+                <div class="week-card-day-range">Monday - Sunday</div>
+            </div>
+
+            <div class="week-card" id="nextWeek">
+                <div class="week-card-header">Next Week</div>
+                <div class="week-card-number">Week --</div>
+                <div class="week-card-dates">
+                    <div>---</div>
+                    <div>---</div>
+                </div>
+                <div class="week-card-day-range">Monday - Sunday</div>
+            </div>
+        </div>
+
+        <div class="date-lookup">
+            <div class="date-lookup-title">Find Week Number by Date</div>
+            
+            <div class="date-input-group">
+                <div class="date-input-wrapper">
+                    <label>Enter any date:</label>
+                    <input type="date" id="datePicker">
+                </div>
+                <button class="btn" onclick="lookupWeek()">Find Week</button>
+            </div>
+
+            <div class="result-box" id="resultBox">
+                <div class="result-label">Week Number:</div>
+                <div class="result-week" id="resultWeekNumber">Week --</div>
+                <div class="result-dates" id="resultDates">--- to ---</div>
+                <div class="result-day-range">Monday - Sunday</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Calculate ISO week number (Monday-Sunday weeks)
+        function getISOWeek(date) {
+            const d = new Date(date);
+            d.setHours(0, 0, 0, 0);
+            // Set to nearest Thursday: current date + 4 - current day number
+            // Make Sunday's day number 7
+            d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+            // Get first day of year
+            const yearStart = new Date(d.getFullYear(), 0, 1);
+            // Calculate full weeks to nearest Thursday
+            const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            return weekNo;
+        }
+
+        // Get the Monday of a given week
+        function getMonday(year, week) {
+            const jan4 = new Date(year, 0, 4);
+            const jan4Day = jan4.getDay() || 7; // Make Sunday = 7
+            const mondayJan4Week = new Date(jan4);
+            mondayJan4Week.setDate(jan4.getDate() - jan4Day + 1);
+            const targetMonday = new Date(mondayJan4Week);
+            targetMonday.setDate(mondayJan4Week.getDate() + (week - 1) * 7);
+            return targetMonday;
+        }
+
+        // Format date
+        function formatDate(date) {
+            return date.toLocaleDateString('en-US', { 
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
+
+        // Display a week in a card
+        function displayWeek(elementId, year, weekNumber) {
+            const monday = getMonday(year, weekNumber);
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+
+            const element = document.getElementById(elementId);
+            element.querySelector('.week-card-number').textContent = `Week ${weekNumber}`;
+            element.querySelector('.week-card-dates').innerHTML = `
+                <div>${formatDate(monday)}</div>
+                <div>${formatDate(sunday)}</div>
+            `;
+        }
+
+        // Initialize three weeks display
+        function initializeThreeWeeks() {
+            const today = new Date();
+            
+            // Get current week's Monday
+            const currentMonday = new Date(today);
+            const currentDay = currentMonday.getDay() || 7; // Make Sunday = 7
+            currentMonday.setDate(today.getDate() - currentDay + 1);
+            
+            // Calculate past week (7 days before current Monday)
+            const pastMonday = new Date(currentMonday);
+            pastMonday.setDate(currentMonday.getDate() - 7);
+            const pastWeek = getISOWeek(pastMonday);
+            const pastYear = pastMonday.getFullYear();
+            
+            // Current week
+            const currentWeek = getISOWeek(today);
+            const currentYear = today.getFullYear();
+            
+            // Calculate next week (7 days after current Monday)
+            const nextMonday = new Date(currentMonday);
+            nextMonday.setDate(currentMonday.getDate() + 7);
+            const nextWeek = getISOWeek(nextMonday);
+            const nextYear = nextMonday.getFullYear();
+
+            displayWeek('pastWeek', pastYear, pastWeek);
+            displayWeek('currentWeek', currentYear, currentWeek);
+            displayWeek('nextWeek', nextYear, nextWeek);
+        }
+
+        // Lookup week from date picker
+        function lookupWeek() {
+            const dateInput = document.getElementById('datePicker').value;
+            
+            if (!dateInput) {
+                alert('Please select a date');
+                return;
+            }
+
+            const selectedDate = new Date(dateInput + 'T00:00:00');
+            const weekNumber = getISOWeek(selectedDate);
+            const year = selectedDate.getFullYear();
+
+            const monday = getMonday(year, weekNumber);
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+
+            // Show result
+            document.getElementById('resultWeekNumber').textContent = `Week ${weekNumber}`;
+            document.getElementById('resultDates').textContent = 
+                `${formatDate(monday)} to ${formatDate(sunday)}`;
+            
+            const resultBox = document.getElementById('resultBox');
+            resultBox.classList.add('show');
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            initializeThreeWeeks();
+            
+            // Set today's date as default in date picker
+            const today = new Date();
+            const dateString = today.toISOString().split('T')[0];
+            document.getElementById('datePicker').value = dateString;
+        });
+    </script>
+</body>
+</html>
