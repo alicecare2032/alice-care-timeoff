@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - Mileage v2.4.2</title>
+    <title>Alice Care - Mileage v3.3</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -408,7 +408,7 @@
 
         <div id="reportSection" class="report-section hidden">
             <div class="notice-box">
-                <p><strong>Note:</strong> This report displays all on-call services, including your first service (commute). Commute mileage is shown for reference but is <strong>not included in billable totals</strong> and cannot be adjusted. Only review and adjust billable services as needed, then approve when ready.</p>
+                <p><strong>Note:</strong> This report displays all on-call services, including your first service (commute). Commute mileage is shown for reference but is <strong>not included in reimbursable totals</strong> and cannot be adjusted. Only review and adjust reimbursable services as needed, then approve when ready.</p>
             </div>
 
             <div id="servicesList"></div>
@@ -544,8 +544,8 @@
             }
 
             // Update stats
-            const billableServices = data.services.length - commuteServices;
-            document.getElementById('totalServices').textContent = billableServices + (commuteServices > 0 ? ' (+' + commuteServices + ' commute)' : '');
+            const reimbursableServices = data.services.length - commuteServices;
+            document.getElementById('totalServices').textContent = reimbursableServices + (commuteServices > 0 ? ' (+' + commuteServices + ' commute)' : '');
             document.getElementById('originalMileage').textContent = originalTotal.toFixed(1);
             document.getElementById('adjustedMileage').textContent = adjustedTotal.toFixed(1);
             document.getElementById('reportStatus').textContent = data.approved ? 'Approved ✓' : 'Pending';
@@ -604,7 +604,7 @@
                                    id="adj_${i}" 
                                    step="0.1" 
                                    value="${adjustedMileage !== null ? adjustedMileage.toFixed(1) : ''}"
-                                   placeholder="${isCommute ? 'Not billable' : originalMileage.toFixed(1)}"
+                                   placeholder="${isCommute ? 'Not reimbursable' : originalMileage.toFixed(1)}"
                                    onchange="updateAdjustment(${i}, this.value)"
                                    ${isDisabled ? 'disabled' : ''}
                                    style="width: 80px; padding: 6px 8px; border: 2px solid ${adjustedMileage !== null ? '#62B790' : '#D3D7DF'}; border-radius: 6px; font-size: 14px; text-align: center; font-family: 'Poppins', sans-serif; background: ${adjustedMileage !== null ? '#F0FDF4' : (isCommute ? '#F3F4F6' : 'white')};">
@@ -641,7 +641,7 @@
                 <tfoot>
                     <tr style="background: #E5ECF3; border-top: 2px solid #1A365C;">
                         <td colspan="3" style="padding: 12px; font-weight: 600; font-size: 14px; color: #1A365C; text-align: right;">
-                            TOTAL BILLABLE:
+                            TOTAL REIMBURSABLE:
                         </td>
                         <td style="padding: 12px; font-weight: 700; font-size: 16px; color: #1A365C; text-align: right;">
                             ${originalTotal.toFixed(1)} mi
@@ -650,7 +650,7 @@
                             ${adjustedTotal.toFixed(1)} mi
                         </td>
                         <td colspan="2" style="padding: 12px; font-size: 12px; color: #3D3D3D; text-align: center;">
-                            ${billableServices} billable service${billableServices !== 1 ? 's' : ''}
+                            ${reimbursableServices} reimbursable service${reimbursableServices !== 1 ? 's' : ''}
                             ${commuteServices > 0 ? '<br><span style="color: #9CA3AF; font-size: 11px;">(' + commuteServices + ' commute excluded)</span>' : ''}
                         </td>
                     </tr>
