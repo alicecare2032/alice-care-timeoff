@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - Mileage v3.3</title>
+    <title>Alice Care - Mileage v3.4</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -52,7 +52,7 @@
             font-weight: 400;
         }
         
-        .container {
+        .container {alice.
             max-width: 1200px;
             margin: 0 auto;
             background: white;
@@ -354,14 +354,14 @@
 <body>
     <div class="nav-bar">
         <div class="logo">
-            <span class="alice">Alice</span><span class="dot">.</span><span class="care">Care</span>
+            <span class="alice">Alice</span><span class="dot">.</span><span class="care">care</span>
         </div>
     </div>
 
     <div class="container">
         <div class="header">
             <h1>Mileage Report Portal</h1>
-            <p>Review and approve your weekly mileage reports</p>
+            <p>Review and submit your weekly mileage reports</p>
         </div>
 
         <div class="lookup-section">
@@ -408,14 +408,14 @@
 
         <div id="reportSection" class="report-section hidden">
             <div class="notice-box">
-                <p><strong>Note:</strong> This report displays all on-call services, including your first service (commute). Commute mileage is shown for reference but is <strong>not included in reimbursable totals</strong> and cannot be adjusted. Only review and adjust reimbursable services as needed, then approve when ready.</p>
+                <p><strong>Note:</strong> This report displays all on-call services, including your first service (commute). Commute mileage is shown for reference but is <strong>not included in reimbursable totals</strong> and cannot be adjusted. Only review and adjust reimbursable services as needed, then submit when ready.</p>
             </div>
 
             <div id="servicesList"></div>
 
             <div class="approval-section">
-                <h3>Ready to Approve?</h3>
-                <p>Once you approve this report, the mileage data will be finalized and submitted for processing.</p>
+                <h3>Ready to Submit?</h3>
+                <p>Once you submit this report, the mileage data will be finalized and submitted for processing.</p>
                 <button class="btn btn-success" onclick="approveReport()" id="approveBtn">Approve Report</button>
             </div>
         </div>
@@ -669,16 +669,16 @@
                 }
             }
 
-            // Disable approve button if already approved
+            // Disable approve button if already submitted
             if (data.approved) {
                 document.getElementById('approveBtn').disabled = true;
-                document.getElementById('approveBtn').textContent = 'Report Already Approved';
+                document.getElementById('approveBtn').textContent = 'Report Already Submitted';
                 document.getElementById('approveBtn').style.background = '#9CA3AF';
                 document.getElementById('approveBtn').style.cursor = 'not-allowed';
-                document.querySelector('.approval-section p').textContent = 'This report has been approved and submitted. No further changes can be made.';
+                document.querySelector('.approval-section p').textContent = 'This report has been submitted. No further changes can be made.';
             } else {
                 document.getElementById('approveBtn').disabled = false;
-                document.getElementById('approveBtn').textContent = 'Approve Report';
+                document.getElementById('approveBtn').textContent = 'Submit Report';
                 document.getElementById('approveBtn').style.background = '#62B790';
                 document.getElementById('approveBtn').style.cursor = 'pointer';
             }
@@ -736,7 +736,7 @@
                 return;
             }
 
-            if (!confirm('Are you sure you want to approve this mileage report? This action cannot be undone.')) {
+            if (!confirm('Are you sure you want to submit this mileage report? This action cannot be undone.')) {
                 return;
             }
 
@@ -793,16 +793,16 @@
             })
             .then(function() {
                 console.log('POST request completed (no-cors mode)');
-                alert('Report approved successfully!');
+                alert('Report submitted successfully!');
                 
-                // Reload report to show approved status
+                // Reload report to show submitted status
                 loadReport();
             })
             .catch(function(error) {
                 console.error('POST request error:', error);
                 // In no-cors mode, we can't distinguish success from failure
                 // Assume success and reload
-                alert('Report approved successfully!');
+                alert('Report submitted successfully!');
                 loadReport();
             });
         }
