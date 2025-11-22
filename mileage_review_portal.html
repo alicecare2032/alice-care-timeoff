@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - Mileage Review Portal v3.7.2</title>
+    <title>Alice Care - Mileage Review v3.8</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -483,12 +483,12 @@
 
             <div id="exportSection" style="display: none;">
                 <div class="export-section">
-                    <h3>Export Text File (Submitted Reports Only)</h3>
+                    <h3>Export Text File (All Employees)</h3>
                     <div class="notice-box">
                         <p><strong>Format:</strong> Each data line will be formatted as: EMPLOYEE_ID,MLE,AMOUNT,,,,,</p>
                         <p><strong>Rate:</strong> $0.70 per mile (federal reimbursement rate)</p>
-                        <p><strong>Includes:</strong> Header with summary (Total Employees, Submitted, Not Submitted) and footer with record count</p>
-                        <p><strong>Note:</strong> Only employees with SUBMITTED reports will be included in the data section.</p>
+                        <p><strong>Sections:</strong> File includes separate sections for SUBMITTED and NOT SUBMITTED employees</p>
+                        <p><strong>Includes:</strong> Header with summary counts, data sections, and footer with totals</p>
                     </div>
                     <div class="text-preview" id="textPreview"></div>
                     <button class="btn btn-success" onclick="downloadTextFile()">
@@ -650,12 +650,13 @@
 
             document.getElementById('reportsTable').innerHTML = html;
 
-            // Generate text preview (only submitted reports)
+            // Generate text preview - include ALL employees (submitted and not submitted)
             const submittedReports = data.submissions.filter(emp => emp.isSubmitted);
             const pendingReports = data.submissions.filter(emp => !emp.isSubmitted);
             
-            if (submittedReports.length > 0) {
-                generateTextPreview(submittedReports, submittedReports.length, pendingReports.length, totalEmployees);
+            // Always show export section if there are any employees
+            if (data.submissions.length > 0) {
+                generateTextPreview(data.submissions, submittedReports.length, pendingReports.length, totalEmployees);
                 document.getElementById('exportSection').style.display = 'block';
             }
         }
@@ -748,7 +749,7 @@
             }
         }
 
-        function generateTextPreview(submissions, submittedCount, pendingCount, totalCount) {
+        function generateTextPreview(allSubmissions, submittedCount, pendingCount, totalCount) {
             let text = '';
             
             // Add header with counts
@@ -767,23 +768,54 @@
             text += `Submitted: ${submittedCount}\n`;
             text += `Not Submitted: ${pendingCount}\n`;
             text += `\n`;
-            text += `REIMBURSEMENT DATA:\n`;
-            text += `---\n`;
             
-            // Sort by employee ID
-            const sorted = [...submissions].sort((a, b) => a.employeeId.localeCompare(b.employeeId));
+            // Separate submitted and not submitted
+            const submitted = allSubmissions.filter(emp => emp.isSubmitted);
+            const notSubmitted = allSubmissions.filter(emp => !emp.isSubmitted);
             
-            sorted.forEach(emp => {
-                // Format: EMPLOYEE_ID,MLE,AMOUNT,,,,,
-                const employeeId = emp.employeeId.padStart(4, '0'); // Ensure 4 digits
-                const amount = emp.reimbursementAmount.toFixed(2);
-                text += `${employeeId},MLE,${amount},,,,,\n`;
-            });
+            // SUBMITTED EMPLOYEES SECTION
+            if (submitted.length > 0) {
+                text += `SUBMITTED - REIMBURSEMENT DATA:\n`;
+                text += `---\n`;
+                
+                // Sort by employee ID
+                const sortedSubmitted = [...submitted].sort((a, b) => a.employeeId.localeCompare(b.employeeId));
+                
+                sortedSubmitted.forEach(emp => {
+                    // Format: EMPLOYEE_ID,MLE,AMOUNT,,,,,
+                    const employeeId = emp.employeeId.padStart(4, '0');
+                    const amount = emp.reimbursementAmount.toFixed(2);
+                    text += `${employeeId},MLE,${amount},,,,,\n`;
+                });
+                
+                text += `---\n`;
+                text += `Submitted Records: ${submitted.length}\n`;
+                text += `\n`;
+            }
+            
+            // NOT SUBMITTED EMPLOYEES SECTION
+            if (notSubmitted.length > 0) {
+                text += `NOT SUBMITTED - PENDING:\n`;
+                text += `---\n`;
+                
+                // Sort by employee ID
+                const sortedNotSubmitted = [...notSubmitted].sort((a, b) => a.employeeId.localeCompare(b.employeeId));
+                
+                sortedNotSubmitted.forEach(emp => {
+                    // Format: EMPLOYEE_ID,MLE,AMOUNT,,,,,
+                    const employeeId = emp.employeeId.padStart(4, '0');
+                    const amount = emp.reimbursementAmount.toFixed(2);
+                    text += `${employeeId},MLE,${amount},,,,,\n`;
+                });
+                
+                text += `---\n`;
+                text += `Pending Records: ${notSubmitted.length}\n`;
+                text += `\n`;
+            }
             
             // Add footer
-            text += `---\n`;
             text += `END OF REPORT\n`;
-            text += `Total Records: ${sorted.length}\n`;
+            text += `Total Records: ${allSubmissions.length}\n`;
 
             document.getElementById('textPreview').textContent = text;
         }
