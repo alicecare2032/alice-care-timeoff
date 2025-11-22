@@ -139,7 +139,6 @@
             font-size: 14px;
             cursor: pointer;
             transition: all 0.3s;
-            min-height: 44px; /* Better touch target */
         }
         
         .btn-primary {
@@ -230,230 +229,198 @@
             box-shadow: 0 4px 12px rgba(245, 118, 0, 0.1);
         }
         
+        /* Table Styles */
+        table {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        table tbody tr {
+            transition: all 0.2s;
+        }
+        
+        table tbody tr:hover {
+            background: #FFF4E5 !important;
+            box-shadow: 0 2px 8px rgba(245, 118, 0, 0.1);
+        }
+        
+        table input[type="number"]:focus,
+        table input[type="text"]:focus {
+            outline: none;
+            border-color: #F57600;
+            box-shadow: 0 0 0 3px rgba(245, 118, 0, 0.1);
+        }
+        
+        table input[type="number"]:disabled,
+        table input[type="text"]:disabled {
+            background: #F5F5F5;
+            cursor: not-allowed;
+        }
+        
+        table label:hover {
+            background: #FFF4E5;
+            border-color: #F57600;
+        }
+        
+        /* Responsive table */
+        @media (max-width: 768px) {
+            table {
+                font-size: 12px;
+            }
+            
+            table th,
+            table td {
+                padding: 8px 4px !important;
+            }
+            
+            table input {
+                font-size: 12px;
+                padding: 4px 6px !important;
+            }
+        }
+        
+        
+        .approval-section {
+            background: #E5ECF3;
+            padding: 25px;
+            border-radius: 8px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .approval-section h3 {
+            font-size: 18px;
+            color: #1A365C;
+            margin-bottom: 15px;
+        }
+        
+        .approval-section p {
+            font-size: 13px;
+            color: #3D3D3D;
+            margin-bottom: 20px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-oncall {
+            background: #FFE8CC;
+            color: #F57600;
+        }
+        
+        .badge-approved {
+            background: #D4F4E2;
+            color: #62B790;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #3D3D3D;
+        }
+        
+        .empty-state h3 {
+            font-size: 20px;
+            color: #1A365C;
+            margin-bottom: 10px;
+        }
+        
+        .empty-state p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
         .loading {
             text-align: center;
             padding: 40px;
             color: #3D3D3D;
         }
         
-        .loading-spinner {
-            border: 4px solid #E5ECF3;
-            border-top: 4px solid #F57600;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
+        .hidden {
+            display: none;
         }
         
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Table Container for Horizontal Scroll */
-        .table-container {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            margin: 20px 0;
-        }
-
-        .services-table {
-            width: 100%;
-            min-width: 800px; /* Minimum width before scrolling */
-            border-collapse: collapse;
-            background: white;
-        }
-
-        .services-table thead {
-            background: #1A365C;
-            color: white;
-        }
-
-        .services-table th {
-            padding: 12px;
-            text-align: left;
-            font-size: 13px;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        .services-table td {
-            padding: 12px;
-            border-bottom: 1px solid #E5ECF3;
-            font-size: 13px;
-        }
-
-        .services-table tbody tr:hover {
-            background: #F9FAFB;
-        }
-
-        .text-right {
-            text-align: right !important;
-        }
-
-        .commute-badge {
-            display: inline-block;
-            background: #9CA3AF;
-            color: white;
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 4px;
-            margin-left: 8px;
-            font-weight: 500;
-        }
-
-        .adjustment-input {
-            width: 80px;
-            padding: 6px 10px;
-            border: 2px solid #D3D7DF;
-            border-radius: 6px;
-            font-size: 13px;
-            text-align: right;
-        }
-
-        .adjustment-reason {
-            width: 100%;
-            padding: 8px;
-            border: 2px solid #D3D7DF;
-            border-radius: 6px;
-            font-size: 12px;
-            font-family: 'Poppins', sans-serif;
-            margin-top: 5px;
-        }
-
-        .approval-section {
-            margin-top: 30px;
-            padding: 25px;
-            background: #E5ECF3;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .approval-section p {
-            color: #3D3D3D;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-
         /* Mobile Responsive Styles */
         @media (max-width: 768px) {
             body {
                 padding: 10px;
             }
-
+            
             .nav-bar {
                 padding: 12px 15px;
-                flex-direction: column;
-                gap: 10px;
+                margin-bottom: 15px;
             }
-
+            
             .logo {
-                font-size: 24px;
+                font-size: 20px;
             }
-
+            
             .header {
                 padding: 20px 15px;
             }
-
+            
             .header h1 {
                 font-size: 22px;
             }
-
+            
             .lookup-section {
                 padding: 20px 15px;
             }
-
+            
             .lookup-grid {
                 grid-template-columns: 1fr;
                 gap: 12px;
             }
-
+            
             .stats-row {
                 grid-template-columns: 1fr;
                 padding: 15px;
                 gap: 12px;
             }
-
+            
             .report-section {
                 padding: 20px 15px;
             }
-
+            
             .btn {
                 width: 100%;
                 padding: 14px 20px;
             }
-
-            .services-table {
-                font-size: 12px;
+            
+            /* Make table scrollable on mobile */
+            table {
+                display: block;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                white-space: nowrap;
             }
-
-            .services-table th,
-            .services-table td {
-                padding: 8px;
-            }
-
-            .adjustment-input {
-                width: 70px;
-            }
-
-            /* Stack service cards vertically on mobile instead of table */
-            .mobile-service-card {
-                background: white;
-                border: 2px solid #E5ECF3;
-                border-radius: 8px;
-                padding: 15px;
-                margin-bottom: 12px;
-            }
-
-            .mobile-service-card .service-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: start;
-                margin-bottom: 12px;
-                padding-bottom: 12px;
-                border-bottom: 1px solid #E5ECF3;
-            }
-
-            .mobile-service-card .service-title {
-                font-weight: 600;
-                color: #1A365C;
-                font-size: 14px;
-            }
-
-            .mobile-service-card .service-row {
-                display: flex;
-                justify-content: space-between;
-                padding: 6px 0;
-                font-size: 13px;
-            }
-
-            .mobile-service-card .service-label {
-                color: #3D3D3D;
-                font-weight: 500;
-            }
-
-            .mobile-service-card .service-value {
-                color: #1A365C;
-                font-weight: 600;
+            
+            table td, table th {
+                min-width: 80px;
             }
         }
-
+        
         @media (max-width: 480px) {
-            .logo {
-                font-size: 20px;
-            }
-
             .header h1 {
-                font-size: 20px;
+                font-size: 18px;
             }
-
+            
+            .lookup-title {
+                font-size: 16px;
+            }
+            
             .stat-card .number {
-                font-size: 24px;
-            }
-
-            .lookup-grid {
-                grid-template-columns: 1fr;
+                font-size: 22px;
             }
         }
     </style>
@@ -461,74 +428,86 @@
 <body>
     <div class="nav-bar">
         <div class="logo">
-            <span class="alice">alice</span><span class="dot">.</span><span class="care">care</span>
+            <span class="alice">Alice</span><span class="dot">.</span><span class="care">care</span>
         </div>
     </div>
 
     <div class="container">
         <div class="header">
-            <h1>Weekly Mileage Report</h1>
-            <p>Review and submit your weekly mileage for reimbursement</p>
+            <h1>Mileage Report Portal</h1>
+            <p>Review and submit your weekly mileage reports</p>
         </div>
 
         <div class="lookup-section">
-            <div class="lookup-title">Enter Your Information</div>
+            <div class="lookup-title">Lookup Your Report</div>
             <div class="lookup-grid">
                 <div class="form-group">
                     <label>Employee ID <span class="required">*</span></label>
-                    <input type="text" id="employeeId" placeholder="e.g., 1234">
+                    <input type="text" id="employeeId" placeholder="Enter Employee ID">
                 </div>
                 <div class="form-group">
                     <label>Last Name <span class="required">*</span></label>
-                    <input type="text" id="lastName" placeholder="Smith">
+                    <input type="text" id="lastName" placeholder="Enter Last Name">
                 </div>
                 <div class="form-group">
                     <label>Week Number <span class="required">*</span></label>
-                    <input type="number" id="weekNumber" placeholder="e.g., 47" min="1" max="53">
+                    <input type="number" id="weekNumber" placeholder="1-52" min="1" max="53">
                 </div>
                 <div class="form-group">
                     <label>Year <span class="required">*</span></label>
-                    <input type="number" id="year" placeholder="2024" min="2024">
+                    <input type="number" id="year" placeholder="2024" min="2020" max="2030">
                 </div>
             </div>
-            <button class="btn btn-primary" onclick="loadReport()">Load My Report</button>
+            <button class="btn btn-primary" onclick="loadReport()">Load Report</button>
         </div>
 
-        <div id="reportContent" style="display: none;">
-            <div class="stats-row">
-                <div class="stat-card">
-                    <h3>Total Services</h3>
-                    <div class="number" id="totalServices">0</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Original Mileage</h3>
-                    <div class="number" id="originalMileage">0.0</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Adjusted Mileage</h3>
-                    <div class="number" id="adjustedMileage">0.0</div>
-                </div>
+        <div id="statsSection" class="stats-row hidden">
+            <div class="stat-card">
+                <h3>Total Services</h3>
+                <div class="number" id="totalServices">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Original Mileage</h3>
+                <div class="number" id="originalMileage">0.0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Adjusted Mileage</h3>
+                <div class="number" id="adjustedMileage">0.0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Status</h3>
+                <div class="number" id="reportStatus" style="font-size: 16px;">-</div>
+            </div>
+        </div>
+
+        <div id="reportSection" class="report-section hidden">
+            <div class="notice-box">
+                <p><strong>Note:</strong> This report displays all on-call services, including your first service (commute). Commute mileage is shown for reference but is <strong>not included in reimbursable totals</strong> and cannot be adjusted. Only review and adjust reimbursable services as needed, then submit when ready.</p>
             </div>
 
-            <div class="report-section">
-                <div class="notice-box">
-                    <p><strong>Review Your Services:</strong> Verify each service entry below. You can adjust mileage if needed and provide a reason for any changes. Commute services are shown for reference but are not included in reimbursement totals.</p>
-                </div>
+            <div id="servicesList"></div>
 
-                <div class="table-container">
-                    <div id="servicesList"></div>
-                </div>
-
-                <div class="approval-section">
-                    <p>Once you submit this report, no further changes can be made.</p>
-                    <button class="btn btn-success" id="approveBtn" onclick="approveReport()">Submit Report</button>
-                </div>
+            <div class="approval-section">
+                <h3>Ready to Submit?</h3>
+                <p>Once you submit this report, the mileage data will be finalized and submitted for processing.</p>
+                <button class="btn btn-success" onclick="approveReport()" id="approveBtn">Approve Report</button>
             </div>
+        </div>
+
+        <div id="emptyState" class="empty-state hidden">
+            <h3>No Report Found</h3>
+            <p>No services found for the specified week. Please verify your Employee ID, Last Name, Week Number, and Year.</p>
+        </div>
+
+        <div id="loadingState" class="loading hidden">
+            <p>Loading your report...</p>
         </div>
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwYrRTXxRBFSp5LRBN2KPzwZVcfZFuFm3kQQ4hTGdl14iLCCnx7ZVebR_T21pUf-NqL/exec';
+        // REPLACE THIS WITH YOUR GOOGLE APPS SCRIPT WEB APP URL
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/a/macros/alicecare.com/s/AKfycbxsiJuU6W3msDffnoNBuFhzMOy-WtmNp-mi9IUpRUiawGdlKLOedFUq6R9qCADNqKbQ/exec';
+        
         let currentReport = null;
         let adjustments = {};
 
@@ -538,129 +517,188 @@
             const weekNumber = document.getElementById('weekNumber').value.trim();
             const year = document.getElementById('year').value.trim();
 
+            console.log('=== LOADING REPORT ===');
+            console.log('Employee ID:', employeeId);
+            console.log('Last Name:', lastName);
+            console.log('Week:', weekNumber);
+            console.log('Year:', year);
+
             if (!employeeId || !lastName || !weekNumber || !year) {
                 alert('Please fill in all required fields');
                 return;
             }
 
-            const url = `${GOOGLE_SCRIPT_URL}?action=getEmployeeReport&employeeId=${employeeId}&lastName=${lastName}&week=${weekNumber}&year=${year}`;
+            // Show loading state
+            document.getElementById('loadingState').classList.remove('hidden');
+            document.getElementById('statsSection').classList.add('hidden');
+            document.getElementById('reportSection').classList.add('hidden');
+            document.getElementById('emptyState').classList.add('hidden');
 
-            console.log('=== LOADING REPORT ===');
-            console.log('URL:', url);
-
-            document.getElementById('reportContent').style.display = 'none';
-            document.getElementById('servicesList').innerHTML = '<div class="loading"><div class="loading-spinner"></div><p>Loading your report...</p></div>';
-            document.getElementById('reportContent').style.display = 'block';
-
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Response data:', data);
-                    if (data.error) {
-                        alert(data.error);
-                        document.getElementById('reportContent').style.display = 'none';
-                        return;
-                    }
-                    currentReport = data;
+            // Use JSONP for GET requests (works with Google Workspace Scripts)
+            // This bypasses CORS issues that affect fetch() with Workspace domains
+            const callbackName = 'mileageCallback_' + Date.now();
+            
+            window[callbackName] = function(data) {
+                console.log('Report data received via JSONP:', data);
+                
+                // Clean up
+                delete window[callbackName];
+                const scriptElement = document.getElementById('jsonp_script');
+                if (scriptElement) {
+                    scriptElement.remove();
+                }
+                
+                // Process data
+                currentReport = data;
+                adjustments = {};
+                
+                if (data.error) {
+                    console.error('Backend error:', data.error);
+                    document.getElementById('loadingState').classList.add('hidden');
+                    alert('Error loading report:\n' + data.error + '\n\nPlease check:\n1. SHEET_ID is correct in Apps Script\n2. Schedule tab exists\n3. Column names match exactly');
+                    return;
+                }
+                
+                if (data.services && data.services.length > 0) {
                     displayReport(data);
-                })
-                .catch(error => {
-                    console.error('Error loading report:', error);
-                    alert('Error loading report. Please try again.');
-                    document.getElementById('reportContent').style.display = 'none';
-                });
+                } else {
+                    document.getElementById('loadingState').classList.add('hidden');
+                    document.getElementById('emptyState').classList.remove('hidden');
+                }
+            };
+            
+            // Create script tag for JSONP request
+            const script = document.createElement('script');
+            script.id = 'jsonp_script';
+            script.type = 'text/javascript'; // Explicitly set type
+            script.src = GOOGLE_SCRIPT_URL + 
+                '?action=getReport' +
+                '&employeeId=' + encodeURIComponent(employeeId) +
+                '&lastName=' + encodeURIComponent(lastName) +
+                '&week=' + encodeURIComponent(weekNumber) +
+                '&year=' + encodeURIComponent(year) +
+                '&callback=' + callbackName;
+            
+            script.onerror = function() {
+                console.error('JSONP request failed');
+                document.getElementById('loadingState').classList.add('hidden');
+                alert('Error loading report. Please check:\n1. Web App URL is correct\n2. Apps Script is deployed\n3. Your internet connection');
+                delete window[callbackName];
+            };
+            
+            console.log('Loading via JSONP:', script.src);
+            document.head.appendChild(script);
         }
 
         function displayReport(data) {
-            document.getElementById('totalServices').textContent = data.services.length;
+            // Hide loading, show report
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('statsSection').classList.remove('hidden');
+            document.getElementById('reportSection').classList.remove('hidden');
 
+            // Calculate totals (excluding commute services)
             let originalTotal = 0;
             let adjustedTotal = 0;
-            let reimbursableServices = 0;
             let commuteServices = 0;
-
-            data.services.forEach(service => {
+            
+            for (let i = 0; i < data.services.length; i++) {
+                const service = data.services[i];
                 const isCommute = service.isCommute === true;
-                const originalMileage = parseFloat(service.Mileage || 0);
-                const adjustedMileage = service.Adjusted_Mileage ? parseFloat(service.Adjusted_Mileage) : null;
-
+                
+                // Only include non-commute services in totals
                 if (!isCommute) {
+                    const originalMileage = parseFloat(service.Mileage || 0);
+                    const adjustedMileage = service.Adjusted_Mileage ? parseFloat(service.Adjusted_Mileage) : originalMileage;
+                    
                     originalTotal += originalMileage;
-                    adjustedTotal += (adjustedMileage !== null ? adjustedMileage : originalMileage);
-                    reimbursableServices++;
+                    adjustedTotal += adjustedMileage;
                 } else {
                     commuteServices++;
                 }
-            });
+            }
 
+            // Update stats
+            const reimbursableServices = data.services.length - commuteServices;
+            document.getElementById('totalServices').textContent = reimbursableServices + (commuteServices > 0 ? ' (+' + commuteServices + ' commute)' : '');
             document.getElementById('originalMileage').textContent = originalTotal.toFixed(1);
             document.getElementById('adjustedMileage').textContent = adjustedTotal.toFixed(1);
+            document.getElementById('reportStatus').textContent = data.approved ? 'Submitted ✓' : 'Pending';
 
-            let servicesHtml = `
-            <table class="services-table">
+            // Display services as a table
+            let servicesHtml = '<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">';
+            
+            // Table header
+            servicesHtml += `
                 <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Client</th>
-                        <th class="text-right">Original Miles</th>
-                        <th class="text-right">Adjusted Miles</th>
-                        <th>Adjustment Reason</th>
+                    <tr style="background: #1A365C; color: white;">
+                        <th style="padding: 12px; text-align: left; font-weight: 600; font-size: 13px;">Date</th>
+                        <th style="padding: 12px; text-align: left; font-weight: 600; font-size: 13px;">Time</th>
+                        <th style="padding: 12px; text-align: left; font-weight: 600; font-size: 13px;">Client Name</th>
+                        <th style="padding: 12px; text-align: right; font-weight: 600; font-size: 13px;">Original Miles</th>
+                        <th style="padding: 12px; text-align: center; font-weight: 600; font-size: 13px;">Adjusted Miles</th>
+                        <th style="padding: 12px; text-align: left; font-weight: 600; font-size: 13px;">Reason</th>
                     </tr>
                 </thead>
-                <tbody>`;
-
-            data.services.forEach((service, index) => {
+                <tbody>
+            `;
+            
+            // Table rows - one per service
+            for (let i = 0; i < data.services.length; i++) {
+                const service = data.services[i];
                 const isCommute = service.isCommute === true;
-                const originalMileage = parseFloat(service.Mileage || 0);
+                
+                // Commute rows get a distinct gray background and italic style
+                const bgColor = isCommute ? '#F3F4F6' : (i % 2 === 0 ? '#FFFFFF' : '#F9FAFB');
+                // Disable inputs if approved OR if it's a commute
+                const isDisabled = data.approved || isCommute;
+                
+                const originalMileage = parseFloat(service.Mileage);
                 const adjustedMileage = service.Adjusted_Mileage ? parseFloat(service.Adjusted_Mileage) : null;
-
+                const adjustmentReason = service.Adjustment_Reason || '';
+                
                 servicesHtml += `
-                    <tr style="${isCommute ? 'opacity: 0.6; background: #F9FAFB;' : ''}">
-                        <td style="white-space: nowrap;">
+                    <tr style="background: ${bgColor}; border-bottom: 1px solid #E5ECF3; ${isCommute ? 'opacity: 0.7;' : ''}">
+                        <td style="padding: 12px; font-size: 14px; color: #1A365C; font-weight: 600;">
                             ${formatDate(service.Scheduled_Date)}
-                            ${isCommute ? '<span class="commute-badge">Commute</span>' : ''}
+                            ${isCommute ? '<span style="display: inline-block; margin-left: 8px; padding: 2px 8px; background: #9CA3AF; color: white; font-size: 10px; font-weight: 600; border-radius: 4px; text-transform: uppercase;">Commute</span>' : ''}
                         </td>
-                        <td>${formatTime(service.Scheduled_Time)}</td>
-                        <td>${service.Service_Recipient_First_Name || 'N/A'}</td>
-                        <td class="text-right" style="font-weight: 600; color: #1A365C;">
+                        <td style="padding: 12px; font-size: 14px; color: #3D3D3D;">
+                            ${formatTime(service.Scheduled_Time)}
+                        </td>
+                        <td style="padding: 12px; font-size: 14px; color: #3D3D3D;">
+                            ${service.Service_Recipient_First_Name || 'N/A'}
+                        </td>
+                        <td style="padding: 12px; font-size: 14px; color: #1A365C; font-weight: 600; text-align: right;">
                             ${originalMileage.toFixed(1)} mi
                         </td>
-                        <td class="text-right">
-                            ${!isCommute ? 
-                                `<input type="number" 
-                                    class="adjustment-input" 
-                                    id="adj_${index}" 
-                                    value="${adjustedMileage !== null ? adjustedMileage.toFixed(1) : ''}" 
-                                    placeholder="${originalMileage.toFixed(1)}"
-                                    step="0.1" 
-                                    min="0"
-                                    onchange="updateAdjustment(${index}, this.value)"
-                                    ${data.approved ? 'disabled' : ''}
-                                />` 
-                                : '<span style="color: #9CA3AF;">N/A</span>'
-                            }
+                        <td style="padding: 8px; text-align: center;">
+                            <input type="number" 
+                                   id="adj_${i}" 
+                                   step="0.1" 
+                                   value="${adjustedMileage !== null ? adjustedMileage.toFixed(1) : ''}"
+                                   placeholder="${isCommute ? 'Not reimbursable' : originalMileage.toFixed(1)}"
+                                   onchange="updateAdjustment(${i}, this.value)"
+                                   ${isDisabled ? 'disabled' : ''}
+                                   style="width: 80px; padding: 6px 8px; border: 2px solid ${adjustedMileage !== null ? '#62B790' : '#D3D7DF'}; border-radius: 6px; font-size: 14px; text-align: center; font-family: 'Poppins', sans-serif; background: ${adjustedMileage !== null ? '#F0FDF4' : (isCommute ? '#F3F4F6' : 'white')};">
                         </td>
-                        <td>
-                            ${!isCommute ? 
-                                `<input type="text" 
-                                    class="adjustment-reason" 
-                                    id="reason_${index}" 
-                                    value="${service.Adjustment_Reason || ''}"
-                                    placeholder="Reason for adjustment..."
-                                    ${data.approved ? 'disabled' : ''}
-                                />` 
-                                : '<span style="color: #9CA3AF; font-size: 12px;">N/A</span>'
-                            }
+                        <td style="padding: 8px;">
+                            <input type="text" 
+                                   id="reason_${i}" 
+                                   value="${adjustmentReason}"
+                                   placeholder="${isCommute ? 'N/A' : 'Required if adjusted'}"
+                                   ${isDisabled ? 'disabled' : ''}
+                                   style="width: 100%; padding: 6px 8px; border: 2px solid #D3D7DF; border-radius: 6px; font-size: 13px; font-family: 'Poppins', sans-serif; background: ${isCommute ? '#F3F4F6' : 'white'};">
                         </td>
-                    </tr>`;
-            });
-
+                    </tr>
+                `;
+            }
+            
+            // Table footer with totals (excludes commute services)
             servicesHtml += `
                 </tbody>
                 <tfoot>
-                    <tr style="background: #F9FAFB; font-weight: 700;">
-                        <td colspan="3" style="padding: 12px; text-align: right; color: #1A365C; font-size: 14px;">
+                    <tr style="background: #E5ECF3; border-top: 2px solid #1A365C;">
+                        <td colspan="3" style="padding: 12px; font-weight: 600; font-size: 14px; color: #1A365C; text-align: right;">
                             TOTAL REIMBURSABLE:
                         </td>
                         <td style="padding: 12px; font-weight: 700; font-size: 16px; color: #1A365C; text-align: right;">
@@ -679,6 +717,7 @@
 
             document.getElementById('servicesList').innerHTML = servicesHtml;
             
+            // Pre-populate adjustments object with existing values
             adjustments = {};
             for (let i = 0; i < data.services.length; i++) {
                 if (data.services[i].Adjusted_Mileage) {
@@ -688,6 +727,7 @@
                 }
             }
 
+            // Disable approve button if already submitted
             if (data.approved) {
                 document.getElementById('approveBtn').disabled = true;
                 document.getElementById('approveBtn').textContent = 'Report Already Submitted';
@@ -712,11 +752,13 @@
                 adjustments[index].adjustedMileage = parseFloat(value);
             }
             
+            // Recalculate total adjusted mileage (excluding commute services)
             let adjustedTotal = 0;
             for (let i = 0; i < currentReport.services.length; i++) {
                 const service = currentReport.services[i];
                 const isCommute = service.isCommute === true;
                 
+                // Skip commute services in total calculation
                 if (!isCommute) {
                     if (adjustments[i] && adjustments[i].adjustedMileage) {
                         adjustedTotal += adjustments[i].adjustedMileage;
@@ -727,6 +769,7 @@
             }
             document.getElementById('adjustedMileage').textContent = adjustedTotal.toFixed(1);
             
+            // Update the table footer as well
             const footerCell = document.querySelector('tfoot td:nth-child(3)');
             if (footerCell) {
                 footerCell.textContent = adjustedTotal.toFixed(1) + ' mi';
@@ -748,10 +791,12 @@
             const weekNumber = document.getElementById('weekNumber').value.trim();
             const year = document.getElementById('year').value.trim();
 
+            // Validate: If adjustment made, reason must be provided
             for (let i = 0; i < currentReport.services.length; i++) {
                 const service = currentReport.services[i];
                 const isCommute = service.isCommute === true;
                 
+                // Skip commute services
                 if (isCommute) {
                     continue;
                 }
@@ -761,6 +806,7 @@
                 const originalMileage = parseFloat(service.Mileage);
                 const adjustedMileage = adj.adjustedMileage;
                 
+                // Check if adjustment was made (adjusted value differs from original)
                 if (adjustedMileage && Math.abs(adjustedMileage - originalMileage) > 0.01) {
                     if (!reason) {
                         alert('Please provide a reason for the mileage adjustment on ' + formatDate(service.Scheduled_Date) + ' at ' + formatTime(service.Scheduled_Time) + ' (' + service.Service_Recipient_First_Name + ')');
@@ -771,11 +817,13 @@
                 }
             }
 
+            // Prepare adjustment data (only for non-commute services)
             const adjustmentData = [];
             for (let i = 0; i < currentReport.services.length; i++) {
                 const service = currentReport.services[i];
                 const isCommute = service.isCommute === true;
                 
+                // Skip commute services - they don't get saved to the sheet
                 if (isCommute) {
                     continue;
                 }
@@ -805,6 +853,7 @@
             console.log('=== SUBMITTING APPROVAL ===');
             console.log('Data:', JSON.stringify(data, null, 2));
 
+            // Use no-cors mode for POST (same as time-off system)
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -816,10 +865,14 @@
             .then(function() {
                 console.log('POST request completed (no-cors mode)');
                 alert('Report submitted successfully!');
+                
+                // Reload report to show submitted status
                 loadReport();
             })
             .catch(function(error) {
                 console.error('POST request error:', error);
+                // In no-cors mode, we can't distinguish success from failure
+                // Assume success and reload
                 alert('Report submitted successfully!');
                 loadReport();
             });
@@ -836,17 +889,21 @@
         }
         
         function formatTime(timeValue) {
+            // Handle Google Sheets time format (serial number or datetime string)
             if (!timeValue) return '';
             
             try {
+                // If it's already a string in HH:MM format, return it
                 if (typeof timeValue === 'string' && /^\d{1,2}:\d{2}/.test(timeValue)) {
                     return timeValue;
                 }
                 
+                // Convert to Date object
                 let date;
                 if (typeof timeValue === 'string') {
                     date = new Date(timeValue);
                 } else if (typeof timeValue === 'number') {
+                    // Google Sheets serial time (fraction of a day)
                     const hours = Math.floor(timeValue * 24);
                     const minutes = Math.floor((timeValue * 24 * 60) % 60);
                     return String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0');
@@ -856,6 +913,7 @@
                     return String(timeValue);
                 }
                 
+                // Extract time in HH:MM format
                 const hours = date.getHours();
                 const minutes = date.getMinutes();
                 return String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0');
@@ -866,6 +924,7 @@
             }
         }
 
+        // Set current year as default
         document.getElementById('year').value = new Date().getFullYear();
     </script>
 </body>

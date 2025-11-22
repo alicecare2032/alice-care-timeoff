@@ -139,7 +139,6 @@
             font-size: 14px;
             cursor: pointer;
             transition: all 0.3s;
-            min-height: 44px;
         }
         
         .btn-primary {
@@ -231,22 +230,15 @@
             font-size: 13px;
             line-height: 1.6;
         }
-
-        /* Table Container for Horizontal Scroll */
-        .table-container {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            margin: 20px 0;
-        }
         
-        /* Review Table */
+        /* Table Styles */
         .review-table {
             width: 100%;
-            min-width: 900px;
             border-collapse: collapse;
+            margin-top: 20px;
         }
         
-        .review-table thead {
+        .review-table thead tr {
             background: #1A365C;
             color: white;
         }
@@ -254,20 +246,14 @@
         .review-table th {
             padding: 12px;
             text-align: left;
-            font-size: 13px;
             font-weight: 600;
-            white-space: nowrap;
-        }
-        
-        .review-table td {
-            padding: 12px;
-            border-bottom: 1px solid #E5ECF3;
             font-size: 13px;
         }
         
         .review-table tbody tr {
+            border-bottom: 1px solid #E5ECF3;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s;
         }
         
         .review-table tbody tr:hover {
@@ -275,42 +261,18 @@
         }
         
         .review-table tbody tr.expanded {
-            background: #FFF4E5;
+            background: #E5ECF3;
         }
         
-        .detail-row {
-            display: none;
-            background: #F9FAFB;
+        .review-table td {
+            padding: 15px 12px;
+            font-size: 14px;
+            color: #3D3D3D;
         }
         
-        .detail-row.show {
-            display: table-row;
-        }
-        
-        .detail-row td {
-            padding: 0 !important;
-            border: none !important;
-        }
-        
-        .detail-content {
-            padding: 20px;
-            background: white;
-            margin: 10px;
-            border-radius: 8px;
-            border: 2px solid #E5ECF3;
-        }
-        
-        .expand-icon {
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: #F57600;
-            color: white;
-            text-align: center;
-            line-height: 24px;
-            font-weight: 700;
-            margin-right: 8px;
+        .employee-id {
+            font-weight: 600;
+            color: #1A365C;
         }
         
         .status-badge {
@@ -319,193 +281,238 @@
             border-radius: 12px;
             font-size: 11px;
             font-weight: 600;
+            text-transform: uppercase;
         }
         
         .status-submitted {
-            background: #62B790;
-            color: white;
+            background: #D4F4E2;
+            color: #0A7D4A;
         }
         
         .status-pending {
-            background: #FFA500;
+            background: #FFF4E5;
+            color: #D97706;
+        }
+        
+        .expand-icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            line-height: 18px;
+            text-align: center;
+            border: 2px solid #1A365C;
+            border-radius: 4px;
+            color: #1A365C;
+            font-weight: 700;
+            font-size: 16px;
+            margin-right: 8px;
+            transition: all 0.2s;
+        }
+        
+        tr.expanded .expand-icon {
+            background: #1A365C;
             color: white;
+        }
+        
+        /* Detail Row Styles */
+        .detail-row {
+            display: none;
+        }
+        
+        .detail-row.show {
+            display: table-row;
+        }
+        
+        .detail-cell {
+            padding: 0 !important;
+            background: #F9FAFB;
+        }
+        
+        .detail-content {
+            padding: 20px 30px;
+        }
+        
+        .services-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .services-table thead tr {
+            background: #E5ECF3;
+            color: #1A365C;
+        }
+        
+        .services-table th {
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+        }
+        
+        .services-table td {
+            padding: 10px 12px;
+            font-size: 13px;
+            border-bottom: 1px solid #E5ECF3;
+        }
+        
+        .services-table tbody tr:last-child td {
+            border-bottom: none;
         }
         
         .commute-badge {
             display: inline-block;
+            margin-left: 8px;
+            padding: 2px 8px;
             background: #9CA3AF;
             color: white;
             font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 4px;
-            margin-left: 8px;
-            font-weight: 500;
-        }
-        
-        /* Services Table (nested in details) */
-        .services-table {
-            width: 100%;
-            min-width: 700px;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        
-        .services-table thead {
-            background: #E5ECF3;
-        }
-        
-        .services-table th {
-            padding: 10px;
-            text-align: left;
-            font-size: 12px;
             font-weight: 600;
-            color: #1A365C;
-        }
-        
-        .services-table td {
-            padding: 10px;
-            border-bottom: 1px solid #E5ECF3;
-            font-size: 12px;
+            border-radius: 4px;
+            text-transform: uppercase;
         }
         
         .services-table tfoot {
-            background: #F9FAFB;
-            font-weight: 700;
+            background: #E5ECF3;
+            font-weight: 600;
         }
         
-        .text-right {
-            text-align: right !important;
+        .services-table tfoot td {
+            padding: 12px;
+            border-top: 2px solid #1A365C;
         }
         
         .export-section {
-            margin-top: 30px;
-            padding: 25px;
             background: #E5ECF3;
-            border-radius: 12px;
+            padding: 25px 30px;
+            margin-top: 20px;
+            border-radius: 8px;
         }
         
         .export-section h3 {
+            font-size: 16px;
             color: #1A365C;
+            font-weight: 600;
             margin-bottom: 15px;
-            font-size: 18px;
         }
         
         .text-preview {
             background: white;
-            padding: 15px;
+            border: 2px solid #D3D7DF;
             border-radius: 8px;
+            padding: 15px;
             font-family: 'Courier New', monospace;
-            font-size: 12px;
-            white-space: pre-wrap;
-            max-height: 400px;
+            font-size: 13px;
+            color: #1A365C;
+            max-height: 300px;
             overflow-y: auto;
             margin-bottom: 15px;
-            border: 2px solid #D3D7DF;
+            white-space: pre;
         }
-
+        
+        .text-right {
+            text-align: left;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
         /* Mobile Responsive Styles */
         @media (max-width: 768px) {
             body {
                 padding: 10px;
             }
-
+            
             .nav-bar {
                 padding: 12px 15px;
-                flex-direction: column;
-                gap: 10px;
+                margin-bottom: 15px;
             }
-
+            
             .logo {
-                font-size: 24px;
+                font-size: 20px;
             }
-
+            
             .header {
                 padding: 20px 15px;
             }
-
+            
             .header h1 {
                 font-size: 22px;
             }
-
+            
             .lookup-section {
                 padding: 20px 15px;
             }
-
+            
             .lookup-grid {
                 grid-template-columns: 1fr;
                 gap: 12px;
             }
-
-            .btn {
-                width: 100%;
-                margin-left: 0 !important;
-                margin-top: 10px;
-            }
-
-            .btn-success {
-                margin-left: 0 !important;
-            }
-
+            
             .stats-row {
                 grid-template-columns: 1fr;
                 padding: 15px;
                 gap: 12px;
             }
-
+            
             .review-section {
                 padding: 20px 15px;
             }
-
-            .review-table,
-            .services-table {
-                font-size: 12px;
-            }
-
-            .review-table th,
-            .review-table td,
-            .services-table th,
-            .services-table td {
-                padding: 8px;
-            }
-
-            .expand-icon {
-                width: 20px;
-                height: 20px;
-                line-height: 20px;
-                font-size: 14px;
-            }
-
-            .detail-content {
-                padding: 15px;
-                margin: 5px;
-            }
-
+            
             .export-section {
                 padding: 15px;
             }
-
+            
+            .btn {
+                width: 100%;
+                padding: 14px 20px;
+                margin-left: 0 !important;
+                margin-top: 10px;
+            }
+            
+            /* Make tables scrollable on mobile */
+            .review-table, .services-table {
+                display: block;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .review-table td, .review-table th,
+            .services-table td, .services-table th {
+                min-width: 80px;
+                white-space: nowrap;
+            }
+            
+            /* Adjust detail rows for mobile */
+            .detail-row td {
+                padding: 10px !important;
+            }
+            
             .text-preview {
-                font-size: 10px;
-                padding: 10px;
+                font-size: 11px;
+                max-height: 200px;
             }
         }
-
+        
         @media (max-width: 480px) {
-            .logo {
-                font-size: 20px;
-            }
-
             .header h1 {
-                font-size: 20px;
+                font-size: 18px;
             }
-
+            
+            .lookup-title {
+                font-size: 16px;
+            }
+            
             .stat-card .number {
-                font-size: 24px;
+                font-size: 22px;
             }
-
-            .review-table,
-            .services-table {
-                min-width: 600px;
+            
+            .expand-icon {
+                font-size: 18px;
             }
         }
     </style>
@@ -513,67 +520,86 @@
 <body>
     <div class="nav-bar">
         <div class="logo">
-            <span class="alice">alice</span><span class="dot">.</span><span class="care">care</span>
+            <span class="alice">Alice</span><span class="dot">.</span><span class="care">care</span>
         </div>
     </div>
 
     <div class="container">
         <div class="header">
             <h1>Mileage Review Portal</h1>
-            <p>Administrative review of weekly mileage submissions</p>
+            <p>Review all on-call reports and generate reimbursement files</p>
         </div>
 
         <div class="lookup-section">
-            <div class="lookup-title">Select Reporting Period</div>
+            <div class="lookup-title">Select Week to Review</div>
             <div class="lookup-grid">
                 <div class="form-group">
                     <label>Week Number <span class="required">*</span></label>
-                    <input type="number" id="weekNumber" placeholder="e.g., 47" min="1" max="53">
+                    <input type="number" id="weekNumber" min="1" max="53" placeholder="46">
                 </div>
                 <div class="form-group">
                     <label>Year <span class="required">*</span></label>
-                    <input type="number" id="year" placeholder="2024" min="2024">
+                    <input type="number" id="year" min="2020" max="2030" placeholder="2025">
                 </div>
             </div>
-            <button class="btn btn-primary" onclick="loadSubmissions()">Load Submissions</button>
-            <button class="btn btn-success" onclick="downloadTextFile()">Download Report</button>
+            <button class="btn btn-primary" onclick="loadSubmissions()">Load Reports</button>
         </div>
 
-        <div id="submissionsContent" style="display: none;">
+        <div id="statsSection" style="display: none;">
             <div class="stats-row">
                 <div class="stat-card">
                     <h3>Total Employees</h3>
                     <div class="number" id="totalEmployees">0</div>
                 </div>
                 <div class="stat-card">
-                    <h3>Submitted</h3>
-                    <div class="number" id="submittedCount">0</div>
+                    <h3>Submitted Reports</h3>
+                    <div class="number" id="submittedReports">0</div>
                 </div>
                 <div class="stat-card">
-                    <h3>Not Submitted</h3>
-                    <div class="number" id="pendingCount">0</div>
+                    <h3>Total Reimbursable Miles</h3>
+                    <div class="number" id="totalMiles">0.0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Reimbursement</h3>
+                    <div class="number" id="totalAmount">$0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="review-section">
+            <div id="loadingIndicator" style="display: none;">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading reports...</p>
                 </div>
             </div>
 
-            <div class="review-section">
-                <div class="notice-box">
-                    <p><strong>Review Submissions:</strong> Click on any employee row to view detailed service entries and adjustments. Use the download button to export reimbursement data for payroll processing.</p>
-                </div>
+            <div id="reportsTable"></div>
 
-                <div class="table-container">
-                    <div id="submissionsList"></div>
-                </div>
-
-                <div id="exportSection" class="export-section" style="display: none;">
-                    <h3>Payroll Export Preview</h3>
+            <div id="exportSection" style="display: none;">
+                <div class="export-section">
+                    <h3>Export Text File (All Employees)</h3>
+                    <div class="notice-box">
+                        <p><strong>Format:</strong> Each data line will be formatted as: EMPLOYEE_ID,MLE,AMOUNT,,,,,</p>
+                        <p><strong>Rate:</strong> $0.70 per mile (federal reimbursement rate)</p>
+                        <p><strong>Sections:</strong> File includes separate sections for SUBMITTED and NOT SUBMITTED employees</p>
+                        <p><strong>Includes:</strong> Header with summary counts, data sections, and footer with totals</p>
+                    </div>
                     <div class="text-preview" id="textPreview"></div>
+                    <button class="btn btn-success" onclick="downloadTextFile()">
+                        Download Text File
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwYrRTXxRBFSp5LRBN2KPzwZVcfZFuFm3kQQ4hTGdl14iLCCnx7ZVebR_T21pUf-NqL/exec';
+        // IMPORTANT: Replace this URL with your actual Google Apps Script web app URL
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/a/macros/alicecare.com/s/AKfycbxsiJuU6W3msDffnoNBuFhzMOy-WtmNp-mi9IUpRUiawGdlKLOedFUq6R9qCADNqKbQ/exec';
+        
+        const REIMBURSEMENT_RATE = 0.70; // Federal rate per mile
+        
         let currentSubmissions = null;
         let currentWeek = null;
         let currentYear = null;
@@ -590,99 +616,142 @@
             currentWeek = weekNumber;
             currentYear = year;
 
-            const url = `${GOOGLE_SCRIPT_URL}?action=getAllSubmissions&week=${weekNumber}&year=${year}`;
+            document.getElementById('loadingIndicator').style.display = 'block';
+            document.getElementById('reportsTable').innerHTML = '';
+            document.getElementById('statsSection').style.display = 'none';
+            document.getElementById('exportSection').style.display = 'none';
 
-            console.log('=== LOADING SUBMISSIONS ===');
-            console.log('URL:', url);
+            // Create JSONP callback name
+            const callbackName = 'jsonpCallback_' + Date.now();
+            
+            // Define the callback function
+            window[callbackName] = function(data) {
+                console.log('Received data:', data);
+                document.getElementById('loadingIndicator').style.display = 'none';
+                
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                    return;
+                }
+                
+                currentSubmissions = data;
+                displayReports(data);
+                
+                // Clean up
+                delete window[callbackName];
+            };
 
-            document.getElementById('submissionsContent').style.display = 'none';
-            document.getElementById('submissionsList').innerHTML = '<div class="loading"><div class="loading-spinner"></div><p>Loading submissions...</p></div>';
-            document.getElementById('submissionsContent').style.display = 'block';
+            // Build JSONP URL
+            const url = GOOGLE_SCRIPT_URL + 
+                '?action=getSubmissions' +
+                '&week=' + encodeURIComponent(weekNumber) +
+                '&year=' + encodeURIComponent(year) +
+                '&callback=' + callbackName;
 
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Response data:', data);
-                    if (data.error) {
-                        alert(data.error);
-                        document.getElementById('submissionsContent').style.display = 'none';
-                        return;
-                    }
-                    currentSubmissions = data;
-                    displaySubmissions(data);
-                })
-                .catch(error => {
-                    console.error('Error loading submissions:', error);
-                    alert('Error loading submissions. Please try again.');
-                    document.getElementById('submissionsContent').style.display = 'none';
-                });
+            console.log('Fetching:', url);
+
+            // Create script tag for JSONP request
+            const script = document.createElement('script');
+            script.src = url;
+            script.onerror = function() {
+                document.getElementById('loadingIndicator').style.display = 'none';
+                alert('Failed to load reports. Please check your script URL.');
+                delete window[callbackName];
+            };
+            document.body.appendChild(script);
         }
 
-        function displaySubmissions(data) {
-            const allSubmissions = data.submissions;
-            const submitted = allSubmissions.filter(emp => emp.isSubmitted);
-            const pending = allSubmissions.filter(emp => !emp.isSubmitted);
+        function displayReports(data) {
+            if (!data.submissions || data.submissions.length === 0) {
+                document.getElementById('reportsTable').innerHTML = `
+                    <div class="notice-box">
+                        <p><strong>No reports found for Week ${currentWeek}, ${currentYear}</strong></p>
+                        <p>There are no on-call services for this week.</p>
+                    </div>
+                `;
+                return;
+            }
 
-            document.getElementById('totalEmployees').textContent = allSubmissions.length;
-            document.getElementById('submittedCount').textContent = submitted.length;
-            document.getElementById('pendingCount').textContent = pending.length;
+            // Calculate totals
+            let totalEmployees = data.submissions.length;
+            let submittedCount = 0;
+            let totalMiles = 0;
+            let totalAmount = 0;
 
+            data.submissions.forEach(emp => {
+                if (emp.isSubmitted) {
+                    submittedCount++;
+                    totalMiles += emp.totalReimbursableMiles;
+                    totalAmount += emp.reimbursementAmount;
+                }
+            });
+
+            // Update stats
+            document.getElementById('totalEmployees').textContent = totalEmployees;
+            document.getElementById('submittedReports').textContent = submittedCount;
+            document.getElementById('totalMiles').textContent = totalMiles.toFixed(1);
+            document.getElementById('totalAmount').textContent = '$' + totalAmount.toFixed(2);
+            document.getElementById('statsSection').style.display = 'block';
+
+            // Build table
             let html = `
-            <table class="review-table">
-                <thead>
-                    <tr>
-                        <th>Employee</th>
-                        <th>ID</th>
-                        <th>Status</th>
-                        <th class="text-right">Total Services</th>
-                        <th class="text-right">Original Miles</th>
-                        <th class="text-right">Adjusted Miles</th>
-                        <th class="text-right">Reimbursement</th>
-                    </tr>
-                </thead>
-                <tbody>`;
+                <table class="review-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;"></th>
+                            <th>Employee ID</th>
+                            <th>Name</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-right">Total Services</th>
+                            <th class="text-right">Reimbursable Miles</th>
+                            <th class="text-right">Reimbursement</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
 
-            allSubmissions.forEach((emp, index) => {
+            data.submissions.forEach((emp, index) => {
                 const statusClass = emp.isSubmitted ? 'status-submitted' : 'status-pending';
-                const statusText = emp.isSubmitted ? 'Submitted' : 'Not Submitted';
-
+                const statusText = emp.isSubmitted ? 'Submitted' : 'Pending';
+                
                 html += `
                     <tr onclick="toggleDetails(${index})">
                         <td>
                             <span class="expand-icon" id="icon_${index}">+</span>
-                            ${emp.employeeName}
                         </td>
-                        <td>${emp.employeeId}</td>
-                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                        <td class="text-right">${emp.totalServices}</td>
-                        <td class="text-right">${emp.originalMileage.toFixed(1)} mi</td>
-                        <td class="text-right" style="color: ${emp.adjustedMileage !== emp.originalMileage ? '#F57600' : '#1A365C'}; font-weight: 600;">
-                            ${emp.adjustedMileage.toFixed(1)} mi
+                        <td class="employee-id">${emp.employeeId}</td>
+                        <td>${emp.lastName}, ${emp.firstName}</td>
+                        <td class="text-center">
+                            <span class="status-badge ${statusClass}">${statusText}</span>
                         </td>
-                        <td class="text-right" style="font-weight: 700; color: #62B790;">
-                            $${emp.reimbursementAmount.toFixed(2)}
-                        </td>
+                        <td class="text-right">${emp.serviceCount}</td>
+                        <td class="text-right">${emp.totalReimbursableMiles.toFixed(1)} mi</td>
+                        <td class="text-right">$${emp.reimbursementAmount.toFixed(2)}</td>
                     </tr>
                     <tr class="detail-row" id="detail_${index}">
-                        <td colspan="7">
+                        <td colspan="7" class="detail-cell">
                             <div class="detail-content">
-                                <h4 style="color: #1A365C; margin-bottom: 15px;">Service Details for ${emp.employeeName}</h4>
-                                <div class="table-container">
-                                    ${generateServiceDetails(emp)}
-                                </div>
+                                ${generateServiceDetails(emp)}
                             </div>
                         </td>
-                    </tr>`;
+                    </tr>
+                `;
             });
 
             html += `
-                </tbody>
-            </table>`;
+                    </tbody>
+                </table>
+            `;
 
-            document.getElementById('submissionsList').innerHTML = html;
+            document.getElementById('reportsTable').innerHTML = html;
 
-            if (allSubmissions.length > 0) {
-                generateTextPreview(allSubmissions, submitted.length, pending.length, allSubmissions.length);
+            // Generate text preview - include ALL employees (submitted and not submitted)
+            const submittedReports = data.submissions.filter(emp => emp.isSubmitted);
+            const pendingReports = data.submissions.filter(emp => !emp.isSubmitted);
+            
+            // Always show export section if there are any employees
+            if (data.submissions.length > 0) {
+                generateTextPreview(data.submissions, submittedReports.length, pendingReports.length, totalEmployees);
                 document.getElementById('exportSection').style.display = 'block';
             }
         }
@@ -714,6 +783,7 @@
                 const adjustedMileage = service.Adjusted_Mileage ? parseFloat(service.Adjusted_Mileage) : null;
                 const reason = service.Adjustment_Reason || '';
                 
+                // Only count non-commute in totals
                 if (!isCommute) {
                     originalTotal += originalMileage;
                     adjustedTotal += (adjustedMileage !== null ? adjustedMileage : originalMileage);
@@ -777,6 +847,7 @@
         function generateTextPreview(allSubmissions, submittedCount, pendingCount, totalCount) {
             let text = '';
             
+            // Add header with counts
             text += `ALICE CARE MILEAGE REIMBURSEMENT\n`;
             text += `Week ${currentWeek}, ${currentYear}\n`;
             text += `Generated: ${new Date().toLocaleDateString('en-US', { 
@@ -793,16 +864,20 @@
             text += `Not Submitted: ${pendingCount}\n`;
             text += `\n`;
             
+            // Separate submitted and not submitted
             const submitted = allSubmissions.filter(emp => emp.isSubmitted);
             const notSubmitted = allSubmissions.filter(emp => !emp.isSubmitted);
             
+            // SUBMITTED EMPLOYEES SECTION
             if (submitted.length > 0) {
                 text += `SUBMITTED - REIMBURSEMENT DATA:\n`;
                 text += `---\n`;
                 
+                // Sort by employee ID
                 const sortedSubmitted = [...submitted].sort((a, b) => a.employeeId.localeCompare(b.employeeId));
                 
                 sortedSubmitted.forEach(emp => {
+                    // Format: EMPLOYEE_ID,MLE,AMOUNT,,,,,
                     const employeeId = emp.employeeId.padStart(4, '0');
                     const amount = emp.reimbursementAmount.toFixed(2);
                     text += `${employeeId},MLE,${amount},,,,,\n`;
@@ -813,13 +888,16 @@
                 text += `\n`;
             }
             
+            // NOT SUBMITTED EMPLOYEES SECTION
             if (notSubmitted.length > 0) {
                 text += `NOT SUBMITTED - PENDING:\n`;
                 text += `---\n`;
                 
+                // Sort by employee ID
                 const sortedNotSubmitted = [...notSubmitted].sort((a, b) => a.employeeId.localeCompare(b.employeeId));
                 
                 sortedNotSubmitted.forEach(emp => {
+                    // Format: EMPLOYEE_ID,MLE,AMOUNT,,,,,
                     const employeeId = emp.employeeId.padStart(4, '0');
                     const amount = emp.reimbursementAmount.toFixed(2);
                     text += `${employeeId},MLE,${amount},,,,,\n`;
@@ -830,6 +908,7 @@
                 text += `\n`;
             }
             
+            // Add footer
             text += `END OF REPORT\n`;
             text += `Total Records: ${allSubmissions.length}\n`;
 
@@ -845,6 +924,7 @@
             const text = document.getElementById('textPreview').textContent;
             const filename = `mileage_week${currentWeek}_${currentYear}.txt`;
 
+            // Create blob and download
             const blob = new Blob([text], { type: 'text/plain' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -869,17 +949,21 @@
         }
         
         function formatTime(timeValue) {
+            // Handle Google Sheets time format
             if (!timeValue) return '';
             
             try {
+                // If it's already a string in HH:MM format, return it
                 if (typeof timeValue === 'string' && /^\d{1,2}:\d{2}/.test(timeValue)) {
                     return timeValue;
                 }
                 
+                // Convert to Date object
                 let date;
                 if (typeof timeValue === 'string') {
                     date = new Date(timeValue);
                 } else if (typeof timeValue === 'number') {
+                    // Google Sheets serial time (fraction of a day)
                     const hours = Math.floor(timeValue * 24);
                     const minutes = Math.floor((timeValue * 24 * 60) % 60);
                     return String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0');
@@ -889,6 +973,7 @@
                     return String(timeValue);
                 }
                 
+                // Extract time in HH:MM format
                 const hours = date.getHours();
                 const minutes = date.getMinutes();
                 return String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0');
@@ -899,6 +984,7 @@
             }
         }
 
+        // Set current year as default
         document.getElementById('year').value = new Date().getFullYear();
     </script>
 </body>
