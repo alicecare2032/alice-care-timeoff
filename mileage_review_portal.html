@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - Mileage Review Portal v3.7</title>
+    <title>Alice Care - Mileage Review Portal v3.7.2</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -485,9 +485,10 @@
                 <div class="export-section">
                     <h3>Export Text File (Submitted Reports Only)</h3>
                     <div class="notice-box">
-                        <p><strong>Format:</strong> Each line will be formatted as: EMPLOYEE_ID,MLE,AMOUNT,,,,,</p>
+                        <p><strong>Format:</strong> Each data line will be formatted as: EMPLOYEE_ID,MLE,AMOUNT,,,,,</p>
                         <p><strong>Rate:</strong> $0.70 per mile (federal reimbursement rate)</p>
-                        <p><strong>Note:</strong> Only employees with SUBMITTED reports will be included in the export.</p>
+                        <p><strong>Includes:</strong> Header with summary (Total Employees, Submitted, Not Submitted) and footer with record count</p>
+                        <p><strong>Note:</strong> Only employees with SUBMITTED reports will be included in the data section.</p>
                     </div>
                     <div class="text-preview" id="textPreview"></div>
                     <button class="btn btn-success" onclick="downloadTextFile()">
@@ -651,8 +652,10 @@
 
             // Generate text preview (only submitted reports)
             const submittedReports = data.submissions.filter(emp => emp.isSubmitted);
+            const pendingReports = data.submissions.filter(emp => !emp.isSubmitted);
+            
             if (submittedReports.length > 0) {
-                generateTextPreview(submittedReports);
+                generateTextPreview(submittedReports, submittedReports.length, pendingReports.length, totalEmployees);
                 document.getElementById('exportSection').style.display = 'block';
             }
         }
@@ -745,8 +748,27 @@
             }
         }
 
-        function generateTextPreview(submissions) {
+        function generateTextPreview(submissions, submittedCount, pendingCount, totalCount) {
             let text = '';
+            
+            // Add header with counts
+            text += `ALICE CARE MILEAGE REIMBURSEMENT\n`;
+            text += `Week ${currentWeek}, ${currentYear}\n`;
+            text += `Generated: ${new Date().toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })}\n`;
+            text += `\n`;
+            text += `SUMMARY:\n`;
+            text += `Total Employees: ${totalCount}\n`;
+            text += `Submitted: ${submittedCount}\n`;
+            text += `Not Submitted: ${pendingCount}\n`;
+            text += `\n`;
+            text += `REIMBURSEMENT DATA:\n`;
+            text += `---\n`;
             
             // Sort by employee ID
             const sorted = [...submissions].sort((a, b) => a.employeeId.localeCompare(b.employeeId));
@@ -757,6 +779,11 @@
                 const amount = emp.reimbursementAmount.toFixed(2);
                 text += `${employeeId},MLE,${amount},,,,,\n`;
             });
+            
+            // Add footer
+            text += `---\n`;
+            text += `END OF REPORT\n`;
+            text += `Total Records: ${sorted.length}\n`;
 
             document.getElementById('textPreview').textContent = text;
         }
