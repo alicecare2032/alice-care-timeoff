@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Care - Mileage v3.4</title>
+    <title>Alice Care - Mileage v3.5</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -354,7 +354,7 @@
 <body>
     <div class="nav-bar">
         <div class="logo">
-            <span class="alice">Alice</span><span class="dot">.</span><span class="care">care</span>
+            <span class="alice">Alice</span><span class="dot">.</span><span class="care">Care</span>
         </div>
     </div>
 
@@ -563,7 +563,6 @@
                         <th style="padding: 12px; text-align: right; font-weight: 600; font-size: 13px;">Original Miles</th>
                         <th style="padding: 12px; text-align: center; font-weight: 600; font-size: 13px;">Adjusted Miles</th>
                         <th style="padding: 12px; text-align: left; font-weight: 600; font-size: 13px;">Reason</th>
-                        <th style="padding: 12px; text-align: center; font-weight: 600; font-size: 13px;">Reference</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -582,7 +581,6 @@
                 const originalMileage = parseFloat(service.Mileage);
                 const adjustedMileage = service.Adjusted_Mileage ? parseFloat(service.Adjusted_Mileage) : null;
                 const adjustmentReason = service.Adjustment_Reason || '';
-                const hasFile = service.Has_Reference_File || '';
                 
                 servicesHtml += `
                     <tr style="background: ${bgColor}; border-bottom: 1px solid #E5ECF3; ${isCommute ? 'opacity: 0.7;' : ''}">
@@ -613,23 +611,9 @@
                             <input type="text" 
                                    id="reason_${i}" 
                                    value="${adjustmentReason}"
-                                   placeholder="${isCommute ? 'N/A' : 'Optional'}"
+                                   placeholder="${isCommute ? 'N/A' : 'Required if adjusted'}"
                                    ${isDisabled ? 'disabled' : ''}
                                    style="width: 100%; padding: 6px 8px; border: 2px solid #D3D7DF; border-radius: 6px; font-size: 13px; font-family: 'Poppins', sans-serif; background: ${isCommute ? '#F3F4F6' : 'white'};">
-                        </td>
-                        <td style="padding: 8px; text-align: center;">
-                            ${isCommute ? '<span style="color: #9CA3AF; font-size: 12px; font-style: italic;">N/A</span>' : `
-                            <label for="file_${i}" style="cursor: ${isDisabled ? 'not-allowed' : 'pointer'}; display: inline-block; padding: 6px 12px; background: ${hasFile === 'Yes' ? '#D4F4E2' : '#E5ECF3'}; border: 2px solid ${hasFile === 'Yes' ? '#62B790' : '#D3D7DF'}; border-radius: 6px; font-size: 12px; color: #1A365C; font-weight: 500; transition: all 0.3s;">
-                                ${hasFile === 'Yes' ? '✓ File' : '📎 File'}
-                            </label>
-                            <input type="file" 
-                                   id="file_${i}" 
-                                   accept=".pdf,.jpg,.jpeg,.png" 
-                                   onchange="handleFileSelect(${i}, this)"
-                                   ${isDisabled ? 'disabled' : ''}
-                                   style="display: none;">
-                            <div id="filename_${i}" style="font-size: 10px; color: #3D3D3D; margin-top: 4px;"></div>
-                            `}
                         </td>
                     </tr>
                 `;
@@ -649,7 +633,7 @@
                         <td style="padding: 12px; font-weight: 700; font-size: 16px; color: #F57600; text-align: center;">
                             ${adjustedTotal.toFixed(1)} mi
                         </td>
-                        <td colspan="2" style="padding: 12px; font-size: 12px; color: #3D3D3D; text-align: center;">
+                        <td style="padding: 12px; font-size: 12px; color: #3D3D3D; text-align: center;">
                             ${reimbursableServices} reimbursable service${reimbursableServices !== 1 ? 's' : ''}
                             ${commuteServices > 0 ? '<br><span style="color: #9CA3AF; font-size: 11px;">(' + commuteServices + ' commute excluded)</span>' : ''}
                         </td>
@@ -718,18 +702,6 @@
             }
         }
 
-        function handleFileSelect(index, input) {
-            if (input.files && input.files[0]) {
-                const file = input.files[0];
-                document.getElementById('filename_' + index).textContent = file.name;
-                
-                if (!adjustments[index]) {
-                    adjustments[index] = {};
-                }
-                adjustments[index].file = file;
-            }
-        }
-
         function approveReport() {
             if (!currentReport) {
                 alert('No report loaded');
@@ -744,6 +716,32 @@
             const lastName = document.getElementById('lastName').value.trim();
             const weekNumber = document.getElementById('weekNumber').value.trim();
             const year = document.getElementById('year').value.trim();
+
+            // Validate: If adjustment made, reason must be provided
+            for (let i = 0; i < currentReport.services.length; i++) {
+                const service = currentReport.services[i];
+                const isCommute = service.isCommute === true;
+                
+                // Skip commute services
+                if (isCommute) {
+                    continue;
+                }
+                
+                const adj = adjustments[i] || {};
+                const reason = document.getElementById('reason_' + i).value.trim();
+                const originalMileage = parseFloat(service.Mileage);
+                const adjustedMileage = adj.adjustedMileage;
+                
+                // Check if adjustment was made (adjusted value differs from original)
+                if (adjustedMileage && Math.abs(adjustedMileage - originalMileage) > 0.01) {
+                    if (!reason) {
+                        alert('Please provide a reason for the mileage adjustment on ' + formatDate(service.Scheduled_Date) + ' at ' + formatTime(service.Scheduled_Time) + ' (' + service.Service_Recipient_First_Name + ')');
+                        document.getElementById('reason_' + i).focus();
+                        document.getElementById('reason_' + i).style.border = '2px solid #FF7475';
+                        return;
+                    }
+                }
+            }
 
             // Prepare adjustment data (only for non-commute services)
             const adjustmentData = [];
@@ -764,8 +762,7 @@
                     scheduledTime: service.Scheduled_Time,
                     originalMileage: service.Mileage,
                     adjustedMileage: adj.adjustedMileage || service.Mileage,
-                    adjustmentReason: reason,
-                    hasFile: !!adj.file
+                    adjustmentReason: reason
                 });
             }
 
