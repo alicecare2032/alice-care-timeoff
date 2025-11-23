@@ -55,7 +55,7 @@
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 900px;
             margin: 0 auto;
             background: white;
             border-radius: 12px;
@@ -571,198 +571,6 @@
         .badge-rejected {
             background: #FFE3E3;
             color: #FF7475;
-        }
-        
-        /* Table Styles for My Requests */
-        .requests-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-            background: white;
-        }
-        
-        .requests-table thead {
-            background: #1A365C;
-            color: white;
-        }
-        
-        .requests-table th {
-            padding: 12px 10px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 12px;
-            white-space: nowrap;
-        }
-        
-        .requests-table td {
-            padding: 12px 10px;
-            border-bottom: 1px solid #E5ECF3;
-            vertical-align: top;
-        }
-        
-        .requests-table tbody tr:hover {
-            background: #F9FAFB;
-        }
-        
-        .requests-table tbody tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .expand-btn {
-            background: #F57600;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: 'Poppins', sans-serif;
-            transition: all 0.3s;
-        }
-        
-        .expand-btn:hover {
-            background: #D66600;
-        }
-        
-        .expand-btn.expanded {
-            background: #1A365C;
-        }
-        
-        .expand-btn.expanded:hover {
-            background: #0F2340;
-        }
-        
-        .services-details-content {
-            margin-top: 10px;
-            padding: 10px;
-            background: white;
-            border-radius: 6px;
-            border: 1px solid #E5ECF3;
-        }
-        
-        /* Modal Overlay for Service Details */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(26, 54, 92, 0.8);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        .modal-overlay.active {
-            display: flex;
-        }
-        
-        .modal-content {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            max-width: 800px;
-            width: 100%;
-            max-height: 80vh;
-            overflow-y: auto;
-            position: relative;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #E5ECF3;
-        }
-        
-        .modal-header h3 {
-            color: #1A365C;
-            font-size: 20px;
-            font-weight: 600;
-            margin: 0;
-        }
-        
-        .modal-close {
-            background: #FF7475;
-            color: white;
-            border: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            font-size: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-        
-        .modal-close:hover {
-            background: #E55A5B;
-            transform: rotate(90deg);
-        }
-        
-        .modal-service-item {
-            background: #F9FAFB;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            border-left: 4px solid #F57600;
-        }
-        
-        .modal-service-item:last-child {
-            margin-bottom: 0;
-        }
-        
-        .modal-service-item h4 {
-            color: #1A365C;
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-        
-        .modal-service-details {
-            display: flex;
-            gap: 30px;
-            font-size: 14px;
-            color: #3D3D3D;
-        }
-        
-        .modal-service-details > div {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .modal-service-details label {
-            font-weight: 500;
-            color: #1A365C;
-            margin-bottom: 4px;
-            font-size: 12px;
-        }
-        
-        .modal-service-details .value {
-            font-weight: 600;
-            color: #1A365C;
-        }
-        
-        .modal-total {
-            background: #1A365C;
-            color: white;
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
-            font-size: 16px;
         }
         
         .review-section {
@@ -1448,51 +1256,6 @@
             });
         }
         
-        function toggleServices(index) {
-            var request = myRequests[index];
-            var modal = document.getElementById('servicesModal');
-            var modalBody = document.getElementById('modalServicesBody');
-            var modalDate = document.getElementById('modalRequestDate');
-            
-            // Set the date header
-            var date = new Date(request.requestDate).toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric',
-                weekday: 'long'
-            });
-            modalDate.textContent = date;
-            
-            // Build services list
-            var html = '';
-            var totalHours = 0;
-            for (var s = 0; s < request.services.length; s++) {
-                var service = request.services[s];
-                totalHours += parseFloat(service.hoursMissed);
-                html += '<div class="modal-service-item">' +
-                    '<h4>Service ' + (s + 1) + '</h4>' +
-                    '<div class="modal-service-details">' +
-                    '<div><label>Client Name</label><div class="value">' + service.client + '</div></div>' +
-                    '<div><label>Start Time</label><div class="value">' + service.startTime + '</div></div>' +
-                    '<div><label>Hours Missed</label><div class="value">' + service.hoursMissed + ' hours</div></div>' +
-                    '</div>' +
-                    '</div>';
-            }
-            
-            html += '<div class="modal-total"><span>Total Hours for the Day</span><span>' + totalHours.toFixed(2) + ' hours</span></div>';
-            
-            modalBody.innerHTML = html;
-            modal.classList.add('active');
-        }
-        
-        function closeServicesModal() {
-            var modal = document.getElementById('servicesModal');
-            modal.classList.remove('active');
-        }
-        
-        // Store myRequests globally so toggleServices can access it
-        var myRequests = [];
-        
         function filterMyRequests() {
             var employeeId = document.getElementById('myEmployeeIdFilter').value.trim();
             var employeeEmail = document.getElementById('myEmployeeEmailFilter').value.trim().toLowerCase();
@@ -1513,7 +1276,7 @@
                 return;
             }
             
-            myRequests = [];
+            var myRequests = [];
             for (var i = 0; i < requests.length; i++) {
                 // More robust comparison - trim and lowercase both values
                 var storedId = String(requests[i].employeeId || '').trim();
@@ -1551,24 +1314,12 @@
             document.getElementById('myVacationRequests').textContent = vacCount;
             document.getElementById('mySickRequests').textContent = sickCount;
             
-            var html = '<table class="requests-table"><thead><tr>' +
-                '<th>Status</th>' +
-                '<th>Request Date</th>' +
-                '<th>Type</th>' +
-                '<th>Services</th>' +
-                '<th>Total Hours</th>' +
-                '<th>Services Details</th>' +
-                '<th>Review Status</th>' +
-                '<th>Approval Status</th>' +
-                '<th>Approved Hours</th>' +
-                '<th>Submitted</th>' +
-                '</tr></thead><tbody>';
-            
+            var html = '';
             for (var r = 0; r < myRequests.length; r++) {
                 var request = myRequests[r];
                 var date = new Date(request.requestDate).toLocaleDateString('en-US', { 
                     year: 'numeric', 
-                    month: 'short', 
+                    month: 'long', 
                     day: 'numeric' 
                 });
                 var submittedDate = new Date(request.submittedDate).toLocaleDateString('en-US', { 
@@ -1584,55 +1335,82 @@
                     totalHours += parseFloat(request.services[s].hoursMissed);
                 }
                 
-                // Status Badge
-                var statusBadge = '';
+                // Status Badges
+                var statusBadges = '<div class="request-badges">';
                 if (request.rejectionStatus === 'rejected') {
-                    statusBadge = '<span class="badge badge-rejected">NOT_ELIGIBLE</span>';
+                    statusBadges += '<span class="badge badge-rejected">NOT_ELIGIBLE</span>';
                 } else if (request.approvalStatus === 'approved') {
-                    statusBadge = '<span class="badge badge-approved">APPROVED</span>';
+                    statusBadges += '<span class="badge badge-approved">APPROVED</span>';
                 } else if (request.reviewStatus === 'reviewed') {
-                    statusBadge = '<span class="badge badge-reviewed">REVIEWED</span>';
+                    statusBadges += '<span class="badge badge-reviewed">REVIEWED</span>';
                 } else {
-                    statusBadge = '<span class="badge badge-pending">PENDING</span>';
+                    statusBadges += '<span class="badge badge-pending">PENDING REVIEW</span>';
+                }
+                statusBadges += '</div>';
+                
+                var servicesHtml = '';
+                for (var s = 0; s < request.services.length; s++) {
+                    var service = request.services[s];
+                    servicesHtml += '<div class="service-item"><div class="service-main"><strong>Service ' + (s + 1) + ':</strong> ' + service.client + '</div><div class="service-details"><span>Start: ' + service.startTime + '</span><span>Hours: ' + service.hoursMissed + '</span></div></div>';
                 }
                 
-                // Review Status
-                var reviewStatus = request.reviewStatus === 'reviewed' ? 
-                    '<span style="color: #62B790;">✓ Reviewed</span>' : 
-                    '<span style="color: #999;">Pending</span>';
+                // Review Status Section - Simplified
+                var reviewStatusHtml = '<div class="review-section"><h4>Request Status</h4><div class="review-status">';
                 
-                // Approval Status
-                var approvalStatus = '';
+                // Review Box - Only show status
+                if (request.reviewStatus === 'reviewed') {
+                    reviewStatusHtml += '<div class="status-box reviewed">' +
+                        '<h5>Review Status</h5>' +
+                        '<div class="value">✓ Reviewed</div>' +
+                        '</div>';
+                } else {
+                    reviewStatusHtml += '<div class="status-box">' +
+                        '<h5>Review Status</h5>' +
+                        '<div class="value">Pending</div>' +
+                        '</div>';
+                }
+                
+                // Approval Box - Only show status and approved hours
                 if (request.rejectionStatus === 'rejected') {
-                    approvalStatus = '<span style="color: #FF7475;">✗ Not Eligible</span>';
+                    reviewStatusHtml += '<div class="status-box rejected">' +
+                        '<h5>Approval Status</h5>' +
+                        '<div class="value" style="color: #FF7475;">✗ Not Eligible</div>' +
+                        '</div>';
                 } else if (request.approvalStatus === 'approved') {
-                    approvalStatus = '<span style="color: #62B790;">✓ Approved</span>';
+                    reviewStatusHtml += '<div class="status-box approved">' +
+                        '<h5>Approval Status</h5>' +
+                        '<div class="value" style="color: #62B790;">✓ Approved</div>' +
+                        '<div style="font-size: 14px; color: #1A365C; margin-top: 10px; font-weight: 600;">Approved Hours: ' + (request.approvedHours || '0.00') + '</div>' +
+                        '</div>';
                 } else {
-                    approvalStatus = '<span style="color: #999;">Pending</span>';
+                    reviewStatusHtml += '<div class="status-box">' +
+                        '<h5>Approval Status</h5>' +
+                        '<div class="value">Pending</div>' +
+                        '</div>';
                 }
                 
-                // Approved Hours
-                var approvedHours = (request.approvalStatus === 'approved' && request.approvedHours) ? 
-                    request.approvedHours : '-';
+                reviewStatusHtml += '</div></div>';
                 
-                // Request Type
-                var requestType = request.requestType === 'vacation' ? 'Vacation' : 'Sick';
-                
-                html += '<tr>' +
-                    '<td>' + statusBadge + '</td>' +
-                    '<td>' + date + '</td>' +
-                    '<td>' + requestType + '</td>' +
-                    '<td style="text-align: center;">' + request.services.length + '</td>' +
-                    '<td style="text-align: center;"><strong>' + totalHours.toFixed(2) + '</strong></td>' +
-                    '<td><button class="expand-btn" onclick="toggleServices(' + r + ')">📋 View Details</button></td>' +
-                    '<td>' + reviewStatus + '</td>' +
-                    '<td>' + approvalStatus + '</td>' +
-                    '<td style="text-align: center;"><strong>' + approvedHours + '</strong></td>' +
-                    '<td style="font-size: 12px;">' + submittedDate + '</td>' +
-                    '</tr>';
+                html += '<div class="request-card">' +
+                    '<div class="request-header">' +
+                    '<div><div class="request-id">' + request.requestId + '</div></div>' +
+                    statusBadges +
+                    '</div>' +
+                    '<div class="request-info">' +
+                    '<div class="info-item"><div class="info-label">Request Date</div><div class="info-value">' + date + '</div></div>' +
+                    '<div class="info-item"><div class="info-label">Total Services</div><div class="info-value">' + request.services.length + '</div></div>' +
+                    '<div class="info-item"><div class="info-label">Total Hours</div><div class="info-value">' + totalHours.toFixed(2) + ' hrs</div></div>' +
+                     '<div class="info-item"><div class="info-label">Submitted</div><div class="info-value">' + submittedDate + '</div></div>' +
+                    '</div>' +
+                    '<div class="services-list">' +
+                    '<h4>Services Missed (' + request.services.length + ')</h4>' +
+                    servicesHtml +
+                    '<div class="services-total"><span>Total Hours for the Day</span><span>' + totalHours.toFixed(2) + ' hours</span></div>' +
+                    '</div>' +
+                    reviewStatusHtml +
+                    '</div>';
             }
             
-            html += '</tbody></table>';
             myRequestsList.innerHTML = html;
         }
         
@@ -1681,18 +1459,5 @@
             updateStats();
         }
     </script>
-    
-    <!-- Modal for Service Details -->
-    <div id="servicesModal" class="modal-overlay" onclick="if(event.target === this) closeServicesModal()">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Services Missed on <span id="modalRequestDate"></span></h3>
-                <button class="modal-close" onclick="closeServicesModal()">&times;</button>
-            </div>
-            <div id="modalServicesBody">
-                <!-- Services will be populated here -->
-            </div>
-        </div>
-    </div>
 </body>
 </html>
