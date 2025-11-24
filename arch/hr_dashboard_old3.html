@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>alice.care - HR Dashboard v.45</title>
+    <title>alice.care - HR Dashboard v.44</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -258,31 +258,6 @@
         
         .requests-table thead th:last-child {
             border-radius: 0 8px 8px 0;
-        }
-        
-        .requests-table thead th.sortable {
-            cursor: pointer;
-            user-select: none;
-            position: relative;
-            padding-right: 25px;
-        }
-        
-        .requests-table thead th.sortable:hover {
-            background: #2d4a73;
-        }
-        
-        .requests-table thead th .sort-icon {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 12px;
-            opacity: 0.5;
-        }
-        
-        .requests-table thead th.sort-asc .sort-icon,
-        .requests-table thead th.sort-desc .sort-icon {
-            opacity: 1;
         }
         
         .requests-table tbody tr {
@@ -806,13 +781,13 @@
             <table class="requests-table">
                 <thead>
                     <tr>
-                        <th class="sortable" onclick="sortTable('employeeName')" id="th-employeeName">Employee <span class="sort-icon">⇅</span></th>
-                        <th class="sortable" onclick="sortTable('employeeId')" id="th-employeeId">Employee ID <span class="sort-icon">⇅</span></th>
-                        <th class="sortable" onclick="sortTable('requestType')" id="th-requestType">Type <span class="sort-icon">⇅</span></th>
-                        <th class="sortable" onclick="sortTable('status')" id="th-status">Status <span class="sort-icon">⇅</span></th>
-                        <th class="sortable" onclick="sortTable('weekYear')" id="th-weekYear">Week <span class="sort-icon">⇅</span></th>
-                        <th class="sortable" onclick="sortTable('totalHours')" id="th-totalHours">Total Hours <span class="sort-icon">⇅</span></th>
-                        <th class="sortable" onclick="sortTable('approvedHours')" id="th-approvedHours">Approved Hours <span class="sort-icon">⇅</span></th>
+                        <th>Employee</th>
+                        <th>Employee ID</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Week</th>
+                        <th>Total Hours</th>
+                        <th>Approved Hours</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -917,8 +892,6 @@
         var filteredRequests = [];
         var currentRequestId = null;
         var currentRequestForDetail = null;
-        var currentSortColumn = null;
-        var currentSortDirection = 'asc';
         
         window.onload = function() {
             loadRequests();
@@ -999,85 +972,6 @@
             }
             
             requestsTableBody.innerHTML = html;
-        }
-        
-        function sortTable(column) {
-            // If clicking the same column, toggle direction
-            if (currentSortColumn === column) {
-                currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
-            } else {
-                currentSortColumn = column;
-                currentSortDirection = 'asc';
-            }
-            
-            // Update header styles
-            var headers = document.querySelectorAll('.requests-table thead th.sortable');
-            headers.forEach(function(th) {
-                th.classList.remove('sort-asc', 'sort-desc');
-                th.querySelector('.sort-icon').textContent = '⇅';
-            });
-            
-            var activeHeader = document.getElementById('th-' + column);
-            if (activeHeader) {
-                activeHeader.classList.add('sort-' + currentSortDirection);
-                activeHeader.querySelector('.sort-icon').textContent = currentSortDirection === 'asc' ? '↑' : '↓';
-            }
-            
-            // Sort the filteredRequests array
-            filteredRequests.sort(function(a, b) {
-                var valA, valB;
-                
-                // Handle special columns
-                if (column === 'employeeName') {
-                    valA = (a.employeeName + ' ' + a.employeeLastName).toLowerCase();
-                    valB = (b.employeeName + ' ' + b.employeeLastName).toLowerCase();
-                } else if (column === 'status') {
-                    // Custom order for status
-                    var statusOrder = { 'pending': 1, 'reviewed': 2, 'approved': 3, 'rejected': 4 };
-                    valA = getStatusValue(a);
-                    valB = getStatusValue(b);
-                    valA = statusOrder[valA] || 0;
-                    valB = statusOrder[valB] || 0;
-                } else if (column === 'totalHours') {
-                    valA = a.totalHours || 0;
-                    valB = b.totalHours || 0;
-                } else if (column === 'approvedHours') {
-                    valA = parseFloat(a.approvedHours) || 0;
-                    valB = parseFloat(b.approvedHours) || 0;
-                } else if (column === 'weekYear') {
-                    // Parse week-year format (e.g., "47-2024")
-                    valA = parseWeekYear(a.weekYear);
-                    valB = parseWeekYear(b.weekYear);
-                } else {
-                    valA = (a[column] || '').toString().toLowerCase();
-                    valB = (b[column] || '').toString().toLowerCase();
-                }
-                
-                // Compare values
-                if (valA < valB) return currentSortDirection === 'asc' ? -1 : 1;
-                if (valA > valB) return currentSortDirection === 'asc' ? 1 : -1;
-                return 0;
-            });
-            
-            displayRequests();
-        }
-        
-        function getStatusValue(req) {
-            if (req.rejectionStatus === 'rejected') return 'rejected';
-            if (req.approvalStatus === 'approved') return 'approved';
-            if (req.reviewStatus === 'reviewed') return 'reviewed';
-            return 'pending';
-        }
-        
-        function parseWeekYear(weekYear) {
-            if (!weekYear) return 0;
-            var parts = weekYear.split('-');
-            if (parts.length === 2) {
-                var week = parseInt(parts[0]) || 0;
-                var year = parseInt(parts[1]) || 0;
-                return year * 100 + week; // e.g., 2024-47 becomes 202447
-            }
-            return 0;
         }
         
         function openDetailModal(requestId) {
@@ -1335,15 +1229,6 @@
             document.getElementById('filterWeek').value = '';
             document.getElementById('filterType').value = '';
             document.getElementById('filterStatus').value = '';
-            
-            // Reset sort state
-            currentSortColumn = null;
-            currentSortDirection = 'asc';
-            var headers = document.querySelectorAll('.requests-table thead th.sortable');
-            headers.forEach(function(th) {
-                th.classList.remove('sort-asc', 'sort-desc');
-                th.querySelector('.sort-icon').textContent = '⇅';
-            });
             
             filteredRequests = requests;
             displayRequests();
