@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>alice.care - HR Dashboard v.41</title>
+    <title>alice.care - HR Dashboard v.43</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -781,7 +781,6 @@
             <table class="requests-table">
                 <thead>
                     <tr>
-                        <th>Request ID</th>
                         <th>Employee</th>
                         <th>Employee ID</th>
                         <th>Type</th>
@@ -793,7 +792,7 @@
                 </thead>
                 <tbody id="requestsTableBody">
                     <tr>
-                        <td colspan="8" class="loading">Loading requests</td>
+                        <td colspan="7" class="loading">Loading requests</td>
                     </tr>
                 </tbody>
             </table>
@@ -899,7 +898,7 @@
         
         function loadRequests() {
             var requestsTableBody = document.getElementById('requestsTableBody');
-            requestsTableBody.innerHTML = '<tr><td colspan="8" class="loading">Loading requests</td></tr>';
+            requestsTableBody.innerHTML = '<tr><td colspan="7" class="loading">Loading requests</td></tr>';
             
             fetch(GOOGLE_SCRIPT_URL)
                 .then(function(response) {
@@ -914,16 +913,16 @@
                             displayRequests();
                             updateStats();
                         } else {
-                            requestsTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #FF7475;">Error loading requests: ' + (result.error || 'Unknown error') + '</td></tr>';
+                            requestsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: #FF7475;">Error loading requests: ' + (result.error || 'Unknown error') + '</td></tr>';
                         }
                     } catch (e) {
                         console.error('Parse error:', e);
-                        requestsTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #FF7475;">Error: Unable to load requests. Please check Google Apps Script deployment.</td></tr>';
+                        requestsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: #FF7475;">Error: Unable to load requests. Please check Google Apps Script deployment.</td></tr>';
                     }
                 })
                 .catch(function(error) {
                     console.error('Fetch error:', error);
-                    requestsTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #FF7475;">Network error. Please try again.</td></tr>';
+                    requestsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: #FF7475;">Network error. Please try again.</td></tr>';
                 });
         }
         
@@ -934,7 +933,7 @@
             filterCount.innerHTML = 'Showing <span style="color: #F57600; font-weight: 700;">' + filteredRequests.length + '</span> requests';
             
             if (filteredRequests.length === 0) {
-                requestsTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #3D3D3D;">No requests found</td></tr>';
+                requestsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: #3D3D3D;">No requests found</td></tr>';
                 return;
             }
             
@@ -960,7 +959,6 @@
                 var typeBadge = '<span class="badge badge-' + req.requestType + '">' + req.requestType.toUpperCase() + '</span>';
                 
                 html += '<tr>' +
-                    '<td class="request-id-cell">' + req.requestId + '</td>' +
                     '<td class="employee-name-cell">' + req.employeeName + ' ' + req.employeeLastName + '</td>' +
                     '<td>' + req.employeeId + '</td>' +
                     '<td>' + typeBadge + '</td>' +
@@ -1144,18 +1142,22 @@
         }
         
         function openReviewModalFromDetail() {
+            var requestId = currentRequestForDetail.requestId;
             closeModal('detailModal');
-            openReviewModal(currentRequestForDetail.requestId);
+            openReviewModal(requestId);
         }
         
         function openApprovalModalFromDetail() {
+            var requestId = currentRequestForDetail.requestId;
+            var totalHours = currentRequestForDetail.totalHours;
             closeModal('detailModal');
-            openApprovalModal(currentRequestForDetail.requestId, currentRequestForDetail.totalHours);
+            openApprovalModal(requestId, totalHours);
         }
         
         function openRejectionModalFromDetail() {
+            var requestId = currentRequestForDetail.requestId;
             closeModal('detailModal');
-            openRejectionModal(currentRequestForDetail.requestId);
+            openRejectionModal(requestId);
         }
         
         function updateStats() {
