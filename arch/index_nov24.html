@@ -1556,11 +1556,11 @@
                 '<th>Request Date</th>' +
                 '<th>Type</th>' +
                 '<th>Services</th>' +
+                '<th>Total Hours</th>' +
+                '<th>Services Details</th>' +
                 '<th>Review Status</th>' +
                 '<th>Approval Status</th>' +
-                '<th>Requested Hours</th>' +
                 '<th>Approved Hours</th>' +
-                '<th>Services Details</th>' +
                 '<th>Submitted</th>' +
                 '</tr></thead><tbody>';
             
@@ -1623,11 +1623,11 @@
                     '<td>' + date + '</td>' +
                     '<td>' + requestType + '</td>' +
                     '<td style="text-align: center;">' + request.services.length + '</td>' +
+                    '<td style="text-align: center;"><strong>' + totalHours.toFixed(2) + '</strong></td>' +
+                    '<td><button class="expand-btn" onclick="toggleServices(' + r + ')">📋 View Details</button></td>' +
                     '<td>' + reviewStatus + '</td>' +
                     '<td>' + approvalStatus + '</td>' +
-                    '<td style="text-align: center;"><strong>' + totalHours.toFixed(2) + '</strong></td>' +
                     '<td style="text-align: center;"><strong>' + approvedHours + '</strong></td>' +
-                    '<td><button class="expand-btn" onclick="toggleServices(' + r + ')">📋 View Details</button></td>' +
                     '<td style="font-size: 12px;">' + submittedDate + '</td>' +
                     '</tr>';
             }
