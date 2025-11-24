@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>alice.care - HR Dashboard v.43</title>
+    <title>alice.care - HR Dashboard v.44</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -787,12 +787,13 @@
                         <th>Status</th>
                         <th>Week</th>
                         <th>Total Hours</th>
+                        <th>Approved Hours</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody id="requestsTableBody">
                     <tr>
-                        <td colspan="7" class="loading">Loading requests</td>
+                        <td colspan="8" class="loading">Loading requests</td>
                     </tr>
                 </tbody>
             </table>
@@ -898,7 +899,7 @@
         
         function loadRequests() {
             var requestsTableBody = document.getElementById('requestsTableBody');
-            requestsTableBody.innerHTML = '<tr><td colspan="7" class="loading">Loading requests</td></tr>';
+            requestsTableBody.innerHTML = '<tr><td colspan="8" class="loading">Loading requests</td></tr>';
             
             fetch(GOOGLE_SCRIPT_URL)
                 .then(function(response) {
@@ -913,16 +914,16 @@
                             displayRequests();
                             updateStats();
                         } else {
-                            requestsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: #FF7475;">Error loading requests: ' + (result.error || 'Unknown error') + '</td></tr>';
+                            requestsTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #FF7475;">Error loading requests: ' + (result.error || 'Unknown error') + '</td></tr>';
                         }
                     } catch (e) {
                         console.error('Parse error:', e);
-                        requestsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: #FF7475;">Error: Unable to load requests. Please check Google Apps Script deployment.</td></tr>';
+                        requestsTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #FF7475;">Error: Unable to load requests. Please check Google Apps Script deployment.</td></tr>';
                     }
                 })
                 .catch(function(error) {
                     console.error('Fetch error:', error);
-                    requestsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: #FF7475;">Network error. Please try again.</td></tr>';
+                    requestsTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #FF7475;">Network error. Please try again.</td></tr>';
                 });
         }
         
@@ -933,7 +934,7 @@
             filterCount.innerHTML = 'Showing <span style="color: #F57600; font-weight: 700;">' + filteredRequests.length + '</span> requests';
             
             if (filteredRequests.length === 0) {
-                requestsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: #3D3D3D;">No requests found</td></tr>';
+                requestsTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #3D3D3D;">No requests found</td></tr>';
                 return;
             }
             
@@ -965,6 +966,7 @@
                     '<td>' + statusBadge + '</td>' +
                     '<td>' + (req.weekYear || 'N/A') + '</td>' +
                     '<td class="hours-cell">' + totalHours.toFixed(2) + ' hrs</td>' +
+                    '<td class="hours-cell">' + (req.approvedHours ? parseFloat(req.approvedHours).toFixed(2) : '-') + '</td>' +
                     '<td><button class="btn btn-view-details btn-small" onclick="openDetailModal(\'' + req.requestId + '\')">View Details</button></td>' +
                     '</tr>';
             }
