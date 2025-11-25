@@ -287,24 +287,6 @@
             margin-left: 0;
         }
         
-        .btn-delete {
-            background: #E5ECF3;
-            color: #dc3545;
-            padding: 6px 10px;
-            font-size: 14px;
-            min-width: 36px;
-        }
-        
-        .btn-delete:hover {
-            background: #dc3545;
-            color: white;
-        }
-        
-        .btn-delete.loading {
-            pointer-events: none;
-            opacity: 0.6;
-        }
-        
         .actions-cell {
             white-space: nowrap;
         }
@@ -1271,7 +1253,6 @@
                 html += '<td>' + escapeHtml(c.last_checked || '-') + '</td>';
                 html += '<td class="actions-cell">';
                 html += '<button class="btn btn-refresh" onclick="refreshRecord(' + originalIndex + ')" title="Refresh this record">🔄</button> ';
-                html += '<button class="btn btn-delete" onclick="deleteRecord(\'' + escapeHtml(c.hca_id) + '\', \'' + escapeHtml(c.first_name) + '\', \'' + escapeHtml(c.last_name) + '\')" title="Delete this record">🗑️</button> ';
                 html += '<a href="' + c.registry_link + '" target="_blank" class="btn btn-view">View →</a>';
                 html += '</td>';
                 html += '</tr>';
@@ -1700,126 +1681,6 @@
                 refreshBtn.classList.remove('loading');
                 refreshBtn.innerHTML = '🔄';
             }
-        }
-        
-        // ============================================
-        // DELETE RECORD
-        // ============================================
-        function deleteRecord(hcaId, firstName, lastName) {
-            var fullName = firstName + ' ' + lastName;
-            
-            // Confirm deletion
-            if (!confirm('Are you sure you want to delete this caregiver?\n\n' + fullName + '\nHCA ID: ' + hcaId + '\n\nThis action cannot be undone.')) {
-                return;
-            }
-            
-            var row = document.getElementById('row-' + hcaId);
-            if (row) {
-                row.classList.add('row-updating');
-            }
-            
-            if (GOOGLE_SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL') {
-                // No Google Script configured - delete locally only
-                deleteCaregiverLocally(hcaId);
-                alert('Record deleted locally.\n\nNote: Changes are local only - not saved to Google Sheet.');
-                return;
-            }
-            
-            // Call Google Apps Script to delete from sheet
-            var deleteUrl = GOOGLE_SCRIPT_URL + 
-                '?page=delete' +
-                '&hca=' + encodeURIComponent(hcaId) +
-                '&fname=' + encodeURIComponent(firstName) +
-                '&lname=' + encodeURIComponent(lastName);
-            
-            // Use no-cors mode - we can't read the response but the request will go through
-            fetch(deleteUrl, { mode: 'no-cors' })
-                .then(function() {
-                    // Request sent - now reload data to verify deletion
-                    console.log('Delete request sent, verifying deletion...');
-                    verifyDeletion(hcaId, fullName, row);
-                })
-                .catch(function(error) {
-                    console.error('Delete error:', error);
-                    alert('Error deleting caregiver. Please try again.\n\nError: ' + error.message);
-                    if (row) row.classList.remove('row-updating');
-                });
-        }
-        
-        function verifyDeletion(hcaId, fullName, row) {
-            // Small delay to let the sheet update
-            setTimeout(function() {
-                // Reload data from the API
-                var apiUrl = GOOGLE_SCRIPT_URL + '?page=api';
-                fetch(apiUrl)
-                    .then(function(response) { return response.json(); })
-                    .then(function(data) {
-                        if (data.data) {
-                            // Check if the HCA ID is still in the data
-                            var stillExists = data.data.some(function(c) {
-                                return c.hca_id === hcaId;
-                            });
-                            
-                            if (!stillExists) {
-                                // Successfully deleted
-                                deleteCaregiverLocally(hcaId);
-                                showDeleteSuccess(fullName, hcaId);
-                            } else {
-                                // Still exists - deletion may have failed
-                                alert('Deletion could not be verified. Please refresh and try again.');
-                                if (row) row.classList.remove('row-updating');
-                            }
-                        } else {
-                            // Couldn't verify - assume success and update locally
-                            deleteCaregiverLocally(hcaId);
-                            showDeleteSuccess(fullName, hcaId);
-                        }
-                    })
-                    .catch(function(error) {
-                        console.error('Verification error:', error);
-                        // Assume success and update locally
-                        deleteCaregiverLocally(hcaId);
-                        showDeleteSuccess(fullName, hcaId);
-                    });
-            }, 1000);
-        }
-        
-        function deleteCaregiverLocally(hcaId) {
-            // Remove from allCaregivers
-            var index = allCaregivers.findIndex(function(c) {
-                return c.hca_id === hcaId;
-            });
-            if (index !== -1) {
-                allCaregivers.splice(index, 1);
-            }
-            
-            // Remove from filteredCaregivers
-            var filteredIndex = filteredCaregivers.findIndex(function(c) {
-                return c.hca_id === hcaId;
-            });
-            if (filteredIndex !== -1) {
-                filteredCaregivers.splice(filteredIndex, 1);
-            }
-            
-            // Update UI
-            updateStats();
-            renderTable();
-        }
-        
-        function showDeleteSuccess(fullName, hcaId) {
-            // Brief success notification
-            var notification = document.createElement('div');
-            notification.style.cssText = 'position:fixed;top:20px;right:20px;background:#d4edda;color:#155724;padding:15px 25px;border-radius:8px;box-shadow:0 4px 15px rgba(0,0,0,0.2);z-index:9999;font-family:Poppins,sans-serif;';
-            notification.innerHTML = '✅ <strong>' + fullName + '</strong> deleted successfully';
-            document.body.appendChild(notification);
-            
-            setTimeout(function() {
-                notification.style.transition = 'opacity 0.5s';
-                notification.style.opacity = '0';
-                setTimeout(function() {
-                    document.body.removeChild(notification);
-                }, 500);
-            }, 3000);
         }
         
         function exportCSV() {
