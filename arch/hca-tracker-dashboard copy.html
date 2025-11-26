@@ -1,0 +1,2046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>alice.care - HCA Registry Tracker v.1</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #E5ECF3;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .nav-bar {
+            max-width: 1400px;
+            margin: 0 auto 20px;
+            background: white;
+            padding: 15px 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(26, 54, 92, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .logo .alice {
+            color: #F57600;
+            font-weight: 700;
+        }
+        
+        .logo .dot {
+            color: #F57600;
+            font-weight: 700;
+            margin: 0 -2px;
+        }
+        
+        .logo .care {
+            color: #1A365C;
+            font-weight: 400;
+        }
+        
+        .nav-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .back-link {
+            color: #1A365C;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .back-link:hover {
+            background: #E5ECF3;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(26, 54, 92, 0.15);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #1A365C;
+            color: white;
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-content h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .header-content p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            padding: 20px 30px;
+            background: #E5ECF3;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #F57600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(26, 54, 92, 0.15);
+        }
+        
+        .stat-card.active {
+            border-left-color: #1A365C;
+            background: #f8fafc;
+        }
+        
+        .stat-card h3 {
+            font-size: 12px;
+            color: #3D3D3D;
+            margin-bottom: 8px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .stat-card .number {
+            font-size: 28px;
+            color: #1A365C;
+            font-weight: 700;
+        }
+        
+        .stat-card.registered .number { color: #28a745; }
+        .stat-card.expired .number { color: #dc3545; }
+        .stat-card.warning .number { color: #e6a000; }
+        .stat-card.pending .number { color: #17a2b8; }
+        
+        .filters-section {
+            padding: 25px 30px;
+            background: white;
+            border-bottom: 2px solid #E5ECF3;
+        }
+        
+        .filters-title {
+            font-size: 16px;
+            color: #1A365C;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .filter-group label {
+            font-size: 13px;
+            color: #1A365C;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            padding: 10px 14px;
+            border: 2px solid #D3D7DF;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s;
+        }
+        
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #F57600;
+            box-shadow: 0 0 0 3px rgba(245, 118, 0, 0.1);
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: #F57600;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #e06d00;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #E5ECF3;
+            color: #1A365C;
+        }
+        
+        .btn-secondary:hover {
+            background: #d5dce6;
+        }
+        
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+        
+        .btn-view {
+            background: #1A365C;
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        
+        .btn-view:hover {
+            background: #2d4a73;
+        }
+        
+        .btn-refresh {
+            background: #E5ECF3;
+            color: #1A365C;
+            padding: 6px 10px;
+            font-size: 14px;
+            min-width: 36px;
+        }
+        
+        .btn-refresh:hover {
+            background: #F57600;
+            color: white;
+        }
+        
+        .btn-refresh.loading {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        
+        .btn-refresh.loading::after {
+            content: '';
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #ccc;
+            border-top-color: #1A365C;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 0;
+        }
+        
+        .btn-delete {
+            background: #E5ECF3;
+            color: #dc3545;
+            padding: 6px 10px;
+            font-size: 14px;
+            min-width: 36px;
+        }
+        
+        .btn-delete:hover {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-delete.loading {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        
+        .actions-cell {
+            white-space: nowrap;
+        }
+        
+        .actions-cell .btn {
+            display: inline-flex;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+        
+        .actions-cell .btn:last-child {
+            margin-right: 0;
+        }
+        
+        .row-updating {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .row-updated {
+            animation: highlightRow 1.5s ease-out;
+        }
+        
+        @keyframes highlightRow {
+            0% { background-color: #d4edda; }
+            100% { background-color: #f8fafc; }
+        }
+        
+        .btn-header {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .btn-header:hover {
+            background: rgba(255,255,255,0.25);
+        }
+        
+        /* Table Styles */
+        .table-container {
+            padding: 30px;
+            overflow-x: auto;
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .table-title {
+            font-size: 18px;
+            color: #1A365C;
+            font-weight: 600;
+        }
+        
+        .result-count {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+        
+        .data-table thead {
+            background: #1A365C;
+            color: white;
+        }
+        
+        .data-table thead th {
+            padding: 15px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+        
+        .data-table thead th:first-child {
+            border-radius: 8px 0 0 8px;
+        }
+        
+        .data-table thead th:last-child {
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .data-table thead th:hover {
+            background: #2d4a73;
+        }
+        
+        .data-table thead th .sort-icon {
+            margin-left: 5px;
+            opacity: 0.5;
+        }
+        
+        .data-table thead th.sorted .sort-icon {
+            opacity: 1;
+        }
+        
+        .data-table tbody tr {
+            background: #f8fafc;
+            transition: all 0.2s;
+        }
+        
+        .data-table tbody tr:hover {
+            background: #E5ECF3;
+            transform: scale(1.005);
+        }
+        
+        .data-table tbody td {
+            padding: 15px;
+            font-size: 14px;
+            border-top: 1px solid #E5ECF3;
+            border-bottom: 1px solid #E5ECF3;
+        }
+        
+        .data-table tbody td:first-child {
+            border-left: 1px solid #E5ECF3;
+            border-radius: 8px 0 0 8px;
+        }
+        
+        .data-table tbody td:last-child {
+            border-right: 1px solid #E5ECF3;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        
+        .status-registered {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-expired {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-forfeited {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-suspended {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-revoked {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-denied {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-withdrawn {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+        
+        .status-inactive {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+        
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-notfound,
+        .status-unknown,
+        .status-error {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+        
+        /* Days Badge */
+        .days-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .days-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .days-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .days-ok {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #E5ECF3;
+            border-top-color: #F57600;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .empty-state-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+        
+        .empty-state-text {
+            font-size: 16px;
+            color: #1A365C;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 54, 92, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(26, 54, 92, 0.3);
+        }
+        
+        .modal-header {
+            background: #1A365C;
+            color: white;
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+        
+        .modal-close:hover {
+            opacity: 1;
+        }
+        
+        .modal-body {
+            padding: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: #1A365C;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            padding-top: 10px;
+            border-top: 2px solid #E5ECF3;
+            margin-top: 20px;
+        }
+        
+        /* Lookup Result */
+        .lookup-result {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+            border-left: 4px solid #F57600;
+        }
+        
+        .lookup-result.success {
+            border-left-color: #28a745;
+        }
+        
+        .lookup-result.error {
+            border-left-color: #dc3545;
+        }
+        
+        .lookup-result.pending {
+            border-left-color: #ffc107;
+            background: #fffbeb;
+        }
+        
+        .lookup-result h4 {
+            font-size: 14px;
+            color: #1A365C;
+            margin-bottom: 10px;
+        }
+        
+        .lookup-result p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .lookup-result strong {
+            color: #1A365C;
+        }
+        
+        /* Last Updated */
+        .last-updated {
+            font-size: 12px;
+            color: #999;
+            margin-left: 15px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-bar {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .table-container {
+                padding: 15px;
+            }
+            
+            .data-table {
+                min-width: 900px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <div class="nav-bar">
+        <div class="logo">
+            <span class="alice">alice</span><span class="dot">.</span><span class="care">care</span>
+        </div>
+        <div class="nav-actions">
+            <span class="last-updated" id="lastUpdated"></span>
+            <a href="#" class="back-link" onclick="openLookupModal()">🔍 Quick Lookup</a>
+        </div>
+    </div>
+    
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <h1>🏥 HCA Registry Tracker</h1>
+                <p>Monitor caregiver CDSS registration status and expiration dates</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-header" onclick="openAddModal()" title="Add New Caregiver">➕ Add</button>
+                <button class="btn btn-header" onclick="refreshFromSheet()" title="Refresh from Google Sheet">🔄 Refresh</button>
+                <button class="btn btn-header" onclick="refreshAllFromCDSS()" title="Refresh all records from CDSS API">🌐 Refresh All CDSS</button>
+                <button class="btn btn-primary" onclick="exportCSV()">📥 Export CSV</button>
+            </div>
+        </div>
+        
+        <!-- Stats Row -->
+        <div class="stats-row">
+            <div class="stat-card" id="stat-total" onclick="filterByCard('all')">
+                <h3>Total Caregivers</h3>
+                <div class="number" id="total-count">-</div>
+            </div>
+            <div class="stat-card registered" onclick="filterByCard('registered')">
+                <h3>Registered</h3>
+                <div class="number" id="registered-count">-</div>
+            </div>
+            <div class="stat-card warning" onclick="filterByCard('expiring')">
+                <h3>Expiring Soon (90 days)</h3>
+                <div class="number" id="expiring-count">-</div>
+            </div>
+            <div class="stat-card expired" onclick="filterByCard('problem')">
+                <h3>Expired / Problem</h3>
+                <div class="number" id="expired-count">-</div>
+            </div>
+        </div>
+        
+        <!-- Filters Section -->
+        <div class="filters-section">
+            <div class="filters-title">🔍 Filter Caregivers</div>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label>Search Name or HCA ID</label>
+                    <input type="text" id="searchInput" placeholder="Enter name or ID..." oninput="applyFilters()">
+                </div>
+                <div class="filter-group">
+                    <label>Status</label>
+                    <select id="statusFilter" onchange="applyFilters()">
+                        <option value="">All Statuses</option>
+                        <option value="Registered">Registered</option>
+                        <option value="Active">Active</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Expired">Expired</option>
+                        <option value="Forfeited">Forfeited</option>
+                        <option value="Suspended">Suspended</option>
+                        <option value="Revoked">Revoked</option>
+                        <option value="Denied">Denied</option>
+                        <option value="Withdrawn">Withdrawn</option>
+                        <option value="Inactive">Inactive</option>
+                        <option value="Not Found">Not Found</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Expiration</label>
+                    <select id="expirationFilter" onchange="applyFilters()">
+                        <option value="">All</option>
+                        <option value="problem">Problem Status</option>
+                        <option value="expired">Already Expired</option>
+                        <option value="7">Within 7 days</option>
+                        <option value="30">Within 30 days</option>
+                        <option value="60">Within 60 days</option>
+                        <option value="90">Within 90 days</option>
+                        <option value="valid">Valid (90+ days)</option>
+                    </select>
+                </div>
+                <div class="filter-actions">
+                    <button class="btn btn-secondary" onclick="clearFilters()">Clear Filters</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Table Section -->
+        <div class="table-container">
+            <div class="table-header">
+                <div class="table-title">Caregivers List</div>
+                <div class="result-count" id="resultCount">Loading...</div>
+            </div>
+            <div id="tableContent">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <div>Loading caregivers...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Lookup Modal -->
+    <div class="modal" id="lookupModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🔍 Quick CDSS Lookup</h2>
+                <button class="modal-close" onclick="closeLookupModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" id="lookupFirstName" placeholder="Enter first name">
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" id="lookupLastName" placeholder="Enter last name">
+                </div>
+                <div class="form-group">
+                    <label>HCA ID (PER ID)</label>
+                    <input type="text" id="lookupHcaId" placeholder="Enter HCA ID">
+                </div>
+                <div id="lookupResult"></div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="closeLookupModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="performLookup()">🔍 Lookup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Employee Modal -->
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>➕ Add New Caregiver</h2>
+                <button class="modal-close" onclick="closeAddModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>First Name <span style="color:#dc3545;">*</span></label>
+                    <input type="text" id="addFirstName" placeholder="Enter first name">
+                </div>
+                <div class="form-group">
+                    <label>Last Name <span style="color:#dc3545;">*</span></label>
+                    <input type="text" id="addLastName" placeholder="Enter last name">
+                </div>
+                <div class="form-group">
+                    <label>HCA ID (PER ID) <span style="color:#dc3545;">*</span></label>
+                    <input type="text" id="addHcaId" placeholder="Enter HCA ID">
+                </div>
+                <div id="addResult"></div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="closeAddModal()">Cancel</button>
+                    <button class="btn btn-primary" id="addSubmitBtn" onclick="submitNewCaregiver()">➕ Add Caregiver</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ============================================
+        // CONFIGURATION - UPDATE THIS URL
+        // ============================================
+        // IMPORTANT: To enable refresh and lookup features, you must:
+        // 1. Deploy the Google Apps Script (cdss-registry-tracker.js) as a web app
+        // 2. Set "Execute as: Me" and "Who has access: Anyone"
+        // 3. Copy the web app URL and paste it below
+        // 
+        // Without this, the browser cannot directly call the CDSS API due to CORS restrictions.
+        // The Google Apps Script acts as a proxy to fetch data server-side.
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxLKFlITKdmgcmy0XHw1LDo4WrhhkEHOolSatbopXusIdy7755eV_3HI2QT-imsxz_ePw/exec';
+        
+        // CDSS Lookup API URL
+        const CDSS_LOOKUP_URL = 'https://n39a29a2d3.execute-api.us-east-2.amazonaws.com/default/CDSSLookup';
+        
+        // ============================================
+        // DATA STORAGE
+        // ============================================
+        let allCaregivers = [];
+        let filteredCaregivers = [];
+        let sortColumn = 'last_name';
+        let sortDirection = 'asc';
+        
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if Google Apps Script URL is configured
+            if (GOOGLE_SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL') {
+                showConfigWarning();
+            }
+            loadData();
+        });
+        
+        function showConfigWarning() {
+            var warning = document.createElement('div');
+            warning.id = 'config-warning';
+            warning.style.cssText = 'background:#fff3cd;border-left:4px solid #ffc107;padding:15px 30px;color:#856404;font-size:14px;';
+            warning.innerHTML = '<strong>⚠️ Configuration Required:</strong> To enable refresh and lookup features, deploy the Google Apps Script and update <code>GOOGLE_SCRIPT_URL</code> in this file. <a href="#" onclick="document.getElementById(\'config-warning\').style.display=\'none\';return false;" style="float:right;color:#856404;">Dismiss</a>';
+            var container = document.querySelector('.container');
+            container.insertBefore(warning, container.firstChild);
+        }
+        
+        // ============================================
+        // DATA LOADING
+        // ============================================
+        function loadData() {
+            // Check if we're using Google Apps Script or sample data
+            if (GOOGLE_SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL') {
+                // Use sample data for testing
+                loadSampleData();
+            } else {
+                // Load from Google Apps Script
+                loadFromGoogleScript();
+            }
+        }
+        
+        function loadFromGoogleScript() {
+            fetch(GOOGLE_SCRIPT_URL + '?page=api')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showError(data.error);
+                        return;
+                    }
+                    allCaregivers = data.data;
+                    filteredCaregivers = [...allCaregivers];
+                    updateStats();
+                    applyFilters();
+                    updateLastUpdated();
+                })
+                .catch(error => {
+                    console.error('Error loading data:', error);
+                    showError('Failed to load data. Using sample data.');
+                    loadSampleData();
+                });
+        }
+        
+        function loadSampleData() {
+            // Sample data for testing without backend
+            allCaregivers = [
+                {
+                    first_name: 'Jecinta',
+                    last_name: 'Kinyua',
+                    hca_id: '4600897642',
+                    status: 'Registered',
+                    expiration_date: '2027-10-24',
+                    days_remaining: 700,
+                    last_checked: '2024-11-24',
+                    registry_link: 'https://n39a29a2d3.execute-api.us-east-2.amazonaws.com/default/CDSSLookup?fname=Jecinta&lname=Kinyua&hca=4600897642'
+                },
+                {
+                    first_name: 'Maria',
+                    last_name: 'Delgado',
+                    hca_id: '4600861511',
+                    status: 'Pending',
+                    expiration_date: '',
+                    days_remaining: null,
+                    last_checked: '2024-11-24',
+                    registry_link: 'https://n39a29a2d3.execute-api.us-east-2.amazonaws.com/default/CDSSLookup?fname=Maria&lname=Delgado&hca=4600861511'
+                },
+                {
+                    first_name: 'Sandra',
+                    last_name: 'Castiblanco Esmanech',
+                    hca_id: '7507000860',
+                    status: 'Forfeited',
+                    expiration_date: '2025-02-24',
+                    days_remaining: 92,
+                    last_checked: '2024-11-24',
+                    registry_link: 'https://n39a29a2d3.execute-api.us-east-2.amazonaws.com/default/CDSSLookup?fname=Sandra&lname=Castiblanco%20Esmanech&hca=7507000860'
+                },
+                {
+                    first_name: 'Maria',
+                    last_name: 'Santos',
+                    hca_id: '4600123456',
+                    status: 'Registered',
+                    expiration_date: '2025-02-15',
+                    days_remaining: 83,
+                    last_checked: '2024-11-23',
+                    registry_link: '#'
+                },
+                {
+                    first_name: 'John',
+                    last_name: 'Smith',
+                    hca_id: '4600987654',
+                    status: 'Registered',
+                    expiration_date: '2025-01-10',
+                    days_remaining: 47,
+                    last_checked: '2024-11-22',
+                    registry_link: '#'
+                },
+                {
+                    first_name: 'Sarah',
+                    last_name: 'Johnson',
+                    hca_id: '4600456789',
+                    status: 'Expired',
+                    expiration_date: '2024-11-01',
+                    days_remaining: -23,
+                    last_checked: '2024-11-20',
+                    registry_link: '#'
+                },
+                {
+                    first_name: 'David',
+                    last_name: 'Lee',
+                    hca_id: '4600111222',
+                    status: 'Pending',
+                    expiration_date: '',
+                    days_remaining: null,
+                    last_checked: '2024-11-18',
+                    registry_link: '#'
+                }
+            ];
+            
+            filteredCaregivers = [...allCaregivers];
+            updateStats();
+            applyFilters();
+            updateLastUpdated();
+            
+            console.log('Loaded sample data. Update GOOGLE_SCRIPT_URL to connect to your backend.');
+        }
+        
+        function showError(message) {
+            document.getElementById('tableContent').innerHTML = 
+                '<div class="empty-state">' +
+                    '<div class="empty-state-icon">⚠️</div>' +
+                    '<div class="empty-state-text">' + message + '</div>' +
+                '</div>';
+        }
+        
+        function updateLastUpdated() {
+            const now = new Date();
+            document.getElementById('lastUpdated').textContent = 
+                'Last updated: ' + now.toLocaleString();
+        }
+        
+        // ============================================
+        // STATISTICS
+        // ============================================
+        function updateStats() {
+            const total = allCaregivers.length;
+            const registered = allCaregivers.filter(c => c.status === 'Registered' || c.status === 'Active').length;
+            
+            // Problem statuses: Expired, Forfeited, Suspended, Revoked, Denied
+            const problemStatuses = ['Expired', 'Forfeited', 'Suspended', 'Revoked', 'Denied'];
+            const expired = allCaregivers.filter(c => 
+                problemStatuses.includes(c.status) || (c.days_remaining !== null && c.days_remaining <= 0)
+            ).length;
+            
+            const expiring = allCaregivers.filter(c => 
+                c.days_remaining !== null && c.days_remaining > 0 && c.days_remaining <= 90 &&
+                !problemStatuses.includes(c.status)
+            ).length;
+            
+            document.getElementById('total-count').textContent = total;
+            document.getElementById('registered-count').textContent = registered;
+            document.getElementById('expired-count').textContent = expired;
+            document.getElementById('expiring-count').textContent = expiring;
+        }
+        
+        // ============================================
+        // FILTERING
+        // ============================================
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const status = document.getElementById('statusFilter').value;
+            const expiration = document.getElementById('expirationFilter').value;
+            
+            // Problem statuses
+            const problemStatuses = ['Expired', 'Forfeited', 'Suspended', 'Revoked', 'Denied'];
+            
+            filteredCaregivers = allCaregivers.filter(function(c) {
+                // Search filter
+                if (search) {
+                    const searchStr = (c.first_name + ' ' + c.last_name + ' ' + c.hca_id).toLowerCase();
+                    if (searchStr.indexOf(search) === -1) return false;
+                }
+                
+                // Status filter
+                if (status && c.status !== status) return false;
+                
+                // Expiration filter
+                if (expiration) {
+                    if (expiration === 'expired') {
+                        if (c.days_remaining === null || c.days_remaining > 0) return false;
+                    } else if (expiration === 'problem') {
+                        // Show all problem statuses OR expired by date
+                        if (!problemStatuses.includes(c.status) && (c.days_remaining === null || c.days_remaining > 0)) return false;
+                    } else if (expiration === 'valid') {
+                        if (c.days_remaining === null || c.days_remaining <= 90) return false;
+                    } else {
+                        var days = parseInt(expiration);
+                        if (c.days_remaining === null || c.days_remaining <= 0 || c.days_remaining > days) return false;
+                    }
+                }
+                
+                return true;
+            });
+            
+            sortData();
+            renderTable();
+        }
+        
+        function filterByCard(type) {
+            // Clear other filters
+            document.getElementById('searchInput').value = '';
+            
+            // Update active state
+            document.querySelectorAll('.stat-card').forEach(function(card) {
+                card.classList.remove('active');
+            });
+            
+            if (type === 'all') {
+                document.getElementById('statusFilter').value = '';
+                document.getElementById('expirationFilter').value = '';
+                document.getElementById('stat-total').classList.add('active');
+            } else if (type === 'registered') {
+                document.getElementById('statusFilter').value = 'Registered';
+                document.getElementById('expirationFilter').value = '';
+                event.currentTarget.classList.add('active');
+            } else if (type === 'expiring') {
+                document.getElementById('statusFilter').value = '';
+                document.getElementById('expirationFilter').value = '90';
+                event.currentTarget.classList.add('active');
+            } else if (type === 'problem') {
+                document.getElementById('statusFilter').value = '';
+                document.getElementById('expirationFilter').value = 'problem';
+                event.currentTarget.classList.add('active');
+            }
+            
+            applyFilters();
+        }
+        
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('expirationFilter').value = '';
+            document.querySelectorAll('.stat-card').forEach(function(card) {
+                card.classList.remove('active');
+            });
+            applyFilters();
+        }
+        
+        // ============================================
+        // SORTING
+        // ============================================
+        function sortData() {
+            filteredCaregivers.sort(function(a, b) {
+                var aVal = a[sortColumn];
+                var bVal = b[sortColumn];
+                
+                if (sortColumn === 'days_remaining') {
+                    aVal = aVal === null ? 9999 : aVal;
+                    bVal = bVal === null ? 9999 : bVal;
+                }
+                
+                if (typeof aVal === 'string') {
+                    aVal = aVal.toLowerCase();
+                    bVal = bVal.toLowerCase();
+                }
+                
+                if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+                if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+        
+        function handleSort(column) {
+            if (sortColumn === column) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortDirection = 'asc';
+            }
+            sortData();
+            renderTable();
+        }
+        
+        // ============================================
+        // TABLE RENDERING
+        // ============================================
+        function renderTable() {
+            document.getElementById('resultCount').textContent = 
+                'Showing ' + filteredCaregivers.length + ' of ' + allCaregivers.length + ' caregivers';
+            
+            if (filteredCaregivers.length === 0) {
+                document.getElementById('tableContent').innerHTML = 
+                    '<div class="empty-state">' +
+                        '<div class="empty-state-icon">🔍</div>' +
+                        '<div class="empty-state-text">No caregivers match your filters</div>' +
+                    '</div>';
+                return;
+            }
+            
+            var getSortIcon = function(col) {
+                if (sortColumn !== col) return '<span class="sort-icon">↕</span>';
+                return '<span class="sort-icon">' + (sortDirection === 'asc' ? '↑' : '↓') + '</span>';
+            };
+            
+            var html = '<table class="data-table">';
+            html += '<thead><tr>';
+            html += '<th class="' + (sortColumn === 'first_name' ? 'sorted' : '') + '" onclick="handleSort(\'first_name\')">First Name' + getSortIcon('first_name') + '</th>';
+            html += '<th class="' + (sortColumn === 'last_name' ? 'sorted' : '') + '" onclick="handleSort(\'last_name\')">Last Name' + getSortIcon('last_name') + '</th>';
+            html += '<th class="' + (sortColumn === 'hca_id' ? 'sorted' : '') + '" onclick="handleSort(\'hca_id\')">HCA ID' + getSortIcon('hca_id') + '</th>';
+            html += '<th class="' + (sortColumn === 'status' ? 'sorted' : '') + '" onclick="handleSort(\'status\')">Status' + getSortIcon('status') + '</th>';
+            html += '<th class="' + (sortColumn === 'expiration_date' ? 'sorted' : '') + '" onclick="handleSort(\'expiration_date\')">Expiration' + getSortIcon('expiration_date') + '</th>';
+            html += '<th class="' + (sortColumn === 'days_remaining' ? 'sorted' : '') + '" onclick="handleSort(\'days_remaining\')">Days Left' + getSortIcon('days_remaining') + '</th>';
+            html += '<th class="' + (sortColumn === 'last_checked' ? 'sorted' : '') + '" onclick="handleSort(\'last_checked\')">Last Refresh' + getSortIcon('last_checked') + '</th>';
+            html += '<th>Actions</th>';
+            html += '</tr></thead>';
+            html += '<tbody>';
+            
+            filteredCaregivers.forEach(function(c, index) {
+                var statusClass = 'status-' + (c.status || 'unknown').toLowerCase().replace(' ', '');
+                var daysClass = 'days-ok';
+                if (c.days_remaining !== null) {
+                    if (c.days_remaining <= 0) daysClass = 'days-danger';
+                    else if (c.days_remaining <= 30) daysClass = 'days-warning';
+                }
+                
+                // Find original index in allCaregivers for refresh
+                var originalIndex = allCaregivers.findIndex(function(orig) {
+                    return orig.hca_id === c.hca_id;
+                });
+                
+                html += '<tr id="row-' + c.hca_id + '">';
+                html += '<td><strong>' + escapeHtml(c.first_name) + '</strong></td>';
+                html += '<td>' + escapeHtml(c.last_name) + '</td>';
+                html += '<td>' + escapeHtml(c.hca_id) + '</td>';
+                html += '<td><span class="status-badge ' + statusClass + '">' + escapeHtml(c.status || 'Unknown') + '</span></td>';
+                html += '<td>' + escapeHtml(c.expiration_date || '-') + '</td>';
+                html += '<td>' + (c.days_remaining !== null ? '<span class="days-badge ' + daysClass + '">' + c.days_remaining + '</span>' : '-') + '</td>';
+                html += '<td>' + escapeHtml(c.last_checked || '-') + '</td>';
+                html += '<td class="actions-cell">';
+                html += '<button class="btn btn-refresh" onclick="refreshRecord(' + originalIndex + ')" title="Refresh this record">🔄</button> ';
+                html += '<button class="btn btn-delete" onclick="deleteRecord(\'' + escapeHtml(c.hca_id) + '\', \'' + escapeHtml(c.first_name) + '\', \'' + escapeHtml(c.last_name) + '\')" title="Delete this record">🗑️</button> ';
+                html += '<a href="' + c.registry_link + '" target="_blank" class="btn btn-view">View →</a>';
+                html += '</td>';
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            document.getElementById('tableContent').innerHTML = html;
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            var div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // ============================================
+        // QUICK LOOKUP
+        // ============================================
+        function openLookupModal() {
+            document.getElementById('lookupModal').classList.add('active');
+            document.getElementById('lookupFirstName').value = '';
+            document.getElementById('lookupLastName').value = '';
+            document.getElementById('lookupHcaId').value = '';
+            document.getElementById('lookupResult').innerHTML = '';
+        }
+        
+        function closeLookupModal() {
+            document.getElementById('lookupModal').classList.remove('active');
+        }
+        
+        function performLookup() {
+            var firstName = document.getElementById('lookupFirstName').value.trim();
+            var lastName = document.getElementById('lookupLastName').value.trim();
+            var hcaId = document.getElementById('lookupHcaId').value.trim();
+            
+            if (!firstName || !lastName || !hcaId) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            var resultDiv = document.getElementById('lookupResult');
+            resultDiv.innerHTML = '<div class="lookup-result"><div class="loading-spinner" style="width:30px;height:30px;margin:10px auto;"></div><p style="text-align:center;">Looking up...</p></div>';
+            
+            var directLookupUrl = CDSS_LOOKUP_URL + 
+                '?fname=' + encodeURIComponent(firstName) + 
+                '&lname=' + encodeURIComponent(lastName) + 
+                '&hca=' + encodeURIComponent(hcaId);
+            
+            // Use Google Apps Script as proxy to avoid CORS issues
+            if (GOOGLE_SCRIPT_URL !== 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL') {
+                var proxyUrl = GOOGLE_SCRIPT_URL + 
+                    '?page=lookup' +
+                    '&fname=' + encodeURIComponent(firstName) + 
+                    '&lname=' + encodeURIComponent(lastName) + 
+                    '&hca=' + encodeURIComponent(hcaId);
+                
+                fetch(proxyUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        var status = data.status || 'Not Found';
+                        var expiration = data.expirationDate || '';
+                        var problemStatuses = ['Expired', 'Forfeited', 'Suspended', 'Revoked', 'Denied'];
+                        var resultClass = (status === 'Registered' || status === 'Active') ? 'success' : 
+                                         (problemStatuses.includes(status) ? 'error' : 
+                                         (status === 'Pending' ? 'pending' : ''));
+                        
+                        resultDiv.innerHTML = 
+                            '<div class="lookup-result ' + resultClass + '">' +
+                                '<h4>Lookup Result</h4>' +
+                                '<p><strong>Name:</strong> ' + escapeHtml(firstName + ' ' + lastName) + '</p>' +
+                                '<p><strong>HCA ID:</strong> ' + escapeHtml(hcaId) + '</p>' +
+                                '<p><strong>Status:</strong> <span class="status-badge status-' + status.toLowerCase().replace(' ', '') + '">' + status + '</span></p>' +
+                                '<p><strong>Expiration:</strong> ' + (expiration || 'N/A') + '</p>' +
+                                '<p style="margin-top:15px;"><a href="' + directLookupUrl + '" target="_blank" class="btn btn-view btn-small">View Full Record →</a></p>' +
+                            '</div>';
+                    })
+                    .catch(error => {
+                        console.error('Lookup error:', error);
+                        resultDiv.innerHTML = 
+                            '<div class="lookup-result error">' +
+                                '<h4>Lookup Failed</h4>' +
+                                '<p>Unable to retrieve information. Please try again.</p>' +
+                            '</div>';
+                    });
+            } else {
+                // Direct API call (may fail due to CORS when running locally)
+                fetch(directLookupUrl)
+                    .then(response => response.text())
+                    .then(html => {
+                        var result = parseCDSSResponse(html, hcaId);
+                        var status = result.status;
+                        var expiration = result.expiration;
+                        var problemStatuses = ['Expired', 'Forfeited', 'Suspended', 'Revoked', 'Denied'];
+                        var resultClass = (status === 'Registered' || status === 'Active') ? 'success' : 
+                                         (problemStatuses.includes(status) ? 'error' : 
+                                         (status === 'Pending' ? 'pending' : ''));
+                        
+                        resultDiv.innerHTML = 
+                            '<div class="lookup-result ' + resultClass + '">' +
+                                '<h4>Lookup Result</h4>' +
+                                '<p><strong>Name:</strong> ' + escapeHtml(firstName + ' ' + lastName) + '</p>' +
+                                '<p><strong>HCA ID:</strong> ' + escapeHtml(hcaId) + '</p>' +
+                                '<p><strong>Status:</strong> <span class="status-badge status-' + status.toLowerCase().replace(' ', '') + '">' + status + '</span></p>' +
+                                '<p><strong>Expiration:</strong> ' + (expiration || 'N/A') + '</p>' +
+                                '<p style="margin-top:15px;"><a href="' + directLookupUrl + '" target="_blank" class="btn btn-view btn-small">View Full Record →</a></p>' +
+                            '</div>';
+                    })
+                    .catch(error => {
+                        console.error('Lookup error:', error);
+                        resultDiv.innerHTML = 
+                            '<div class="lookup-result error">' +
+                                '<h4>Lookup Failed</h4>' +
+                                '<p>Unable to retrieve information due to CORS restrictions.</p>' +
+                                '<p style="font-size:12px;color:#666;margin-top:10px;">To enable lookups, deploy the Google Apps Script and update GOOGLE_SCRIPT_URL in this file.</p>' +
+                                '<p style="margin-top:15px;"><a href="' + directLookupUrl + '" target="_blank" class="btn btn-view btn-small">Open Directly →</a></p>' +
+                            '</div>';
+                    });
+            }
+        }
+        
+        // Close modal when clicking outside
+        document.getElementById('lookupModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeLookupModal();
+            }
+        });
+        
+        // ============================================
+        // ACTIONS
+        // ============================================
+        
+        // Simple page refresh - reloads data from Google Sheet only
+        function refreshFromSheet() {
+            document.getElementById('tableContent').innerHTML = 
+                '<div class="loading">' +
+                    '<div class="loading-spinner"></div>' +
+                    '<div>Refreshing from sheet...</div>' +
+                '</div>';
+            loadData();
+        }
+        
+        // Refresh ALL records from CDSS API
+        var refreshAllInProgress = false;
+        var refreshAllCancelled = false;
+        
+        function refreshAllFromCDSS() {
+            if (GOOGLE_SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL') {
+                alert('Please configure GOOGLE_SCRIPT_URL first to enable CDSS lookups.');
+                return;
+            }
+            
+            if (refreshAllInProgress) {
+                if (confirm('A refresh is already in progress. Do you want to cancel it?')) {
+                    refreshAllCancelled = true;
+                }
+                return;
+            }
+            
+            var totalCount = allCaregivers.length;
+            if (totalCount === 0) {
+                alert('No caregivers to refresh.');
+                return;
+            }
+            
+            if (!confirm('This will refresh all ' + totalCount + ' caregivers from the CDSS registry.\n\nThis may take a few minutes. Continue?')) {
+                return;
+            }
+            
+            refreshAllInProgress = true;
+            refreshAllCancelled = false;
+            
+            var progressHtml = 
+                '<div class="loading">' +
+                    '<div class="loading-spinner"></div>' +
+                    '<div id="refresh-progress">Refreshing from CDSS: 0 / ' + totalCount + '</div>' +
+                    '<div style="margin-top:10px;">' +
+                        '<button class="btn btn-secondary btn-small" onclick="refreshAllCancelled=true;">Cancel</button>' +
+                    '</div>' +
+                '</div>';
+            document.getElementById('tableContent').innerHTML = progressHtml;
+            
+            // Process caregivers sequentially with delay to avoid rate limiting
+            var currentIndex = 0;
+            var successCount = 0;
+            var errorCount = 0;
+            
+            function processNext() {
+                if (refreshAllCancelled || currentIndex >= totalCount) {
+                    // Done or cancelled
+                    refreshAllInProgress = false;
+                    var message = refreshAllCancelled 
+                        ? 'Refresh cancelled. Processed ' + currentIndex + ' of ' + totalCount + ' caregivers.'
+                        : 'Refresh complete! ' + successCount + ' succeeded, ' + errorCount + ' failed.';
+                    alert(message);
+                    renderTable();
+                    updateStats();
+                    return;
+                }
+                
+                var caregiver = allCaregivers[currentIndex];
+                document.getElementById('refresh-progress').textContent = 
+                    'Refreshing from CDSS: ' + (currentIndex + 1) + ' / ' + totalCount + 
+                    ' (' + caregiver.first_name + ' ' + caregiver.last_name + ')';
+                
+                var lookupUrl = GOOGLE_SCRIPT_URL + 
+                    '?page=lookup' +
+                    '&fname=' + encodeURIComponent(caregiver.first_name) + 
+                    '&lname=' + encodeURIComponent(caregiver.last_name) + 
+                    '&hca=' + encodeURIComponent(caregiver.hca_id);
+                
+                fetch(lookupUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        var status = data.status || 'Not Found';
+                        var expiration = data.expirationDate || '';
+                        
+                        var daysRemaining = null;
+                        if (expiration) {
+                            var today = new Date();
+                            var expDate = new Date(expiration);
+                            daysRemaining = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+                        }
+                        
+                        // Update local data
+                        var now = new Date();
+                        var dateStr = now.getFullYear() + '-' + 
+                            String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                            String(now.getDate()).padStart(2, '0');
+                        
+                        allCaregivers[currentIndex].status = status;
+                        allCaregivers[currentIndex].expiration_date = expiration;
+                        allCaregivers[currentIndex].days_remaining = daysRemaining;
+                        allCaregivers[currentIndex].last_checked = dateStr;
+                        
+                        successCount++;
+                        currentIndex++;
+                        
+                        // Small delay to avoid rate limiting
+                        setTimeout(processNext, 500);
+                    })
+                    .catch(error => {
+                        console.error('Error refreshing ' + caregiver.hca_id + ':', error);
+                        errorCount++;
+                        currentIndex++;
+                        setTimeout(processNext, 500);
+                    });
+            }
+            
+            processNext();
+        }
+        
+        function refreshRecord(index) {
+            var caregiver = allCaregivers[index];
+            if (!caregiver) {
+                alert('Caregiver not found');
+                return;
+            }
+            
+            var row = document.getElementById('row-' + caregiver.hca_id);
+            var refreshBtn = row ? row.querySelector('.btn-refresh') : null;
+            
+            // Show loading state
+            if (row) row.classList.add('row-updating');
+            if (refreshBtn) {
+                refreshBtn.classList.add('loading');
+                refreshBtn.innerHTML = '';
+            }
+            
+            // Use Google Apps Script as proxy to avoid CORS issues
+            var lookupUrl;
+            if (GOOGLE_SCRIPT_URL !== 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL') {
+                // Use proxy through Google Apps Script
+                lookupUrl = GOOGLE_SCRIPT_URL + 
+                    '?page=lookup' +
+                    '&fname=' + encodeURIComponent(caregiver.first_name) + 
+                    '&lname=' + encodeURIComponent(caregiver.last_name) + 
+                    '&hca=' + encodeURIComponent(caregiver.hca_id);
+                
+                fetch(lookupUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        var status = data.status || 'Not Found';
+                        var expiration = data.expirationDate || '';
+                        
+                        // Calculate days remaining
+                        var daysRemaining = null;
+                        if (expiration) {
+                            var today = new Date();
+                            var expDate = new Date(expiration);
+                            daysRemaining = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+                        }
+                        
+                        updateCaregiverRecord(index, caregiver, status, expiration, daysRemaining);
+                    })
+                    .catch(error => {
+                        console.error('Refresh error:', error);
+                        handleRefreshError(caregiver, row, refreshBtn);
+                    });
+            } else {
+                // Direct API call (may fail due to CORS when running locally)
+                lookupUrl = CDSS_LOOKUP_URL + 
+                    '?fname=' + encodeURIComponent(caregiver.first_name) + 
+                    '&lname=' + encodeURIComponent(caregiver.last_name) + 
+                    '&hca=' + encodeURIComponent(caregiver.hca_id);
+                
+                fetch(lookupUrl)
+                    .then(response => response.text())
+                    .then(html => {
+                        var result = parseCDSSResponse(html, caregiver.hca_id);
+                        updateCaregiverRecord(index, caregiver, result.status, result.expiration, result.daysRemaining);
+                    })
+                    .catch(error => {
+                        console.error('Refresh error:', error);
+                        handleRefreshError(caregiver, row, refreshBtn);
+                    });
+            }
+        }
+        
+        function parseCDSSResponse(html, hcaId) {
+            var status = 'Not Found';
+            var expiration = '';
+            
+            // Check if HCA ID exists in response
+            if (html.indexOf(hcaId) === -1) {
+                console.log('HCA ID not found in response: ' + hcaId);
+                return { status: 'Not Found', expiration: '', daysRemaining: null };
+            }
+            
+            // All possible CDSS status values (in order of likelihood)
+            var statusValues = ['Registered', 'Pending', 'Expired', 'Forfeited', 'Suspended', 'Revoked', 'Denied', 'Withdrawn', 'Inactive', 'Active'];
+            
+            // Get the portion of text AFTER the HCA ID appears
+            // Use lastIndexOf to find the HCA ID in the results table, not in URL params or hidden fields at the top
+            var hcaIndex = html.lastIndexOf(hcaId);
+            var afterHcaId = html.substring(hcaIndex + hcaId.length);
+            
+            // Find the first status value that appears after the HCA ID
+            var earliestPosition = 999999;
+            var foundStatus = 'Not Found';
+            
+            for (var i = 0; i < statusValues.length; i++) {
+                var statusVal = statusValues[i];
+                // Case-insensitive search
+                var lowerAfterHca = afterHcaId.toLowerCase();
+                var lowerStatus = statusVal.toLowerCase();
+                var pos = lowerAfterHca.indexOf(lowerStatus);
+                
+                // Only consider matches within the first 200 characters after the HCA ID
+                // This prevents matching status words in error messages further down
+                if (pos !== -1 && pos < 200 && pos < earliestPosition) {
+                    earliestPosition = pos;
+                    foundStatus = statusVal;
+                }
+            }
+            
+            status = foundStatus;
+            
+            // Find expiration date (YYYY-MM-DD format) - look for it after the HCA ID
+            var dateMatch = afterHcaId.match(/\d{4}-\d{2}-\d{2}/);
+            if (dateMatch) {
+                expiration = dateMatch[0];
+            }
+            
+            // Calculate days remaining
+            var daysRemaining = null;
+            if (expiration) {
+                var today = new Date();
+                var expDate = new Date(expiration);
+                daysRemaining = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+            }
+            
+            console.log('Parsed CDSS response - HCA: ' + hcaId + ', Status: ' + status + ', Expiration: ' + expiration);
+            
+            return { status: status, expiration: expiration, daysRemaining: daysRemaining };
+        }
+        
+        function updateCaregiverRecord(index, caregiver, status, expiration, daysRemaining) {
+            var now = new Date();
+            var dateStr = now.getFullYear() + '-' + 
+                String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                String(now.getDate()).padStart(2, '0');
+            
+            // Build registry link
+            var registryLink = CDSS_LOOKUP_URL + 
+                '?fname=' + encodeURIComponent(caregiver.first_name) + 
+                '&lname=' + encodeURIComponent(caregiver.last_name) + 
+                '&hca=' + encodeURIComponent(caregiver.hca_id);
+            
+            allCaregivers[index].status = status;
+            allCaregivers[index].expiration_date = expiration;
+            allCaregivers[index].days_remaining = daysRemaining;
+            allCaregivers[index].last_checked = dateStr;
+            allCaregivers[index].registry_link = registryLink;
+            
+            // Update filtered list too
+            var filteredIndex = filteredCaregivers.findIndex(function(c) {
+                return c.hca_id === caregiver.hca_id;
+            });
+            if (filteredIndex !== -1) {
+                filteredCaregivers[filteredIndex] = allCaregivers[index];
+            }
+            
+            updateStats();
+            renderTable();
+            
+            // Highlight the updated row
+            setTimeout(function() {
+                var updatedRow = document.getElementById('row-' + caregiver.hca_id);
+                if (updatedRow) {
+                    updatedRow.classList.add('row-updated');
+                    setTimeout(function() {
+                        updatedRow.classList.remove('row-updated');
+                    }, 1500);
+                }
+            }, 100);
+            
+            console.log('Refreshed record for ' + caregiver.first_name + ' ' + caregiver.last_name + ': ' + status);
+        }
+        
+        function handleRefreshError(caregiver, row, refreshBtn) {
+            alert('Failed to refresh record for ' + caregiver.first_name + ' ' + caregiver.last_name + '.\n\nIf running locally, please deploy the Google Apps Script and update GOOGLE_SCRIPT_URL.');
+            
+            if (row) row.classList.remove('row-updating');
+            if (refreshBtn) {
+                refreshBtn.classList.remove('loading');
+                refreshBtn.innerHTML = '🔄';
+            }
+        }
+        
+        // ============================================
+        // DELETE RECORD
+        // ============================================
+        function deleteRecord(hcaId, firstName, lastName) {
+            var fullName = firstName + ' ' + lastName;
+            
+            // Confirm deletion
+            if (!confirm('Are you sure you want to delete this caregiver?\n\n' + fullName + '\nHCA ID: ' + hcaId + '\n\nThis action cannot be undone.')) {
+                return;
+            }
+            
+            var row = document.getElementById('row-' + hcaId);
+            if (row) {
+                row.classList.add('row-updating');
+            }
+            
+            if (GOOGLE_SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL') {
+                // No Google Script configured - delete locally only
+                deleteCaregiverLocally(hcaId);
+                alert('Record deleted locally.\n\nNote: Changes are local only - not saved to Google Sheet.');
+                return;
+            }
+            
+            // Call Google Apps Script to delete from sheet
+            var deleteUrl = GOOGLE_SCRIPT_URL + 
+                '?page=delete' +
+                '&hca=' + encodeURIComponent(hcaId) +
+                '&fname=' + encodeURIComponent(firstName) +
+                '&lname=' + encodeURIComponent(lastName);
+            
+            // Use no-cors mode - we can't read the response but the request will go through
+            fetch(deleteUrl, { mode: 'no-cors' })
+                .then(function() {
+                    // Request sent - now reload data to verify deletion
+                    console.log('Delete request sent, verifying deletion...');
+                    verifyDeletion(hcaId, fullName, row);
+                })
+                .catch(function(error) {
+                    console.error('Delete error:', error);
+                    alert('Error deleting caregiver. Please try again.\n\nError: ' + error.message);
+                    if (row) row.classList.remove('row-updating');
+                });
+        }
+        
+        function verifyDeletion(hcaId, fullName, row) {
+            // Small delay to let the sheet update
+            setTimeout(function() {
+                // Reload data from the API
+                var apiUrl = GOOGLE_SCRIPT_URL + '?page=api';
+                fetch(apiUrl)
+                    .then(function(response) { return response.json(); })
+                    .then(function(data) {
+                        if (data.data) {
+                            // Check if the HCA ID is still in the data
+                            var stillExists = data.data.some(function(c) {
+                                return c.hca_id === hcaId;
+                            });
+                            
+                            if (!stillExists) {
+                                // Successfully deleted
+                                deleteCaregiverLocally(hcaId);
+                                showDeleteSuccess(fullName, hcaId);
+                            } else {
+                                // Still exists - deletion may have failed
+                                alert('Deletion could not be verified. Please refresh and try again.');
+                                if (row) row.classList.remove('row-updating');
+                            }
+                        } else {
+                            // Couldn't verify - assume success and update locally
+                            deleteCaregiverLocally(hcaId);
+                            showDeleteSuccess(fullName, hcaId);
+                        }
+                    })
+                    .catch(function(error) {
+                        console.error('Verification error:', error);
+                        // Assume success and update locally
+                        deleteCaregiverLocally(hcaId);
+                        showDeleteSuccess(fullName, hcaId);
+                    });
+            }, 1000);
+        }
+        
+        function deleteCaregiverLocally(hcaId) {
+            // Remove from allCaregivers
+            var index = allCaregivers.findIndex(function(c) {
+                return c.hca_id === hcaId;
+            });
+            if (index !== -1) {
+                allCaregivers.splice(index, 1);
+            }
+            
+            // Remove from filteredCaregivers
+            var filteredIndex = filteredCaregivers.findIndex(function(c) {
+                return c.hca_id === hcaId;
+            });
+            if (filteredIndex !== -1) {
+                filteredCaregivers.splice(filteredIndex, 1);
+            }
+            
+            // Update UI
+            updateStats();
+            renderTable();
+        }
+        
+        function showDeleteSuccess(fullName, hcaId) {
+            // Brief success notification
+            var notification = document.createElement('div');
+            notification.style.cssText = 'position:fixed;top:20px;right:20px;background:#d4edda;color:#155724;padding:15px 25px;border-radius:8px;box-shadow:0 4px 15px rgba(0,0,0,0.2);z-index:9999;font-family:Poppins,sans-serif;';
+            notification.innerHTML = '✅ <strong>' + fullName + '</strong> deleted successfully';
+            document.body.appendChild(notification);
+            
+            setTimeout(function() {
+                notification.style.transition = 'opacity 0.5s';
+                notification.style.opacity = '0';
+                setTimeout(function() {
+                    document.body.removeChild(notification);
+                }, 500);
+            }, 3000);
+        }
+        
+        function exportCSV() {
+            var headers = ['first_name', 'last_name', 'hca_id', 'status', 'expiration_date', 'days_remaining', 'last_checked', 'registry_link'];
+            var csv = headers.join(',') + '\n';
+            
+            filteredCaregivers.forEach(function(c) {
+                var row = headers.map(function(h) {
+                    var val = c[h] || '';
+                    if (typeof val === 'string' && (val.indexOf(',') > -1 || val.indexOf('"') > -1)) {
+                        val = '"' + val.replace(/"/g, '""') + '"';
+                    }
+                    return val;
+                });
+                csv += row.join(',') + '\n';
+            });
+            
+            var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            var url = URL.createObjectURL(blob);
+            var link = document.createElement('a');
+            var now = new Date();
+            var dateStr = now.getFullYear() + '-' + 
+                String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                String(now.getDate()).padStart(2, '0');
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'hca_registry_' + dateStr + '.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            alert('Export complete!\nFilename: hca_registry_' + dateStr + '.csv');
+        }
+        
+        // ============================================
+        // ADD EMPLOYEE MODAL
+        // ============================================
+        function openAddModal() {
+            document.getElementById('addModal').classList.add('active');
+            document.getElementById('addFirstName').value = '';
+            document.getElementById('addLastName').value = '';
+            document.getElementById('addHcaId').value = '';
+            document.getElementById('addResult').innerHTML = '';
+            document.getElementById('addFirstName').focus();
+        }
+        
+        function closeAddModal() {
+            document.getElementById('addModal').classList.remove('active');
+        }
+        
+        // Close modal when clicking outside
+        document.getElementById('addModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAddModal();
+            }
+        });
+        
+        function submitNewCaregiver() {
+            var firstName = document.getElementById('addFirstName').value.trim();
+            var lastName = document.getElementById('addLastName').value.trim();
+            var hcaId = document.getElementById('addHcaId').value.trim();
+            var resultDiv = document.getElementById('addResult');
+            var submitBtn = document.getElementById('addSubmitBtn');
+            
+            // Validation
+            if (!firstName || !lastName || !hcaId) {
+                resultDiv.innerHTML = 
+                    '<div class="lookup-error" style="margin-top:15px;padding:12px;background:#f8d7da;border-radius:8px;color:#721c24;">' +
+                        '⚠️ Please fill in all fields.' +
+                    '</div>';
+                return;
+            }
+            
+            // Check for duplicate HCA ID
+            var existingCaregiver = allCaregivers.find(function(c) {
+                return c.hca_id === hcaId;
+            });
+            
+            if (existingCaregiver) {
+                resultDiv.innerHTML = 
+                    '<div class="lookup-error" style="margin-top:15px;padding:12px;background:#f8d7da;border-radius:8px;color:#721c24;">' +
+                        '⚠️ A caregiver with HCA ID ' + hcaId + ' already exists (' + existingCaregiver.first_name + ' ' + existingCaregiver.last_name + ').' +
+                    '</div>';
+                return;
+            }
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="loading-spinner" style="width:16px;height:16px;border-width:2px;"></span> Adding...';
+            resultDiv.innerHTML = 
+                '<div style="margin-top:15px;padding:12px;background:#e7f3ff;border-radius:8px;color:#0c5460;">' +
+                    '🔄 Looking up caregiver in CDSS registry...' +
+                '</div>';
+            
+            if (GOOGLE_SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL') {
+                // No Google Script configured - add locally only
+                addCaregiverLocally(firstName, lastName, hcaId, 'Not Checked', '', null);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '➕ Add Caregiver';
+                return;
+            }
+            
+            // Look up in CDSS first via Google Apps Script proxy
+            var lookupUrl = GOOGLE_SCRIPT_URL + 
+                '?page=lookup' +
+                '&fname=' + encodeURIComponent(firstName) + 
+                '&lname=' + encodeURIComponent(lastName) + 
+                '&hca=' + encodeURIComponent(hcaId);
+            
+            fetch(lookupUrl)
+                .then(response => response.json())
+                .then(data => {
+                    var status = data.status || 'Not Found';
+                    var expiration = data.expirationDate || '';
+                    
+                    var daysRemaining = null;
+                    if (expiration) {
+                        var today = new Date();
+                        var expDate = new Date(expiration);
+                        daysRemaining = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+                    }
+                    
+                    // Now add to Google Sheet via Apps Script
+                    addCaregiverToSheet(firstName, lastName, hcaId, status, expiration, daysRemaining);
+                })
+                .catch(error => {
+                    console.error('Lookup error:', error);
+                    // Add anyway with unknown status
+                    addCaregiverToSheet(firstName, lastName, hcaId, 'Error', '', null);
+                });
+        }
+        
+        function addCaregiverToSheet(firstName, lastName, hcaId, status, expiration, daysRemaining) {
+            var resultDiv = document.getElementById('addResult');
+            var submitBtn = document.getElementById('addSubmitBtn');
+            
+            // Call Google Apps Script to add the caregiver to the sheet
+            var addUrl = GOOGLE_SCRIPT_URL + 
+                '?page=add' +
+                '&fname=' + encodeURIComponent(firstName) + 
+                '&lname=' + encodeURIComponent(lastName) + 
+                '&hca=' + encodeURIComponent(hcaId) +
+                '&status=' + encodeURIComponent(status) +
+                '&expiration=' + encodeURIComponent(expiration);
+            
+            fetch(addUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        addCaregiverLocally(firstName, lastName, hcaId, status, expiration, daysRemaining);
+                    } else {
+                        resultDiv.innerHTML = 
+                            '<div class="lookup-error" style="margin-top:15px;padding:12px;background:#f8d7da;border-radius:8px;color:#721c24;">' +
+                                '❌ Failed to add caregiver: ' + (data.error || 'Unknown error') +
+                            '</div>';
+                    }
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '➕ Add Caregiver';
+                })
+                .catch(error => {
+                    console.error('Add error:', error);
+                    // Still add locally for display
+                    addCaregiverLocally(firstName, lastName, hcaId, status, expiration, daysRemaining);
+                    resultDiv.innerHTML += 
+                        '<div style="margin-top:10px;padding:8px;background:#fff3cd;border-radius:6px;color:#856404;font-size:12px;">' +
+                            '⚠️ Note: Could not save to Google Sheet. Changes are local only.' +
+                        '</div>';
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '➕ Add Caregiver';
+                });
+        }
+        
+        function addCaregiverLocally(firstName, lastName, hcaId, status, expiration, daysRemaining) {
+            var resultDiv = document.getElementById('addResult');
+            
+            var now = new Date();
+            var dateStr = now.getFullYear() + '-' + 
+                String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                String(now.getDate()).padStart(2, '0');
+            
+            var registryLink = CDSS_LOOKUP_URL + 
+                '?fname=' + encodeURIComponent(firstName) + 
+                '&lname=' + encodeURIComponent(lastName) + 
+                '&hca=' + encodeURIComponent(hcaId);
+            
+            var newCaregiver = {
+                first_name: firstName,
+                last_name: lastName,
+                hca_id: hcaId,
+                status: status,
+                expiration_date: expiration,
+                days_remaining: daysRemaining,
+                last_checked: dateStr,
+                registry_link: registryLink
+            };
+            
+            allCaregivers.push(newCaregiver);
+            filteredCaregivers = [...allCaregivers];
+            
+            updateStats();
+            applyFilters();
+            
+            var statusClass = 'status-' + status.toLowerCase().replace(' ', '');
+            resultDiv.innerHTML = 
+                '<div style="margin-top:15px;padding:15px;background:#d4edda;border-radius:8px;color:#155724;">' +
+                    '✅ <strong>Caregiver added successfully!</strong><br><br>' +
+                    '<strong>' + firstName + ' ' + lastName + '</strong><br>' +
+                    'HCA ID: ' + hcaId + '<br>' +
+                    'Status: <span class="status-badge ' + statusClass + '">' + status + '</span>' +
+                    (expiration ? '<br>Expiration: ' + expiration : '') +
+                '</div>';
+            
+            // Clear form after short delay
+            setTimeout(function() {
+                document.getElementById('addFirstName').value = '';
+                document.getElementById('addLastName').value = '';
+                document.getElementById('addHcaId').value = '';
+            }, 500);
+        }
+    </script>
+</body>
+</html>
