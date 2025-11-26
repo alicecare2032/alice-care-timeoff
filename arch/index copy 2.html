@@ -1141,10 +1141,10 @@
                 employeePhone: document.getElementById('employeePhone').value
             };
             
-            // Collect all days into an array
+            // Collect all days
             var days = document.querySelectorAll('.day-card');
-            var daysData = [];
             var submittedIds = [];
+            var submitPromises = [];
             
             days.forEach(function(day, index) {
                 var requestId = generateRequestId();
@@ -1162,60 +1162,58 @@
                     });
                 });
                 
-                daysData.push({
+                var data = {
                     requestId: requestId,
+                    employeeId: employeeInfo.employeeId,
+                    employeeName: employeeInfo.employeeName,
+                    employeeLastName: employeeInfo.employeeLastName,
+                    employeeEmail: employeeInfo.employeeEmail,
+                    employeePhone: employeeInfo.employeePhone,
                     requestType: type,
                     requestDate: date,
+                    submittedDate: new Date().toISOString(),
+                    recaptchaToken: recaptchaResponse,
                     services: services
+                };
+                
+                var promise = fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
                 });
+                
+                submitPromises.push(promise);
             });
             
-            // Send all days in a single request
-            var data = {
-                action: 'multiday',
-                employeeId: employeeInfo.employeeId,
-                employeeName: employeeInfo.employeeName,
-                employeeLastName: employeeInfo.employeeLastName,
-                employeeEmail: employeeInfo.employeeEmail,
-                employeePhone: employeeInfo.employeePhone,
-                submittedDate: new Date().toISOString(),
-                recaptchaToken: recaptchaResponse,
-                days: daysData
-            };
-            
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            })
-            .then(function() {
-                document.getElementById('generatedIds').innerHTML = 'Request IDs: ' + submittedIds.join(', ');
-                document.getElementById('successMessage').style.display = 'block';
-                
-                // Reset form
-                document.getElementById('timeOffForm').reset();
-                document.getElementById('daysContainer').innerHTML = '';
-                dayCount = 0;
-                addDay();
-                
-                grecaptcha.reset();
-                
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Submit Request';
-                
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                
-                setTimeout(function() {
-                    document.getElementById('successMessage').style.display = 'none';
-                }, 8000);
-            })
-            .catch(function(error) {
-                console.error('Error:', error);
-                alert('Request submitted successfully!');
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Submit Request';
-            });
+            Promise.all(submitPromises)
+                .then(function() {
+                    document.getElementById('generatedIds').innerHTML = 'Request IDs: ' + submittedIds.join(', ');
+                    document.getElementById('successMessage').style.display = 'block';
+                    
+                    // Reset form
+                    document.getElementById('timeOffForm').reset();
+                    document.getElementById('daysContainer').innerHTML = '';
+                    dayCount = 0;
+                    addDay();
+                    
+                    grecaptcha.reset();
+                    
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Request';
+                    
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    
+                    setTimeout(function() {
+                        document.getElementById('successMessage').style.display = 'none';
+                    }, 8000);
+                })
+                .catch(function(error) {
+                    console.error('Error:', error);
+                    alert('Request submitted successfully!');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Request';
+                });
         });
         
         // Load requests from Google Sheets
