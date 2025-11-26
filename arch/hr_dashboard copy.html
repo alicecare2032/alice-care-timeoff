@@ -1263,39 +1263,21 @@
         }
         
         function openReviewModalFromDetail() {
-            if (!currentRequestForDetail) {
-                console.error('No request selected');
-                alert('Error: No request selected. Please try again.');
-                return;
-            }
             var requestId = currentRequestForDetail.requestId;
-            // Close detail modal without clearing currentRequestForDetail yet
-            document.getElementById('detailModal').style.display = 'none';
+            closeModal('detailModal');
             openReviewModal(requestId);
         }
         
         function openApprovalModalFromDetail() {
-            if (!currentRequestForDetail) {
-                console.error('No request selected');
-                alert('Error: No request selected. Please try again.');
-                return;
-            }
             var requestId = currentRequestForDetail.requestId;
             var totalHours = currentRequestForDetail.totalHours;
-            // Close detail modal without clearing currentRequestForDetail yet
-            document.getElementById('detailModal').style.display = 'none';
+            closeModal('detailModal');
             openApprovalModal(requestId, totalHours);
         }
         
         function openRejectionModalFromDetail() {
-            if (!currentRequestForDetail) {
-                console.error('No request selected');
-                alert('Error: No request selected. Please try again.');
-                return;
-            }
             var requestId = currentRequestForDetail.requestId;
-            // Close detail modal without clearing currentRequestForDetail yet
-            document.getElementById('detailModal').style.display = 'none';
+            closeModal('detailModal');
             openRejectionModal(requestId);
         }
         
@@ -1535,13 +1517,8 @@
         
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
-            // Only clear relevant variables based on which modal is being closed
-            if (modalId === 'detailModal') {
-                currentRequestForDetail = null;
-            } else {
-                // For action modals (review, approval, rejection), clear currentRequestId
-                currentRequestId = null;
-            }
+            currentRequestId = null;
+            currentRequestForDetail = null;
         }
         
         function submitReview() {
@@ -1552,11 +1529,6 @@
             console.log('Reviewer Name:', reviewerName);
             console.log('Review Comments:', reviewComments);
             console.log('Request ID:', currentRequestId);
-            
-            if (!currentRequestId) {
-                alert('Error: No request selected. Please close this modal and try again.');
-                return;
-            }
             
             if (!reviewerName) {
                 alert('Please enter your name');
@@ -1591,11 +1563,6 @@
             console.log('Approved Hours:', approvedHours);
             console.log('Approval Comments:', approvalComments);
             console.log('Request ID:', currentRequestId);
-            
-            if (!currentRequestId) {
-                alert('Error: No request selected. Please close this modal and try again.');
-                return;
-            }
             
             if (!approverName) {
                 alert('Please enter your name');
@@ -1634,11 +1601,6 @@
             console.log('Rejector Name:', rejectorName);
             console.log('Rejection Comments:', rejectionComments);
             console.log('Request ID:', currentRequestId);
-            
-            if (!currentRequestId) {
-                alert('Error: No request selected. Please close this modal and try again.');
-                return;
-            }
             
             if (!rejectorName) {
                 alert('Please enter your name');
@@ -1690,14 +1652,13 @@
             });
         }
         
-        // Close modal when clicking outside - but only for detail modal
-        // Don't close action modals (review, approval, rejection) by clicking outside
+        // Close modal when clicking outside
         window.onclick = function(event) {
-            if (event.target.id === 'detailModal') {
+            if (event.target.className === 'modal') {
                 event.target.style.display = 'none';
+                currentRequestId = null;
                 currentRequestForDetail = null;
             }
-            // Don't allow closing action modals by clicking backdrop - require explicit button click
         }
     </script>
 </body>
