@@ -810,7 +810,6 @@
                         <th class="sortable" onclick="sortTable('employeeId')" id="th-employeeId">Employee ID <span class="sort-icon">⇅</span></th>
                         <th class="sortable" onclick="sortTable('requestType')" id="th-requestType">Type <span class="sort-icon">⇅</span></th>
                         <th class="sortable" onclick="sortTable('status')" id="th-status">Status <span class="sort-icon">⇅</span></th>
-                        <th class="sortable" onclick="sortTable('requestDate')" id="th-requestDate">Date <span class="sort-icon">⇅</span></th>
                         <th class="sortable" onclick="sortTable('weekYear')" id="th-weekYear">Week <span class="sort-icon">⇅</span></th>
                         <th class="sortable" onclick="sortTable('totalHours')" id="th-totalHours">Requested Hours <span class="sort-icon">⇅</span></th>
                         <th class="sortable" onclick="sortTable('approvedHours')" id="th-approvedHours">Approved Hours <span class="sort-icon">⇅</span></th>
@@ -819,7 +818,7 @@
                 </thead>
                 <tbody id="requestsTableBody">
                     <tr>
-                        <td colspan="9" class="loading">Loading requests</td>
+                        <td colspan="8" class="loading">Loading requests</td>
                     </tr>
                 </tbody>
             </table>
@@ -927,7 +926,7 @@
         
         function loadRequests() {
             var requestsTableBody = document.getElementById('requestsTableBody');
-            requestsTableBody.innerHTML = '<tr><td colspan="9" class="loading">Loading requests</td></tr>';
+            requestsTableBody.innerHTML = '<tr><td colspan="8" class="loading">Loading requests</td></tr>';
             
             fetch(GOOGLE_SCRIPT_URL)
                 .then(function(response) {
@@ -942,16 +941,16 @@
                             displayRequests();
                             updateStats();
                         } else {
-                            requestsTableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: #FF7475;">Error loading requests: ' + (result.error || 'Unknown error') + '</td></tr>';
+                            requestsTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #FF7475;">Error loading requests: ' + (result.error || 'Unknown error') + '</td></tr>';
                         }
                     } catch (e) {
                         console.error('Parse error:', e);
-                        requestsTableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: #FF7475;">Error: Unable to load requests. Please check Google Apps Script deployment.</td></tr>';
+                        requestsTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #FF7475;">Error: Unable to load requests. Please check Google Apps Script deployment.</td></tr>';
                     }
                 })
                 .catch(function(error) {
                     console.error('Fetch error:', error);
-                    requestsTableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: #FF7475;">Network error. Please try again.</td></tr>';
+                    requestsTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #FF7475;">Network error. Please try again.</td></tr>';
                 });
         }
         
@@ -962,7 +961,7 @@
             filterCount.innerHTML = 'Showing <span style="color: #F57600; font-weight: 700;">' + filteredRequests.length + '</span> requests';
             
             if (filteredRequests.length === 0) {
-                requestsTableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: #3D3D3D;">No requests found</td></tr>';
+                requestsTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #3D3D3D;">No requests found</td></tr>';
                 return;
             }
             
@@ -987,26 +986,15 @@
                 
                 var typeBadge = '<span class="badge badge-' + req.requestType + '">' + req.requestType.toUpperCase() + '</span>';
                 
-                // Get formatted date from requestDate (e.g., "25-Nov-25")
-                var formattedDate = 'N/A';
-                if (req.requestDate) {
-                    var dateObj = new Date(req.requestDate);
-                    var day = String(dateObj.getDate()).padStart(2, '0');
-                    var month = dateObj.toLocaleDateString('en-US', { month: 'short' });
-                    var year = String(dateObj.getFullYear()).slice(-2);
-                    formattedDate = day + '-' + month + '-' + year;
-                }
-                
                 html += '<tr>' +
                     '<td class="employee-name-cell">' + req.employeeName + ' ' + req.employeeLastName + '</td>' +
                     '<td>' + req.employeeId + '</td>' +
                     '<td>' + typeBadge + '</td>' +
                     '<td>' + statusBadge + '</td>' +
-                    '<td>' + formattedDate + '</td>' +
                     '<td>' + (req.weekYear || 'N/A') + '</td>' +
                     '<td class="hours-cell">' + totalHours.toFixed(2) + ' hrs</td>' +
                     '<td class="hours-cell">' + (req.approvedHours ? parseFloat(req.approvedHours).toFixed(2) : '-') + '</td>' +
-                    '<td><button class="btn btn-view-details btn-small" onclick="openDetailModal(' + i + ')">View Details</button></td>' +
+                    '<td><button class="btn btn-view-details btn-small" onclick="openDetailModal(\'' + req.requestId + '\')">View Details</button></td>' +
                     '</tr>';
             }
             
@@ -1056,10 +1044,6 @@
                 } else if (column === 'approvedHours') {
                     valA = parseFloat(a.approvedHours) || 0;
                     valB = parseFloat(b.approvedHours) || 0;
-                } else if (column === 'requestDate') {
-                    // Sort by date
-                    valA = a.requestDate ? new Date(a.requestDate).getTime() : 0;
-                    valB = b.requestDate ? new Date(b.requestDate).getTime() : 0;
                 } else if (column === 'weekYear') {
                     // Parse week-year format (e.g., "47-2024")
                     valA = parseWeekYear(a.weekYear);
@@ -1096,14 +1080,17 @@
             return 0;
         }
         
-        function openDetailModal(index) {
-            // Get request directly by index from filteredRequests
-            var req = filteredRequests[index];
-            
-            if (!req) {
-                console.error('Request not found at index:', index);
-                return;
+        function openDetailModal(requestId) {
+            // Find the request
+            var req = null;
+            for (var i = 0; i < filteredRequests.length; i++) {
+                if (filteredRequests[i].requestId === requestId) {
+                    req = filteredRequests[i];
+                    break;
+                }
             }
+            
+            if (!req) return;
             
             currentRequestForDetail = req;
             
