@@ -6,7 +6,6 @@
     <title>alice.care: Client Service Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <style>
         * {
             margin: 0;
@@ -1447,7 +1446,7 @@
                 </div>
                 
                 <!-- Row 1: Weekly Charts -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
                     <div style="background: white; border: 1px solid #E5ECF3; border-radius: 12px; padding: 20px;">
                         <h3 style="color: #1A365C; margin: 0 0 20px 0; font-size: 16px;">Weekly Revenue (Last 12 Weeks)</h3>
                         <div style="height: 220px; position: relative;">
@@ -1458,12 +1457,6 @@
                         <h3 style="color: #1A365C; margin: 0 0 20px 0; font-size: 16px;">Weekly Volume (Last 12 Weeks)</h3>
                         <div style="height: 220px; position: relative;">
                             <canvas id="weeklyVolumeChart"></canvas>
-                        </div>
-                    </div>
-                    <div style="background: white; border: 1px solid #E5ECF3; border-radius: 12px; padding: 20px;">
-                        <h3 style="color: #1A365C; margin: 0 0 20px 0; font-size: 16px;">Peak Hours (12 Week Avg)</h3>
-                        <div style="height: 220px; position: relative;">
-                            <canvas id="peakHoursChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -1493,7 +1486,7 @@
                 <!-- Row 3: Top Paying Clients -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
                     <div style="background: white; border: 1px solid #E5ECF3; border-radius: 12px; padding: 20px;">
-                        <h3 style="color: #1A365C; margin: 0 0 15px 0; font-size: 16px;">🏆 Top 10 Clients Last Week <span id="topClientsWeekLabel" style="font-weight: 400; color: #666;">(Week --)</span></h3>
+                        <h3 style="color: #1A365C; margin: 0 0 15px 0; font-size: 16px;">🏆 Top 10 Clients This Week <span id="topClientsWeekLabel" style="font-weight: 400; color: #666;">(Week --)</span></h3>
                         <table style="width: 100%; border-collapse: collapse;">
                             <thead>
                                 <tr style="background: #F9FAFB;">
@@ -3540,12 +3533,6 @@
         let monthlyRevenueChart = null;
         let monthlyVolumeChart = null;
         let quarterlyChart = null;
-        let peakHoursChart = null;
-        
-        // Register and configure datalabels plugin
-        Chart.register(ChartDataLabels);
-        // Disable datalabels plugin by default for all charts
-        Chart.defaults.plugins.datalabels.display = false;
         
         async function loadDashboardData() {
             const selectedYear = parseInt(document.getElementById('dashboardYear')?.value || new Date().getFullYear());
@@ -3605,21 +3592,20 @@
                 
                 document.getElementById('activeClients').textContent = metrics.activeClients;
                 
-                // Update week/month labels for top clients (use LAST week since data is always one week behind)
-                document.getElementById('topClientsWeekLabel').textContent = '(Week ' + metrics.lastWeekNum + ')';
+                // Update week/month labels for top clients
+                document.getElementById('topClientsWeekLabel').textContent = '(Week ' + metrics.currentWeekNum + ')';
                 document.getElementById('topClientsMonthLabel').textContent = '(' + metrics.currentMonthName + ')';
                 
                 // Render charts
                 renderWeeklyRevenueChart(metrics.weeklyData);
                 renderWeeklyVolumeChart(metrics.weeklyData);
-                renderPeakHoursChart(metrics.peakHoursData);
                 renderMonthlyRevenueChart(metrics.last13MonthsData);
                 renderMonthlyVolumeChart(metrics.last13MonthsData);
                 renderQuarterlyChart(metrics.quarterlyData);
                 
-                // Render top clients tables (use LAST week data)
+                // Render top clients tables
                 renderTopClientsTable('topClientsMonth', metrics.topClientsMonth);
-                renderTopClientsTable('topClientsWeek', metrics.topClientsLastWeek);
+                renderTopClientsTable('topClientsWeek', metrics.topClientsWeek);
                 
                 // Initialize provider filter and render tables
                 initProviderFilters();
@@ -3764,15 +3750,6 @@
             const weekHours = currentWeekData.reduce((sum, r) => sum + (parseFloat(r['Service Duration']) || 0) / 60, 0);
             const weekRevenue = currentWeekData.reduce((sum, r) => sum + (parseFloat(r['Cost To Customer']) || 0), 0);
             
-            // Last week (data is always one week behind)
-            const lastWeek = currentWeek > 1 ? currentWeek - 1 : 52;
-            const lastWeekYear = currentWeek > 1 ? year : year - 1;
-            const lastWeekData = data.filter(r => 
-                (r.Status || '').toUpperCase() === 'COMPLETED' &&
-                parseInt(r.Year) === lastWeekYear && 
-                parseInt(r.Week) === lastWeek
-            );
-            
             // Current month
             const currentMonthData = completedYearData.filter(r => parseInt(r.Month) === currentMonth);
             const monthServices = currentMonthData.length;
@@ -3851,9 +3828,6 @@
                 });
             }
             
-            // Peak hours data - analyze start times from last 12 weeks
-            const peakHoursData = calculatePeakHours(allCompletedData, now);
-            
             return {
                 ytd: { services: ytdServices, hours: ytdHours, revenue: ytdRevenue, avgRevenue: ytdAvgRevenue },
                 yoy: {
@@ -3867,80 +3841,13 @@
                 currentQuarter: { services: quarterServices, hours: quarterHours, revenue: quarterRevenue },
                 activeClients,
                 currentWeekNum: currentWeek,
-                lastWeekNum: lastWeek,
                 currentMonthName: fullMonthNames[currentMonth - 1],
                 last13MonthsData,
                 quarterlyData,
                 weeklyData,
-                peakHoursData,
                 topClientsMonth: calculateTopClients(currentMonthData, 10),
-                topClientsLastWeek: calculateTopClients(lastWeekData, 10)
+                topClientsWeek: calculateTopClients(currentWeekData, 10)
             };
-        }
-        
-        function calculatePeakHours(data, now) {
-            // Get data from last 12 weeks
-            const twelveWeeksAgo = new Date(now);
-            twelveWeeksAgo.setDate(twelveWeeksAgo.getDate() - 84); // 12 weeks * 7 days
-            
-            // Initialize hourly buckets (5 AM to 10 PM to cover typical service hours)
-            const hourlyData = {};
-            for (let h = 5; h <= 22; h++) {
-                hourlyData[h] = { hour: h, totalServices: 0, days: new Set() };
-            }
-            
-            // Analyze each service's start time
-            data.forEach(r => {
-                // Try to get start time from STxTime or StartTIME column
-                const startTime = r['STxTime'] || r['StartTIME'] || r['Start Time'] || '';
-                if (!startTime) return;
-                
-                // Parse the time to get hour
-                let hour = null;
-                if (typeof startTime === 'string') {
-                    // Handle formats like "9:00 AM", "14:00", "9:00"
-                    const timeMatch = startTime.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
-                    if (timeMatch) {
-                        hour = parseInt(timeMatch[1]);
-                        const isPM = timeMatch[3] && timeMatch[3].toUpperCase() === 'PM';
-                        const isAM = timeMatch[3] && timeMatch[3].toUpperCase() === 'AM';
-                        if (isPM && hour !== 12) hour += 12;
-                        if (isAM && hour === 12) hour = 0;
-                    }
-                } else if (typeof startTime === 'number') {
-                    // Handle Excel serial time (fraction of day)
-                    hour = Math.floor(startTime * 24);
-                }
-                
-                if (hour !== null && hour >= 5 && hour <= 22 && hourlyData[hour]) {
-                    hourlyData[hour].totalServices++;
-                    // Track unique days to calculate average
-                    const dateKey = r['Scheduled Date'] || r['Year'] + '-' + r['Month'] + '-' + r['Week'];
-                    hourlyData[hour].days.add(dateKey);
-                }
-            });
-            
-            // Calculate daily average for each hour
-            const result = [];
-            for (let h = 5; h <= 22; h++) {
-                const dayCount = hourlyData[h].days.size || 1;
-                const avgServices = hourlyData[h].totalServices / Math.max(dayCount / 7, 1); // Normalize to weekly average
-                result.push({
-                    hour: h,
-                    label: formatHour(h),
-                    avgServices: avgServices,
-                    totalServices: hourlyData[h].totalServices
-                });
-            }
-            
-            return result;
-        }
-        
-        function formatHour(hour) {
-            if (hour === 0 || hour === 24) return '12 AM';
-            if (hour === 12) return '12 PM';
-            if (hour < 12) return hour + ' AM';
-            return (hour - 12) + ' PM';
         }
         
         function calculateTopClients(data, limit = 10) {
@@ -4050,103 +3957,19 @@
                 type: 'bar',
                 data: {
                     labels: weeklyData.map(d => d.label),
-                    datasets: [
-                        {
-                            label: 'Services',
-                            data: weeklyData.map(d => d.services),
-                            backgroundColor: '#62B790',
-                            borderRadius: 4,
-                            yAxisID: 'y',
-                            order: 2  // Higher order = rendered first (behind)
-                        },
-                        {
-                            label: 'Hours',
-                            data: weeklyData.map(d => d.hours),
-                            type: 'line',
-                            borderColor: '#1A365C',
-                            backgroundColor: 'rgba(26, 54, 92, 0.1)',
-                            tension: 0.3,
-                            fill: false,
-                            borderWidth: 2,
-                            pointRadius: 3,
-                            pointBackgroundColor: '#1A365C',
-                            yAxisID: 'y1',
-                            order: 1  // Lower order = rendered last (in front)
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: { intersect: false, mode: 'index' },
-                    plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 8 } } },
-                    scales: {
-                        y: { 
-                            type: 'linear', 
-                            position: 'left', 
-                            beginAtZero: true,
-                            title: { display: true, text: 'Services' }
-                        },
-                        y1: { 
-                            type: 'linear', 
-                            position: 'right', 
-                            beginAtZero: true,
-                            title: { display: true, text: 'Hours' },
-                            grid: { drawOnChartArea: false }
-                        }
-                    }
-                }
-            });
-        }
-        
-        function renderPeakHoursChart(peakHoursData) {
-            const ctx = document.getElementById('peakHoursChart');
-            if (!ctx) return;
-            
-            if (peakHoursChart) peakHoursChart.destroy();
-            
-            peakHoursChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: peakHoursData.map(d => d.label),
                     datasets: [{
-                        label: 'Avg Services',
-                        data: peakHoursData.map(d => d.avgServices),
-                        backgroundColor: peakHoursData.map(d => {
-                            // Color code by intensity
-                            const maxVal = Math.max(...peakHoursData.map(x => x.avgServices));
-                            const intensity = d.avgServices / maxVal;
-                            if (intensity > 0.7) return '#F57600'; // Peak hours - orange
-                            if (intensity > 0.4) return '#1A365C'; // Moderate - navy
-                            return '#E5ECF3'; // Low - light gray
-                        }),
+                        label: 'Services',
+                        data: weeklyData.map(d => d.services),
+                        backgroundColor: '#62B790',
                         borderRadius: 4
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return 'Avg: ' + context.raw.toFixed(1) + ' services/day';
-                                }
-                            }
-                        }
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
-                        y: { 
-                            beginAtZero: true, 
-                            title: { display: true, text: 'Avg Services' }
-                        },
-                        x: {
-                            ticks: {
-                                maxRotation: 45,
-                                minRotation: 45
-                            }
-                        }
+                        y: { beginAtZero: true, title: { display: true, text: 'Services' } }
                     }
                 }
             });
@@ -4239,16 +4062,14 @@
                     datasets: [{
                         data: quarterlyData.map(d => d.revenue),
                         backgroundColor: ['#1A365C', '#F57600', '#62B790', '#2196F3'],
-                        borderWidth: 2,
-                        borderColor: '#fff'
+                        borderWidth: 0
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    cutout: '40%',
                     plugins: {
-                        legend: { display: false },
+                        legend: { position: 'bottom' },
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
@@ -4256,23 +4077,6 @@
                                     return context.label + ': $' + value.toLocaleString(undefined, {maximumFractionDigits: 0});
                                 }
                             }
-                        },
-                        datalabels: {
-                            display: true,
-                            color: '#fff',
-                            font: {
-                                weight: 'bold',
-                                size: 14
-                            },
-                            formatter: function(value, context) {
-                                const label = context.chart.data.labels[context.dataIndex];
-                                if (value > 0) {
-                                    return label;
-                                }
-                                return '';
-                            },
-                            anchor: 'center',
-                            align: 'center'
                         }
                     }
                 }
