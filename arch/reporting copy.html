@@ -21,60 +21,6 @@
             padding: 20px;
         }
         
-        /* Loading Spinner Overlay */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(26, 54, 92, 0.7);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-            backdrop-filter: blur(3px);
-        }
-        
-        .loading-overlay.active {
-            display: flex;
-        }
-        
-        .loading-content {
-            background: white;
-            padding: 40px 60px;
-            border-radius: 16px;
-            text-align: center;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-        }
-        
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 5px solid #E5ECF3;
-            border-top: 5px solid #F57600;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .loading-text {
-            color: #1A365C;
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-        
-        .loading-subtext {
-            color: #666;
-            font-size: 13px;
-        }
-        
         /* Tab Navigation */
         .nav-tabs {
             max-width: 1200px;
@@ -1185,15 +1131,6 @@
     </style>
 </head>
 <body>
-    <!-- Loading Spinner Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-content">
-            <div class="spinner"></div>
-            <div class="loading-text" id="loadingText">Loading...</div>
-            <div class="loading-subtext" id="loadingSubtext">Please wait</div>
-        </div>
-    </div>
-    
     <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
     
@@ -1672,24 +1609,6 @@
                     </div>
                     <div id="automationStatusContent" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
                         <!-- Populated by JS -->
-                    </div>
-                </div>
-                
-                <!-- Historical Archive Section -->
-                <div id="archiveSection" style="background: #E8F5E9; border: 1px solid #A5D6A7; border-radius: 12px; padding: 20px; margin-bottom: 30px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <h3 style="color: #1A365C; margin: 0; font-size: 16px;">📊 Data Cache Status</h3>
-                        <button class="btn btn-secondary" onclick="clearDashboardCache()" style="padding: 8px 12px;">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
-                                <polyline points="1 4 1 10 7 10"/>
-                                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
-                            </svg>
-                            Refresh Data
-                        </button>
-                    </div>
-                    <div id="cacheStatusContent" style="font-size: 13px; color: #666;">
-                        <p>Data is loaded by year for faster performance. Select a year from the dropdown above to view historical data.</p>
-                        <div id="cachedYearsInfo" style="margin-top: 10px; font-size: 12px;"></div>
                     </div>
                 </div>
             </div>
@@ -2545,10 +2464,6 @@
         let currentPage = 1;
         let selectedClient = null;
         
-        // Dashboard data cache - stores data by year to avoid re-fetching
-        let dashboardDataCache = {};
-        let availableYears = [];
-        
         // ============================================
         // JSONP FETCH (No-CORS compatible)
         // ============================================
@@ -2588,7 +2503,12 @@
         // ============================================
         // TAB NAVIGATION
         // ============================================
-        // Tab handlers are set up in DOMContentLoaded below
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tab = this.dataset.tab;
+                switchTab(tab);
+            });
+        });
         
         function switchTab(tab) {
             currentTab = tab;
@@ -2606,12 +2526,7 @@
             } else if (tab === 'client' && clientData.length === 0) {
                 loadClientData();
             } else if (tab === 'dashboard') {
-                // Load available years first if not loaded, then load dashboard data
-                if (availableYears.length === 0) {
-                    loadAvailableYears().then(() => loadDashboardData());
-                } else {
-                    loadDashboardData();
-                }
+                loadDashboardData();
             }
         }
         
@@ -2772,8 +2687,7 @@
             document.getElementById('filterMonth').value = '';
             document.getElementById('filterYear').value = '';
             currentPage = 1;
-            reportData = [];  // Clear the data
-            showReportFilterPrompt();  // Show filter prompt instead of loading all data
+            loadReportData();
         }
         
         // ============================================
@@ -3288,16 +3202,7 @@
             btn.disabled = true;
             btn.innerHTML = '<div class="spinner" style="width: 16px; height: 16px; border-width: 2px; margin: 0;"></div> Sending...';
             
-            // Show loading overlay
-            let periodLabel;
-            if (periodType === 'week') periodLabel = 'Week ' + periodValue;
-            else if (periodType === 'month') periodLabel = 'Month ' + periodValue;
-            else periodLabel = 'Year ' + year;
-            showLoading('Generating Report', `Creating ${periodLabel} report for ${selectedClient['Customer Name']}...`);
-            
             try {
-                updateLoadingText('Sending Report', 'Sending email with PDF attachment...');
-                
                 const result = await jsonpFetch({ 
                     action: 'sendClientInvoice', 
                     customerName: selectedClient['Customer Name'],
@@ -3306,10 +3211,13 @@
                     year: year
                 });
                 
-                hideLoading();
                 console.log('Send report result:', result);
                 
                 if (result.success) {
+                    let periodLabel;
+                    if (periodType === 'week') periodLabel = 'Week ' + periodValue;
+                    else if (periodType === 'month') periodLabel = 'Month ' + periodValue;
+                    else periodLabel = 'Year ' + year;
                     showToast(`Report for ${periodLabel} sent to ${result.sentTo}`, 'success');
                     closeSendReportModal();
                 } else {
@@ -3320,7 +3228,6 @@
                     throw new Error(result.error || 'Failed to send report');
                 }
             } catch (error) {
-                hideLoading();
                 showToast(error.message, 'error');
                 console.error('Send report error:', error);
             } finally {
@@ -3345,7 +3252,10 @@
             closeClientDetail();
             
             // Switch to report tab
-            switchTab('report');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelector('[data-tab="report"]').classList.add('active');
+            document.getElementById('report-panel').classList.add('active');
             
             // Set the filter value
             document.getElementById('filterClient').value = customerName;
@@ -3637,99 +3547,35 @@
         // Disable datalabels plugin by default for all charts
         Chart.defaults.plugins.datalabels.display = false;
         
-        /**
-         * Load available years from the server and populate the year dropdown
-         */
-        async function loadAvailableYears() {
-            try {
-                console.log('Fetching available years...');
-                const result = await jsonpFetch({ action: 'getAvailableYears' });
-                console.log('Available years result:', result);
-                
-                if (result.success) {
-                    availableYears = result.years || [];
-                    
-                    // Populate dashboard year dropdown
-                    const yearSelect = document.getElementById('dashboardYear');
-                    if (yearSelect && availableYears.length > 0) {
-                        yearSelect.innerHTML = '';
-                        availableYears.forEach(year => {
-                            const option = document.createElement('option');
-                            option.value = year;
-                            option.textContent = year;
-                            if (result.yearCounts && result.yearCounts[year]) {
-                                option.textContent += ` (${result.yearCounts[year].toLocaleString()} records)`;
-                            }
-                            yearSelect.appendChild(option);
-                        });
-                        
-                        // Default to current year if available, otherwise first year
-                        const currentYear = new Date().getFullYear();
-                        if (availableYears.includes(currentYear)) {
-                            yearSelect.value = currentYear;
-                        }
-                    }
-                    
-                    console.log('Year dropdown populated with:', availableYears);
-                    return availableYears;
-                } else {
-                    console.error('Failed to load available years:', result.error);
-                    return [];
-                }
-            } catch (error) {
-                console.error('Error loading available years:', error);
-                return [];
-            }
-        }
-        
         async function loadDashboardData() {
             const selectedYear = parseInt(document.getElementById('dashboardYear')?.value || new Date().getFullYear());
             document.getElementById('dashboardYearLabel').textContent = selectedYear;
             
-            showLoading('Loading Dashboard', `Fetching ${selectedYear} data...`);
-            
             try {
-                // Check if we have cached data for this year
-                if (!dashboardDataCache[selectedYear]) {
-                    console.log(`Fetching data for year ${selectedYear}...`);
-                    
-                    // Fetch data for selected year + last year (for YoY comparison)
-                    const result = await jsonpFetch({ 
-                        action: 'getDashboardData', 
-                        year: selectedYear.toString(),
-                        includeLastYear: 'true'
-                    });
-                    
-                    console.log('Dashboard data result:', result);
-                    
-                    if (result.success) {
-                        // Cache the data
-                        dashboardDataCache[selectedYear] = result.data || [];
-                        console.log(`Cached ${dashboardDataCache[selectedYear].length} records for ${selectedYear}`);
-                    } else {
-                        hideLoading();
-                        console.error('Failed to fetch dashboard data:', result.error);
-                        showToast('Error loading dashboard: ' + result.error, 'error');
-                        return;
+                // Always fetch fresh data for dashboard
+                console.log('Fetching report data for dashboard...');
+                const result = await jsonpFetch({ action: 'getReportData' });
+                console.log('Report data result:', result);
+                
+                if (result.success) {
+                    reportData = result.data || [];
+                    console.log('Loaded ' + reportData.length + ' records');
+                    if (reportData.length > 0) {
+                        console.log('Sample record:', reportData[0]);
+                        console.log('Available fields:', Object.keys(reportData[0]));
                     }
                 } else {
-                    console.log(`Using cached data for ${selectedYear} (${dashboardDataCache[selectedYear].length} records)`);
-                }
-                
-                // Use cached data
-                const yearData = dashboardDataCache[selectedYear];
-                
-                if (yearData.length === 0) {
-                    hideLoading();
-                    console.log('No data available for ' + selectedYear);
-                    showToast(`No data found for ${selectedYear}`, 'warning');
+                    console.error('Failed to fetch report data:', result.error);
                     return;
                 }
                 
-                updateLoadingText('Loading Dashboard', 'Calculating metrics...');
+                if (reportData.length === 0) {
+                    console.log('No report data available');
+                    return;
+                }
                 
                 // Calculate dashboard metrics
-                const metrics = calculateDashboardMetrics(yearData, selectedYear);
+                const metrics = calculateDashboardMetrics(reportData, selectedYear);
                 console.log('Calculated metrics:', metrics);
                 
                 // Update YTD KPIs
@@ -3745,17 +3591,17 @@
                 updateYoYChange('ytdAvgRevenueChange', metrics.yoy.avgRevenueChange);
                 
                 // Update current period stats
-                document.getElementById('weekServices').textContent = metrics.thisWeek.services.toLocaleString();
-                document.getElementById('weekHours').textContent = metrics.thisWeek.hours.toLocaleString(undefined, {maximumFractionDigits: 1});
-                document.getElementById('weekRevenue').textContent = metrics.thisWeek.revenue.toLocaleString(undefined, {maximumFractionDigits: 0});
+                document.getElementById('weekServices').textContent = metrics.currentWeek.services.toLocaleString();
+                document.getElementById('weekHours').textContent = metrics.currentWeek.hours.toLocaleString(undefined, {maximumFractionDigits: 1});
+                document.getElementById('weekRevenue').textContent = metrics.currentWeek.revenue.toLocaleString(undefined, {maximumFractionDigits: 0});
                 
-                document.getElementById('monthServices').textContent = metrics.thisMonth.services.toLocaleString();
-                document.getElementById('monthHours').textContent = metrics.thisMonth.hours.toLocaleString(undefined, {maximumFractionDigits: 1});
-                document.getElementById('monthRevenue').textContent = metrics.thisMonth.revenue.toLocaleString(undefined, {maximumFractionDigits: 0});
+                document.getElementById('monthServices').textContent = metrics.currentMonth.services.toLocaleString();
+                document.getElementById('monthHours').textContent = metrics.currentMonth.hours.toLocaleString(undefined, {maximumFractionDigits: 1});
+                document.getElementById('monthRevenue').textContent = metrics.currentMonth.revenue.toLocaleString(undefined, {maximumFractionDigits: 0});
                 
-                document.getElementById('quarterServices').textContent = metrics.thisQuarter.services.toLocaleString();
-                document.getElementById('quarterHours').textContent = metrics.thisQuarter.hours.toLocaleString(undefined, {maximumFractionDigits: 1});
-                document.getElementById('quarterRevenue').textContent = metrics.thisQuarter.revenue.toLocaleString(undefined, {maximumFractionDigits: 0});
+                document.getElementById('quarterServices').textContent = metrics.currentQuarter.services.toLocaleString();
+                document.getElementById('quarterHours').textContent = metrics.currentQuarter.hours.toLocaleString(undefined, {maximumFractionDigits: 1});
+                document.getElementById('quarterRevenue').textContent = metrics.currentQuarter.revenue.toLocaleString(undefined, {maximumFractionDigits: 0});
                 
                 document.getElementById('activeClients').textContent = metrics.activeClients;
                 
@@ -3781,15 +3627,8 @@
                 
                 // Load automation config
                 loadAutomationConfig();
-                
-                // Update cache status display
-                updateCacheStatus();
-                
-                hideLoading();
             } catch (error) {
-                hideLoading();
                 console.error('Failed to load dashboard data:', error);
-                showToast('Error loading dashboard', 'error');
             }
         }
         
@@ -3819,33 +3658,6 @@
             updateProviderFilter();
         }
         
-        /**
-         * Clear dashboard data cache and reload
-         */
-        function clearDashboardCache() {
-            dashboardDataCache = {};
-            showToast('Cache cleared. Reloading data...', 'info');
-            loadDashboardData();
-        }
-        
-        /**
-         * Update the cache status display
-         */
-        function updateCacheStatus() {
-            const cachedYears = Object.keys(dashboardDataCache);
-            const infoDiv = document.getElementById('cachedYearsInfo');
-            if (infoDiv) {
-                if (cachedYears.length > 0) {
-                    const details = cachedYears.map(y => 
-                        `${y}: ${dashboardDataCache[y].length.toLocaleString()} records`
-                    ).join(' | ');
-                    infoDiv.innerHTML = `<strong>Cached:</strong> ${details}`;
-                } else {
-                    infoDiv.innerHTML = '<em>No data cached yet</em>';
-                }
-            }
-        }
-        
         function updateProviderFilter() {
             const filterType = document.getElementById('providerFilterType').value;
             document.getElementById('providerFilterMonth').style.display = filterType === 'month' ? 'inline-block' : 'none';
@@ -3859,11 +3671,9 @@
             const month = parseInt(document.getElementById('providerFilterMonth').value);
             const week = parseInt(document.getElementById('providerFilterWeek').value);
             
-            // Use cached dashboard data if available, otherwise use reportData
-            const sourceData = dashboardDataCache[year] || reportData;
-            
-            // Filter data based on selection (data is already completed from getDashboardData)
-            let filteredData = sourceData.filter(r => parseInt(r.Year) === year);
+            // Filter data based on selection
+            let filteredData = reportData.filter(r => (r.Status || '').toUpperCase() === 'COMPLETED');
+            filteredData = filteredData.filter(r => parseInt(r.Year) === year);
             
             if (filterType === 'month') {
                 filteredData = filteredData.filter(r => parseInt(r.Month) === month);
@@ -3921,15 +3731,9 @@
         
         function calculateDashboardMetrics(data, year) {
             const now = new Date();
-            const currentActualYear = now.getFullYear();
-            const isHistoricalYear = year < currentActualYear;
-            
-            // For historical years, use end of that year as reference point
-            // For current year, use today's date
-            const referenceDate = isHistoricalYear ? new Date(year, 11, 31) : now;
-            const currentMonth = isHistoricalYear ? 12 : (now.getMonth() + 1);
+            const currentMonth = now.getMonth() + 1;
             const currentQuarter = Math.ceil(currentMonth / 3);
-            const currentWeek = isHistoricalYear ? 52 : getWeekNumber(now);
+            const currentWeek = getWeekNumber(now);
             
             // Filter data by year
             const yearData = data.filter(r => parseInt(r.Year) === year);
@@ -3954,28 +3758,28 @@
             // YoY changes
             const calcChange = (current, previous) => previous > 0 ? ((current - previous) / previous * 100) : 0;
             
-            // Current week (for historical years, use last week of that year)
+            // Current week
             const currentWeekData = completedYearData.filter(r => parseInt(r.Week) === currentWeek);
             const weekServices = currentWeekData.length;
             const weekHours = currentWeekData.reduce((sum, r) => sum + (parseFloat(r['Service Duration']) || 0) / 60, 0);
             const weekRevenue = currentWeekData.reduce((sum, r) => sum + (parseFloat(r['Cost To Customer']) || 0), 0);
             
-            // Last week (for historical years, use week 51)
-            const lastWeek = isHistoricalYear ? 51 : (currentWeek > 1 ? currentWeek - 1 : 52);
-            const lastWeekYear = isHistoricalYear ? year : (currentWeek > 1 ? year : year - 1);
+            // Last week (data is always one week behind)
+            const lastWeek = currentWeek > 1 ? currentWeek - 1 : 52;
+            const lastWeekYear = currentWeek > 1 ? year : year - 1;
             const lastWeekData = data.filter(r => 
                 (r.Status || '').toUpperCase() === 'COMPLETED' &&
                 parseInt(r.Year) === lastWeekYear && 
                 parseInt(r.Week) === lastWeek
             );
             
-            // Current month (for historical years, use December)
+            // Current month
             const currentMonthData = completedYearData.filter(r => parseInt(r.Month) === currentMonth);
             const monthServices = currentMonthData.length;
             const monthHours = currentMonthData.reduce((sum, r) => sum + (parseFloat(r['Service Duration']) || 0) / 60, 0);
             const monthRevenue = currentMonthData.reduce((sum, r) => sum + (parseFloat(r['Cost To Customer']) || 0), 0);
             
-            // Current quarter (for historical years, use Q4)
+            // Current quarter
             const quarterMonths = [(currentQuarter - 1) * 3 + 1, (currentQuarter - 1) * 3 + 2, (currentQuarter - 1) * 3 + 3];
             const currentQuarterData = completedYearData.filter(r => quarterMonths.includes(parseInt(r.Month)));
             const quarterServices = currentQuarterData.length;
@@ -3989,44 +3793,28 @@
             const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             const fullMonthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
             
-            // All completed data (for charts)
+            // All completed data (for last 13 months calculation)
             const allCompletedData = data.filter(r => (r.Status || '').toUpperCase() === 'COMPLETED');
             
-            // Last 13 months data - for historical years, show that year's 12 months
+            // Last 13 months data (rolling window)
             const last13MonthsData = [];
-            if (isHistoricalYear) {
-                // For historical year, show all 12 months of that year
-                for (let m = 1; m <= 12; m++) {
-                    const monthData = completedYearData.filter(r => parseInt(r.Month) === m);
-                    last13MonthsData.push({
-                        label: monthNames[m - 1] + ' ' + String(year).slice(2),
-                        month: m,
-                        year: year,
-                        services: monthData.length,
-                        hours: monthData.reduce((sum, r) => sum + (parseFloat(r['Service Duration']) || 0) / 60, 0),
-                        revenue: monthData.reduce((sum, r) => sum + (parseFloat(r['Cost To Customer']) || 0), 0)
-                    });
-                }
-            } else {
-                // For current year, show rolling 13 months
-                for (let i = 12; i >= 0; i--) {
-                    const targetDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                    const targetYear = targetDate.getFullYear();
-                    const targetMonth = targetDate.getMonth() + 1;
-                    
-                    const monthData = allCompletedData.filter(r => 
-                        parseInt(r.Year) === targetYear && parseInt(r.Month) === targetMonth
-                    );
-                    
-                    last13MonthsData.push({
-                        label: monthNames[targetMonth - 1] + ' ' + String(targetYear).slice(2),
-                        month: targetMonth,
-                        year: targetYear,
-                        services: monthData.length,
-                        hours: monthData.reduce((sum, r) => sum + (parseFloat(r['Service Duration']) || 0) / 60, 0),
-                        revenue: monthData.reduce((sum, r) => sum + (parseFloat(r['Cost To Customer']) || 0), 0)
-                    });
-                }
+            for (let i = 12; i >= 0; i--) {
+                const targetDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const targetYear = targetDate.getFullYear();
+                const targetMonth = targetDate.getMonth() + 1;
+                
+                const monthData = allCompletedData.filter(r => 
+                    parseInt(r.Year) === targetYear && parseInt(r.Month) === targetMonth
+                );
+                
+                last13MonthsData.push({
+                    label: monthNames[targetMonth - 1] + ' ' + String(targetYear).slice(2),
+                    month: targetMonth,
+                    year: targetYear,
+                    services: monthData.length,
+                    hours: monthData.reduce((sum, r) => sum + (parseFloat(r['Service Duration']) || 0) / 60, 0),
+                    revenue: monthData.reduce((sum, r) => sum + (parseFloat(r['Cost To Customer']) || 0), 0)
+                });
             }
             
             // Quarterly data for selected year
@@ -4042,65 +3830,29 @@
                 });
             }
             
-            // Weekly data (last 12 weeks) - for historical years, show last 12 weeks of that year
+            // Weekly data (last 12 weeks) - handle year boundary
             const weeklyData = [];
-            if (isHistoricalYear) {
-                // For historical year, show weeks 41-52 (last 12 weeks of year)
-                for (let w = 41; w <= 52; w++) {
-                    const weekData = completedYearData.filter(r => parseInt(r.Week) === w);
-                    weeklyData.push({
-                        week: w,
-                        label: 'W' + w,
-                        services: weekData.length,
-                        hours: weekData.reduce((sum, r) => sum + (parseFloat(r['Service Duration']) || 0) / 60, 0),
-                        revenue: weekData.reduce((sum, r) => sum + (parseFloat(r['Cost To Customer']) || 0), 0)
-                    });
-                }
-            } else {
-                // For current year, show rolling 12 weeks
-                for (let i = 11; i >= 0; i--) {
-                    const targetDate = new Date(now);
-                    targetDate.setDate(targetDate.getDate() - (i * 7));
-                    const targetWeek = getWeekNumber(targetDate);
-                    const targetYear = targetDate.getFullYear();
-                    
-                    const weekData = allCompletedData.filter(r => 
-                        parseInt(r.Year) === targetYear && parseInt(r.Week) === targetWeek
-                    );
-                    
-                    weeklyData.push({
-                        week: targetWeek,
-                        label: 'W' + targetWeek,
-                        services: weekData.length,
-                        hours: weekData.reduce((sum, r) => sum + (parseFloat(r['Service Duration']) || 0) / 60, 0),
-                        revenue: weekData.reduce((sum, r) => sum + (parseFloat(r['Cost To Customer']) || 0), 0)
-                    });
-                }
+            for (let i = 11; i >= 0; i--) {
+                const targetDate = new Date(now);
+                targetDate.setDate(targetDate.getDate() - (i * 7));
+                const targetWeek = getWeekNumber(targetDate);
+                const targetYear = targetDate.getFullYear();
+                
+                const weekData = allCompletedData.filter(r => 
+                    parseInt(r.Year) === targetYear && parseInt(r.Week) === targetWeek
+                );
+                
+                weeklyData.push({
+                    week: targetWeek,
+                    label: 'W' + targetWeek,
+                    services: weekData.length,
+                    hours: weekData.reduce((sum, r) => sum + (parseFloat(r['Service Duration']) || 0) / 60, 0),
+                    revenue: weekData.reduce((sum, r) => sum + (parseFloat(r['Cost To Customer']) || 0), 0)
+                });
             }
             
-            // Peak hours data - analyze start times from the year's data
-            const peakHoursData = calculatePeakHours(completedYearData, referenceDate);
-            
-            // For "this week" label - show appropriate week info
-            const thisWeek = {
-                services: weekServices,
-                hours: weekHours,
-                revenue: weekRevenue
-            };
-            
-            // For "this month" - use currentMonth data
-            const thisMonth = {
-                services: monthServices,
-                hours: monthHours,
-                revenue: monthRevenue
-            };
-            
-            // For "this quarter" - use currentQuarter data
-            const thisQuarter = {
-                services: quarterServices,
-                hours: quarterHours,
-                revenue: quarterRevenue
-            };
+            // Peak hours data - analyze start times from last 12 weeks
+            const peakHoursData = calculatePeakHours(allCompletedData, now);
             
             return {
                 ytd: { services: ytdServices, hours: ytdHours, revenue: ytdRevenue, avgRevenue: ytdAvgRevenue },
@@ -4110,21 +3862,19 @@
                     revenueChange: calcChange(ytdRevenue, lyRevenue),
                     avgRevenueChange: calcChange(ytdAvgRevenue, lyAvgRevenue)
                 },
-                thisWeek: thisWeek,
-                thisMonth: thisMonth,
-                thisQuarter: thisQuarter,
+                currentWeek: { services: weekServices, hours: weekHours, revenue: weekRevenue },
+                currentMonth: { services: monthServices, hours: monthHours, revenue: monthRevenue },
+                currentQuarter: { services: quarterServices, hours: quarterHours, revenue: quarterRevenue },
                 activeClients,
                 currentWeekNum: currentWeek,
                 lastWeekNum: lastWeek,
                 currentMonthName: fullMonthNames[currentMonth - 1],
-                currentQuarter: currentQuarter,
                 last13MonthsData,
                 quarterlyData,
                 weeklyData,
                 peakHoursData,
                 topClientsMonth: calculateTopClients(currentMonthData, 10),
-                topClientsLastWeek: calculateTopClients(lastWeekData, 10),
-                isHistoricalYear: isHistoricalYear
+                topClientsLastWeek: calculateTopClients(lastWeekData, 10)
             };
         }
         
@@ -4527,175 +4277,6 @@
                     }
                 }
             });
-        }
-        
-        // ============================================
-        // ARCHIVE DATA FUNCTIONS
-        // ============================================
-        
-        let archiveData = [];
-        let archiveYears = [];
-        
-        async function loadArchiveYears() {
-            try {
-                console.log('Calling getArchiveYears...');
-                const result = await jsonpFetch({ action: 'getArchiveYears' });
-                console.log('getArchiveYears result:', result);
-                
-                if (result.success) {
-                    archiveYears = result.years || [];
-                    console.log('Archive years found:', archiveYears);
-                    
-                    // Update UI
-                    document.getElementById('archiveNotConfigured').style.display = 'none';
-                    document.getElementById('archiveContent').style.display = 'block';
-                    
-                    // Populate year dropdown
-                    const select = document.getElementById('archiveYearSelect');
-                    select.innerHTML = '<option value="">All Years</option>';
-                    archiveYears.forEach(year => {
-                        select.innerHTML += `<option value="${year}">${year}</option>`;
-                    });
-                    
-                    // Update stats
-                    document.getElementById('archiveStatsContent').innerHTML = `
-                        <div style="font-weight: 600;">${result.totalRecords?.toLocaleString() || 0} records archived</div>
-                        <div style="font-size: 12px; color: #666; margin-top: 5px;">
-                            Years: ${archiveYears.length > 0 ? archiveYears.join(', ') : 'None'}
-                        </div>
-                    `;
-                    
-                    showToast(`Found ${archiveYears.length} years in archive`, 'success');
-                } else if (result.error && result.error.includes('not configured')) {
-                    document.getElementById('archiveNotConfigured').style.display = 'block';
-                    document.getElementById('archiveContent').style.display = 'none';
-                    showToast('Archive not configured', 'warning');
-                } else {
-                    console.error('Archive error:', result.error);
-                    showToast('Error loading archive: ' + result.error, 'error');
-                }
-            } catch (error) {
-                console.error('Error loading archive years:', error);
-                showToast('Error loading archive years: ' + error.message, 'error');
-            }
-        }
-        
-        async function loadArchiveData() {
-            const year = document.getElementById('archiveYearSelect').value;
-            console.log('Loading archive data for year:', year || 'all');
-            
-            try {
-                showLoading('Loading Archive Data', year ? `Retrieving ${year} records...` : 'Retrieving all historical records...');
-                
-                const params = { action: 'getArchiveData' };
-                if (year) params.year = year;
-                
-                console.log('Calling getArchiveData with params:', params);
-                const result = await jsonpFetch(params);
-                console.log('getArchiveData result:', result);
-                hideLoading();
-                
-                if (result.success) {
-                    archiveData = result.data || [];
-                    console.log('Archive data loaded:', archiveData.length, 'records');
-                    console.log('Sample archive record:', archiveData[0]);
-                    
-                    if (archiveData.length === 0) {
-                        showToast('No archive data found' + (year ? ' for ' + year : ''), 'warning');
-                        return;
-                    }
-                    
-                    showToast(`Loaded ${archiveData.length} archive records${year ? ' from ' + year : ''}`, 'success');
-                    
-                    // Ask if user wants to view archive data in dashboard
-                    if (confirm(`Loaded ${archiveData.length} archive records.\n\nWould you like to view this data in the dashboard?\n\nNote: This will temporarily show historical data.`)) {
-                        showLoading('Updating Dashboard', 'Calculating metrics for archive data...');
-                        
-                        // Add archive year to dropdown if not present
-                        const yearSelect = document.getElementById('dashboardYear');
-                        archiveYears.forEach(y => {
-                            if (!Array.from(yearSelect.options).some(opt => opt.value == y)) {
-                                const option = document.createElement('option');
-                                option.value = y;
-                                option.textContent = y;
-                                yearSelect.appendChild(option);
-                            }
-                        });
-                        
-                        // Sort options descending
-                        const options = Array.from(yearSelect.options);
-                        options.sort((a, b) => parseInt(b.value) - parseInt(a.value));
-                        yearSelect.innerHTML = '';
-                        options.forEach(opt => yearSelect.appendChild(opt));
-                        
-                        // Set the year selector to the archive year
-                        const targetYear = year ? parseInt(year) : (archiveYears.length > 0 ? archiveYears[0] : new Date().getFullYear());
-                        yearSelect.value = targetYear;
-                        document.getElementById('dashboardYearLabel').textContent = targetYear;
-                        
-                        // Calculate metrics using ONLY archive data for historical view
-                        const metrics = calculateDashboardMetrics(archiveData, targetYear);
-                        console.log('Archive metrics calculated:', metrics);
-                        
-                        // Update YTD KPIs with archive data
-                        document.getElementById('ytdServices').textContent = metrics.ytd.services.toLocaleString();
-                        document.getElementById('ytdHours').textContent = metrics.ytd.hours.toLocaleString(undefined, {maximumFractionDigits: 1});
-                        document.getElementById('ytdRevenue').textContent = '$' + metrics.ytd.revenue.toLocaleString(undefined, {maximumFractionDigits: 0});
-                        document.getElementById('ytdAvgRevenue').textContent = '$' + metrics.ytd.avgRevenue.toLocaleString(undefined, {maximumFractionDigits: 0});
-                        
-                        // Clear YoY changes for archive (no comparison available)
-                        document.getElementById('ytdServicesChange').textContent = 'Archive';
-                        document.getElementById('ytdServicesChange').style.color = '#666';
-                        document.getElementById('ytdHoursChange').textContent = 'Archive';
-                        document.getElementById('ytdHoursChange').style.color = '#666';
-                        document.getElementById('ytdRevenueChange').textContent = 'Archive';
-                        document.getElementById('ytdRevenueChange').style.color = '#666';
-                        document.getElementById('ytdAvgRevenueChange').textContent = 'Archive';
-                        document.getElementById('ytdAvgRevenueChange').style.color = '#666';
-                        
-                        // Update period stats
-                        document.getElementById('thisWeekServices').textContent = metrics.thisWeek.services.toLocaleString();
-                        document.getElementById('thisWeekLabel').textContent = `Week ${metrics.currentWeekNum}`;
-                        document.getElementById('thisMonthServices').textContent = metrics.thisMonth.services.toLocaleString();
-                        document.getElementById('thisMonthLabel').textContent = metrics.currentMonthName;
-                        document.getElementById('thisQuarterServices').textContent = metrics.thisQuarter.services.toLocaleString();
-                        document.getElementById('thisQuarterLabel').textContent = `Q${metrics.currentQuarter}`;
-                        document.getElementById('activeClients').textContent = metrics.activeClients.toLocaleString();
-                        
-                        // Update charts with archive data
-                        renderWeeklyRevenueChart(metrics.weeklyData);
-                        renderWeeklyVolumeChart(metrics.weeklyData);
-                        renderPeakHoursChart(metrics.peakHoursData);
-                        renderMonthlyRevenueChart(metrics.last13MonthsData);
-                        renderMonthlyVolumeChart(metrics.last13MonthsData);
-                        renderQuarterlyChart(metrics.quarterlyData);
-                        
-                        // Update top clients tables
-                        renderTopClientsTable('topClientsLastWeek', metrics.topClientsLastWeek);
-                        renderTopClientsTable('topClientsMonth', metrics.topClientsMonth);
-                        
-                        hideLoading();
-                        showToast(`Dashboard updated with ${targetYear} archive data`, 'success');
-                    }
-                    
-                    // Update archive stats
-                    document.getElementById('archiveStatsContent').innerHTML = `
-                        <div style="font-weight: 600; color: #2E7D32;">✓ ${archiveData.length} records loaded</div>
-                        <div style="font-size: 12px; color: #666; margin-top: 5px;">
-                            ${year ? 'Year: ' + year : 'All archived years'}
-                        </div>
-                        <button class="btn btn-secondary" onclick="loadDashboardData()" style="margin-top: 10px; padding: 6px 12px; font-size: 12px;">
-                            ↻ Return to Current Data
-                        </button>
-                    `;
-                } else {
-                    showToast('Error loading archive: ' + result.error, 'error');
-                }
-            } catch (error) {
-                hideLoading();
-                console.error('Error loading archive data:', error);
-                showToast('Error loading archive data', 'error');
-            }
         }
         
         // ============================================
@@ -5128,13 +4709,11 @@
         }
         
         async function sendBulkReports(reportType) {
-            showLoading('Sending Reports', `Preparing ${reportType} reports for all clients...`);
+            showToast(`Starting ${reportType} report send...`, 'info');
             
             const config = JSON.parse(localStorage.getItem('aliceCareAutomationConfig') || '{}');
             
             try {
-                updateLoadingText('Sending Reports', 'This may take a few minutes...');
-                
                 const result = await jsonpFetch({ 
                     action: 'sendBulkReports', 
                     reportType: reportType,
@@ -5142,15 +4721,12 @@
                     testEmail: config.testEmail || ''
                 });
                 
-                hideLoading();
-                
                 if (result.success) {
                     showToast(`${reportType} reports sent! ${result.sentCount} emails sent.`, 'success');
                 } else {
                     showToast('Failed to send reports: ' + (result.error || 'Unknown error'), 'error');
                 }
             } catch (error) {
-                hideLoading();
                 showToast('Error sending reports: ' + error.message, 'error');
             }
         }
@@ -5383,22 +4959,6 @@
             }, 4000);
         }
         
-        // Loading Spinner Functions
-        function showLoading(text = 'Loading...', subtext = 'Please wait') {
-            document.getElementById('loadingText').textContent = text;
-            document.getElementById('loadingSubtext').textContent = subtext;
-            document.getElementById('loadingOverlay').classList.add('active');
-        }
-        
-        function hideLoading() {
-            document.getElementById('loadingOverlay').classList.remove('active');
-        }
-        
-        function updateLoadingText(text, subtext) {
-            if (text) document.getElementById('loadingText').textContent = text;
-            if (subtext) document.getElementById('loadingSubtext').textContent = subtext;
-        }
-        
         function exportReport() {
             if (reportData.length === 0) {
                 showToast('No data to export', 'warning');
@@ -5521,13 +5081,7 @@
             uploadBtn.disabled = true;
             uploadBtn.innerHTML = '<div class="spinner" style="width: 16px; height: 16px; border-width: 2px; margin: 0;"></div> Uploading...';
             
-            // Show loading overlay
-            const rowCount = (csvContent.match(/\n/g) || []).length;
-            showLoading('Uploading Data', `Processing ${rowCount.toLocaleString()} rows (${uploadMode} mode)...`);
-            
             try {
-                updateLoadingText('Uploading Data', 'Sending data to server...');
-                
                 // Create form data for POST
                 const formData = new FormData();
                 formData.append('action', 'uploadCSV');
@@ -5545,7 +5099,6 @@
                 });
                 
                 const result = await response.json();
-                hideLoading();
                 
                 if (result.success) {
                     showToast(`Successfully uploaded ${result.rowsAdded} rows!`, 'success');
@@ -5560,9 +5113,7 @@
             } catch (error) {
                 // Try JSONP fallback for CORS issues
                 try {
-                    updateLoadingText('Uploading Data', 'Retrying with alternate method...');
                     const result = await uploadViaJSONP(csvContent, uploadMode);
-                    hideLoading();
                     if (result.success) {
                         showToast(`Successfully uploaded ${result.rowsAdded} rows!`, 'success');
                         closeUploadModal();
@@ -5572,7 +5123,6 @@
                         throw new Error(result.error || 'Upload failed');
                     }
                 } catch (jsonpError) {
-                    hideLoading();
                     showToast('Upload failed: ' + jsonpError.message, 'error');
                 }
             } finally {
@@ -5671,11 +5221,25 @@
                 return;
             }
             
-            // Initialize tabs - use the switchTab function
+            // Initialize tabs
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const tabId = this.dataset.tab;
-                    switchTab(tabId);
+                    
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                          
+                    this.classList.add('active');
+                    document.getElementById(`${tabId}-panel`).classList.add('active');
+                    
+                    // Load data for the tab if needed
+                    if (tabId === 'report' && reportData.length === 0) {
+                        showReportFilterPrompt();  // Show filter prompt instead of loading all data
+                    } else if (tabId === 'client' && clientData.length === 0) {
+                        loadClientData();
+                    } else if (tabId === 'dashboard') {
+                        loadDashboardData();
+                    }
                 });
             });
             
@@ -5690,7 +5254,10 @@
                 const query = this.value.trim();
                 if (query) {
                     // Switch to client tab and search
-                    switchTab('client');
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                    document.querySelector('[data-tab="client"]').classList.add('active');
+                    document.getElementById('client-panel').classList.add('active');
                     
                     if (clientData.length === 0) {
                         loadClientData().then(() => {
