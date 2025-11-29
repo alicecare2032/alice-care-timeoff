@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>alice.care - Mileage Review v3.8</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #E5ECF3;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .nav-bar {
+            max-width: 1400px;
+            margin: 0 auto 20px;
+            background: white;
+            padding: 15px 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(26, 54, 92, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .logo .alice {
+            color: #F57600;
+            font-weight: 700;
+        }
+        
+        .logo .dot {
+            color: #F57600;
+            font-weight: 700;
+            margin: 0 -2px;
+        }
+        
+        .logo .care {
+            color: #1A365C;
+            font-weight: 400;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(26, 54, 92, 0.15);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #1A365C;
+            color: white;
+            padding: 30px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .lookup-section {
+            padding: 30px;
+            background: #E5ECF3;
+            border-bottom: 2px solid #D3D7DF;
+        }
+        
+        .lookup-title {
+            font-size: 18px;
+            color: #1A365C;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .lookup-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-size: 13px;
+            color: #1A365C;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        
+        .required {
+            color: #FF7475;
+        }
+        
+        input[type="text"],
+        input[type="number"] {
+            padding: 10px 14px;
+            border: 2px solid #D3D7DF;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #F57600;
+            box-shadow: 0 0 0 3px rgba(245, 118, 0, 0.1);
+        }
+        
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #F57600;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #e06d00;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 118, 0, 0.3);
+        }
+        
+        .btn-success {
+            background: #62B790;
+            color: white;
+            margin-left: 10px;
+        }
+        
+        .btn-success:hover {
+            background: #52a780;
+            transform: translateY(-2px);
+        }
+        
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            padding: 20px 30px;
+            background: #E5ECF3;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #F57600;
+        }
+        
+        .stat-card h3 {
+            font-size: 12px;
+            color: #3D3D3D;
+            margin-bottom: 8px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .stat-card .number {
+            font-size: 28px;
+            color: #1A365C;
+            font-weight: 700;
+        }
+        
+        .review-section {
+            padding: 30px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #3D3D3D;
+        }
+        
+        .loading-spinner {
+            border: 4px solid #E5ECF3;
+            border-top: 4px solid #F57600;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .notice-box {
+            background: #FFF4E5;
+            border-left: 4px solid #F57600;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+        
+        .notice-box p {
+            color: #3D3D3D;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        
+        /* Import Section Styles */
+        .import-section {
+            padding: 30px;
+            background: #E5ECF3;
+            border-bottom: 2px solid #D3D7DF;
+        }
+        
+        .import-title {
+            font-size: 18px;
+            color: #1A365C;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .import-box {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 4px solid #F57600;
+        }
+        
+        .import-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 15px;
+            align-items: end;
+        }
+        
+        .file-input-wrapper input[type="file"] {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #D3D7DF;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            background: white;
+        }
+        
+        .file-input-wrapper input[type="file"]::file-selector-button {
+            padding: 8px 16px;
+            background: #1A365C;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            margin-right: 10px;
+        }
+        
+        .file-input-wrapper input[type="file"]::file-selector-button:hover {
+            background: #2d4a73;
+        }
+        
+        .import-info {
+            font-size: 12px;
+            color: #3D3D3D;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .import-info::before {
+            content: "ℹ️";
+        }
+        
+        .import-message {
+            margin-top: 15px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            display: none;
+        }
+        
+        .import-message.success {
+            background: #D1FAE5;
+            color: #065F46;
+            border-left: 4px solid #10B981;
+        }
+        
+        .import-message.error {
+            background: #FEE2E2;
+            color: #991B1B;
+            border-left: 4px solid #EF4444;
+        }
+        
+        .import-loading {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            font-size: 13px;
+            color: #3D3D3D;
+        }
+        
+        .import-spinner {
+            border: 3px solid #E5ECF3;
+            border-top: 3px solid #F57600;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        
+        /* Table Styles */
+        .review-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .review-table thead tr {
+            background: #1A365C;
+            color: white;
+        }
+        
+        .review-table th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        
+        .review-table tbody tr {
+            border-bottom: 1px solid #E5ECF3;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .review-table tbody tr:hover {
+            background: #F9FAFB;
+        }
+        
+        .review-table tbody tr.expanded {
+            background: #E5ECF3;
+        }
+        
+        .review-table td {
+            padding: 15px 12px;
+            font-size: 14px;
+            color: #3D3D3D;
+        }
+        
+        .employee-id {
+            font-weight: 600;
+            color: #1A365C;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-submitted {
+            background: #D4F4E2;
+            color: #0A7D4A;
+        }
+        
+        .status-pending {
+            background: #FFF4E5;
+            color: #D97706;
+        }
+        
+        .expand-icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            line-height: 18px;
+            text-align: center;
+            border: 2px solid #1A365C;
+            border-radius: 4px;
+            color: #1A365C;
+            font-weight: 700;
+            font-size: 16px;
+            margin-right: 8px;
+            transition: all 0.2s;
+        }
+        
+        tr.expanded .expand-icon {
+            background: #1A365C;
+            color: white;
+        }
+        
+        /* Detail Row Styles */
+        .detail-row {
+            display: none;
+        }
+        
+        .detail-row.show {
+            display: table-row;
+        }
+        
+        .detail-cell {
+            padding: 0 !important;
+            background: #F9FAFB;
+        }
+        
+        .detail-content {
+            padding: 20px 30px;
+        }
+        
+        .services-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .services-table thead tr {
+            background: #E5ECF3;
+            color: #1A365C;
+        }
+        
+        .services-table th {
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+        }
+        
+        .services-table td {
+            padding: 10px 12px;
+            font-size: 13px;
+            border-bottom: 1px solid #E5ECF3;
+        }
+        
+        .services-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .commute-badge {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 2px 8px;
+            background: #9CA3AF;
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+        
+        .services-table tfoot {
+            background: #E5ECF3;
+            font-weight: 600;
+        }
+        
+        .services-table tfoot td {
+            padding: 12px;
+            border-top: 2px solid #1A365C;
+        }
+        
+        .export-section {
+            background: #E5ECF3;
+            padding: 25px 30px;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+        
+        .export-section h3 {
+            font-size: 16px;
+            color: #1A365C;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .text-preview {
+            background: white;
+            border: 2px solid #D3D7DF;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #1A365C;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            white-space: pre;
+        }
+        
+        .text-right {
+            text-align: left;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .nav-bar {
+                padding: 12px 15px;
+                margin-bottom: 15px;
+            }
+            
+            .logo {
+                font-size: 20px;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 22px;
+            }
+            
+            .import-section {
+                padding: 20px 15px;
+            }
+            
+            .import-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .import-box {
+                padding: 20px 15px;
+            }
+            
+            .lookup-section {
+                padding: 20px 15px;
+            }
+            
+            .lookup-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .stats-row {
+                grid-template-columns: 1fr;
+                padding: 15px;
+                gap: 12px;
+            }
+            
+            .review-section {
+                padding: 20px 15px;
+            }
+            
+            .export-section {
+                padding: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+                padding: 14px 20px;
+                margin-left: 0 !important;
+                margin-top: 10px;
+            }
+            
+            /* Make tables scrollable on mobile */
+            .review-table, .services-table {
+                display: block;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .review-table td, .review-table th,
+            .services-table td, .services-table th {
+                min-width: 80px;
+                white-space: nowrap;
+            }
+            
+            /* Adjust detail rows for mobile */
+            .detail-row td {
+                padding: 10px !important;
+            }
+            
+            .text-preview {
+                font-size: 11px;
+                max-height: 200px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 18px;
+            }
+            
+            .lookup-title {
+                font-size: 16px;
+            }
+            
+            .stat-card .number {
+                font-size: 22px;
+            }
+            
+            .expand-icon {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <div class="logo">
+            <span class="alice">alice</span><span class="dot">.</span><span class="care">care</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>Mileage Review Portal</h1>
+            <p>Review all on-call reports and generate reimbursement files</p>
+        </div>
+
+        <!-- Import Section -->
+        <div class="import-section">
+            <div class="import-title">📤 Import Schedule Data</div>
+            <div class="import-box">
+                <div class="import-grid">
+                    <div class="form-group">
+                        <label for="scheduleFile">Upload CSV File (Columns A-G)</label>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="scheduleFile" accept=".csv">
+                        </div>
+                        <div class="import-info">
+                            Import CSV data to columns A-G. Header row will be skipped. Formulas in columns H+ will be copied automatically.
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="uploadScheduleFile()">Upload & Import</button>
+                </div>
+                <div class="import-loading" id="importLoading">
+                    <div class="import-spinner"></div>
+                    <span>Importing data...</span>
+                </div>
+                <div class="import-message" id="importMessage"></div>
+            </div>
+        </div>
+
+        <div class="lookup-section">
+            <div class="lookup-title">Select Week to Review</div>
+            <div class="lookup-grid">
+                <div class="form-group">
+                     <label>Week Number <span class="required">* <a href="week_number_reference.html" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: #F57600; color: white; text-decoration: none; border-radius: 50%; font-weight: bold; font-size: 16px;" title="Find Week Number">?</a></span></label>
+                    <input type="number" id="weekNumber" min="1" max="53" placeholder="46">
+                </div>
+                <div class="form-group">
+                    <label>Year <span class="required">*</span></label>
+                    <input type="number" id="year" min="2020" max="2030" placeholder="2025">
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="loadSubmissions()">Load Reports</button>
+        </div>
+
+        <div id="statsSection" style="display: none;">
+            <div class="stats-row">
+                <div class="stat-card">
+                    <h3>Total Employees</h3>
+                    <div class="number" id="totalEmployees">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Submitted Reports</h3>
+                    <div class="number" id="submittedReports">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Reimbursable Miles</h3>
+                    <div class="number" id="totalMiles">0.0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Reimbursement</h3>
+                    <div class="number" id="totalAmount">$0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="review-section">
+            <div id="loadingIndicator" style="display: none;">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading reports...</p>
+                </div>
+            </div>
+
+            <div id="reportsTable"></div>
+
+            <div id="exportSection" style="display: none;">
+                <div class="export-section">
+                    <h3>Export Text File (All Employees)</h3>
+                    <div class="notice-box">
+                        <p><strong>Format:</strong> Each data line will be formatted as: EMPLOYEE_ID,MLE,AMOUNT,,,,,</p>
+                        <p><strong>Rate:</strong> $0.70 per mile (federal reimbursement rate)</p>
+                        <p><strong>Sections:</strong> File includes separate sections for SUBMITTED and NOT SUBMITTED employees</p>
+                        <p><strong>Includes:</strong> Header with summary counts, data sections, and footer with totals</p>
+                    </div>
+                    <div class="text-preview" id="textPreview"></div>
+                    <button class="btn btn-success" onclick="downloadTextFile()">
+                        Download Text File
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // IMPORTANT: Replace this URL with your actual Google Apps Script web app URL
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/a/macros/alicecare.com/s/AKfycbxsiJuU6W3msDffnoNBuFhzMOy-WtmNp-mi9IUpRUiawGdlKLOedFUq6R9qCADNqKbQ/exec';
+        
+        const REIMBURSEMENT_RATE = 0.70; // Federal rate per mile
+        
+        let currentSubmissions = null;
+        let currentWeek = null;
+        let currentYear = null;
+
+        function loadSubmissions() {
+            const weekNumber = document.getElementById('weekNumber').value.trim();
+            const year = document.getElementById('year').value.trim();
+
+            if (!weekNumber || !year) {
+                alert('Please enter both week number and year');
+                return;
+            }
+
+            currentWeek = weekNumber;
+            currentYear = year;
+
+            document.getElementById('loadingIndicator').style.display = 'block';
+            document.getElementById('reportsTable').innerHTML = '';
+            document.getElementById('statsSection').style.display = 'none';
+            document.getElementById('exportSection').style.display = 'none';
+
+            // Create JSONP callback name
+            const callbackName = 'jsonpCallback_' + Date.now();
+            
+            // Define the callback function
+            window[callbackName] = function(data) {
+                console.log('Received data:', data);
+                document.getElementById('loadingIndicator').style.display = 'none';
+                
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                    return;
+                }
+                
+                currentSubmissions = data;
+                displayReports(data);
+                
+                // Clean up
+                delete window[callbackName];
+            };
+
+            // Build JSONP URL
+            const url = GOOGLE_SCRIPT_URL + 
+                '?action=getSubmissions' +
+                '&week=' + encodeURIComponent(weekNumber) +
+                '&year=' + encodeURIComponent(year) +
+                '&callback=' + callbackName;
+
+            console.log('Fetching:', url);
+
+            // Create script tag for JSONP request
+            const script = document.createElement('script');
+            script.src = url;
+            script.onerror = function() {
+                document.getElementById('loadingIndicator').style.display = 'none';
+                alert('Failed to load reports. Please check your script URL.');
+                delete window[callbackName];
+            };
+            document.body.appendChild(script);
+        }
+
+        function displayReports(data) {
+            if (!data.submissions || data.submissions.length === 0) {
+                document.getElementById('reportsTable').innerHTML = `
+                    <div class="notice-box">
+                        <p><strong>No reports found for Week ${currentWeek}, ${currentYear}</strong></p>
+                        <p>There are no on-call services for this week.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Calculate totals
+            let totalEmployees = data.submissions.length;
+            let submittedCount = 0;
+            let totalMiles = 0;
+            let totalAmount = 0;
+
+            data.submissions.forEach(emp => {
+                if (emp.isSubmitted) {
+                    submittedCount++;
+                    totalMiles += emp.totalReimbursableMiles;
+                    totalAmount += emp.reimbursementAmount;
+                }
+            });
+
+            // Update stats
+            document.getElementById('totalEmployees').textContent = totalEmployees;
+            document.getElementById('submittedReports').textContent = submittedCount;
+            document.getElementById('totalMiles').textContent = totalMiles.toFixed(1);
+            document.getElementById('totalAmount').textContent = '$' + totalAmount.toFixed(2);
+            document.getElementById('statsSection').style.display = 'block';
+
+            // Build table
+            let html = `
+                <table class="review-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;"></th>
+                            <th>Employee ID</th>
+                            <th>Name</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-right">Total Services</th>
+                            <th class="text-right">Reimbursable Miles</th>
+                            <th class="text-right">Reimbursement</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            data.submissions.forEach((emp, index) => {
+                const statusClass = emp.isSubmitted ? 'status-submitted' : 'status-pending';
+                const statusText = emp.isSubmitted ? 'Submitted' : 'Pending';
+                
+                html += `
+                    <tr onclick="toggleDetails(${index})">
+                        <td>
+                            <span class="expand-icon" id="icon_${index}">+</span>
+                        </td>
+                        <td class="employee-id">${emp.employeeId}</td>
+                        <td>${emp.lastName}, ${emp.firstName}</td>
+                        <td class="text-center">
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                        </td>
+                        <td class="text-right">${emp.serviceCount}</td>
+                        <td class="text-right">${emp.totalReimbursableMiles.toFixed(1)} mi</td>
+                        <td class="text-right">$${emp.reimbursementAmount.toFixed(2)}</td>
+                    </tr>
+                    <tr class="detail-row" id="detail_${index}">
+                        <td colspan="7" class="detail-cell">
+                            <div class="detail-content">
+                                ${generateServiceDetails(emp)}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById('reportsTable').innerHTML = html;
+
+            // Generate text preview - include ALL employees (submitted and not submitted)
+            const submittedReports = data.submissions.filter(emp => emp.isSubmitted);
+            const pendingReports = data.submissions.filter(emp => !emp.isSubmitted);
+            
+            // Always show export section if there are any employees
+            if (data.submissions.length > 0) {
+                generateTextPreview(data.submissions, submittedReports.length, pendingReports.length, totalEmployees);
+                document.getElementById('exportSection').style.display = 'block';
+            }
+        }
+
+        function generateServiceDetails(employee) {
+            let html = `
+                <table class="services-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Client</th>
+                            <th class="text-right">Original Miles</th>
+                            <th class="text-right">Adjusted Miles</th>
+                            <th>Reason</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            let originalTotal = 0;
+            let adjustedTotal = 0;
+            let reimbursableCount = 0;
+            let commuteCount = 0;
+
+            employee.services.forEach(service => {
+                const isCommute = service.isCommute === true;
+                const originalMileage = parseFloat(service.Mileage || 0);
+                const adjustedMileage = service.Adjusted_Mileage ? parseFloat(service.Adjusted_Mileage) : null;
+                const reason = service.Adjustment_Reason || '';
+                
+                // Only count non-commute in totals
+                if (!isCommute) {
+                    originalTotal += originalMileage;
+                    adjustedTotal += (adjustedMileage !== null ? adjustedMileage : originalMileage);
+                    reimbursableCount++;
+                } else {
+                    commuteCount++;
+                }
+
+                html += `
+                    <tr style="${isCommute ? 'opacity: 0.6; background: #F9FAFB;' : ''}">
+                        <td>
+                            ${formatDate(service.Scheduled_Date)}
+                            ${isCommute ? '<span class="commute-badge">Commute</span>' : ''}
+                        </td>
+                        <td>${formatTime(service.Scheduled_Time)}</td>
+                        <td>${service.Service_Recipient_First_Name || 'N/A'}</td>
+                        <td class="text-right">${originalMileage.toFixed(1)} mi</td>
+                        <td class="text-right" style="${adjustedMileage !== null ? 'color: #F57600; font-weight: 600;' : ''}">
+                            ${adjustedMileage !== null ? adjustedMileage.toFixed(1) + ' mi' : '-'}
+                        </td>
+                        <td style="font-size: 12px; color: #3D3D3D;">${reason || (isCommute ? 'N/A' : '-')}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-right">TOTAL REIMBURSABLE:</td>
+                            <td class="text-right">${originalTotal.toFixed(1)} mi</td>
+                            <td class="text-right" style="color: #F57600;">${adjustedTotal.toFixed(1)} mi</td>
+                            <td style="font-size: 12px;">
+                                ${reimbursableCount} service${reimbursableCount !== 1 ? 's' : ''}
+                                ${commuteCount > 0 ? '<br><span style="color: #9CA3AF;">(' + commuteCount + ' commute excluded)</span>' : ''}
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            `;
+
+            return html;
+        }
+
+        function toggleDetails(index) {
+            const detailRow = document.getElementById('detail_' + index);
+            const icon = document.getElementById('icon_' + index);
+            const mainRow = detailRow.previousElementSibling;
+            
+            if (detailRow.classList.contains('show')) {
+                detailRow.classList.remove('show');
+                icon.textContent = '+';
+                mainRow.classList.remove('expanded');
+            } else {
+                detailRow.classList.add('show');
+                icon.textContent = '−';
+                mainRow.classList.add('expanded');
+            }
+        }
+
+        function generateTextPreview(allSubmissions, submittedCount, pendingCount, totalCount) {
+            let text = '';
+            
+            // Add header with counts
+            text += `ALICE CARE MILEAGE REIMBURSEMENT\n`;
+            text += `Week ${currentWeek}, ${currentYear}\n`;
+            text += `Generated: ${new Date().toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })}\n`;
+            text += `\n`;
+            text += `SUMMARY:\n`;
+            text += `Total Employees: ${totalCount}\n`;
+            text += `Submitted: ${submittedCount}\n`;
+            text += `Not Submitted: ${pendingCount}\n`;
+            text += `\n`;
+            
+            // Separate submitted and not submitted
+            const submitted = allSubmissions.filter(emp => emp.isSubmitted);
+            const notSubmitted = allSubmissions.filter(emp => !emp.isSubmitted);
+            
+            // SUBMITTED EMPLOYEES SECTION
+            if (submitted.length > 0) {
+                text += `SUBMITTED - REIMBURSEMENT DATA:\n`;
+                text += `---\n`;
+                
+                // Sort by employee ID
+                const sortedSubmitted = [...submitted].sort((a, b) => a.employeeId.localeCompare(b.employeeId));
+                
+                sortedSubmitted.forEach(emp => {
+                    // Format: EMPLOYEE_ID,MLE,AMOUNT,,,,,
+                    const employeeId = emp.employeeId.padStart(4, '0');
+                    const amount = emp.reimbursementAmount.toFixed(2);
+                    text += `${employeeId},MLE,${amount},,,,,\n`;
+                });
+                
+                text += `---\n`;
+                text += `Submitted Records: ${submitted.length}\n`;
+                text += `\n`;
+            }
+            
+            // NOT SUBMITTED EMPLOYEES SECTION
+            if (notSubmitted.length > 0) {
+                text += `NOT SUBMITTED - PENDING:\n`;
+                text += `---\n`;
+                
+                // Sort by employee ID
+                const sortedNotSubmitted = [...notSubmitted].sort((a, b) => a.employeeId.localeCompare(b.employeeId));
+                
+                sortedNotSubmitted.forEach(emp => {
+                    // Format: EMPLOYEE_ID,MLE,AMOUNT,,,,,
+                    const employeeId = emp.employeeId.padStart(4, '0');
+                    const amount = emp.reimbursementAmount.toFixed(2);
+                    text += `${employeeId},MLE,${amount},,,,,\n`;
+                });
+                
+                text += `---\n`;
+                text += `Pending Records: ${notSubmitted.length}\n`;
+                text += `\n`;
+            }
+            
+            // Add footer
+            text += `END OF REPORT\n`;
+            text += `Total Records: ${allSubmissions.length}\n`;
+
+            document.getElementById('textPreview').textContent = text;
+        }
+
+        function downloadTextFile() {
+            if (!currentSubmissions || !currentSubmissions.submissions) {
+                alert('No data to download');
+                return;
+            }
+
+            const text = document.getElementById('textPreview').textContent;
+            const filename = `mileage_week${currentWeek}_${currentYear}.txt`;
+
+            // Create blob and download
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+
+            console.log('Downloaded:', filename);
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', { 
+                weekday: 'short',
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+        
+        function formatTime(timeValue) {
+            // Handle Google Sheets time format
+            if (!timeValue) return '';
+            
+            try {
+                // If it's already a string in HH:MM format, return it
+                if (typeof timeValue === 'string' && /^\d{1,2}:\d{2}/.test(timeValue)) {
+                    return timeValue;
+                }
+                
+                // Convert to Date object
+                let date;
+                if (typeof timeValue === 'string') {
+                    date = new Date(timeValue);
+                } else if (typeof timeValue === 'number') {
+                    // Google Sheets serial time (fraction of a day)
+                    const hours = Math.floor(timeValue * 24);
+                    const minutes = Math.floor((timeValue * 24 * 60) % 60);
+                    return String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0');
+                } else if (timeValue instanceof Date) {
+                    date = timeValue;
+                } else {
+                    return String(timeValue);
+                }
+                
+                // Extract time in HH:MM format
+                const hours = date.getHours();
+                const minutes = date.getMinutes();
+                return String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0');
+                
+            } catch (error) {
+                console.error('Error formatting time:', error, timeValue);
+                return String(timeValue);
+            }
+        }
+
+        // Upload Schedule File Function (CSV only - uses JSONP)
+        function uploadScheduleFile() {
+            const fileInput = document.getElementById('scheduleFile');
+            const loadingDiv = document.getElementById('importLoading');
+            const messageDiv = document.getElementById('importMessage');
+            
+            if (!fileInput.files || fileInput.files.length === 0) {
+                showImportMessage('Please select a CSV file to upload', 'error');
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            const fileName = file.name;
+            
+            // Validate file type - CSV only
+            if (!fileName.toLowerCase().endsWith('.csv')) {
+                showImportMessage('Please upload a CSV file only', 'error');
+                return;
+            }
+            
+            // Show loading
+            loadingDiv.style.display = 'flex';
+            messageDiv.style.display = 'none';
+            
+            // Read and parse CSV file
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const csvText = e.target.result;
+                    const data = parseCSVFile(csvText);
+                    
+                    if (!data || data.length === 0) {
+                        showImportMessage('No data found in CSV file', 'error');
+                        loadingDiv.style.display = 'none';
+                        return;
+                    }
+                    
+                    console.log('Parsed CSV data:', data);
+                    
+                    // Send data to backend via JSONP
+                    sendImportDataToSheet(data, fileInput, loadingDiv);
+                    
+                } catch (error) {
+                    loadingDiv.style.display = 'none';
+                    showImportMessage('Error parsing CSV: ' + error.message, 'error');
+                }
+            };
+            
+            reader.onerror = function() {
+                loadingDiv.style.display = 'none';
+                showImportMessage('Error reading file', 'error');
+            };
+            
+            reader.readAsText(file);
+        }
+        
+        function parseCSVFile(text) {
+            const lines = text.split(/\r\n|\n|\r/);
+            const result = [];
+            let isFirstRow = true;
+            
+            for (let line of lines) {
+                if (line.trim() === '') continue;
+                
+                // Skip header row
+                if (isFirstRow) {
+                    isFirstRow = false;
+                    console.log('Skipping header row');
+                    continue;
+                }
+                
+                const row = [];
+                let currentField = '';
+                let inQuotes = false;
+                
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    
+                    if (char === '"') {
+                        if (inQuotes && line[i + 1] === '"') {
+                            currentField += '"';
+                            i++;
+                        } else {
+                            inQuotes = !inQuotes;
+                        }
+                    } else if (char === ',' && !inQuotes) {
+                        row.push(currentField.trim());
+                        currentField = '';
+                    } else {
+                        currentField += char;
+                    }
+                }
+                row.push(currentField.trim());
+                
+                // Take first 7 columns (A-G)
+                const limitedRow = row.slice(0, 7);
+                
+                // Pad with empty strings if less than 7 columns
+                while (limitedRow.length < 7) {
+                    limitedRow.push('');
+                }
+                
+                result.push(limitedRow);
+            }
+            
+            console.log('Parsed', result.length, 'data rows (header skipped)');
+            return result;
+        }
+        
+        function sendImportDataToSheet(data, fileInput, loadingDiv) {
+            const numRows = data.length;
+            console.log('Calling import with', numRows, 'rows');
+            
+            // Update loading message with row count
+            const loadingText = loadingDiv.querySelector('span');
+            if (loadingText) {
+                loadingText.textContent = 'Uploading ' + numRows + ' rows...';
+            }
+            
+            // Use POST request instead of JSONP (to handle large data)
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors', // Required for Google Apps Script
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    action: 'importSchedule',
+                    data: data
+                })
+            })
+            .then(() => {
+                // With no-cors, we can't read the response
+                // Show processing message
+                if (loadingText) {
+                    loadingText.textContent = 'Processing ' + numRows + ' rows...';
+                }
+                
+                // Wait a bit for server to process, then show success
+                setTimeout(() => {
+                    loadingDiv.style.display = 'none';
+                    showImportMessage(
+                        'Import completed! ' + numRows + ' rows uploaded. Check your Schedule sheet to verify.',
+                        'success'
+                    );
+                    fileInput.value = '';
+                }, 2000); // Give server 2 seconds to process
+            })
+            .catch(error => {
+                loadingDiv.style.display = 'none';
+                showImportMessage('Failed to send import request: ' + error.message, 'error');
+                console.error('Import error:', error);
+            });
+        }
+        
+        function showImportMessage(text, type) {
+            const messageDiv = document.getElementById('importMessage');
+            messageDiv.textContent = text;
+            messageDiv.className = 'import-message ' + type;
+            messageDiv.style.display = 'block';
+            
+            // Auto-hide success messages after 5 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // Set current year as default
+        document.getElementById('year').value = new Date().getFullYear();
+    </script>
+</body>
+</html>

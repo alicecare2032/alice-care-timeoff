@@ -217,6 +217,109 @@
             100% { transform: rotate(360deg); }
         }
         
+        /* Full Page Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(26, 54, 92, 0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .loading-overlay .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top: 5px solid #F57600;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        .loading-overlay .loading-text {
+            color: white;
+            font-size: 16px;
+            margin-top: 16px;
+            font-weight: 500;
+        }
+        
+        .loading-overlay .loading-subtext {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            margin-top: 8px;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Collapsible Export Section */
+        .export-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 2px solid #D3D7DF;
+            margin-bottom: 0;
+        }
+        
+        .export-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        
+        .export-header-left:hover {
+            opacity: 0.7;
+        }
+        
+        .export-header-left h3 {
+            font-size: 16px;
+            color: #1A365C;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .export-toggle {
+            width: 24px;
+            height: 24px;
+            background: #1A365C;
+            color: white;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 700;
+            transition: transform 0.3s;
+            flex-shrink: 0;
+        }
+        
+        .export-toggle.expanded {
+            transform: rotate(45deg);
+        }
+        
+        .export-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .export-content.expanded {
+            max-height: 1000px;
+        }
+        
+        .export-content-inner {
+            padding-top: 20px;
+        }
+        
         .notice-box {
             background: #FFF4E5;
             border-left: 4px solid #F57600;
@@ -229,6 +332,246 @@
             color: #3D3D3D;
             font-size: 13px;
             line-height: 1.6;
+        }
+        
+        /* Rate Reminder Banner */
+        .rate-reminder-banner {
+            background: linear-gradient(135deg, #FFF4E5 0%, #FFE4CC 100%);
+            border: 2px solid #F57600;
+            border-radius: 12px;
+            padding: 20px 25px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        
+        .rate-reminder-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .rate-reminder-icon {
+            font-size: 32px;
+        }
+        
+        .rate-reminder-text h3 {
+            color: #1A365C;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .rate-reminder-text p {
+            color: #3D3D3D;
+            font-size: 13px;
+        }
+        
+        .rate-reminder-actions {
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        
+        .rate-reminder-actions .btn {
+            white-space: nowrap;
+        }
+        
+        /* Rate Settings in Nav */
+        .rate-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #3D3D3D;
+        }
+        
+        .rate-badge {
+            background: #E5ECF3;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            color: #1A365C;
+        }
+        
+        .rate-edit-btn {
+            background: none;
+            border: none;
+            color: #F57600;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        
+        .rate-edit-btn:hover {
+            background: #FFF4E5;
+        }
+        
+        /* Rate Settings Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(26, 54, 92, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9998;
+        }
+        
+        .modal-overlay.hidden {
+            display: none;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h2 {
+            color: #1A365C;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #9CA3AF;
+            cursor: pointer;
+            padding: 4px;
+            line-height: 1;
+        }
+        
+        .modal-close:hover {
+            color: #3D3D3D;
+        }
+        
+        .modal-body {
+            margin-bottom: 25px;
+        }
+        
+        .rate-input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .rate-input-group label {
+            font-size: 14px;
+            color: #3D3D3D;
+            min-width: 120px;
+        }
+        
+        .rate-input-group input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #D3D7DF;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            font-family: inherit;
+            text-align: center;
+        }
+        
+        .rate-input-group input:focus {
+            outline: none;
+            border-color: #F57600;
+        }
+        
+        .rate-input-prefix {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1A365C;
+        }
+        
+        .rate-history {
+            background: #F8FAFC;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .rate-history h4 {
+            font-size: 13px;
+            color: #6B7280;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .rate-history-item {
+            font-size: 13px;
+            color: #3D3D3D;
+            padding: 5px 0;
+            border-bottom: 1px solid #E5ECF3;
+        }
+        
+        .rate-history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .modal-footer .btn {
+            padding: 10px 20px;
+        }
+        
+        .btn-secondary {
+            background: #E5ECF3;
+            color: #1A365C;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .btn-secondary:hover {
+            background: #D3D7DF;
+        }
+        
+        .current-rate-display {
+            text-align: center;
+            padding: 15px;
+            background: #E5ECF3;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .current-rate-display .rate-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #1A365C;
+        }
+        
+        .current-rate-display .rate-label {
+            font-size: 13px;
+            color: #6B7280;
         }
         
         /* Import Section Styles */
@@ -252,11 +595,21 @@
             border-left: 4px solid #F57600;
         }
         
-        .import-grid {
-            display: grid;
-            grid-template-columns: 1fr auto;
+        .import-row {
+            display: flex;
+            align-items: center;
             gap: 15px;
-            align-items: end;
+        }
+        
+        .import-row .file-input-wrapper {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .import-row .btn {
+            flex-shrink: 0;
+            white-space: nowrap;
+            margin: 0;
         }
         
         .file-input-wrapper input[type="file"] {
@@ -636,33 +989,96 @@
     </style>
 </head>
 <body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loadingText">Processing...</div>
+        <div class="loading-subtext" id="loadingSubtext">Please wait</div>
+    </div>
+
+    <!-- Rate Settings Modal -->
+    <div id="rateModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚙️ Mileage Rate Settings</h2>
+                <button class="modal-close" onclick="closeRateModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="current-rate-display">
+                    <div class="rate-value" id="modalCurrentRate">$0.70</div>
+                    <div class="rate-label">Current Rate per Mile</div>
+                </div>
+                
+                <div class="rate-input-group">
+                    <label>New Rate:</label>
+                    <span class="rate-input-prefix">$</span>
+                    <input type="number" id="newRateInput" step="0.01" min="0" max="5" placeholder="0.70">
+                    <span style="color: #6B7280; font-size: 13px;">per mile</span>
+                </div>
+                
+                <div class="notice-box" style="margin-bottom: 0;">
+                    <p><strong>Note:</strong> The IRS standard mileage rate typically updates annually on January 1st.</p>
+                    <p>Check <a href="https://www.irs.gov/tax-professionals/standard-mileage-rates" target="_blank" style="color: #F57600;">IRS.gov</a> for the current federal rate.</p>
+                </div>
+                
+                <div class="rate-history" id="rateHistory">
+                    <h4>Rate Update History</h4>
+                    <div id="rateHistoryList">No history available</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeRateModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="confirmRateUnchanged()">Rate Unchanged</button>
+                <button class="btn btn-success" onclick="saveNewRate()">Save New Rate</button>
+            </div>
+        </div>
+    </div>
+
     <div class="nav-bar">
         <div class="logo">
             <span class="alice">alice</span><span class="dot">.</span><span class="care">care</span>
         </div>
+        <div class="rate-display">
+            <span>Mileage Rate:</span>
+            <span class="rate-badge" id="navRateBadge">$0.70/mi</span>
+            <button class="rate-edit-btn" onclick="openRateModal()">✏️ Edit</button>
+        </div>
     </div>
 
     <div class="container">
+        <!-- Rate Reminder Banner (shown after Jan 1 if not yet updated) -->
+        <div id="rateReminderBanner" class="rate-reminder-banner" style="display: none;">
+            <div class="rate-reminder-content">
+                <div class="rate-reminder-icon">⚠️</div>
+                <div class="rate-reminder-text">
+                    <h3>Annual Rate Review Reminder</h3>
+                    <p>It's a new year! Please verify the mileage reimbursement rate is current for <span id="reminderYear">2025</span>.</p>
+                </div>
+            </div>
+            <div class="rate-reminder-actions">
+                <button class="btn btn-secondary" onclick="dismissReminder()">Dismiss</button>
+                <button class="btn btn-primary" onclick="openRateModal()">Review Rate</button>
+            </div>
+        </div>
+
         <div class="header">
             <h1>Mileage Review Portal</h1>
-            <p>Review all on-call reports and generate reimbursement files</p>
+            <p>Review on-call reports and manual mileage entries, generate reimbursement files</p>
         </div>
 
         <!-- Import Section -->
         <div class="import-section">
             <div class="import-title">📤 Import Schedule Data</div>
             <div class="import-box">
-                <div class="import-grid">
-                    <div class="form-group">
-                        <label for="scheduleFile">Upload CSV File (Columns A-G)</label>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="scheduleFile" accept=".csv">
-                        </div>
-                        <div class="import-info">
-                            Import CSV data to columns A-G. Header row will be skipped. Formulas in columns H+ will be copied automatically.
-                        </div>
+                <label for="scheduleFile" style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: #3D3D3D;">Upload CSV File (Columns A-G)</label>
+                <div class="import-row">
+                    <div class="file-input-wrapper">
+                        <input type="file" id="scheduleFile" accept=".csv">
                     </div>
                     <button class="btn btn-primary" onclick="uploadScheduleFile()">Upload & Import</button>
+                </div>
+                <div class="import-info">
+                    Import CSV data to columns A-G. Header row will be skipped. Formulas in columns H+ will be copied automatically.
                 </div>
                 <div class="import-loading" id="importLoading">
                     <div class="import-spinner"></div>
@@ -718,19 +1134,31 @@
 
             <div id="reportsTable"></div>
 
+            <!-- Manual Entries Section -->
+            <div id="manualEntriesSection" style="display: none; margin-top: 30px;"></div>
+
             <div id="exportSection" style="display: none;">
                 <div class="export-section">
-                    <h3>Export Text File (All Employees)</h3>
-                    <div class="notice-box">
-                        <p><strong>Format:</strong> Each data line will be formatted as: EMPLOYEE_ID,MLE,AMOUNT,,,,,</p>
-                        <p><strong>Rate:</strong> $0.70 per mile (federal reimbursement rate)</p>
-                        <p><strong>Sections:</strong> File includes separate sections for SUBMITTED and NOT SUBMITTED employees</p>
-                        <p><strong>Includes:</strong> Header with summary counts, data sections, and footer with totals</p>
+                    <div class="export-header-row">
+                        <div class="export-header-left" onclick="toggleExportSection()">
+                            <div class="export-toggle" id="exportToggle">+</div>
+                            <h3>📄 Export Text File</h3>
+                        </div>
+                        <button class="btn btn-success" onclick="downloadTextFile()" style="margin: 0;">
+                            Download Text File
+                        </button>
                     </div>
-                    <div class="text-preview" id="textPreview"></div>
-                    <button class="btn btn-success" onclick="downloadTextFile()">
-                        Download Text File
-                    </button>
+                    <div class="export-content" id="exportContent">
+                        <div class="export-content-inner">
+                            <div class="notice-box" style="margin-bottom: 15px;">
+                                <p><strong>Format:</strong> Each data line will be formatted as: EMPLOYEE_ID,MLE,AMOUNT,,,,,</p>
+                                <p><strong>Rate:</strong> $0.70 per mile (federal reimbursement rate)</p>
+                                <p><strong>Sections:</strong> File includes ON-CALL SUBMITTED, MANUAL MILEAGE, and PENDING sections</p>
+                                <p><strong>Includes:</strong> Both on-call mileage reports AND manual mileage entries</p>
+                            </div>
+                            <div class="text-preview" id="textPreview"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -738,13 +1166,269 @@
 
     <script>
         // IMPORTANT: Replace this URL with your actual Google Apps Script web app URL
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/a/macros/alicecare.com/s/AKfycbxsiJuU6W3msDffnoNBuFhzMOy-WtmNp-mi9IUpRUiawGdlKLOedFUq6R9qCADNqKbQ/exec';
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyoge_hluInEjc7ovFBnxttmqxY4GgXi-wTKdDeHzNUk3-jhMGAnwn9oYt2219A2FVU/exec';
         
-        const REIMBURSEMENT_RATE = 0.70; // Federal rate per mile
+        // ==========================================
+        // MILEAGE RATE MANAGEMENT
+        // ==========================================
+        
+        const RATE_STORAGE_KEY = 'aliceCare_mileageRate';
+        const RATE_HISTORY_KEY = 'aliceCare_rateHistory';
+        const RATE_REVIEW_KEY = 'aliceCare_lastRateReview';
+        
+        // Default rate - will be overridden by localStorage if available
+        let REIMBURSEMENT_RATE = 0.70;
+        
+        function initializeRateSettings() {
+            // Load saved rate from localStorage
+            const savedRate = localStorage.getItem(RATE_STORAGE_KEY);
+            if (savedRate) {
+                REIMBURSEMENT_RATE = parseFloat(savedRate);
+            }
+            
+            // Update UI
+            updateRateDisplay();
+            
+            // Check if we need to show the reminder
+            checkRateReminder();
+        }
+        
+        function updateRateDisplay() {
+            // Update nav badge
+            const navBadge = document.getElementById('navRateBadge');
+            if (navBadge) {
+                navBadge.textContent = `$${REIMBURSEMENT_RATE.toFixed(2)}/mi`;
+            }
+            
+            // Update modal current rate
+            const modalRate = document.getElementById('modalCurrentRate');
+            if (modalRate) {
+                modalRate.textContent = `$${REIMBURSEMENT_RATE.toFixed(2)}`;
+            }
+            
+            // Update export section info if it exists
+            updateExportRateInfo();
+        }
+        
+        function updateExportRateInfo() {
+            const exportContent = document.querySelector('.export-content-inner .notice-box');
+            if (exportContent) {
+                const rateParagraph = exportContent.querySelector('p:nth-child(2)');
+                if (rateParagraph) {
+                    rateParagraph.innerHTML = `<strong>Rate:</strong> $${REIMBURSEMENT_RATE.toFixed(2)} per mile (current reimbursement rate)`;
+                }
+            }
+        }
+        
+        function checkRateReminder() {
+            const currentYear = new Date().getFullYear();
+            const currentMonth = new Date().getMonth(); // 0 = January
+            const currentDay = new Date().getDate();
+            
+            // Only show reminder starting January 1st
+            if (currentMonth !== 0) {
+                // Not January, hide reminder
+                document.getElementById('rateReminderBanner').style.display = 'none';
+                return;
+            }
+            
+            // Check if already reviewed this year
+            const lastReview = localStorage.getItem(RATE_REVIEW_KEY);
+            if (lastReview) {
+                const reviewData = JSON.parse(lastReview);
+                if (reviewData.year === currentYear) {
+                    // Already reviewed this year
+                    document.getElementById('rateReminderBanner').style.display = 'none';
+                    return;
+                }
+            }
+            
+            // Show the reminder banner
+            document.getElementById('reminderYear').textContent = currentYear;
+            document.getElementById('rateReminderBanner').style.display = 'flex';
+        }
+        
+        function openRateModal() {
+            const modal = document.getElementById('rateModal');
+            modal.classList.remove('hidden');
+            
+            // Pre-fill with current rate
+            document.getElementById('newRateInput').value = REIMBURSEMENT_RATE.toFixed(2);
+            document.getElementById('modalCurrentRate').textContent = `$${REIMBURSEMENT_RATE.toFixed(2)}`;
+            
+            // Load and display history
+            loadRateHistory();
+        }
+        
+        function closeRateModal() {
+            document.getElementById('rateModal').classList.add('hidden');
+        }
+        
+        function loadRateHistory() {
+            const historyList = document.getElementById('rateHistoryList');
+            const history = localStorage.getItem(RATE_HISTORY_KEY);
+            
+            if (!history) {
+                historyList.innerHTML = '<div class="rate-history-item" style="color: #9CA3AF;">No history available</div>';
+                return;
+            }
+            
+            const historyData = JSON.parse(history);
+            if (historyData.length === 0) {
+                historyList.innerHTML = '<div class="rate-history-item" style="color: #9CA3AF;">No history available</div>';
+                return;
+            }
+            
+            // Show last 5 entries (most recent first)
+            const recentHistory = historyData.slice(-5).reverse();
+            historyList.innerHTML = recentHistory.map(entry => {
+                const date = new Date(entry.date).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+                const action = entry.changed ? 
+                    `Changed to <strong>$${entry.rate.toFixed(2)}</strong>` : 
+                    `Confirmed at <strong>$${entry.rate.toFixed(2)}</strong> (unchanged)`;
+                return `<div class="rate-history-item">${date}: ${action}</div>`;
+            }).join('');
+        }
+        
+        function saveNewRate() {
+            const newRateInput = document.getElementById('newRateInput');
+            const newRate = parseFloat(newRateInput.value);
+            
+            if (isNaN(newRate) || newRate <= 0 || newRate > 5) {
+                alert('Please enter a valid rate between $0.01 and $5.00');
+                return;
+            }
+            
+            const oldRate = REIMBURSEMENT_RATE;
+            const rateChanged = Math.abs(newRate - oldRate) > 0.001;
+            
+            // Update the rate
+            REIMBURSEMENT_RATE = newRate;
+            localStorage.setItem(RATE_STORAGE_KEY, newRate.toString());
+            
+            // Record in history
+            addToRateHistory(newRate, rateChanged);
+            
+            // Mark as reviewed for this year
+            markRateReviewed();
+            
+            // Update UI
+            updateRateDisplay();
+            
+            // Hide reminder if shown
+            document.getElementById('rateReminderBanner').style.display = 'none';
+            
+            // Close modal
+            closeRateModal();
+            
+            // Show confirmation
+            if (rateChanged) {
+                alert(`Mileage rate updated from $${oldRate.toFixed(2)} to $${newRate.toFixed(2)} per mile.`);
+            } else {
+                alert(`Mileage rate confirmed at $${newRate.toFixed(2)} per mile for ${new Date().getFullYear()}.`);
+            }
+            
+            // Regenerate text preview if data is loaded
+            if (currentSubmissions || currentManualEntries) {
+                generateCombinedTextPreview();
+            }
+        }
+        
+        function confirmRateUnchanged() {
+            // Keep current rate but record that it was reviewed
+            addToRateHistory(REIMBURSEMENT_RATE, false);
+            markRateReviewed();
+            
+            // Hide reminder if shown
+            document.getElementById('rateReminderBanner').style.display = 'none';
+            
+            // Close modal
+            closeRateModal();
+            
+            alert(`Rate confirmed unchanged at $${REIMBURSEMENT_RATE.toFixed(2)} per mile for ${new Date().getFullYear()}.`);
+        }
+        
+        function addToRateHistory(rate, changed) {
+            let history = localStorage.getItem(RATE_HISTORY_KEY);
+            let historyData = history ? JSON.parse(history) : [];
+            
+            historyData.push({
+                date: new Date().toISOString(),
+                rate: rate,
+                changed: changed,
+                year: new Date().getFullYear()
+            });
+            
+            // Keep only last 20 entries
+            if (historyData.length > 20) {
+                historyData = historyData.slice(-20);
+            }
+            
+            localStorage.setItem(RATE_HISTORY_KEY, JSON.stringify(historyData));
+        }
+        
+        function markRateReviewed() {
+            const reviewData = {
+                year: new Date().getFullYear(),
+                date: new Date().toISOString()
+            };
+            localStorage.setItem(RATE_REVIEW_KEY, JSON.stringify(reviewData));
+        }
+        
+        function dismissReminder() {
+            // Just hide the banner for this session (doesn't mark as reviewed)
+            document.getElementById('rateReminderBanner').style.display = 'none';
+        }
         
         let currentSubmissions = null;
+        let currentManualEntries = null;
         let currentWeek = null;
         let currentYear = null;
+        
+        // ==========================================
+        // LOADING OVERLAY FUNCTIONS
+        // ==========================================
+        
+        function showLoading(text, subtext) {
+            const overlay = document.getElementById('loadingOverlay');
+            const loadingText = document.getElementById('loadingText');
+            const loadingSubtext = document.getElementById('loadingSubtext');
+            
+            loadingText.textContent = text || 'Processing...';
+            loadingSubtext.textContent = subtext || 'Please wait';
+            
+            overlay.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+        
+        // ==========================================
+        // EXPORT SECTION TOGGLE
+        // ==========================================
+        
+        function toggleExportSection() {
+            const content = document.getElementById('exportContent');
+            const toggle = document.getElementById('exportToggle');
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                toggle.classList.remove('expanded');
+                toggle.textContent = '+';
+            } else {
+                content.classList.add('expanded');
+                toggle.classList.add('expanded');
+                toggle.textContent = '+';
+            }
+        }
 
         function loadSubmissions() {
             const weekNumber = document.getElementById('weekNumber').value.trim();
@@ -757,86 +1441,142 @@
 
             currentWeek = weekNumber;
             currentYear = year;
+            
+            // Show loading overlay
+            showLoading('Loading Reports...', `Week ${weekNumber} of ${year}`);
 
             document.getElementById('loadingIndicator').style.display = 'block';
             document.getElementById('reportsTable').innerHTML = '';
             document.getElementById('statsSection').style.display = 'none';
             document.getElementById('exportSection').style.display = 'none';
+            document.getElementById('manualEntriesSection').style.display = 'none';
 
-            // Create JSONP callback name
+            // Track completion of both requests
+            let onCallComplete = false;
+            let manualComplete = false;
+            
+            function checkBothComplete() {
+                if (onCallComplete && manualComplete) {
+                    hideLoading();
+                    document.getElementById('loadingIndicator').style.display = 'none';
+                    displayAllReports();
+                }
+            }
+
+            // ========== LOAD ON-CALL SUBMISSIONS ==========
             const callbackName = 'jsonpCallback_' + Date.now();
             
-            // Define the callback function
             window[callbackName] = function(data) {
-                console.log('Received data:', data);
-                document.getElementById('loadingIndicator').style.display = 'none';
+                console.log('Received on-call data:', data);
                 
                 if (data.error) {
-                    alert('Error: ' + data.error);
-                    return;
+                    console.error('Error loading on-call:', data.error);
+                    currentSubmissions = { submissions: [] };
+                } else {
+                    currentSubmissions = data;
                 }
                 
-                currentSubmissions = data;
-                displayReports(data);
-                
-                // Clean up
                 delete window[callbackName];
+                onCallComplete = true;
+                checkBothComplete();
             };
 
-            // Build JSONP URL
             const url = GOOGLE_SCRIPT_URL + 
                 '?action=getSubmissions' +
                 '&week=' + encodeURIComponent(weekNumber) +
                 '&year=' + encodeURIComponent(year) +
                 '&callback=' + callbackName;
 
-            console.log('Fetching:', url);
+            console.log('Fetching on-call:', url);
 
-            // Create script tag for JSONP request
             const script = document.createElement('script');
             script.src = url;
             script.onerror = function() {
-                document.getElementById('loadingIndicator').style.display = 'none';
-                alert('Failed to load reports. Please check your script URL.');
+                console.error('Failed to load on-call reports');
+                currentSubmissions = { submissions: [] };
                 delete window[callbackName];
+                onCallComplete = true;
+                checkBothComplete();
             };
             document.body.appendChild(script);
+
+            // ========== LOAD MANUAL MILEAGE ENTRIES ==========
+            const manualCallbackName = 'manualCallback_' + Date.now();
+            
+            window[manualCallbackName] = function(data) {
+                console.log('Received manual entries:', data);
+                
+                if (data.error) {
+                    console.error('Error loading manual entries:', data.error);
+                    currentManualEntries = [];
+                } else {
+                    currentManualEntries = Array.isArray(data) ? data : (data.entries || []);
+                }
+                
+                delete window[manualCallbackName];
+                manualComplete = true;
+                checkBothComplete();
+            };
+
+            const manualUrl = GOOGLE_SCRIPT_URL + 
+                '?action=getAllManualMileage' +
+                '&week=' + encodeURIComponent(weekNumber) +
+                '&year=' + encodeURIComponent(year) +
+                '&callback=' + manualCallbackName;
+
+            console.log('Fetching manual entries:', manualUrl);
+
+            const manualScript = document.createElement('script');
+            manualScript.src = manualUrl;
+            manualScript.onerror = function() {
+                console.error('Failed to load manual entries');
+                currentManualEntries = [];
+                delete window[manualCallbackName];
+                manualComplete = true;
+                checkBothComplete();
+            };
+            document.body.appendChild(manualScript);
+        }
+
+        function displayAllReports() {
+            const hasOnCall = currentSubmissions && currentSubmissions.submissions && currentSubmissions.submissions.length > 0;
+            const hasManual = currentManualEntries && currentManualEntries.length > 0;
+            
+            // Display on-call reports
+            if (hasOnCall) {
+                displayReports(currentSubmissions);
+            } else {
+                document.getElementById('reportsTable').innerHTML = `
+                    <div class="notice-box">
+                        <p><strong>No on-call reports found for Week ${currentWeek}, ${currentYear}</strong></p>
+                        <p>There are no on-call services for this week.</p>
+                    </div>
+                `;
+            }
+            
+            // Display manual entries
+            if (hasManual) {
+                displayManualEntries(currentManualEntries);
+            }
+            
+            // Show export section if there's ANY data (on-call OR manual)
+            if (hasOnCall || hasManual) {
+                updateCombinedStats();
+            } else {
+                // No data at all
+                document.getElementById('statsSection').style.display = 'none';
+                document.getElementById('exportSection').style.display = 'none';
+            }
         }
 
         function displayReports(data) {
             if (!data.submissions || data.submissions.length === 0) {
-                document.getElementById('reportsTable').innerHTML = `
-                    <div class="notice-box">
-                        <p><strong>No reports found for Week ${currentWeek}, ${currentYear}</strong></p>
-                        <p>There are no on-call services for this week.</p>
-                    </div>
-                `;
                 return;
             }
 
-            // Calculate totals
-            let totalEmployees = data.submissions.length;
-            let submittedCount = 0;
-            let totalMiles = 0;
-            let totalAmount = 0;
-
-            data.submissions.forEach(emp => {
-                if (emp.isSubmitted) {
-                    submittedCount++;
-                    totalMiles += emp.totalReimbursableMiles;
-                    totalAmount += emp.reimbursementAmount;
-                }
-            });
-
-            // Update stats
-            document.getElementById('totalEmployees').textContent = totalEmployees;
-            document.getElementById('submittedReports').textContent = submittedCount;
-            document.getElementById('totalMiles').textContent = totalMiles.toFixed(1);
-            document.getElementById('totalAmount').textContent = '$' + totalAmount.toFixed(2);
-            document.getElementById('statsSection').style.display = 'block';
-
-            // Build table
+            // Build table for on-call reports
             let html = `
+                <h3 style="font-size: 18px; color: #1A365C; margin-bottom: 15px;">📋 On-Call Mileage Reports</h3>
                 <table class="review-table">
                     <thead>
                         <tr>
@@ -886,16 +1626,424 @@
             `;
 
             document.getElementById('reportsTable').innerHTML = html;
+        }
 
-            // Generate text preview - include ALL employees (submitted and not submitted)
-            const submittedReports = data.submissions.filter(emp => emp.isSubmitted);
-            const pendingReports = data.submissions.filter(emp => !emp.isSubmitted);
-            
-            // Always show export section if there are any employees
-            if (data.submissions.length > 0) {
-                generateTextPreview(data.submissions, submittedReports.length, pendingReports.length, totalEmployees);
-                document.getElementById('exportSection').style.display = 'block';
+        function displayManualEntries(entries) {
+            if (!entries || entries.length === 0) {
+                return;
             }
+
+            // Group entries by employee
+            const employeeMap = new Map();
+            
+            entries.forEach(entry => {
+                const empId = entry.employeeId || entry.Employee_ID || 'Unknown';
+                if (!employeeMap.has(empId)) {
+                    employeeMap.set(empId, {
+                        employeeId: empId,
+                        firstName: entry.firstName || entry.First_Name || '',
+                        lastName: entry.lastName || entry.Last_Name || '',
+                        entries: [],
+                        totalMiles: 0,
+                        submittedCount: 0,
+                        pendingCount: 0
+                    });
+                }
+                
+                const emp = employeeMap.get(empId);
+                emp.entries.push(entry);
+                
+                const miles = parseFloat(entry.totalMileage || entry.Total_Mileage || 0);
+                emp.totalMiles += miles;
+                
+                const status = (entry.status || entry.Status || '').toLowerCase();
+                if (status === 'submitted' || status === 'approved' || status === 'reviewed') {
+                    emp.submittedCount++;
+                } else {
+                    emp.pendingCount++;
+                }
+            });
+
+            // Build manual entries table
+            let html = `
+                <h3 style="font-size: 18px; color: #1A365C; margin-bottom: 15px; margin-top: 30px;">🚗 Manual Mileage Entries</h3>
+                <div class="notice-box" style="margin-bottom: 20px;">
+                    <p><strong>Note:</strong> These are manually submitted mileage entries (not from on-call services).</p>
+                </div>
+                <table class="review-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;"></th>
+                            <th>Employee ID</th>
+                            <th>Name</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-right">Entries</th>
+                            <th class="text-right">Total Miles</th>
+                            <th class="text-right">Reimbursement</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            let manualIndex = 0;
+            employeeMap.forEach((emp, empId) => {
+                const allSubmitted = emp.pendingCount === 0;
+                const statusClass = allSubmitted ? 'status-submitted' : 'status-pending';
+                const statusText = allSubmitted ? 'Reviewed' : `${emp.submittedCount}/${emp.entries.length} Reviewed`;
+                const reimbursement = emp.totalMiles * REIMBURSEMENT_RATE;
+                
+                html += `
+                    <tr onclick="toggleManualDetails(${manualIndex})">
+                        <td>
+                            <span class="expand-icon" id="manual_icon_${manualIndex}">+</span>
+                        </td>
+                        <td class="employee-id">${emp.employeeId}</td>
+                        <td>${emp.lastName}, ${emp.firstName}</td>
+                        <td class="text-center">
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                        </td>
+                        <td class="text-right">${emp.entries.length}</td>
+                        <td class="text-right">${emp.totalMiles.toFixed(1)} mi</td>
+                        <td class="text-right">$${reimbursement.toFixed(2)}</td>
+                        <td class="text-center">
+                            ${!allSubmitted ? `<button class="btn btn-success" style="padding: 6px 12px; font-size: 12px; margin: 0;" onclick="event.stopPropagation(); approveManualEntries('${empId}')">Approve All</button>` : '<span style="color: #62B790; font-weight: 600;">✓</span>'}
+                        </td>
+                    </tr>
+                    <tr class="detail-row" id="manual_detail_${manualIndex}">
+                        <td colspan="8" class="detail-cell">
+                            <div class="detail-content">
+                                ${generateManualEntryDetails(emp)}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                manualIndex++;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById('manualEntriesSection').innerHTML = html;
+            document.getElementById('manualEntriesSection').style.display = 'block';
+        }
+
+        function generateManualEntryDetails(employee) {
+            let html = `
+                <table class="services-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Client</th>
+                            <th>Reason</th>
+                            <th class="text-right">Start Mi</th>
+                            <th class="text-right">End Mi</th>
+                            <th class="text-right">Total Miles</th>
+                            <th class="text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            let totalMiles = 0;
+
+            employee.entries.forEach(entry => {
+                const miles = parseFloat(entry.totalMileage || entry.Total_Mileage || 0);
+                totalMiles += miles;
+                
+                const status = (entry.status || entry.Status || 'Submitted').toLowerCase();
+                const statusClass = (status === 'submitted' || status === 'approved' || status === 'reviewed') ? 'status-submitted' : 'status-pending';
+                const statusText = status.charAt(0).toUpperCase() + status.slice(1);
+                
+                const date = entry.date || entry.Date || '';
+                const time = entry.time || entry.Time || '';
+                const clientName = entry.clientName || entry.Client_Name || '-';
+                const reason = entry.reason || entry.Reason || '-';
+                const startMiles = parseFloat(entry.startMiles || entry.Start_Miles || 0);
+                const endMiles = parseFloat(entry.endMiles || entry.End_Miles || 0);
+
+                html += `
+                    <tr>
+                        <td>${formatDate(date)}</td>
+                        <td>${time}</td>
+                        <td>${clientName}</td>
+                        <td style="font-size: 12px;">${reason}</td>
+                        <td class="text-right">${startMiles.toFixed(1)}</td>
+                        <td class="text-right">${endMiles.toFixed(1)}</td>
+                        <td class="text-right" style="font-weight: 600; color: #F57600;">${miles.toFixed(1)} mi</td>
+                        <td class="text-center">
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            const reimbursement = totalMiles * REIMBURSEMENT_RATE;
+
+            html += `
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="6" class="text-right">TOTAL:</td>
+                            <td class="text-right" style="color: #F57600; font-weight: 700;">${totalMiles.toFixed(1)} mi</td>
+                            <td class="text-center" style="font-weight: 600;">$${reimbursement.toFixed(2)}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            `;
+
+            return html;
+        }
+
+        function toggleManualDetails(index) {
+            const detailRow = document.getElementById('manual_detail_' + index);
+            const icon = document.getElementById('manual_icon_' + index);
+            const mainRow = detailRow.previousElementSibling;
+            
+            if (detailRow.classList.contains('show')) {
+                detailRow.classList.remove('show');
+                icon.textContent = '+';
+                mainRow.classList.remove('expanded');
+            } else {
+                detailRow.classList.add('show');
+                icon.textContent = '−';
+                mainRow.classList.add('expanded');
+            }
+        }
+
+        function approveManualEntries(employeeId) {
+            if (!confirm(`Are you sure you want to approve all manual mileage entries for Employee ${employeeId}?`)) {
+                return;
+            }
+
+            // Show loading overlay
+            showLoading('Approving Entries...', `Processing Employee ${employeeId}`);
+
+            // Call backend to approve
+            const callbackName = 'approveCallback_' + Date.now();
+            
+            window[callbackName] = function(response) {
+                console.log('Approve response:', response);
+                delete window[callbackName];
+                hideLoading();
+                
+                if (response.success) {
+                    alert('Manual entries approved successfully!');
+                    // Reload the data
+                    loadSubmissions();
+                } else {
+                    alert('Error approving entries: ' + (response.message || 'Unknown error'));
+                }
+            };
+
+            const url = GOOGLE_SCRIPT_URL + 
+                '?action=approveManualMileage' +
+                '&employeeId=' + encodeURIComponent(employeeId) +
+                '&week=' + encodeURIComponent(currentWeek) +
+                '&year=' + encodeURIComponent(currentYear) +
+                '&callback=' + callbackName;
+
+            const script = document.createElement('script');
+            script.src = url;
+            script.onerror = function() {
+                delete window[callbackName];
+                hideLoading();
+                alert('Failed to approve entries. Please try again.');
+            };
+            document.body.appendChild(script);
+        }
+
+        function updateCombinedStats() {
+            console.log('=== updateCombinedStats ===');
+            
+            // Calculate on-call totals
+            let onCallEmployees = 0;
+            let onCallSubmitted = 0;
+            let onCallMiles = 0;
+            let onCallAmount = 0;
+
+            if (currentSubmissions && currentSubmissions.submissions) {
+                onCallEmployees = currentSubmissions.submissions.length;
+                currentSubmissions.submissions.forEach(emp => {
+                    if (emp.isSubmitted) {
+                        onCallSubmitted++;
+                        onCallMiles += emp.totalReimbursableMiles;
+                        onCallAmount += emp.reimbursementAmount;
+                    }
+                });
+            }
+
+            // Calculate manual entry totals
+            let manualEmployees = 0;
+            let manualMiles = 0;
+            let manualAmount = 0;
+            const manualEmployeeSet = new Set();
+
+            if (currentManualEntries && currentManualEntries.length > 0) {
+                currentManualEntries.forEach(entry => {
+                    const empId = entry.employeeId || entry.Employee_ID;
+                    manualEmployeeSet.add(empId);
+                    const miles = parseFloat(entry.totalMileage || entry.Total_Mileage || 0);
+                    manualMiles += miles;
+                });
+                manualEmployees = manualEmployeeSet.size;
+                manualAmount = manualMiles * REIMBURSEMENT_RATE;
+            }
+
+            console.log('On-call employees:', onCallEmployees, 'Manual employees:', manualEmployees);
+            console.log('On-call miles:', onCallMiles, 'Manual miles:', manualMiles);
+
+            // Update stats display
+            const hasOnCall = onCallEmployees > 0;
+            const hasManual = manualEmployees > 0;
+
+            // Always show stats and export if we have ANY data
+            if (hasOnCall || hasManual) {
+                document.getElementById('totalEmployees').textContent = onCallEmployees + (hasManual ? ` (+${manualEmployees} manual)` : '');
+                document.getElementById('submittedReports').textContent = onCallSubmitted + (hasManual ? ` (+${manualEmployees} manual)` : '');
+                document.getElementById('totalMiles').textContent = (onCallMiles + manualMiles).toFixed(1);
+                document.getElementById('totalAmount').textContent = '$' + (onCallAmount + manualAmount).toFixed(2);
+                document.getElementById('statsSection').style.display = 'block';
+
+                // Generate text preview with both on-call and manual
+                generateCombinedTextPreview();
+                
+                // Show export section
+                document.getElementById('exportSection').style.display = 'block';
+                console.log('Export section displayed');
+            } else {
+                console.log('No data - hiding export section');
+                document.getElementById('statsSection').style.display = 'none';
+                document.getElementById('exportSection').style.display = 'none';
+            }
+        }
+
+        function generateCombinedTextPreview() {
+            console.log('=== generateCombinedTextPreview ===');
+            console.log('currentSubmissions:', currentSubmissions);
+            console.log('currentManualEntries:', currentManualEntries);
+            
+            let text = '';
+            
+            // Add header
+            text += `ALICE CARE MILEAGE REIMBURSEMENT\n`;
+            text += `Week ${currentWeek}, ${currentYear}\n`;
+            text += `Generated: ${new Date().toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })}\n`;
+            text += `\n`;
+
+            // Calculate totals - handle null/undefined safely
+            const submissions = (currentSubmissions && currentSubmissions.submissions) ? currentSubmissions.submissions : [];
+            const manualEntries = currentManualEntries ? currentManualEntries : [];
+            
+            console.log('Submissions count:', submissions.length);
+            console.log('Manual entries count:', manualEntries.length);
+            
+            const submitted = submissions.filter(emp => emp.isSubmitted);
+            const notSubmitted = submissions.filter(emp => !emp.isSubmitted);
+            
+            // Group manual entries by employee
+            const manualByEmployee = new Map();
+            manualEntries.forEach(entry => {
+                const empId = String(entry.employeeId || entry.Employee_ID || 'Unknown');
+                if (!manualByEmployee.has(empId)) {
+                    manualByEmployee.set(empId, {
+                        employeeId: empId,
+                        firstName: entry.firstName || entry.First_Name || '',
+                        lastName: entry.lastName || entry.Last_Name || '',
+                        totalMiles: 0,
+                        entries: []
+                    });
+                }
+                const emp = manualByEmployee.get(empId);
+                emp.totalMiles += parseFloat(entry.totalMileage || entry.Total_Mileage || 0);
+                emp.entries.push(entry);
+            });
+
+            // Summary
+            text += `SUMMARY:\n`;
+            text += `On-Call Employees: ${submissions.length} (${submitted.length} submitted)\n`;
+            text += `Manual Entries: ${manualEntries.length} entries from ${manualByEmployee.size} employees\n`;
+            text += `\n`;
+
+            // ON-CALL SUBMITTED SECTION
+            if (submitted.length > 0) {
+                text += `ON-CALL - SUBMITTED:\n`;
+                text += `---\n`;
+                
+                const sortedSubmitted = [...submitted].sort((a, b) => a.employeeId.localeCompare(b.employeeId));
+                
+                sortedSubmitted.forEach(emp => {
+                    const employeeId = emp.employeeId.padStart(4, '0');
+                    const amount = emp.reimbursementAmount.toFixed(2);
+                    text += `${employeeId},MLE,${amount},,,,,\n`;
+                });
+                
+                text += `---\n`;
+                text += `On-Call Submitted Records: ${submitted.length}\n`;
+                text += `\n`;
+            }
+
+            // MANUAL MILEAGE SECTION
+            if (manualByEmployee.size > 0) {
+                text += `MANUAL MILEAGE - SUBMITTED:\n`;
+                text += `---\n`;
+                
+                const sortedManual = [...manualByEmployee.values()].sort((a, b) => a.employeeId.localeCompare(b.employeeId));
+                
+                sortedManual.forEach(emp => {
+                    const employeeId = emp.employeeId.padStart(4, '0');
+                    const amount = (emp.totalMiles * REIMBURSEMENT_RATE).toFixed(2);
+                    text += `${employeeId},MLE,${amount},,,,,\n`;
+                });
+                
+                text += `---\n`;
+                text += `Manual Mileage Records: ${manualByEmployee.size}\n`;
+                text += `\n`;
+            }
+
+            // ON-CALL NOT SUBMITTED SECTION
+            if (notSubmitted.length > 0) {
+                text += `ON-CALL - NOT SUBMITTED (PENDING):\n`;
+                text += `---\n`;
+                
+                const sortedNotSubmitted = [...notSubmitted].sort((a, b) => a.employeeId.localeCompare(b.employeeId));
+                
+                sortedNotSubmitted.forEach(emp => {
+                    const employeeId = emp.employeeId.padStart(4, '0');
+                    const amount = emp.reimbursementAmount.toFixed(2);
+                    text += `${employeeId},MLE,${amount},,,,,\n`;
+                });
+                
+                text += `---\n`;
+                text += `Pending Records: ${notSubmitted.length}\n`;
+                text += `\n`;
+            }
+
+            // Calculate grand totals
+            let totalOnCallAmount = 0;
+            let totalManualAmount = 0;
+            
+            submitted.forEach(emp => totalOnCallAmount += emp.reimbursementAmount);
+            manualByEmployee.forEach(emp => totalManualAmount += emp.totalMiles * REIMBURSEMENT_RATE);
+
+            // Footer
+            text += `TOTALS:\n`;
+            text += `On-Call Reimbursement: $${totalOnCallAmount.toFixed(2)}\n`;
+            text += `Manual Mileage Reimbursement: $${totalManualAmount.toFixed(2)}\n`;
+            text += `Grand Total: $${(totalOnCallAmount + totalManualAmount).toFixed(2)}\n`;
+            text += `\n`;
+            text += `END OF REPORT\n`;
+
+            document.getElementById('textPreview').textContent = text;
         }
 
         function generateServiceDetails(employee) {
@@ -986,84 +2134,14 @@
             }
         }
 
-        function generateTextPreview(allSubmissions, submittedCount, pendingCount, totalCount) {
-            let text = '';
-            
-            // Add header with counts
-            text += `ALICE CARE MILEAGE REIMBURSEMENT\n`;
-            text += `Week ${currentWeek}, ${currentYear}\n`;
-            text += `Generated: ${new Date().toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            })}\n`;
-            text += `\n`;
-            text += `SUMMARY:\n`;
-            text += `Total Employees: ${totalCount}\n`;
-            text += `Submitted: ${submittedCount}\n`;
-            text += `Not Submitted: ${pendingCount}\n`;
-            text += `\n`;
-            
-            // Separate submitted and not submitted
-            const submitted = allSubmissions.filter(emp => emp.isSubmitted);
-            const notSubmitted = allSubmissions.filter(emp => !emp.isSubmitted);
-            
-            // SUBMITTED EMPLOYEES SECTION
-            if (submitted.length > 0) {
-                text += `SUBMITTED - REIMBURSEMENT DATA:\n`;
-                text += `---\n`;
-                
-                // Sort by employee ID
-                const sortedSubmitted = [...submitted].sort((a, b) => a.employeeId.localeCompare(b.employeeId));
-                
-                sortedSubmitted.forEach(emp => {
-                    // Format: EMPLOYEE_ID,MLE,AMOUNT,,,,,
-                    const employeeId = emp.employeeId.padStart(4, '0');
-                    const amount = emp.reimbursementAmount.toFixed(2);
-                    text += `${employeeId},MLE,${amount},,,,,\n`;
-                });
-                
-                text += `---\n`;
-                text += `Submitted Records: ${submitted.length}\n`;
-                text += `\n`;
-            }
-            
-            // NOT SUBMITTED EMPLOYEES SECTION
-            if (notSubmitted.length > 0) {
-                text += `NOT SUBMITTED - PENDING:\n`;
-                text += `---\n`;
-                
-                // Sort by employee ID
-                const sortedNotSubmitted = [...notSubmitted].sort((a, b) => a.employeeId.localeCompare(b.employeeId));
-                
-                sortedNotSubmitted.forEach(emp => {
-                    // Format: EMPLOYEE_ID,MLE,AMOUNT,,,,,
-                    const employeeId = emp.employeeId.padStart(4, '0');
-                    const amount = emp.reimbursementAmount.toFixed(2);
-                    text += `${employeeId},MLE,${amount},,,,,\n`;
-                });
-                
-                text += `---\n`;
-                text += `Pending Records: ${notSubmitted.length}\n`;
-                text += `\n`;
-            }
-            
-            // Add footer
-            text += `END OF REPORT\n`;
-            text += `Total Records: ${allSubmissions.length}\n`;
-
-            document.getElementById('textPreview').textContent = text;
-        }
-
         function downloadTextFile() {
-            if (!currentSubmissions || !currentSubmissions.submissions) {
+            const text = document.getElementById('textPreview').textContent;
+            
+            if (!text || text.trim() === '') {
                 alert('No data to download');
                 return;
             }
 
-            const text = document.getElementById('textPreview').textContent;
             const filename = `mileage_week${currentWeek}_${currentYear}.txt`;
 
             // Create blob and download
@@ -1146,7 +2224,10 @@
                 return;
             }
             
-            // Show loading
+            // Show loading overlay
+            showLoading('Uploading Schedule...', `Processing ${fileName}`);
+            
+            // Show section loading
             loadingDiv.style.display = 'flex';
             messageDiv.style.display = 'none';
             
@@ -1158,6 +2239,7 @@
                     const data = parseCSVFile(csvText);
                     
                     if (!data || data.length === 0) {
+                        hideLoading();
                         showImportMessage('No data found in CSV file', 'error');
                         loadingDiv.style.display = 'none';
                         return;
@@ -1169,12 +2251,14 @@
                     sendImportDataToSheet(data, fileInput, loadingDiv);
                     
                 } catch (error) {
+                    hideLoading();
                     loadingDiv.style.display = 'none';
                     showImportMessage('Error parsing CSV: ' + error.message, 'error');
                 }
             };
             
             reader.onerror = function() {
+                hideLoading();
                 loadingDiv.style.display = 'none';
                 showImportMessage('Error reading file', 'error');
             };
@@ -1239,11 +2323,12 @@
             const numRows = data.length;
             console.log('Calling import with', numRows, 'rows');
             
-            // Update loading message with row count
+            // Update loading messages
             const loadingText = loadingDiv.querySelector('span');
             if (loadingText) {
                 loadingText.textContent = 'Uploading ' + numRows + ' rows...';
             }
+            document.getElementById('loadingSubtext').textContent = `Uploading ${numRows} rows...`;
             
             // Use POST request instead of JSONP (to handle large data)
             fetch(GOOGLE_SCRIPT_URL, {
@@ -1263,9 +2348,11 @@
                 if (loadingText) {
                     loadingText.textContent = 'Processing ' + numRows + ' rows...';
                 }
+                document.getElementById('loadingSubtext').textContent = `Processing ${numRows} rows...`;
                 
                 // Wait a bit for server to process, then show success
                 setTimeout(() => {
+                    hideLoading();
                     loadingDiv.style.display = 'none';
                     showImportMessage(
                         'Import completed! ' + numRows + ' rows uploaded. Check your Schedule sheet to verify.',
@@ -1275,6 +2362,7 @@
                 }, 2000); // Give server 2 seconds to process
             })
             .catch(error => {
+                hideLoading();
                 loadingDiv.style.display = 'none';
                 showImportMessage('Failed to send import request: ' + error.message, 'error');
                 console.error('Import error:', error);
@@ -1297,6 +2385,9 @@
 
         // Set current year as default
         document.getElementById('year').value = new Date().getFullYear();
+        
+        // Initialize rate settings on page load
+        initializeRateSettings();
     </script>
 </body>
 </html>
