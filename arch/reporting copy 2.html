@@ -1182,52 +1182,6 @@
         .report-type-option:hover {
             border-color: #999 !important;
         }
-        
-        /* Info tooltip styles */
-        .info-tooltip {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.2);
-            font-size: 11px !important;
-            font-weight: 600;
-        }
-        
-        .info-tooltip:hover::after {
-            content: attr(title);
-            position: absolute;
-            bottom: 130%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.9);
-            color: white;
-            padding: 12px 15px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 400;
-            white-space: pre-line;
-            width: 280px;
-            max-width: 320px;
-            z-index: 1000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            line-height: 1.5;
-            text-transform: none;
-        }
-        
-        .info-tooltip:hover::before {
-            content: '';
-            position: absolute;
-            bottom: 120%;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 6px solid transparent;
-            border-top-color: rgba(0,0,0,0.9);
-            z-index: 1001;
-        }
     </style>
 </head>
 <body>
@@ -1539,52 +1493,22 @@
                     </div>
                 </div>
                 
-                <!-- Last Completed Period Stats -->
+                <!-- Current Period Stats -->
                 <div class="stats-row" style="margin-bottom: 30px;">
                     <div class="stat-card">
-                        <h3>Last Week <span id="lastWeekLabel" style="font-weight: 400; color: #999; font-size: 11px;">(Week --)</span></h3>
-                        <div style="display: flex; gap: 15px; align-items: baseline; margin-bottom: 5px;">
-                            <div>
-                                <span style="font-size: 11px; color: #666; text-transform: uppercase;">Revenue</span>
-                                <div style="font-size: 22px; font-weight: 700; color: #1A365C;">$<span id="weekRevenue">--</span></div>
-                            </div>
-                            <div style="border-left: 1px solid #E5ECF3; padding-left: 15px;">
-                                <span style="font-size: 11px; color: #666; text-transform: uppercase;">Hours</span>
-                                <div style="font-size: 22px; font-weight: 700; color: #1A365C;"><span id="weekHours">--</span></div>
-                            </div>
-                        </div>
-                        <div class="subtitle"><span id="weekServices">--</span> services completed</div>
-                        <div id="weekChange" style="font-size: 11px; margin-top: 5px;"></div>
+                        <h3>This Week</h3>
+                        <div class="number" id="weekServices">--</div>
+                        <div class="subtitle"><span id="weekHours">--</span> hrs | $<span id="weekRevenue">--</span></div>
                     </div>
                     <div class="stat-card green">
-                        <h3>Last Month <span id="lastMonthLabel" style="font-weight: 400; color: #999; font-size: 11px;">(--)</span></h3>
-                        <div style="display: flex; gap: 15px; align-items: baseline; margin-bottom: 5px;">
-                            <div>
-                                <span style="font-size: 11px; color: #666; text-transform: uppercase;">Revenue</span>
-                                <div style="font-size: 22px; font-weight: 700; color: #1A365C;">$<span id="monthRevenue">--</span></div>
-                            </div>
-                            <div style="border-left: 1px solid #E5ECF3; padding-left: 15px;">
-                                <span style="font-size: 11px; color: #666; text-transform: uppercase;">Hours</span>
-                                <div style="font-size: 22px; font-weight: 700; color: #1A365C;"><span id="monthHours">--</span></div>
-                            </div>
-                        </div>
-                        <div class="subtitle"><span id="monthServices">--</span> services completed</div>
-                        <div id="monthChange" style="font-size: 11px; margin-top: 5px;"></div>
+                        <h3>This Month</h3>
+                        <div class="number" id="monthServices">--</div>
+                        <div class="subtitle"><span id="monthHours">--</span> hrs | $<span id="monthRevenue">--</span></div>
                     </div>
                     <div class="stat-card blue">
-                        <h3>Last Quarter <span id="lastQuarterLabel" style="font-weight: 400; color: #999; font-size: 11px;">(--)</span></h3>
-                        <div style="display: flex; gap: 15px; align-items: baseline; margin-bottom: 5px;">
-                            <div>
-                                <span style="font-size: 11px; color: #666; text-transform: uppercase;">Revenue</span>
-                                <div style="font-size: 22px; font-weight: 700; color: #1A365C;">$<span id="quarterRevenue">--</span></div>
-                            </div>
-                            <div style="border-left: 1px solid #E5ECF3; padding-left: 15px;">
-                                <span style="font-size: 11px; color: #666; text-transform: uppercase;">Hours</span>
-                                <div style="font-size: 22px; font-weight: 700; color: #1A365C;"><span id="quarterHours">--</span></div>
-                            </div>
-                        </div>
-                        <div class="subtitle"><span id="quarterServices">--</span> services completed</div>
-                        <div id="quarterChange" style="font-size: 11px; margin-top: 5px;"></div>
+                        <h3>This Quarter</h3>
+                        <div class="number" id="quarterServices">--</div>
+                        <div class="subtitle"><span id="quarterHours">--</span> hrs | $<span id="quarterRevenue">--</span></div>
                     </div>
                     <div class="stat-card" style="border-left-color: #9C27B0;">
                         <h3>Active Clients</h3>
@@ -1966,51 +1890,22 @@
                         <!-- Row 1: LTV Summary KPIs -->
                         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px;">
                             <div style="background: linear-gradient(135deg, #1A365C 0%, #2D4A7C 100%); padding: 20px; border-radius: 12px; color: white;">
-                                <div style="font-size: 12px; text-transform: uppercase; opacity: 0.8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-                                    Avg Client Lifetime Value
-                                    <span class="info-tooltip" style="cursor: help; opacity: 0.7; font-size: 14px; position: relative;" title="LTV = Total Revenue ÷ Number of Clients
-
-Calculation includes:
-• All completed services across all years
-• Revenue from 'Cost To Customer' field
-• Clients merged by fuzzy name matching (85% similarity)
-
-Higher LTV indicates stronger client relationships and service engagement.">ⓘ</span>
-                                </div>
+                                <div style="font-size: 12px; text-transform: uppercase; opacity: 0.8; margin-bottom: 8px;">Avg Client Lifetime Value</div>
                                 <div id="insightsAvgLTV" style="font-size: 28px; font-weight: 700;">--</div>
                                 <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Revenue per client (all time)</div>
                             </div>
                             <div style="background: linear-gradient(135deg, #62B790 0%, #4A9A73 100%); padding: 20px; border-radius: 12px; color: white;">
-                                <div style="font-size: 12px; text-transform: uppercase; opacity: 0.8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-                                    Avg Client Tenure
-                                    <span class="info-tooltip" style="cursor: help; opacity: 0.7; font-size: 14px;" title="Tenure = Last Service Date − First Service Date
-
-Measured in months from the client's first completed service to their most recent service.
-
-Longer tenure indicates better client retention.">ⓘ</span>
-                                </div>
+                                <div style="font-size: 12px; text-transform: uppercase; opacity: 0.8; margin-bottom: 8px;">Avg Client Tenure</div>
                                 <div id="insightsAvgTenure" style="font-size: 28px; font-weight: 700;">--</div>
                                 <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Months of service</div>
                             </div>
                             <div style="background: linear-gradient(135deg, #F57600 0%, #E06500 100%); padding: 20px; border-radius: 12px; color: white;">
-                                <div style="font-size: 12px; text-transform: uppercase; opacity: 0.8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-                                    Avg Monthly Revenue
-                                    <span class="info-tooltip" style="cursor: help; opacity: 0.7; font-size: 14px;" title="Monthly Revenue = Client's Total Revenue ÷ Tenure Months
-
-Calculated only for ACTIVE clients (service in last 30 days).
-
-Shows average monthly spend per engaged client.">ⓘ</span>
-                                </div>
+                                <div style="font-size: 12px; text-transform: uppercase; opacity: 0.8; margin-bottom: 8px;">Avg Monthly Revenue</div>
                                 <div id="insightsAvgMonthlyRev" style="font-size: 28px; font-weight: 700;">--</div>
                                 <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Per active client</div>
                             </div>
                             <div style="background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%); padding: 20px; border-radius: 12px; color: white;">
-                                <div style="font-size: 12px; text-transform: uppercase; opacity: 0.8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-                                    Active Clients
-                                    <span class="info-tooltip" style="cursor: help; opacity: 0.7; font-size: 14px;" title="Active = At least one completed service in the last 30 days.
-
-Clients without recent service are considered inactive but still included in LTV and tenure calculations.">ⓘ</span>
-                                </div>
+                                <div style="font-size: 12px; text-transform: uppercase; opacity: 0.8; margin-bottom: 8px;">Active Clients</div>
                                 <div id="insightsActiveClients" style="font-size: 28px; font-weight: 700;">--</div>
                                 <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">With service in last 30 days</div>
                             </div>
@@ -3702,16 +3597,10 @@ Clients without recent service are considered inactive but still included in LTV
                 return;
             }
             
-            // Show sidebar immediately with loading state
-            document.getElementById('sidebarOverlay').classList.add('active');
-            document.getElementById('clientSidebar').classList.add('active');
-            document.getElementById('detailClientName').textContent = 'Loading...';
-            document.getElementById('detailCustomerName').textContent = identifier;
-            
             try {
                 let clientResult = null;
                 
-                // First try to find in local cached data for instant display
+                // First try to find in local cached data
                 const localClient = clientData.find(c => {
                     const customerName = String(c['Customer Name'] || '').toLowerCase().trim();
                     const email = String(c['email'] || '').toLowerCase().trim();
@@ -3719,123 +3608,114 @@ Clients without recent service are considered inactive but still included in LTV
                     return customerName === searchId || email === searchId || customerName.includes(searchId);
                 });
                 
-                // If found locally, display immediately while fetching fresh data
-                if (localClient) {
-                    displayClientDetails({ success: true, client: localClient });
+                // If found locally, still fetch from server to get latest data and report summary
+                // Try to find by Customer Name first
+                clientResult = await jsonpFetch({ action: 'getClientByCustomerName', customerName: identifier });
+                
+                if (!clientResult.success) {
+                    // Try by email
+                    clientResult = await jsonpFetch({ action: 'getClientByEmail', email: identifier });
                 }
                 
-                // Try all lookup methods in parallel for speed
-                const [byNameResult, byEmailResult, byCustomerNameResult] = await Promise.all([
-                    jsonpFetch({ action: 'getClientByCustomerName', customerName: identifier }).catch(() => ({ success: false })),
-                    jsonpFetch({ action: 'getClientByEmail', email: identifier }).catch(() => ({ success: false })),
-                    jsonpFetch({ action: 'getClientByName', name: identifier }).catch(() => ({ success: false }))
-                ]);
-                
-                // Use the first successful result
-                clientResult = byNameResult.success ? byNameResult : 
-                              (byEmailResult.success ? byEmailResult : 
-                              (byCustomerNameResult.success ? byCustomerNameResult : null));
+                if (!clientResult.success) {
+                    // Try by name
+                    clientResult = await jsonpFetch({ action: 'getClientByName', name: identifier });
+                }
                 
                 // If server lookup failed but we have local data, use that
-                if (!clientResult && localClient) {
+                if (!clientResult.success && localClient) {
                     console.log('Using local client data:', localClient);
                     clientResult = { success: true, client: localClient };
                 }
                 
-                if (!clientResult || !clientResult.success) {
+                if (!clientResult.success) {
                     showToast('Client not found', 'error');
-                    closeClientDetail();
                     return;
                 }
                 
-                // Display the fresh data
-                displayClientDetails(clientResult);
+                selectedClient = clientResult.client;
+                console.log('Selected client data:', selectedClient);
+                const fullName = `${selectedClient['F_Name'] || ''} ${selectedClient['L_Name'] || ''}`.trim();
+                const isAssigned = String(selectedClient['Assigment_Y1_N0']) === '1';
                 
-            } catch (error) {
-                showToast('Error loading client details', 'error');
-                console.error(error);
-                closeClientDetail();
-            }
-        }
-        
-        function displayClientDetails(clientResult) {
-            selectedClient = clientResult.client;
-            console.log('Selected client data:', selectedClient);
-            const fullName = `${selectedClient['F_Name'] || ''} ${selectedClient['L_Name'] || ''}`.trim();
-            const isAssigned = String(selectedClient['Assigment_Y1_N0']) === '1';
-            
-            // Update header
-            document.getElementById('detailClientName').textContent = fullName || selectedClient['Customer Name'] || 'Unknown Client';
-            document.getElementById('detailCustomerName').textContent = selectedClient['Customer Name'] || 'No customer name';
-            
-            // Update email routing indicator
-            const routeIndicator = document.getElementById('emailRouteIndicator');
-            if (isAssigned) {
-                routeIndicator.style.background = '#F3E5F5';
-                routeIndicator.style.borderColor = '#9C27B0';
-                routeIndicator.querySelector('svg').style.stroke = '#9C27B0';
-            } else {
-                routeIndicator.style.background = '#E3F2FD';
-                routeIndicator.style.borderColor = '#2196F3';
-                routeIndicator.querySelector('svg').style.stroke = '#2196F3';
-            }
-            document.getElementById('routeType').textContent = isAssigned ? 'Routed to Billing' : 'Routed to Insurance';
-            document.getElementById('routeEmail').textContent = isAssigned ? appConfig.billingEmail : (selectedClient['eMail_Insurance'] || 'No email');
-            
-            // Update contact info
-            document.getElementById('sidebarClientEmail').value = selectedClient['email'] || '';
-            document.getElementById('detailPhone').textContent = selectedClient['Phone'] || '--';
-            document.getElementById('detailAddress').textContent = selectedClient['Address'] || '--';
-            
-            // Update insurance info
-            document.getElementById('detailInsurance').textContent = selectedClient['Insurance_Name'] || '--';
-            document.getElementById('sidebarInsuranceEmail').value = selectedClient['eMail_Insurance'] || '';
-            document.getElementById('detailPolicy').textContent = selectedClient['Policy'] || '--';
-            document.getElementById('detailClaim').textContent = selectedClient['Claim'] || '--';
-            document.getElementById('emailSaveStatus').style.display = 'none';
-            
-            // Update service codes
-            const serviceCodes = ['BA', 'DR', 'TR', 'CO', 'TO', 'EA', 'AM', 'CS', 'HM'];
-            const codesContainer = document.getElementById('detailServiceCodes');
-            codesContainer.innerHTML = serviceCodes.map(code => `
-                <div style="background: #F9FAFB; padding: 10px; border-radius: 6px; text-align: center;">
-                    <div style="font-weight: 700; color: #1A365C; font-size: 14px;">${code}</div>
-                    <div style="font-size: 12px; color: #666; margin-top: 2px;">${selectedClient[code] || '--'}</div>
-                </div>
-            `).join('');
-            
-            // Update service summary from cached dashboard data if available
-            const customerName = selectedClient['Customer Name'];
-            if (customerName) {
-                const currentYear = new Date().getFullYear();
-                const yearData = dashboardDataCache[currentYear] || [];
-                const clientServices = yearData.filter(r => r['Customer Name'] === customerName);
+                // Update header
+                document.getElementById('detailClientName').textContent = fullName || 'Unknown Client';
+                document.getElementById('detailCustomerName').textContent = selectedClient['Customer Name'] || 'No customer name';
                 
-                if (clientServices.length > 0) {
-                    const totalServices = clientServices.length;
-                    const completedServices = clientServices.filter(r => r['Status'] === 'COMPLETED').length;
-                    const totalHours = clientServices.reduce((sum, r) => sum + ((parseFloat(r['Service Duration']) || 0) / 60), 0);
-                    const totalCost = clientServices.reduce((sum, r) => sum + (parseFloat(r['Cost To Customer']) || 0), 0);
-                    
-                    document.getElementById('detailTotalServices').textContent = totalServices;
-                    document.getElementById('detailCompleted').textContent = completedServices;
-                    document.getElementById('detailTotalHours').textContent = `${totalHours.toFixed(1)} hrs`;
-                    document.getElementById('detailTotalSpent').textContent = `$${formatNumber(totalCost)}`;
-                } else if (clientResult.reportSummary) {
+                // Update email routing indicator
+                const routeIndicator = document.getElementById('emailRouteIndicator');
+                if (isAssigned) {
+                    routeIndicator.style.background = '#F3E5F5';
+                    routeIndicator.style.borderColor = '#9C27B0';
+                    routeIndicator.querySelector('svg').style.stroke = '#9C27B0';
+                } else {
+                    routeIndicator.style.background = '#E3F2FD';
+                    routeIndicator.style.borderColor = '#2196F3';
+                    routeIndicator.querySelector('svg').style.stroke = '#2196F3';
+                }
+                document.getElementById('routeType').textContent = isAssigned ? 'Routed to Billing' : 'Routed to Insurance';
+                document.getElementById('routeEmail').textContent = isAssigned ? appConfig.billingEmail : (selectedClient['eMail_Insurance'] || 'No email');
+                
+                // Update contact info
+                document.getElementById('sidebarClientEmail').value = selectedClient['email'] || '';
+                document.getElementById('detailPhone').textContent = selectedClient['Phone'] || '--';
+                document.getElementById('detailAddress').textContent = selectedClient['Address'] || '--';
+                
+                // Update insurance info
+                document.getElementById('detailInsurance').textContent = selectedClient['Insurance_Name'] || '--';
+                document.getElementById('sidebarInsuranceEmail').value = selectedClient['eMail_Insurance'] || '';
+                document.getElementById('detailPolicy').textContent = selectedClient['Policy'] || '--';
+                document.getElementById('detailClaim').textContent = selectedClient['Claim'] || '--';
+                document.getElementById('emailSaveStatus').style.display = 'none';
+                
+                // Update service codes
+                const serviceCodes = ['BA', 'DR', 'TR', 'CO', 'TO', 'EA', 'AM', 'CS', 'HM'];
+                const codesContainer = document.getElementById('detailServiceCodes');
+                codesContainer.innerHTML = serviceCodes.map(code => `
+                    <div style="background: #F9FAFB; padding: 10px; border-radius: 6px; text-align: center;">
+                        <div style="font-weight: 700; color: #1A365C; font-size: 14px;">${code}</div>
+                        <div style="font-size: 12px; color: #666; margin-top: 2px;">${selectedClient[code] || '--'}</div>
+                    </div>
+                `).join('');
+                
+                // Update service summary
+                if (clientResult.reportSummary) {
                     const s = clientResult.reportSummary;
                     document.getElementById('detailTotalServices').textContent = s.totalServices;
                     document.getElementById('detailCompleted').textContent = s.completedServices;
                     document.getElementById('detailTotalHours').textContent = `${s.totalHours} hrs`;
                     document.getElementById('detailTotalSpent').textContent = `$${s.totalCost}`;
+                } else {
+                    // Try to get report summary separately
+                    try {
+                        const reportResult = await jsonpFetch({ action: 'getReportByClient', clientName: selectedClient['Customer Name'] });
+                        if (reportResult.success && reportResult.summary) {
+                            const s = reportResult.summary;
+                            document.getElementById('detailTotalServices').textContent = s.totalServices;
+                            document.getElementById('detailCompleted').textContent = s.completedServices;
+                            document.getElementById('detailTotalHours').textContent = `${s.totalHours} hrs`;
+                            document.getElementById('detailTotalSpent').textContent = `$${s.totalCost}`;
+                        }
+                    } catch (e) {
+                        console.log('Could not load report summary');
+                    }
                 }
+                
+                // Update subscription checkboxes
+                const subscription = (selectedClient['Subscription'] || '').toLowerCase();
+                document.getElementById('sidebarSubWeekly').checked = subscription.includes('weekly');
+                document.getElementById('sidebarSubMonthly').checked = subscription.includes('monthly');
+                document.getElementById('sidebarSubYearly').checked = subscription.includes('yearly');
+                document.getElementById('subscriptionSaveStatus').style.display = 'none';
+                
+                // Show sidebar
+                document.getElementById('sidebarOverlay').classList.add('active');
+                document.getElementById('clientSidebar').classList.add('active');
+                
+            } catch (error) {
+                showToast('Error loading client details', 'error');
+                console.error(error);
             }
-            
-            // Update subscription checkboxes
-            const subscription = (selectedClient['Subscription'] || '').toLowerCase();
-            document.getElementById('sidebarSubWeekly').checked = subscription.includes('weekly');
-            document.getElementById('sidebarSubMonthly').checked = subscription.includes('monthly');
-            document.getElementById('sidebarSubYearly').checked = subscription.includes('yearly');
-            document.getElementById('subscriptionSaveStatus').style.display = 'none';
         }
         
         function closeClientDetail() {
@@ -4399,19 +4279,9 @@ Clients without recent service are considered inactive but still included in LTV
                 
                 document.getElementById('activeClients').textContent = metrics.activeClients;
                 
-                // Update period labels
-                document.getElementById('lastWeekLabel').textContent = '(Week ' + metrics.thisWeek.weekNum + ')';
-                document.getElementById('lastMonthLabel').textContent = '(' + metrics.thisMonth.monthName + ')';
-                document.getElementById('lastQuarterLabel').textContent = '(' + metrics.thisQuarter.quarterLabel + ')';
-                
-                // Update period change indicators
-                updatePeriodChange('weekChange', metrics.thisWeek.revenueChange, 'week');
-                updatePeriodChange('monthChange', metrics.thisMonth.revenueChange, 'month');
-                updatePeriodChange('quarterChange', metrics.thisQuarter.revenueChange, 'quarter');
-                
-                // Update week/month labels for top clients
+                // Update week/month labels for top clients (use LAST week since data is always one week behind)
                 document.getElementById('topClientsWeekLabel').textContent = '(Week ' + metrics.lastWeekNum + ')';
-                document.getElementById('topClientsMonthLabel').textContent = '(' + metrics.lastMonthName + ')';
+                document.getElementById('topClientsMonthLabel').textContent = '(' + metrics.currentMonthName + ')';
                 
                 // Update weekly chart labels to show the last week number
                 document.getElementById('weeklyChartEndLabel').textContent = 'Week ' + metrics.lastWeekNum;
@@ -5266,76 +5136,33 @@ Clients without recent service are considered inactive but still included in LTV
             // YoY changes
             const calcChange = (current, previous) => previous > 0 ? ((current - previous) / previous * 100) : 0;
             
-            // LAST WEEK (completed week, not current week)
-            const lastWeek = isHistoricalYear ? 52 : (currentWeek > 1 ? currentWeek - 1 : 52);
+            // Current week (for historical years, use last week of that year)
+            const currentWeekData = completedYearData.filter(r => parseInt(r.Week) === currentWeek);
+            const weekServices = currentWeekData.length;
+            const weekHours = currentWeekData.reduce((sum, r) => sum + (parseFloat(r['Service Duration']) || 0) / 60, 0);
+            const weekRevenue = currentWeekData.reduce((sum, r) => sum + (parseFloat(r['Cost To Customer']) || 0), 0);
+            
+            // Last week (for historical years, use week 51)
+            const lastWeek = isHistoricalYear ? 51 : (currentWeek > 1 ? currentWeek - 1 : 52);
             const lastWeekYear = isHistoricalYear ? year : (currentWeek > 1 ? year : year - 1);
             const lastWeekData = data.filter(r => 
                 (r.Status || '').toUpperCase() === 'COMPLETED' &&
                 parseInt(r.Year) === lastWeekYear && 
                 parseInt(r.Week) === lastWeek
             );
-            const weekServices = lastWeekData.length;
-            const weekHours = lastWeekData.reduce((sum, r) => sum + (parseFloat(r['Service Duration']) || 0) / 60, 0);
-            const weekRevenue = lastWeekData.reduce((sum, r) => sum + (parseFloat(r['Cost To Customer']) || 0), 0);
             
-            // Week before last (for comparison)
-            const weekBeforeLast = lastWeek > 1 ? lastWeek - 1 : 52;
-            const weekBeforeLastYear = lastWeek > 1 ? lastWeekYear : lastWeekYear - 1;
-            const weekBeforeLastData = data.filter(r => 
-                (r.Status || '').toUpperCase() === 'COMPLETED' &&
-                parseInt(r.Year) === weekBeforeLastYear && 
-                parseInt(r.Week) === weekBeforeLast
-            );
-            const prevWeekServices = weekBeforeLastData.length;
-            const prevWeekRevenue = weekBeforeLastData.reduce((sum, r) => sum + (parseFloat(r['Cost To Customer']) || 0), 0);
+            // Current month (for historical years, use December)
+            const currentMonthData = completedYearData.filter(r => parseInt(r.Month) === currentMonth);
+            const monthServices = currentMonthData.length;
+            const monthHours = currentMonthData.reduce((sum, r) => sum + (parseFloat(r['Service Duration']) || 0) / 60, 0);
+            const monthRevenue = currentMonthData.reduce((sum, r) => sum + (parseFloat(r['Cost To Customer']) || 0), 0);
             
-            // LAST MONTH (completed month, not current month)
-            const lastMonth = isHistoricalYear ? 12 : (currentMonth > 1 ? currentMonth - 1 : 12);
-            const lastMonthYear = isHistoricalYear ? year : (currentMonth > 1 ? year : year - 1);
-            const lastMonthData = data.filter(r => 
-                (r.Status || '').toUpperCase() === 'COMPLETED' &&
-                parseInt(r.Year) === lastMonthYear && 
-                parseInt(r.Month) === lastMonth
-            );
-            const monthServices = lastMonthData.length;
-            const monthHours = lastMonthData.reduce((sum, r) => sum + (parseFloat(r['Service Duration']) || 0) / 60, 0);
-            const monthRevenue = lastMonthData.reduce((sum, r) => sum + (parseFloat(r['Cost To Customer']) || 0), 0);
-            
-            // Month before last (for comparison)
-            const monthBeforeLast = lastMonth > 1 ? lastMonth - 1 : 12;
-            const monthBeforeLastYear = lastMonth > 1 ? lastMonthYear : lastMonthYear - 1;
-            const monthBeforeLastData = data.filter(r => 
-                (r.Status || '').toUpperCase() === 'COMPLETED' &&
-                parseInt(r.Year) === monthBeforeLastYear && 
-                parseInt(r.Month) === monthBeforeLast
-            );
-            const prevMonthServices = monthBeforeLastData.length;
-            const prevMonthRevenue = monthBeforeLastData.reduce((sum, r) => sum + (parseFloat(r['Cost To Customer']) || 0), 0);
-            
-            // LAST QUARTER (completed quarter, not current quarter)
-            const lastQuarter = isHistoricalYear ? 4 : (currentQuarter > 1 ? currentQuarter - 1 : 4);
-            const lastQuarterYear = isHistoricalYear ? year : (currentQuarter > 1 ? year : year - 1);
-            const lastQuarterMonths = [(lastQuarter - 1) * 3 + 1, (lastQuarter - 1) * 3 + 2, (lastQuarter - 1) * 3 + 3];
-            const lastQuarterData = data.filter(r => 
-                (r.Status || '').toUpperCase() === 'COMPLETED' &&
-                parseInt(r.Year) === lastQuarterYear && 
-                lastQuarterMonths.includes(parseInt(r.Month))
-            );
-            const quarterServices = lastQuarterData.length;
-            const quarterHours = lastQuarterData.reduce((sum, r) => sum + (parseFloat(r['Service Duration']) || 0) / 60, 0);
-            const quarterRevenue = lastQuarterData.reduce((sum, r) => sum + (parseFloat(r['Cost To Customer']) || 0), 0);
-            
-            // Quarter before last (for comparison)
-            const quarterBeforeLast = lastQuarter > 1 ? lastQuarter - 1 : 4;
-            const quarterBeforeLastYear = lastQuarter > 1 ? lastQuarterYear : lastQuarterYear - 1;
-            const quarterBeforeLastMonths = [(quarterBeforeLast - 1) * 3 + 1, (quarterBeforeLast - 1) * 3 + 2, (quarterBeforeLast - 1) * 3 + 3];
-            const quarterBeforeLastData = data.filter(r => 
-                (r.Status || '').toUpperCase() === 'COMPLETED' &&
-                parseInt(r.Year) === quarterBeforeLastYear && 
-                quarterBeforeLastMonths.includes(parseInt(r.Month))
-            );
-            const prevQuarterServices = quarterBeforeLastData.length;
-            const prevQuarterRevenue = quarterBeforeLastData.reduce((sum, r) => sum + (parseFloat(r['Cost To Customer']) || 0), 0);
+            // Current quarter (for historical years, use Q4)
+            const quarterMonths = [(currentQuarter - 1) * 3 + 1, (currentQuarter - 1) * 3 + 2, (currentQuarter - 1) * 3 + 3];
+            const currentQuarterData = completedYearData.filter(r => quarterMonths.includes(parseInt(r.Month)));
+            const quarterServices = currentQuarterData.length;
+            const quarterHours = currentQuarterData.reduce((sum, r) => sum + (parseFloat(r['Service Duration']) || 0) / 60, 0);
+            const quarterRevenue = currentQuarterData.reduce((sum, r) => sum + (parseFloat(r['Cost To Customer']) || 0), 0);
             
             // Active clients
             const activeClients = new Set(completedYearData.map(r => r['Customer Name'])).size;
@@ -5437,41 +5264,25 @@ Clients without recent service are considered inactive but still included in LTV
             // Peak hours data - analyze start times from the year's data
             const peakHoursData = calculatePeakHours(completedYearData, referenceDate);
             
-            // For "last week" - use lastWeek data
+            // For "this week" label - show appropriate week info
             const thisWeek = {
                 services: weekServices,
                 hours: weekHours,
-                revenue: weekRevenue,
-                prevServices: prevWeekServices,
-                prevRevenue: prevWeekRevenue,
-                servicesChange: calcChange(weekServices, prevWeekServices),
-                revenueChange: calcChange(weekRevenue, prevWeekRevenue),
-                weekNum: lastWeek
+                revenue: weekRevenue
             };
             
-            // For "last month" - use lastMonth data
+            // For "this month" - use currentMonth data
             const thisMonth = {
                 services: monthServices,
                 hours: monthHours,
-                revenue: monthRevenue,
-                prevServices: prevMonthServices,
-                prevRevenue: prevMonthRevenue,
-                servicesChange: calcChange(monthServices, prevMonthServices),
-                revenueChange: calcChange(monthRevenue, prevMonthRevenue),
-                monthName: fullMonthNames[lastMonth - 1]
+                revenue: monthRevenue
             };
             
-            // For "last quarter" - use lastQuarter data
+            // For "this quarter" - use currentQuarter data
             const thisQuarter = {
                 services: quarterServices,
                 hours: quarterHours,
-                revenue: quarterRevenue,
-                prevServices: prevQuarterServices,
-                prevRevenue: prevQuarterRevenue,
-                servicesChange: calcChange(quarterServices, prevQuarterServices),
-                revenueChange: calcChange(quarterRevenue, prevQuarterRevenue),
-                quarterNum: lastQuarter,
-                quarterLabel: 'Q' + lastQuarter
+                revenue: quarterRevenue
             };
             
             return {
@@ -5488,15 +5299,13 @@ Clients without recent service are considered inactive but still included in LTV
                 activeClients,
                 currentWeekNum: currentWeek,
                 lastWeekNum: lastWeek,
-                lastMonthName: fullMonthNames[lastMonth - 1],
-                lastQuarterLabel: 'Q' + lastQuarter,
                 currentMonthName: fullMonthNames[currentMonth - 1],
                 currentQuarter: currentQuarter,
                 last13MonthsData,
                 quarterlyData,
                 weeklyData,
                 peakHoursData,
-                topClientsMonth: calculateTopClients(lastMonthData, 30),
+                topClientsMonth: calculateTopClients(currentMonthData, 30),
                 topClientsLastWeek: calculateTopClients(lastWeekData, 30),
                 isHistoricalYear: isHistoricalYear
             };
@@ -5626,37 +5435,6 @@ Clients without recent service are considered inactive but still included in LTV
             const color = isPositive ? '#62B790' : '#EF5350';
             
             el.innerHTML = `<span style="color: ${color};">${arrow} ${Math.abs(changePercent).toFixed(1)}%</span> vs last year`;
-        }
-        
-        function updatePeriodChange(elementId, changePercent, periodType = 'week') {
-            const el = document.getElementById(elementId);
-            if (!el) return;
-            
-            if (changePercent === 0 || isNaN(changePercent)) {
-                el.innerHTML = '<span style="color: #999;">No prior data</span>';
-                return;
-            }
-            
-            const isPositive = changePercent >= 0;
-            const arrow = isPositive ? '↑' : '↓';
-            const color = isPositive ? '#62B790' : '#EF5350';
-            
-            let vsText = '';
-            switch(periodType) {
-                case 'week':
-                    vsText = 'revenue vs prior week';
-                    break;
-                case 'month':
-                    vsText = 'revenue vs prior month';
-                    break;
-                case 'quarter':
-                    vsText = 'revenue vs prior quarter';
-                    break;
-                default:
-                    vsText = 'vs prior period';
-            }
-            
-            el.innerHTML = `<span style="color: ${color};">${arrow} ${Math.abs(changePercent).toFixed(1)}%</span> ${vsText}`;
         }
         
         function renderWeeklyRevenueChart(weeklyData) {
