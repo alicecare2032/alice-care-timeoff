@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>alice.care - Mileage v5.0</title>
+    <title>alice.care - Mileage v4.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -637,330 +637,6 @@
             font-size: 18px;
         }
         
-        /* Trip Status Sections */
-        .trip-mode-container {
-            margin-bottom: 20px;
-        }
-        
-        .incomplete-warning {
-            background: #FFF4E5;
-            border: 2px solid #F57600;
-            border-radius: 10px;
-            padding: 12px 16px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-        }
-        
-        .incomplete-warning .warning-icon {
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-        
-        .incomplete-warning .warning-text {
-            font-size: 13px;
-            color: #3D3D3D;
-            line-height: 1.5;
-        }
-        
-        .incomplete-warning .warning-text strong {
-            color: #1A365C;
-        }
-        
-        /* Trip In Progress Card */
-        .trip-in-progress {
-            background: linear-gradient(135deg, #E5ECF3 0%, #D4E4F7 100%);
-            border: 2px solid #1A365C;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 24px;
-        }
-        
-        .trip-in-progress-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-        }
-        
-        .trip-in-progress-header h3 {
-            font-size: 16px;
-            color: #1A365C;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .trip-in-progress-header .pulse-dot {
-            width: 10px;
-            height: 10px;
-            background: #F57600;
-            border-radius: 50%;
-            animation: pulse 1.5s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.2); }
-        }
-        
-        .trip-details-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-        
-        .trip-detail-item {
-            background: white;
-            padding: 10px 12px;
-            border-radius: 8px;
-        }
-        
-        .trip-detail-item .label {
-            font-size: 11px;
-            color: #6B7280;
-            text-transform: uppercase;
-            margin-bottom: 4px;
-        }
-        
-        .trip-detail-item .value {
-            font-size: 14px;
-            color: #1A365C;
-            font-weight: 600;
-        }
-        
-        .trip-detail-item.full-width {
-            grid-column: 1 / -1;
-        }
-        
-        .complete-trip-form {
-            background: white;
-            padding: 16px;
-            border-radius: 10px;
-            margin-top: 16px;
-        }
-        
-        .complete-trip-form h4 {
-            font-size: 14px;
-            color: #1A365C;
-            margin-bottom: 12px;
-        }
-        
-        .trip-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 16px;
-        }
-        
-        .trip-actions .btn {
-            flex: 1;
-        }
-        
-        .btn-danger {
-            background: #FF7475;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .btn-danger:hover {
-            background: #e65a5b;
-        }
-        
-        /* Section Divider */
-        .section-divider {
-            display: flex;
-            align-items: center;
-            margin: 24px 0;
-        }
-        
-        .section-divider::before,
-        .section-divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 2px solid #E5ECF3;
-        }
-        
-        .section-divider span {
-            padding: 0 16px;
-            color: #9CA3AF;
-            font-size: 12px;
-            text-transform: uppercase;
-            font-weight: 500;
-        }
-        
-        /* Odometer Conflict Modal */
-        .odometer-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(26, 54, 92, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-            padding: 20px;
-        }
-        
-        .odometer-modal.hidden {
-            display: none;
-        }
-        
-        .odometer-modal-content {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-        }
-        
-        .odometer-modal-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-        
-        .odometer-modal-header .icon {
-            font-size: 32px;
-        }
-        
-        .odometer-modal-header h3 {
-            font-size: 18px;
-            color: #1A365C;
-            font-weight: 600;
-        }
-        
-        .odometer-modal-body {
-            margin-bottom: 20px;
-        }
-        
-        .odometer-modal-body p {
-            font-size: 14px;
-            color: #3D3D3D;
-            line-height: 1.6;
-            margin-bottom: 16px;
-        }
-        
-        .conflict-details {
-            background: #FFF4E5;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-        }
-        
-        .conflict-details .conflict-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            padding: 4px 0;
-        }
-        
-        .conflict-details .conflict-row .label {
-            color: #6B7280;
-        }
-        
-        .conflict-details .conflict-row .value {
-            font-weight: 600;
-            color: #1A365C;
-        }
-        
-        .conflict-details .conflict-row.error .value {
-            color: #FF7475;
-        }
-        
-        .justification-options {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .justification-option {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px;
-            background: #F8FAFC;
-            border: 2px solid #E5ECF3;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .justification-option:hover {
-            border-color: #F57600;
-        }
-        
-        .justification-option.selected {
-            border-color: #F57600;
-            background: #FFF4E5;
-        }
-        
-        .justification-option input[type="radio"] {
-            width: 18px;
-            height: 18px;
-            accent-color: #F57600;
-        }
-        
-        .justification-option label {
-            font-size: 14px;
-            color: #3D3D3D;
-            cursor: pointer;
-            flex: 1;
-        }
-        
-        .justification-other-input {
-            margin-top: 10px;
-            padding: 10px 12px;
-            border: 2px solid #D3D7DF;
-            border-radius: 8px;
-            width: 100%;
-            font-family: 'Poppins', sans-serif;
-            font-size: 14px;
-        }
-        
-        .justification-other-input:focus {
-            outline: none;
-            border-color: #F57600;
-        }
-        
-        .odometer-modal-footer {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .odometer-modal-footer .btn {
-            flex: 1;
-            padding: 12px;
-        }
-        
-        .btn-secondary {
-            background: #E5ECF3;
-            color: #1A365C;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .btn-secondary:hover {
-            background: #D3D7DF;
-        }
-        
         /* Form Section Headers */
         .form-section-header {
             font-size: 14px;
@@ -1364,14 +1040,6 @@
 
         <div class="mobile-entry-section">
             <div class="mobile-form">
-                <!-- Incomplete Trip Warning -->
-                <div class="incomplete-warning">
-                    <span class="warning-icon">⚠️</span>
-                    <div class="warning-text">
-                        <strong>Note:</strong> Incomplete trips (started but not finished) are not considered for reimbursement until submitted with end mileage.
-                    </div>
-                </div>
-                
                 <!-- Employee Info Section -->
                 <div class="form-section-header">
                     <span class="section-icon">👤</span> Your Information
@@ -1402,174 +1070,76 @@
                     <button type="button" class="clear-info-btn" onclick="clearSavedEmployee()" id="clearInfoBtn" style="display: none;">Clear</button>
                 </div>
                 
-                <!-- ===================== -->
-                <!-- TRIP IN PROGRESS CARD -->
-                <!-- ===================== -->
-                <div id="tripInProgressSection" class="trip-in-progress" style="display: none;">
-                    <div class="trip-in-progress-header">
-                        <h3><span class="pulse-dot"></span> Trip In Progress</h3>
+                <!-- Trip Details Section -->
+                <div class="form-section-header" style="margin-top: 24px;">
+                    <span class="section-icon">🚗</span> Trip Details
+                </div>
+                
+                <!-- Client Name -->
+                <div class="form-group">
+                    <label>Client Name <span class="required">*</span></label>
+                    <input type="text" id="submitClientName" placeholder="Enter client's name">
+                </div>
+                
+                <!-- Reason Selection -->
+                <div class="form-group">
+                    <label>Reason <span class="required">*</span></label>
+                    <select id="submitReason">
+                        <option value="">Select a reason...</option>
+                        <option value="Transportation">Transportation</option>
+                        <option value="Distance Beyond 50mi/1hr">Distance Beyond 50mi/1hr</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <!-- Date and Time with NOW buttons -->
+                <div class="datetime-row">
+                    <div class="form-group">
+                        <label>Date <span class="required">*</span></label>
+                        <div class="input-with-btn">
+                            <input type="date" id="submitDate">
+                            <button type="button" class="now-btn" onclick="setDateNow()">📅</button>
+                        </div>
                     </div>
-                    
-                    <div class="trip-details-grid">
-                        <div class="trip-detail-item">
-                            <div class="label">Client</div>
-                            <div class="value" id="tripClientDisplay">-</div>
-                        </div>
-                        <div class="trip-detail-item">
-                            <div class="label">Reason</div>
-                            <div class="value" id="tripReasonDisplay">-</div>
-                        </div>
-                        <div class="trip-detail-item">
-                            <div class="label">Started</div>
-                            <div class="value" id="tripStartTimeDisplay">-</div>
-                        </div>
-                        <div class="trip-detail-item">
-                            <div class="label">Start Miles</div>
-                            <div class="value" id="tripStartMilesDisplay">-</div>
-                        </div>
-                    </div>
-                    
-                    <div class="complete-trip-form">
-                        <h4>📍 Complete Your Trip</h4>
-                        <div class="form-group">
-                            <label>End Miles <span class="required">*</span></label>
-                            <input type="number" id="tripEndMiles" placeholder="Enter ending odometer" inputmode="decimal" step="0.1" oninput="calculateTripMileage()">
-                        </div>
-                        <div class="mileage-result" style="margin-top: 12px;">
-                            <div class="label">Total Mileage</div>
-                            <div class="value" id="tripCalculatedMileage">0.0 <span class="unit">mi</span></div>
-                        </div>
-                        
-                        <div class="trip-actions">
-                            <button class="btn btn-danger" onclick="cancelTrip()">🗑️ Cancel</button>
-                            <button class="btn btn-success" onclick="completeTrip()">✓ Complete & Submit</button>
+                    <div class="form-group">
+                        <label>Time <span class="required">*</span></label>
+                        <div class="input-with-btn">
+                            <input type="time" id="submitTime">
+                            <button type="button" class="now-btn" onclick="setTimeNow()">⏱️</button>
                         </div>
                     </div>
                 </div>
+                <div class="datetime-helper">
+                    Tap 📅 for today's date, ⏱️ for current time
+                </div>
                 
-                <!-- ===================== -->
-                <!-- START NEW TRIP FORM -->
-                <!-- ===================== -->
-                <div id="startTripSection">
-                    <div class="form-section-header" style="margin-top: 24px;">
-                        <span class="section-icon">📍</span> Start New Trip
-                    </div>
-                    
-                    <!-- Client Name -->
-                    <div class="form-group">
-                        <label>Client Name <span class="required">*</span></label>
-                        <input type="text" id="startTripClient" placeholder="Enter client's name">
-                    </div>
-                    
-                    <!-- Reason Selection -->
-                    <div class="form-group">
-                        <label>Reason <span class="required">*</span></label>
-                        <select id="startTripReason">
-                            <option value="">Select a reason...</option>
-                            <option value="Transportation">Transportation</option>
-                            <option value="Distance Beyond 50mi/1hr">Distance Beyond 50mi/1hr</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    
-                    <!-- Start Odometer -->
-                    <div class="mileage-calculator">
-                        <h4>📍 Starting Odometer</h4>
+                <!-- Mileage Calculator -->
+                <div class="mileage-calculator">
+                    <h4>📍 Odometer Reading</h4>
+                    <div class="mileage-inputs">
                         <div class="form-group">
                             <label>Start Miles <span class="required">*</span></label>
-                            <input type="number" id="startTripMiles" placeholder="e.g. 45230" inputmode="decimal" step="0.1">
+                            <input type="number" id="startMiles" placeholder="e.g. 45230" inputmode="decimal" step="0.1" oninput="calculateMileage()">
+                        </div>
+                        <div class="form-group">
+                            <label>End Miles <span class="required">*</span></label>
+                            <input type="number" id="endMiles" placeholder="e.g. 45248" inputmode="decimal" step="0.1" oninput="calculateMileage()">
                         </div>
                     </div>
-                    
-                    <!-- Start Trip Button -->
-                    <div class="submit-section">
-                        <button class="btn btn-primary" onclick="startTrip()" id="startTripBtn">
-                            🚗 Start Trip
-                        </button>
+                    <div class="mileage-result">
+                        <div class="label">Total Mileage</div>
+                        <div class="value" id="calculatedMileage">0.0 <span class="unit">mi</span></div>
                     </div>
                 </div>
                 
-                <!-- ===================== -->
-                <!-- SECTION DIVIDER -->
-                <!-- ===================== -->
-                <div class="section-divider">
-                    <span>or log a completed trip</span>
-                </div>
-                
-                <!-- ===================== -->
-                <!-- LOG COMPLETED TRIP -->
-                <!-- ===================== -->
-                <div id="completedTripSection">
-                    <div class="form-section-header">
-                        <span class="section-icon">📝</span> Log Completed Trip
-                    </div>
-                    
-                    <!-- Client Name -->
-                    <div class="form-group">
-                        <label>Client Name <span class="required">*</span></label>
-                        <input type="text" id="submitClientName" placeholder="Enter client's name">
-                    </div>
-                    
-                    <!-- Reason Selection -->
-                    <div class="form-group">
-                        <label>Reason <span class="required">*</span></label>
-                        <select id="submitReason">
-                            <option value="">Select a reason...</option>
-                            <option value="Transportation">Transportation</option>
-                            <option value="Distance Beyond 50mi/1hr">Distance Beyond 50mi/1hr</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    
-                    <!-- Date and Time with NOW buttons -->
-                    <div class="datetime-row">
-                        <div class="form-group">
-                            <label>Date <span class="required">*</span></label>
-                            <div class="input-with-btn">
-                                <input type="date" id="submitDate">
-                                <button type="button" class="now-btn" onclick="setDateNow()">📅</button>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Time <span class="required">*</span></label>
-                            <div class="input-with-btn">
-                                <input type="time" id="submitTime">
-                                <button type="button" class="now-btn" onclick="setTimeNow()">⏱️</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="datetime-helper">
-                        Tap 📅 for today's date, ⏱️ for current time
-                    </div>
-                    
-                    <!-- Mileage Calculator -->
-                    <div class="mileage-calculator">
-                        <h4>📍 Odometer Reading</h4>
-                        <div class="mileage-inputs">
-                            <div class="form-group">
-                                <label>Start Miles <span class="required">*</span></label>
-                                <input type="number" id="startMiles" placeholder="e.g. 45230" inputmode="decimal" step="0.1" oninput="calculateMileage()">
-                            </div>
-                            <div class="form-group">
-                                <label>End Miles <span class="required">*</span></label>
-                                <input type="number" id="endMiles" placeholder="e.g. 45248" inputmode="decimal" step="0.1" oninput="calculateMileage()">
-                            </div>
-                        </div>
-                        <div class="mileage-result">
-                            <div class="label">Total Mileage</div>
-                            <div class="value" id="calculatedMileage">0.0 <span class="unit">mi</span></div>
-                        </div>
-                    </div>
-                    
-                    <!-- Submit Buttons -->
-                    <div class="submit-section">
-                        <button class="btn btn-success" onclick="submitMileageEntry(false)" id="submitMileageBtn">
-                            ✓ Submit Mileage
-                        </button>
-                        <button class="btn btn-primary" onclick="submitMileageEntry(true)" id="submitAddAnotherBtn" style="margin-top: 10px;">
-                            ✓ Submit & Add Another Client
-                        </button>
-                    </div>
+                <!-- Submit Buttons -->
+                <div class="submit-section">
+                    <button class="btn btn-success" onclick="submitMileageEntry(false)" id="submitMileageBtn">
+                        ✓ Submit Mileage
+                    </button>
+                    <button class="btn btn-primary" onclick="submitMileageEntry(true)" id="submitAddAnotherBtn" style="margin-top: 10px;">
+                        ✓ Submit & Add Another Client
+                    </button>
                 </div>
                 
                 <!-- Success Message -->
@@ -1590,56 +1160,6 @@
             </div>
         </div>
     </div>
-    
-    <!-- Odometer Conflict Modal -->
-    <div id="odometerModal" class="odometer-modal hidden">
-        <div class="odometer-modal-content">
-            <div class="odometer-modal-header">
-                <span class="icon">⚠️</span>
-                <h3>Odometer Reading Conflict</h3>
-            </div>
-            <div class="odometer-modal-body">
-                <p id="odometerConflictMessage">Your start miles appear to conflict with your previous entries.</p>
-                
-                <div class="conflict-details">
-                    <div class="conflict-row">
-                        <span class="label">Your last recorded end miles:</span>
-                        <span class="value" id="lastEndMilesDisplay">-</span>
-                    </div>
-                    <div class="conflict-row error">
-                        <span class="label">Your entered start miles:</span>
-                        <span class="value" id="enteredStartMilesDisplay">-</span>
-                    </div>
-                </div>
-                
-                <p>Please select a reason for this discrepancy:</p>
-                
-                <div class="justification-options">
-                    <div class="justification-option" onclick="selectJustification('Different Vehicle')">
-                        <input type="radio" name="justification" value="Different Vehicle" id="justDiffVehicle">
-                        <label for="justDiffVehicle">Different Vehicle</label>
-                    </div>
-                    <div class="justification-option" onclick="selectJustification('Rental Car')">
-                        <input type="radio" name="justification" value="Rental Car" id="justRental">
-                        <label for="justRental">Rental Car</label>
-                    </div>
-                    <div class="justification-option" onclick="selectJustification('Odometer Reset/Repair')">
-                        <input type="radio" name="justification" value="Odometer Reset/Repair" id="justReset">
-                        <label for="justReset">Odometer Reset/Repair</label>
-                    </div>
-                    <div class="justification-option" onclick="selectJustification('Other')">
-                        <input type="radio" name="justification" value="Other" id="justOther">
-                        <label for="justOther">Other</label>
-                    </div>
-                </div>
-                <input type="text" id="justificationOtherText" class="justification-other-input" placeholder="Please specify..." style="display: none;">
-            </div>
-            <div class="odometer-modal-footer">
-                <button class="btn btn-secondary" onclick="closeOdometerModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="confirmOdometerJustification()" id="confirmJustificationBtn">Continue</button>
-            </div>
-        </div>
-    </div>
 
     <script>
         // REPLACE THIS WITH YOUR GOOGLE APPS SCRIPT WEB APP URL
@@ -1648,13 +1168,6 @@
         let currentReport = null;
         let adjustments = {};
         let recentMileageEntries = [];
-        
-        // Trip in progress data
-        const TRIP_STORAGE_KEY = 'aliceCare_tripInProgress';
-        const LAST_ODOMETER_KEY = 'aliceCare_lastOdometer';
-        let currentTripInProgress = null;
-        let pendingOdometerAction = null; // Stores the action to perform after justification
-        let selectedJustification = null;
         
         // ==========================================
         // LOADING OVERLAY FUNCTIONS
@@ -1676,387 +1189,6 @@
             const overlay = document.getElementById('loadingOverlay');
             overlay.classList.add('hidden');
             document.body.style.overflow = ''; // Restore scrolling
-        }
-        
-        // ==========================================
-        // TRIP IN PROGRESS MANAGEMENT
-        // ==========================================
-        
-        function initializeTripState() {
-            // Check for existing trip in progress
-            const savedTrip = localStorage.getItem(TRIP_STORAGE_KEY);
-            if (savedTrip) {
-                currentTripInProgress = JSON.parse(savedTrip);
-                showTripInProgress();
-            } else {
-                hideTripInProgress();
-            }
-        }
-        
-        function showTripInProgress() {
-            if (!currentTripInProgress) return;
-            
-            document.getElementById('tripInProgressSection').style.display = 'block';
-            document.getElementById('startTripSection').style.display = 'none';
-            
-            // Populate display
-            document.getElementById('tripClientDisplay').textContent = currentTripInProgress.clientName;
-            document.getElementById('tripReasonDisplay').textContent = currentTripInProgress.reason;
-            document.getElementById('tripStartMilesDisplay').textContent = parseFloat(currentTripInProgress.startMiles).toLocaleString() + ' mi';
-            
-            // Format start time
-            const startDate = new Date(currentTripInProgress.startDateTime);
-            document.getElementById('tripStartTimeDisplay').textContent = startDate.toLocaleString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                hour: 'numeric',
-                minute: '2-digit',
-                hour12: true
-            });
-        }
-        
-        function hideTripInProgress() {
-            document.getElementById('tripInProgressSection').style.display = 'none';
-            document.getElementById('startTripSection').style.display = 'block';
-            document.getElementById('tripEndMiles').value = '';
-            document.getElementById('tripCalculatedMileage').innerHTML = '0.0 <span class="unit">mi</span>';
-        }
-        
-        function calculateTripMileage() {
-            if (!currentTripInProgress) return;
-            
-            const startMiles = parseFloat(currentTripInProgress.startMiles) || 0;
-            const endMiles = parseFloat(document.getElementById('tripEndMiles').value) || 0;
-            
-            if (endMiles > startMiles) {
-                const total = (endMiles - startMiles).toFixed(1);
-                document.getElementById('tripCalculatedMileage').innerHTML = `${total} <span class="unit">mi</span>`;
-            } else {
-                document.getElementById('tripCalculatedMileage').innerHTML = '0.0 <span class="unit">mi</span>';
-            }
-        }
-        
-        function startTrip() {
-            // Validate employee info
-            const employeeId = document.getElementById('submitEmployeeId').value.trim();
-            const firstName = document.getElementById('submitFirstName').value.trim();
-            const lastName = document.getElementById('submitLastName').value.trim();
-            
-            if (!employeeId || !firstName || !lastName) {
-                alert('Please fill in your employee information first.');
-                return;
-            }
-            
-            // Validate trip details
-            const clientName = document.getElementById('startTripClient').value.trim();
-            const reason = document.getElementById('startTripReason').value;
-            const startMiles = document.getElementById('startTripMiles').value.trim();
-            
-            if (!clientName) {
-                alert('Please enter the client name.');
-                return;
-            }
-            
-            if (!reason) {
-                alert('Please select a reason.');
-                return;
-            }
-            
-            if (!startMiles) {
-                alert('Please enter your starting odometer reading.');
-                return;
-            }
-            
-            // Check odometer against last recorded
-            const lastOdometer = getLastOdometer(employeeId);
-            if (lastOdometer && parseFloat(startMiles) < lastOdometer) {
-                // Show conflict modal
-                pendingOdometerAction = { type: 'startTrip', data: { clientName, reason, startMiles } };
-                showOdometerConflict(lastOdometer, parseFloat(startMiles));
-                return;
-            }
-            
-            // Proceed to start trip
-            proceedStartTrip(clientName, reason, startMiles, null);
-        }
-        
-        function proceedStartTrip(clientName, reason, startMiles, justification) {
-            const employeeId = document.getElementById('submitEmployeeId').value.trim();
-            const firstName = document.getElementById('submitFirstName').value.trim();
-            const lastName = document.getElementById('submitLastName').value.trim();
-            
-            // Create trip object
-            currentTripInProgress = {
-                id: 'trip_' + Date.now(),
-                employeeId: employeeId,
-                firstName: firstName,
-                lastName: lastName,
-                clientName: clientName,
-                reason: reason,
-                startMiles: startMiles,
-                startDateTime: new Date().toISOString(),
-                justification: justification
-            };
-            
-            // Save to localStorage
-            localStorage.setItem(TRIP_STORAGE_KEY, JSON.stringify(currentTripInProgress));
-            
-            // Show loading
-            showLoading('Starting Trip...', `Recording ${clientName} visit`);
-            
-            // Save to Google Sheet as "In Progress"
-            saveTripToSheet(currentTripInProgress, 'In Progress', null, function(success) {
-                hideLoading();
-                
-                if (success) {
-                    // Clear form
-                    document.getElementById('startTripClient').value = '';
-                    document.getElementById('startTripReason').value = '';
-                    document.getElementById('startTripMiles').value = '';
-                    
-                    // Show trip in progress UI
-                    showTripInProgress();
-                    
-                    alert('Trip started! Don\'t forget to complete it when you arrive.');
-                } else {
-                    // Still save locally even if server fails
-                    showTripInProgress();
-                    alert('Trip started locally. Server sync will retry when you complete the trip.');
-                }
-            });
-        }
-        
-        function completeTrip() {
-            if (!currentTripInProgress) {
-                alert('No trip in progress.');
-                return;
-            }
-            
-            const endMiles = document.getElementById('tripEndMiles').value.trim();
-            
-            if (!endMiles) {
-                alert('Please enter your ending odometer reading.');
-                return;
-            }
-            
-            const startMiles = parseFloat(currentTripInProgress.startMiles);
-            const endMilesNum = parseFloat(endMiles);
-            
-            if (endMilesNum <= startMiles) {
-                alert('End miles must be greater than start miles (' + startMiles.toLocaleString() + ').');
-                return;
-            }
-            
-            const totalMileage = endMilesNum - startMiles;
-            
-            if (totalMileage > 500) {
-                if (!confirm(`Total mileage is ${totalMileage.toFixed(1)} miles. Is this correct?`)) {
-                    return;
-                }
-            }
-            
-            showLoading('Completing Trip...', `Submitting ${totalMileage.toFixed(1)} miles`);
-            
-            // Update trip with end data
-            const completedTrip = {
-                ...currentTripInProgress,
-                endMiles: endMiles,
-                endDateTime: new Date().toISOString(),
-                totalMileage: totalMileage.toFixed(1)
-            };
-            
-            // Save to Google Sheet as "Submitted"
-            saveTripToSheet(completedTrip, 'Submitted', completedTrip.id, function(success) {
-                hideLoading();
-                
-                if (success) {
-                    // Save last odometer
-                    saveLastOdometer(completedTrip.employeeId, endMilesNum);
-                    
-                    // Clear trip in progress
-                    currentTripInProgress = null;
-                    localStorage.removeItem(TRIP_STORAGE_KEY);
-                    
-                    // Reset UI
-                    hideTripInProgress();
-                    
-                    // Show success
-                    document.getElementById('submitSuccess').classList.remove('hidden');
-                    document.getElementById('successMessage').textContent = 
-                        `Trip to ${completedTrip.clientName} completed: ${totalMileage.toFixed(1)} miles recorded.`;
-                    
-                    setTimeout(() => {
-                        document.getElementById('submitSuccess').classList.add('hidden');
-                    }, 5000);
-                } else {
-                    alert('Failed to submit trip. Please try again.');
-                }
-            });
-        }
-        
-        function cancelTrip() {
-            if (!confirm('Are you sure you want to cancel this trip? The entry will be deleted.')) {
-                return;
-            }
-            
-            showLoading('Cancelling Trip...', 'Removing entry');
-            
-            // If trip was saved to sheet, we need to delete it or mark as cancelled
-            // For simplicity, we'll just remove locally - sheet entry stays as "In Progress"
-            // which the review portal will handle
-            
-            currentTripInProgress = null;
-            localStorage.removeItem(TRIP_STORAGE_KEY);
-            
-            hideLoading();
-            hideTripInProgress();
-            
-            alert('Trip cancelled.');
-        }
-        
-        function saveTripToSheet(trip, status, existingId, callback) {
-            // Build the data payload
-            const params = new URLSearchParams();
-            params.append('action', 'submitManualMileage');
-            params.append('employeeId', trip.employeeId);
-            params.append('firstName', trip.firstName);
-            params.append('lastName', trip.lastName);
-            params.append('clientName', trip.clientName);
-            params.append('reason', trip.reason);
-            params.append('date', trip.startDateTime.split('T')[0]);
-            params.append('time', new Date(trip.startDateTime).toTimeString().slice(0, 5));
-            params.append('startMiles', trip.startMiles);
-            params.append('endMiles', trip.endMiles || '');
-            params.append('totalMileage', trip.totalMileage || '0');
-            params.append('status', status);
-            params.append('tripId', trip.id);
-            params.append('justification', trip.justification || '');
-            
-            if (existingId) {
-                params.append('updateExisting', 'true');
-                params.append('existingTripId', existingId);
-            }
-            
-            const callbackName = 'tripCallback_' + Date.now();
-            
-            window[callbackName] = function(response) {
-                delete window[callbackName];
-                callback(response && response.success);
-            };
-            
-            const url = GOOGLE_SCRIPT_URL + '?' + params.toString() + '&callback=' + callbackName;
-            
-            const script = document.createElement('script');
-            script.src = url;
-            script.onerror = function() {
-                delete window[callbackName];
-                callback(false);
-            };
-            
-            // Timeout
-            setTimeout(() => {
-                if (window[callbackName]) {
-                    delete window[callbackName];
-                    callback(true); // Assume success on timeout
-                }
-            }, 10000);
-            
-            document.body.appendChild(script);
-        }
-        
-        // ==========================================
-        // ODOMETER VALIDATION
-        // ==========================================
-        
-        function getLastOdometer(employeeId) {
-            const stored = localStorage.getItem(LAST_ODOMETER_KEY);
-            if (!stored) return null;
-            
-            const data = JSON.parse(stored);
-            return data[employeeId] || null;
-        }
-        
-        function saveLastOdometer(employeeId, miles) {
-            let stored = localStorage.getItem(LAST_ODOMETER_KEY);
-            let data = stored ? JSON.parse(stored) : {};
-            data[employeeId] = miles;
-            localStorage.setItem(LAST_ODOMETER_KEY, JSON.stringify(data));
-        }
-        
-        function showOdometerConflict(lastMiles, enteredMiles) {
-            document.getElementById('lastEndMilesDisplay').textContent = lastMiles.toLocaleString() + ' mi';
-            document.getElementById('enteredStartMilesDisplay').textContent = enteredMiles.toLocaleString() + ' mi';
-            
-            if (enteredMiles < lastMiles) {
-                document.getElementById('odometerConflictMessage').textContent = 
-                    'Your start miles are less than your last recorded end miles. This may indicate an error or a different vehicle.';
-            } else {
-                document.getElementById('odometerConflictMessage').textContent = 
-                    'There is a large gap between your last recorded miles and current reading.';
-            }
-            
-            // Reset selection
-            selectedJustification = null;
-            document.querySelectorAll('.justification-option').forEach(opt => opt.classList.remove('selected'));
-            document.querySelectorAll('input[name="justification"]').forEach(radio => radio.checked = false);
-            document.getElementById('justificationOtherText').style.display = 'none';
-            document.getElementById('justificationOtherText').value = '';
-            
-            document.getElementById('odometerModal').classList.remove('hidden');
-        }
-        
-        function closeOdometerModal() {
-            document.getElementById('odometerModal').classList.add('hidden');
-            pendingOdometerAction = null;
-            selectedJustification = null;
-        }
-        
-        function selectJustification(value) {
-            selectedJustification = value;
-            
-            // Update UI
-            document.querySelectorAll('.justification-option').forEach(opt => opt.classList.remove('selected'));
-            event.currentTarget.classList.add('selected');
-            
-            // Check the radio
-            const radio = event.currentTarget.querySelector('input[type="radio"]');
-            if (radio) radio.checked = true;
-            
-            // Show/hide other input
-            if (value === 'Other') {
-                document.getElementById('justificationOtherText').style.display = 'block';
-            } else {
-                document.getElementById('justificationOtherText').style.display = 'none';
-            }
-        }
-        
-        function confirmOdometerJustification() {
-            if (!selectedJustification) {
-                alert('Please select a reason for the odometer discrepancy.');
-                return;
-            }
-            
-            let justification = selectedJustification;
-            if (selectedJustification === 'Other') {
-                const otherText = document.getElementById('justificationOtherText').value.trim();
-                if (!otherText) {
-                    alert('Please specify the reason.');
-                    return;
-                }
-                justification = 'Other: ' + otherText;
-            }
-            
-            closeOdometerModal();
-            
-            // Proceed with the pending action
-            if (pendingOdometerAction) {
-                if (pendingOdometerAction.type === 'startTrip') {
-                    const { clientName, reason, startMiles } = pendingOdometerAction.data;
-                    proceedStartTrip(clientName, reason, startMiles, justification);
-                } else if (pendingOdometerAction.type === 'submitCompleted') {
-                    proceedSubmitMileage(pendingOdometerAction.data.addAnother, justification);
-                }
-            }
         }
         
         // ==========================================
@@ -2220,7 +1352,7 @@
         }
         
         // ==========================================
-        // SUBMIT MILEAGE ENTRY (Completed Trip)
+        // SUBMIT MILEAGE ENTRY
         // ==========================================
         
         function submitMileageEntry(addAnother) {
@@ -2287,31 +1419,6 @@
                 return;
             }
             
-            // Check odometer against last recorded
-            const lastOdometer = getLastOdometer(employeeId);
-            if (lastOdometer && startMiles < lastOdometer) {
-                // Show conflict modal
-                pendingOdometerAction = { type: 'submitCompleted', data: { addAnother } };
-                showOdometerConflict(lastOdometer, startMiles);
-                return;
-            }
-            
-            // Proceed with submission
-            proceedSubmitMileage(addAnother, null);
-        }
-        
-        function proceedSubmitMileage(addAnother, justification) {
-            // Get form values again
-            const employeeId = document.getElementById('submitEmployeeId').value.trim();
-            const firstName = document.getElementById('submitFirstName').value.trim();
-            const lastName = document.getElementById('submitLastName').value.trim();
-            const clientName = document.getElementById('submitClientName').value.trim();
-            const reason = document.getElementById('submitReason').value;
-            const date = document.getElementById('submitDate').value;
-            const time = document.getElementById('submitTime').value;
-            const startMiles = parseFloat(document.getElementById('startMiles').value) || 0;
-            const endMiles = parseFloat(document.getElementById('endMiles').value) || 0;
-            
             const totalMileage = (endMiles - startMiles).toFixed(1);
             
             // Show loading overlay
@@ -2338,8 +1445,7 @@
                 startMiles: startMiles,
                 endMiles: endMiles,
                 totalMileage: parseFloat(totalMileage),
-                submittedAt: new Date().toISOString(),
-                justification: justification || ''
+                submittedAt: new Date().toISOString()
             };
             
             console.log('Submitting mileage entry:', data);
@@ -2383,8 +1489,6 @@
                 startMiles: startMiles,
                 endMiles: endMiles,
                 totalMileage: totalMileage,
-                justification: justification || '',
-                status: 'Submitted',
                 callback: callbackName
             });
             
@@ -2416,9 +1520,6 @@
         function handleSubmitSuccess(data, totalMileage, addAnother, lastEndMiles) {
             // Hide loading (in case not already hidden)
             hideLoading();
-            
-            // Save last odometer reading for this employee
-            saveLastOdometer(data.employeeId, lastEndMiles);
             
             // Save to local storage for recent entries display
             saveRecentEntry({
@@ -3122,9 +2223,6 @@
 
         // Set current year as default
         document.getElementById('year').value = new Date().getFullYear();
-        
-        // Initialize trip state on page load
-        initializeTripState();
     </script>
 </body>
 </html>
