@@ -1,0 +1,2201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>alice.care: Employee Email Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: #E5ECF3; min-height: 100vh; padding: 20px; }
+        
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26, 54, 92, 0.7); display: none; justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(3px); }
+        .loading-overlay.active { display: flex; }
+        .loading-content { background: white; padding: 40px 60px; border-radius: 16px; text-align: center; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); }
+        .spinner { width: 60px; height: 60px; border: 5px solid #E5ECF3; border-top: 5px solid #F57600; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loading-text { color: #1A365C; font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+        .loading-subtext { color: #666; font-size: 13px; }
+        
+        .nav-tabs { max-width: 1400px; margin: 0 auto 20px; display: flex; gap: 10px; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 2px 10px rgba(26, 54, 92, 0.1); flex-wrap: wrap; }
+        .tab-btn { flex: 1; min-width: 120px; padding: 12px 16px; background: transparent; border: none; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 13px; color: #1A365C; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .tab-btn.active { background: #F57600; color: white; }
+        .tab-btn:hover:not(.active):not(.connection-status) { background: #E5ECF3; }
+        .tab-btn svg { width: 18px; height: 18px; }
+        .tab-btn.connection-status { background: #28A745; color: white; cursor: default; min-width: auto; flex: 0; }
+        .tab-btn.connection-status.disconnected { background: #DC3545; }
+        
+        .container { max-width: 1400px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(26, 54, 92, 0.15); overflow: hidden; }
+        .header { background: #1A365C; color: white; padding: 40px 30px; position: relative; overflow: hidden; }
+        .header::before { content: ''; position: absolute; width: 300px; height: 300px; border: 40px solid rgba(245, 118, 0, 0.1); border-radius: 50%; top: -150px; right: -100px; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 1; flex-wrap: wrap; gap: 20px; }
+        .logo { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+        .logo .alice { color: #F57600; font-weight: 700; }
+        .logo .dot { color: #F57600; font-weight: 700; margin: 0 -2px; }
+        .logo .care { color: white; font-weight: 400; }
+        .header h1 { font-size: 24px; margin-bottom: 8px; font-weight: 600; }
+        .header p { opacity: 0.9; font-size: 14px; font-weight: 400; }
+        
+        .tab-content { display: none; padding: 30px; }
+        .tab-content.active { display: block; }
+        .section-title { font-size: 18px; font-weight: 600; color: #1A365C; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .section-title svg { width: 24px; height: 24px; color: #F57600; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 600; color: #1A365C; margin-bottom: 8px; font-size: 14px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 16px; border: 2px solid #E5ECF3; border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 14px; transition: all 0.3s; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #F57600; box-shadow: 0 0 0 3px rgba(245, 118, 0, 0.1); }
+        .form-group textarea { min-height: 150px; resize: vertical; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        
+        .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border: none; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.3s; }
+        .btn-primary { background: #F57600; color: white; }
+        .btn-primary:hover { background: #E06900; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(245, 118, 0, 0.3); }
+        .btn-primary:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-secondary { background: #1A365C; color: white; }
+        .btn-secondary:hover { background: #152d4a; }
+        .btn-outline { background: transparent; border: 2px solid #1A365C; color: #1A365C; }
+        .btn-outline:hover { background: #1A365C; color: white; }
+        .btn-danger { background: #DC3545; color: white; }
+        .btn-danger:hover { background: #C82333; }
+        .btn-success { background: #28A745; color: white; }
+        .btn-success:hover { background: #218838; }
+        .btn-warning { background: #FFC107; color: #1A365C; }
+        .btn-warning:hover { background: #E0A800; }
+        .btn-small { padding: 8px 16px; font-size: 12px; }
+        .btn svg { width: 16px; height: 16px; }
+        
+        .card { background: #F9FAFB; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #E5ECF3; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        .card-title { font-size: 16px; font-weight: 600; color: #1A365C; }
+        
+        .data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .data-table th { background: #1A365C; color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .data-table th:first-child { border-radius: 8px 0 0 0; }
+        .data-table th:last-child { border-radius: 0 8px 0 0; }
+        .data-table td { padding: 12px 16px; border-bottom: 1px solid #E5ECF3; color: #333; }
+        .data-table tbody tr:hover { background: #F9FAFB; }
+        
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .badge-warning-1 { background: #FFF3CD; color: #856404; }
+        .badge-warning-2 { background: #FFE0B2; color: #E65100; }
+        .badge-warning-3 { background: #FFCDD2; color: #C62828; }
+        .badge-final { background: #F8D7DA; color: #721C24; }
+        .badge-success { background: #D4EDDA; color: #155724; }
+        .badge-info { background: #D1ECF1; color: #0C5460; }
+        
+        /* Employee Card with Checkbox */
+        .employee-card { background: white; border: 2px solid #E5ECF3; border-radius: 12px; padding: 15px; margin-bottom: 10px; transition: all 0.3s; cursor: pointer; user-select: none; }
+        .employee-card:hover { border-color: #F57600; background: #FFFAF5; }
+        .employee-card.selected { border-color: #F57600; box-shadow: 0 4px 12px rgba(245, 118, 0, 0.2); background: #FFF8F0; }
+        .employee-card-inner { display: flex; align-items: center; gap: 12px; }
+        .employee-checkbox { width: 24px; height: 24px; border: 2px solid #ccc; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; background: white; }
+        .employee-card.selected .employee-checkbox { background: #F57600; border-color: #F57600; }
+        .employee-checkbox svg { width: 16px; height: 16px; color: white; display: none; }
+        .employee-card.selected .employee-checkbox svg { display: block; }
+        .employee-avatar { width: 44px; height: 44px; background: #1A365C; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 16px; flex-shrink: 0; }
+        .employee-details { flex: 1; min-width: 0; }
+        .employee-details h3 { font-size: 15px; color: #1A365C; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .employee-details p { font-size: 12px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .employee-badge { flex-shrink: 0; }
+        
+        /* Selection Controls */
+        .selection-controls { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; padding: 12px 15px; background: #F9FAFB; border-radius: 8px; flex-wrap: wrap; }
+        .selection-controls .select-actions { display: flex; gap: 10px; }
+        .selection-controls .selected-count { font-size: 14px; color: #1A365C; font-weight: 600; margin-left: auto; }
+        .selection-controls .selected-count span { color: #F57600; }
+        
+        .template-card { background: white; border: 2px solid #E5ECF3; border-radius: 12px; padding: 20px; margin-bottom: 15px; cursor: pointer; transition: all 0.3s; }
+        .template-card:hover { border-color: #F57600; transform: translateY(-2px); }
+        .template-card.selected { border-color: #F57600; background: #FFF8F0; }
+        .template-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
+        .template-name { font-weight: 600; color: #1A365C; font-size: 15px; }
+        .template-category { font-size: 11px; text-transform: uppercase; padding: 4px 10px; background: #E5ECF3; color: #1A365C; border-radius: 4px; font-weight: 600; }
+        .template-preview { font-size: 13px; color: #666; line-height: 1.5; max-height: 60px; overflow: hidden; }
+        
+        .variables-panel { background: #FFF8F0; border: 2px solid #F57600; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .variables-panel h4 { color: #F57600; margin-bottom: 15px; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+        .variable-input { display: grid; grid-template-columns: 140px 1fr; gap: 10px; align-items: center; margin-bottom: 10px; }
+        .variable-input label { font-size: 12px; font-weight: 600; color: #1A365C; font-family: monospace; background: #E5ECF3; padding: 4px 8px; border-radius: 4px; }
+        .variable-input input { padding: 10px 14px; border: 2px solid #E5ECF3; border-radius: 6px; font-family: 'Poppins', sans-serif; font-size: 13px; }
+        .variable-input input:focus { outline: none; border-color: #F57600; }
+        .variable-input input:disabled { background: #f5f5f5; color: #999; }
+        
+        .preview-panel { background: white; border: 2px solid #E5ECF3; border-radius: 12px; overflow: hidden; }
+        .preview-header { background: #1A365C; color: white; padding: 15px 20px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        .preview-header svg { width: 20px; height: 20px; }
+        .preview-content { padding: 20px; }
+        .preview-meta { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #E5ECF3; }
+        .preview-meta-row { display: flex; margin-bottom: 8px; font-size: 13px; }
+        .preview-meta-row:last-child { margin-bottom: 0; }
+        .preview-meta-label { font-weight: 600; color: #1A365C; width: 60px; flex-shrink: 0; }
+        .preview-meta-value { color: #666; }
+        .preview-subject { font-weight: 600; color: #1A365C; padding-bottom: 15px; margin-bottom: 15px; border-bottom: 1px solid #E5ECF3; }
+        .preview-body { color: #333; line-height: 1.7; white-space: pre-wrap; max-height: 250px; overflow-y: auto; }
+        
+        /* Recipients Display */
+        .recipients-display { background: #E8F4FD; border-radius: 8px; padding: 12px 15px; margin-bottom: 15px; }
+        .recipients-display label { font-size: 12px; color: #0C5460; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; display: block; }
+        .recipients-list { display: flex; flex-wrap: wrap; gap: 8px; }
+        .recipient-tag { background: white; border: 1px solid #B3D9F7; border-radius: 20px; padding: 4px 12px; font-size: 12px; color: #0C5460; display: flex; align-items: center; gap: 6px; }
+        .recipient-tag .remove-recipient { cursor: pointer; opacity: 0.6; font-size: 16px; line-height: 1; }
+        .recipient-tag .remove-recipient:hover { opacity: 1; color: #DC3545; }
+        
+        /* Test Email Banner */
+        .test-email-banner { background: #FFF3CD; border: 2px solid #FFEEBA; border-radius: 8px; padding: 12px 15px; margin-bottom: 15px; display: flex; align-items: center; gap: 12px; }
+        .test-email-banner svg { color: #856404; flex-shrink: 0; width: 24px; height: 24px; }
+        .test-email-banner .content { flex: 1; }
+        .test-email-banner .content strong { color: #856404; font-size: 14px; }
+        .test-email-banner .content p { color: #856404; font-size: 12px; margin-top: 2px; }
+        
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26, 54, 92, 0.7); display: none; justify-content: center; align-items: center; z-index: 9999; backdrop-filter: blur(3px); padding: 20px; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: 16px; width: 100%; max-width: 700px; max-height: 90vh; overflow: auto; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); }
+        .modal-header { background: #1A365C; color: white; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1; }
+        .modal-header h2 { font-size: 18px; font-weight: 600; }
+        .modal-close { background: none; border: none; color: white; cursor: pointer; padding: 5px; }
+        .modal-close svg { width: 24px; height: 24px; }
+        .modal-body { padding: 30px; }
+        .modal-footer { padding: 20px 30px; background: #F9FAFB; display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; position: sticky; bottom: 0; }
+        
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 10001; }
+        .toast { background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); margin-bottom: 10px; display: flex; align-items: center; gap: 12px; animation: slideIn 0.3s ease; min-width: 280px; max-width: 400px; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .toast.success { border-left: 4px solid #28A745; }
+        .toast.error { border-left: 4px solid #DC3545; }
+        .toast.warning { border-left: 4px solid #F57600; }
+        .toast.info { border-left: 4px solid #17A2B8; }
+        .toast-icon { width: 24px; height: 24px; flex-shrink: 0; }
+        .toast.success .toast-icon { color: #28A745; }
+        .toast.error .toast-icon { color: #DC3545; }
+        .toast.warning .toast-icon { color: #F57600; }
+        .toast.info .toast-icon { color: #17A2B8; }
+        .toast-message { flex: 1; font-size: 14px; color: #333; }
+        
+        .empty-state { text-align: center; padding: 40px 20px; color: #666; }
+        .empty-state svg { width: 60px; height: 60px; color: #E5ECF3; margin-bottom: 15px; }
+        .empty-state h3 { color: #1A365C; margin-bottom: 8px; font-size: 16px; }
+        .empty-state p { font-size: 13px; }
+        
+        .info-box { background: #E8F4FD; border: 1px solid #B3D9F7; border-radius: 8px; padding: 15px 20px; margin-bottom: 20px; display: flex; gap: 12px; }
+        .info-box.warning { background: #FFF3CD; border-color: #FFEEBA; }
+        .info-box.success { background: #D4EDDA; border-color: #C3E6CB; }
+        .info-box svg { width: 24px; height: 24px; flex-shrink: 0; }
+        .info-box.warning svg { color: #856404; }
+        .info-box.success svg { color: #155724; }
+        .info-box-content h4 { font-size: 14px; margin-bottom: 5px; }
+        .info-box-content p { font-size: 13px; line-height: 1.5; }
+        .info-box-content code { background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+        
+        .search-box { position: relative; margin-bottom: 15px; }
+        .search-box input { width: 100%; padding: 14px 20px 14px 50px; border: 2px solid #E5ECF3; border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 14px; transition: all 0.3s; }
+        .search-box input:focus { outline: none; border-color: #F57600; box-shadow: 0 0 0 3px rgba(245, 118, 0, 0.1); }
+        .search-box svg { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: #999; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        @media (max-width: 1000px) { .grid-2 { grid-template-columns: 1fr; } }
+        
+        .scrollable-list { max-height: 320px; overflow-y: auto; padding-right: 5px; }
+        .scrollable-list::-webkit-scrollbar { width: 6px; }
+        .scrollable-list::-webkit-scrollbar-track { background: #E5ECF3; border-radius: 3px; }
+        .scrollable-list::-webkit-scrollbar-thumb { background: #1A365C; border-radius: 3px; }
+        
+        .action-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+        
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: white; border-radius: 12px; padding: 20px; border: 1px solid #E5ECF3; text-align: center; }
+        .stat-card .stat-value { font-size: 28px; font-weight: 700; color: #1A365C; margin-bottom: 5px; }
+        .stat-card .stat-label { font-size: 12px; color: #666; }
+        .stat-card.warning .stat-value { color: #F57600; }
+        .stat-card.danger .stat-value { color: #DC3545; }
+        
+        .setup-container { max-width: 550px; margin: 0 auto; padding: 40px 20px; }
+        .setup-card { background: white; border-radius: 16px; padding: 40px; box-shadow: 0 4px 20px rgba(26, 54, 92, 0.15); text-align: center; }
+        .setup-card .logo { margin-bottom: 20px; }
+        .setup-card h2 { color: #1A365C; margin-bottom: 10px; }
+        .setup-card p { color: #666; margin-bottom: 30px; }
+        
+        /* Toggle Switch */
+        .toggle-container { display: flex; align-items: center; gap: 12px; }
+        .toggle-switch { position: relative; width: 50px; height: 26px; background: #E5ECF3; border-radius: 13px; cursor: pointer; transition: all 0.3s; }
+        .toggle-switch.active { background: #F57600; }
+        .toggle-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .toggle-switch.active::after { left: 27px; }
+        .toggle-label { font-size: 14px; font-weight: 600; color: #1A365C; }
+        
+        .step-list { counter-reset: step-counter; }
+        .step-item { position: relative; padding-left: 45px; margin-bottom: 20px; }
+        .step-item::before { counter-increment: step-counter; content: counter(step-counter); position: absolute; left: 0; top: 0; width: 28px; height: 28px; background: #F57600; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+        .step-item h4 { color: #1A365C; margin-bottom: 5px; font-size: 14px; }
+        .step-item p { color: #666; font-size: 13px; line-height: 1.5; }
+        
+        @media (max-width: 600px) {
+            .variable-input { grid-template-columns: 1fr; }
+            .modal-content { margin: 10px; }
+            .selection-controls { flex-direction: column; align-items: stretch; }
+            .selection-controls .selected-count { margin-left: 0; margin-top: 10px; }
+        }
+        
+        /* Variable Palette Styles */
+        .variable-palette { background: #F0F7FF; border: 2px solid #B3D4FC; border-radius: 10px; padding: 15px; margin-bottom: 20px; }
+        .variable-palette-header { display: flex; align-items: center; gap: 8px; color: #1A365C; font-weight: 600; font-size: 13px; margin-bottom: 12px; }
+        .variable-chips { display: flex; flex-direction: column; gap: 10px; }
+        .variable-chip-group { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+        .chip-group-label { font-size: 11px; font-weight: 600; color: #666; text-transform: uppercase; min-width: 70px; }
+        .variable-chip { background: white; border: 1px solid #B3D4FC; border-radius: 15px; padding: 4px 10px; font-size: 11px; font-family: 'Courier New', monospace; color: #1A365C; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        .variable-chip:hover { background: #1A365C; color: white; border-color: #1A365C; transform: translateY(-1px); }
+        .variable-chip:active { transform: translateY(0); }
+        .variable-chip.custom-add { background: #F57600; color: white; border-color: #F57600; font-family: 'Poppins', sans-serif; font-weight: 600; }
+        .variable-chip.custom-add:hover { background: #E06900; border-color: #E06900; }
+        .custom-variable-input { padding: 4px 10px; border: 1px solid #B3D4FC; border-radius: 15px; font-size: 11px; font-family: 'Courier New', monospace; width: 100px; }
+        .custom-variable-input:focus { outline: none; border-color: #F57600; }
+        .field-hint { font-size: 11px; color: #999; font-weight: 400; }
+        
+        /* Branded Email Preview Styles */
+        .branded-preview { padding: 0 !important; background: #E5ECF3 !important; }
+        .email-preview-container { max-width: 100%; margin: 0; border-radius: 0 0 12px 12px; overflow: hidden; }
+        .email-preview-header { background: linear-gradient(135deg, #1A365C 0%, #2D4A6F 100%); padding: 20px; position: relative; }
+        .email-preview-logo { font-size: 20px; font-weight: 700; }
+        .logo-alice, .logo-dot { color: #F57600; }
+        .logo-care { color: white; font-weight: 400; }
+        .email-preview-tagline { color: rgba(255,255,255,0.7); font-size: 11px; margin-top: 4px; }
+        .email-preview-meta { background: white; padding: 15px 20px; border-bottom: 1px solid #E5ECF3; }
+        .email-preview-meta .preview-meta-row { margin-bottom: 6px; font-size: 12px; }
+        .email-preview-meta .preview-meta-row:last-child { margin-bottom: 0; }
+        .email-preview-meta .preview-meta-label { font-weight: 600; color: #1A365C; width: 55px; display: inline-block; }
+        .email-preview-meta .preview-meta-value { color: #666; }
+        .email-preview-body { background: white; padding: 20px; color: #333; font-size: 13px; line-height: 1.7; white-space: pre-wrap; max-height: 200px; overflow-y: auto; }
+        .email-preview-footer { background: #1A365C; padding: 15px 20px; color: rgba(255,255,255,0.7); font-size: 10px; line-height: 1.5; }
+        .email-preview-footer strong { color: white; }
+        .footer-company { margin-bottom: 8px; }
+        .footer-location { color: rgba(255,255,255,0.5); }
+        
+        /* Rich Text Editor Styles */
+        .rte-toolbar { display: flex; flex-wrap: wrap; gap: 5px; padding: 8px 10px; background: #F9FAFB; border: 2px solid #E5ECF3; border-bottom: none; border-radius: 8px 8px 0 0; align-items: center; }
+        .rte-toolbar-group { display: flex; gap: 2px; padding-right: 10px; border-right: 1px solid #E5ECF3; }
+        .rte-toolbar-group:last-child { border-right: none; padding-right: 0; }
+        .rte-toolbar-right { margin-left: auto; }
+        .rte-btn { width: 32px; height: 32px; padding: 6px; background: white; border: 1px solid #E5ECF3; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .rte-btn:hover { background: #E5ECF3; border-color: #1A365C; }
+        .rte-btn:active { background: #1A365C; color: white; }
+        .rte-btn svg { width: 16px; height: 16px; }
+        .rte-btn-text { width: auto; padding: 6px 10px; font-size: 11px; font-weight: 600; font-family: monospace; }
+        .rte-color-label { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: white; border: 1px solid #E5ECF3; border-radius: 6px; cursor: pointer; transition: all 0.2s; position: relative; }
+        .rte-color-label:hover { background: #E5ECF3; border-color: #1A365C; }
+        .rte-color-label svg { width: 16px; height: 16px; }
+        .rte-color-label input[type="color"] { position: absolute; bottom: -2px; left: 50%; transform: translateX(-50%); width: 20px; height: 6px; padding: 0; border: none; cursor: pointer; }
+        .rte-select { padding: 6px 8px; border: 1px solid #E5ECF3; border-radius: 6px; font-size: 12px; font-family: 'Poppins', sans-serif; background: white; cursor: pointer; }
+        .rte-select:hover { border-color: #1A365C; }
+        .rte-editor { min-height: 200px; max-height: 350px; overflow-y: auto; padding: 16px; border: 2px solid #E5ECF3; border-top: 1px solid #E5ECF3; border-radius: 0 0 8px 8px; font-family: 'Poppins', sans-serif; font-size: 14px; line-height: 1.6; background: white; outline: none; }
+        .rte-editor:focus { border-color: #F57600; box-shadow: 0 0 0 3px rgba(245, 118, 0, 0.1); }
+        .rte-editor:empty:before { content: attr(placeholder); color: #999; pointer-events: none; }
+        .rte-editor h2 { font-size: 18px; color: #1A365C; margin: 10px 0; }
+        .rte-editor h3 { font-size: 16px; color: #1A365C; margin: 8px 0; }
+        .rte-editor a { color: #F57600; text-decoration: underline; }
+        .rte-editor ul, .rte-editor ol { margin: 10px 0; padding-left: 25px; }
+        .rte-html-source { width: 100%; min-height: 200px; padding: 16px; border: 2px solid #E5ECF3; border-top: 1px solid #E5ECF3; border-radius: 0 0 8px 8px; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.5; background: #2D2D2D; color: #F8F8F2; resize: vertical; }
+        .rte-html-source:focus { outline: none; border-color: #F57600; }
+        
+        /* Log Filters Card Styles */
+        .log-filters-card { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(26, 54, 92, 0.08); margin-bottom: 25px; overflow: hidden; border: 2px solid #E5ECF3; }
+        .log-filters-header { display: flex; align-items: center; gap: 10px; padding: 15px 20px; background: linear-gradient(135deg, #1A365C 0%, #2D4A6F 100%); color: white; font-weight: 600; font-size: 14px; }
+        .log-filters-header svg { width: 18px; height: 18px; opacity: 0.8; }
+        .log-filters-header .btn-outline { background: transparent; border-color: rgba(255,255,255,0.3); color: white; font-size: 11px; padding: 6px 12px; }
+        .log-filters-header .btn-outline:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.5); }
+        .log-filters-body { padding: 20px; background: #F9FAFB; }
+        .log-filter-row { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
+        .log-filter-row:last-child { margin-bottom: 0; }
+        .log-filter-group { flex: 1; min-width: 180px; }
+        .log-filter-group.log-filter-search { flex: 2; min-width: 280px; }
+        .log-filter-group label { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: #1A365C; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .log-filter-group label svg { width: 14px; height: 14px; color: #F57600; }
+        .log-filter-group input, .log-filter-group select { width: 100%; padding: 12px 14px; border: 2px solid #E5ECF3; border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 13px; background: white; transition: all 0.2s; }
+        .log-filter-group input:focus, .log-filter-group select:focus { outline: none; border-color: #F57600; box-shadow: 0 0 0 3px rgba(245, 118, 0, 0.1); }
+        .log-filter-group input::placeholder { color: #999; }
+        .log-filters-footer { padding: 12px 20px; background: white; border-top: 1px solid #E5ECF3; }
+        .log-results-count { font-size: 13px; color: #666; font-weight: 500; }
+        .log-results-count strong { color: #1A365C; }
+    </style>
+</head>
+<body>
+    <div class="toast-container" id="toastContainer"></div>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <div class="loading-text" id="loadingText">Loading...</div>
+            <div class="loading-subtext" id="loadingSubtext">Please wait</div>
+        </div>
+    </div>
+    
+    <!-- Setup Screen -->
+    <div id="setupScreen" style="display: none;">
+        <div class="setup-container">
+            <div class="setup-card">
+                <div class="logo"><span class="alice">alice</span><span class="dot">.</span><span class="care">care</span></div>
+                <h2>Employee Email Manager Setup</h2>
+                <p>Connect to your Google Sheet to get started</p>
+                
+                <div class="form-group" style="text-align: left;">
+                    <label>Google Apps Script Web App URL *</label>
+                    <input type="text" id="setupWebAppUrl" placeholder="https://script.google.com/macros/s/...../exec">
+                </div>
+                
+                <button class="btn btn-primary" onclick="connectToSheet()" style="width: 100%; justify-content: center;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                    Connect to Google Sheet
+                </button>
+                
+                <div class="info-box" style="margin-top: 30px; text-align: left;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    <div class="info-box-content">
+                        <h4>First Time Setup?</h4>
+                        <p>1. Create a new Google Sheet<br>
+                        2. Go to Extensions → Apps Script<br>
+                        3. Paste the Code.gs script<br>
+                        4. Deploy as Web App<br>
+                        5. Paste the URL above</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Application -->
+    <div id="mainApp" style="display: none;">
+        <nav class="nav-tabs">
+            <button class="tab-btn active" data-tab="compose">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                Compose
+            </button>
+            <button class="tab-btn" data-tab="templates">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                Templates
+            </button>
+            <button class="tab-btn" data-tab="employees">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                Employees
+            </button>
+            <button class="tab-btn" data-tab="logs">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                Logs
+            </button>
+            <button class="tab-btn" data-tab="settings">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                Settings
+            </button>
+            <div class="tab-btn connection-status" id="connectionStatus" title="Connected to Google Sheets">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                Connected
+            </div>
+        </nav>
+        
+        <div class="container">
+            <div class="header">
+                <div class="header-content">
+                    <div>
+                        <div class="logo"><span class="alice">alice</span><span class="dot">.</span><span class="care">care</span></div>
+                        <h1>Employee Email Manager</h1>
+                        <p>Connected to Google Sheets • Real-time sync</p>
+                    </div>
+                    <button class="btn btn-outline" onclick="refreshAllData()" style="border-color: white; color: white;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Compose Tab -->
+            <div class="tab-content active" id="tab-compose">
+                <div class="grid-2">
+                    <div>
+                        <h3 class="section-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            Select Employees
+                        </h3>
+                        
+                        <div class="search-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                            <input type="text" id="employeeSearch" placeholder="Search by name, email, department...">
+                        </div>
+                        
+                        <div class="selection-controls">
+                            <div class="select-actions">
+                                <button class="btn btn-small btn-outline" onclick="selectAllEmployees()">Select All</button>
+                                <button class="btn btn-small btn-outline" onclick="clearEmployeeSelection()">Clear</button>
+                            </div>
+                            <div class="selected-count">Selected: <span id="selectedCount">0</span></div>
+                        </div>
+                        
+                        <div id="employeeList" class="scrollable-list"></div>
+                        
+                        <h3 class="section-title" style="margin-top: 25px;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            Select Template
+                        </h3>
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <select id="templateCategory" onchange="renderTemplateList()">
+                                <option value="">All Categories</option>
+                                <option value="warning">Warnings</option>
+                                <option value="reminder">Reminders</option>
+                                <option value="announcement">Announcements</option>
+                                <option value="hr">HR Communications</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+                        <div id="templateList" class="scrollable-list"></div>
+                    </div>
+                    
+                    <div>
+                        <!-- Test Mode Toggle -->
+                        <div class="card" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                                <div class="toggle-container">
+                                    <div class="toggle-switch" id="testModeToggle" onclick="toggleTestMode()"></div>
+                                    <span class="toggle-label">Test Mode</span>
+                                </div>
+                                <div class="form-group" style="margin: 0; flex: 1; min-width: 180px;" id="testEmailGroup">
+                                    <input type="email" id="testEmailAddress" placeholder="Test email address" style="padding: 10px 14px;">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Test Mode Banner -->
+                        <div class="test-email-banner" id="testModeBanner" style="display: none;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            <div class="content">
+                                <strong>Test Mode Active</strong>
+                                <p>Emails will be sent to your test address only</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Recipients Display -->
+                        <div class="recipients-display" id="recipientsDisplay" style="display: none;">
+                            <label>Recipients (<span id="recipientCount">0</span>)</label>
+                            <div class="recipients-list" id="recipientsList"></div>
+                        </div>
+                        
+                        <!-- Variables Panel -->
+                        <div class="variables-panel" id="variablesPanel" style="display: none;">
+                            <h4>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                                Template Variables
+                            </h4>
+                            <div id="variableInputs"></div>
+                        </div>
+                        
+                        <!-- Preview Panel -->
+                        <div class="preview-panel">
+                            <div class="preview-header">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                Email Preview
+                                <span style="margin-left: auto; font-size: 11px; font-weight: 400; opacity: 0.7;">Branded HTML</span>
+                            </div>
+                            <div class="preview-content branded-preview">
+                                <!-- Branded Email Preview -->
+                                <div class="email-preview-container">
+                                    <div class="email-preview-header">
+                                        <div class="email-preview-logo">
+                                            <span class="logo-alice">alice</span><span class="logo-dot">.</span><span class="logo-care">care</span>
+                                        </div>
+                                        <div class="email-preview-tagline">Home Care Organization</div>
+                                    </div>
+                                    <div class="email-preview-meta">
+                                        <div class="preview-meta-row"><span class="preview-meta-label">To:</span><span class="preview-meta-value" id="previewTo">Select employee(s)</span></div>
+                                        <div class="preview-meta-row"><span class="preview-meta-label">From:</span><span class="preview-meta-value" id="previewFrom">hr@alice.care</span></div>
+                                        <div class="preview-meta-row"><span class="preview-meta-label">Subject:</span><span class="preview-meta-value" id="previewSubject">Select a template</span></div>
+                                    </div>
+                                    <div class="email-preview-body" id="previewBody">Select employee(s) and a template to preview the email.</div>
+                                    <div class="email-preview-footer">
+                                        <div class="footer-company">
+                                            <strong>alice.care</strong><br>
+                                            TEKKS LLC DBA alice.care<br>
+                                            CDSS Licensed #344700080
+                                        </div>
+                                        <div class="footer-location">Fair Oaks, California</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Send Buttons -->
+                        <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="sendEmails()" id="sendBtn" disabled>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                                <span id="sendBtnText">Send Email</span>
+                            </button>
+                            <button class="btn btn-warning" onclick="sendTestEmail()" id="testSendBtn" style="display: none;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                Send Test
+                            </button>
+                            <button class="btn btn-outline" onclick="resetCompose()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                                Reset
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Templates Tab -->
+            <div class="tab-content" id="tab-templates">
+                <div class="card-header" style="margin-bottom: 20px;">
+                    <h3 class="section-title" style="margin: 0;">Email Templates</h3>
+                    <button class="btn btn-primary" onclick="openTemplateModal()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Add Template
+                    </button>
+                </div>
+                <div class="info-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    <div class="info-box-content">
+                        <h4>Template Variables</h4>
+                        <p>Click <strong>Add</strong> or <strong>Edit</strong> to open the template editor with clickable variable buttons. No need to remember syntax!</p>
+                    </div>
+                </div>
+                <div id="templatesGrid"></div>
+            </div>
+            
+            <!-- Employees Tab -->
+            <div class="tab-content" id="tab-employees">
+                <div class="card-header" style="margin-bottom: 20px;">
+                    <h3 class="section-title" style="margin: 0;">Employee Directory</h3>
+                    <button class="btn btn-primary" onclick="openEmployeeModal()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Add Employee
+                    </button>
+                </div>
+                <div class="stats-row">
+                    <div class="stat-card"><div class="stat-value" id="statTotal">0</div><div class="stat-label">Total Employees</div></div>
+                    <div class="stat-card warning"><div class="stat-value" id="statWarnings">0</div><div class="stat-label">With Warnings</div></div>
+                    <div class="stat-card danger"><div class="stat-value" id="statFinal">0</div><div class="stat-label">Final Warning</div></div>
+                    <div class="stat-card"><div class="stat-value" id="statEmails">0</div><div class="stat-label">Emails (30d)</div></div>
+                </div>
+                <div class="search-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                    <input type="text" id="employeeDirectorySearch" placeholder="Search by name, email, department...">
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead><tr><th>Employee</th><th>Email</th><th>Department</th><th>Warning Level</th><th>Last Email</th><th>Actions</th></tr></thead>
+                        <tbody id="employeeTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Logs Tab -->
+            <div class="tab-content" id="tab-logs">
+                <h3 class="section-title">Email History</h3>
+                
+                <!-- Branded Filter Card -->
+                <div class="log-filters-card">
+                    <div class="log-filters-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                        <span>Search & Filter</span>
+                        <button class="btn btn-small btn-outline" onclick="clearLogFilters()" style="margin-left: auto;">Clear All</button>
+                    </div>
+                    <div class="log-filters-body">
+                        <div class="log-filter-row">
+                            <div class="log-filter-group log-filter-search">
+                                <label>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                    Employee Search
+                                </label>
+                                <input type="text" id="logSearchInput" placeholder="Search by name or email..." oninput="renderLogs()">
+                            </div>
+                            <div class="log-filter-group">
+                                <label>Department</label>
+                                <select id="logDepartmentFilter" onchange="renderLogs()">
+                                    <option value="">All Departments</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="log-filter-row">
+                            <div class="log-filter-group">
+                                <label>Template</label>
+                                <select id="logTemplateFilter" onchange="renderLogs()">
+                                    <option value="">All Templates</option>
+                                </select>
+                            </div>
+                            <div class="log-filter-group">
+                                <label>Category</label>
+                                <select id="logCategoryFilter" onchange="renderLogs()">
+                                    <option value="">All Categories</option>
+                                    <option value="warning">Warnings</option>
+                                    <option value="reminder">Reminders</option>
+                                    <option value="announcement">Announcements</option>
+                                    <option value="hr">HR</option>
+                                    <option value="custom">Custom</option>
+                                </select>
+                            </div>
+                            <div class="log-filter-group">
+                                <label>Date Range</label>
+                                <select id="logDateFilter" onchange="renderLogs()">
+                                    <option value="all">All Time</option>
+                                    <option value="7">Last 7 Days</option>
+                                    <option value="30" selected>Last 30 Days</option>
+                                    <option value="90">Last 90 Days</option>
+                                    <option value="365">Last Year</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="log-filters-footer">
+                        <span class="log-results-count" id="logResultsCount">0 emails found</span>
+                    </div>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead><tr><th>Date/Time</th><th>Employee</th><th>Department</th><th>Template</th><th>Subject</th><th>Actions</th></tr></thead>
+                        <tbody id="logsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Settings Tab -->
+            <div class="tab-content" id="tab-settings">
+                <div class="grid-2">
+                    <div>
+                        <h3 class="section-title">Google Sheet Connection</h3>
+                        <div class="card">
+                            <div class="info-box success" style="margin-bottom: 15px;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                <div class="info-box-content">
+                                    <h4>Connected</h4>
+                                    <p id="connectedUrl" style="word-break: break-all; font-size: 11px;"></p>
+                                </div>
+                            </div>
+                            <button class="btn btn-danger btn-small" onclick="disconnectSheet()">Disconnect</button>
+                        </div>
+                        
+                        <h3 class="section-title" style="margin-top: 25px;">Email Aliases</h3>
+                        <div class="card">
+                            <div class="card-header"><div class="card-title">Active Aliases</div><button class="btn btn-small btn-primary" onclick="openAliasModal()">Add</button></div>
+                            <div id="aliasesList"></div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title" style="margin-bottom: 10px;">Default Send From</div>
+                            <select id="defaultAlias" onchange="saveDefaultAlias()" style="width: 100%; padding: 10px; border: 2px solid #E5ECF3; border-radius: 8px;"></select>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="section-title">Setup Guide</h3>
+                        <div class="card">
+                            <div class="step-list">
+                                <div class="step-item"><h4>Create Google Sheet</h4><p>Create a new Google Sheet</p></div>
+                                <div class="step-item"><h4>Open Apps Script</h4><p>Extensions → Apps Script</p></div>
+                                <div class="step-item"><h4>Paste Code</h4><p>Copy Code.gs and paste</p></div>
+                                <div class="step-item"><h4>Deploy</h4><p>Deploy → New deployment → Web app</p></div>
+                                <div class="step-item"><h4>Connect</h4><p>Paste URL in setup screen</p></div>
+                            </div>
+                        </div>
+                        
+                        <h3 class="section-title" style="margin-top: 25px;">Data Management</h3>
+                        <div class="card">
+                            <div class="action-buttons">
+                                <button class="btn btn-secondary btn-small" onclick="exportData()">Export</button>
+                                <button class="btn btn-outline btn-small" onclick="document.getElementById('importFile').click()">Import</button>
+                                <input type="file" id="importFile" style="display: none;" accept=".json" onchange="importData(event)">
+                                <button class="btn btn-danger btn-small" onclick="confirmClearData()">Clear All</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Employee Modal -->
+    <div class="modal" id="employeeModal">
+        <div class="modal-content">
+            <div class="modal-header"><h2 id="employeeModalTitle">Add Employee</h2><button class="modal-close" onclick="closeModal('employeeModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+            <div class="modal-body">
+                <input type="hidden" id="editEmployeeId">
+                <div class="form-row">
+                    <div class="form-group"><label>First Name *</label><input type="text" id="empFirstName" placeholder="John"></div>
+                    <div class="form-group"><label>Last Name *</label><input type="text" id="empLastName" placeholder="Doe"></div>
+                </div>
+                <div class="form-group"><label>Email Address *</label><input type="email" id="empEmail" placeholder="john.doe@example.com"></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Department</label><input type="text" id="empDepartment" placeholder="Caregiving"></div>
+                    <div class="form-group"><label>Position</label><input type="text" id="empPosition" placeholder="Caregiver"></div>
+                </div>
+                <div class="form-group"><label>Supervisor Name</label><input type="text" id="empSupervisor" placeholder="Jane Smith"></div>
+            </div>
+            <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('employeeModal')">Cancel</button><button class="btn btn-primary" onclick="saveEmployee()">Save</button></div>
+        </div>
+    </div>
+    
+    <!-- Template Modal -->
+    <div class="modal" id="templateModal">
+        <div class="modal-content">
+            <div class="modal-header"><h2 id="templateModalTitle">Add Template</h2><button class="modal-close" onclick="closeModal('templateModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+            <div class="modal-body">
+                <input type="hidden" id="editTemplateId">
+                <div class="form-row">
+                    <div class="form-group"><label>Name *</label><input type="text" id="tplName" placeholder="First Warning - Attendance"></div>
+                    <div class="form-group"><label>Category *</label><select id="tplCategory"><option value="warning">Warning</option><option value="reminder">Reminder</option><option value="announcement">Announcement</option><option value="hr">HR</option><option value="custom">Custom</option></select></div>
+                </div>
+                
+                <!-- Variable Palette -->
+                <div class="variable-palette">
+                    <div class="variable-palette-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                        <span>Click to insert variable:</span>
+                    </div>
+                    <div class="variable-chips">
+                        <div class="variable-chip-group">
+                            <span class="chip-group-label">Employee</span>
+                            <button type="button" class="variable-chip" onclick="insertVariable('first_name')">{{first_name}}</button>
+                            <button type="button" class="variable-chip" onclick="insertVariable('last_name')">{{last_name}}</button>
+                            <button type="button" class="variable-chip" onclick="insertVariable('supervisor_name')">{{supervisor_name}}</button>
+                        </div>
+                        <div class="variable-chip-group">
+                            <span class="chip-group-label">Dates</span>
+                            <button type="button" class="variable-chip" onclick="insertVariable('date')">{{date}}</button>
+                            <button type="button" class="variable-chip" onclick="insertVariable('incident_date')">{{incident_date}}</button>
+                            <button type="button" class="variable-chip" onclick="insertVariable('effective_date')">{{effective_date}}</button>
+                            <button type="button" class="variable-chip" onclick="insertVariable('due_date')">{{due_date}}</button>
+                            <button type="button" class="variable-chip" onclick="insertVariable('previous_warning_date')">{{previous_warning_date}}</button>
+                        </div>
+                        <div class="variable-chip-group">
+                            <span class="chip-group-label">Details</span>
+                            <button type="button" class="variable-chip" onclick="insertVariable('issue_description')">{{issue_description}}</button>
+                            <button type="button" class="variable-chip" onclick="insertVariable('issue_type')">{{issue_type}}</button>
+                            <button type="button" class="variable-chip" onclick="insertVariable('policy_name')">{{policy_name}}</button>
+                            <button type="button" class="variable-chip" onclick="insertVariable('policy_details')">{{policy_details}}</button>
+                        </div>
+                        <div class="variable-chip-group">
+                            <span class="chip-group-label">Schedule</span>
+                            <button type="button" class="variable-chip" onclick="insertVariable('previous_schedule')">{{previous_schedule}}</button>
+                            <button type="button" class="variable-chip" onclick="insertVariable('new_schedule')">{{new_schedule}}</button>
+                        </div>
+                        <div class="variable-chip-group">
+                            <span class="chip-group-label">Training</span>
+                            <button type="button" class="variable-chip" onclick="insertVariable('training_name')">{{training_name}}</button>
+                            <button type="button" class="variable-chip" onclick="insertVariable('training_duration')">{{training_duration}}</button>
+                            <button type="button" class="variable-chip" onclick="insertVariable('training_link')">{{training_link}}</button>
+                        </div>
+                        <div class="variable-chip-group">
+                            <span class="chip-group-label">Custom</span>
+                            <input type="text" id="customVariableName" placeholder="custom_var" class="custom-variable-input">
+                            <button type="button" class="variable-chip custom-add" onclick="insertCustomVariable()">+ Add</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Subject * <span class="field-hint">(click in field, then click variable above)</span></label>
+                    <input type="text" id="tplSubject" placeholder="{{first_name}} {{last_name}} - Warning">
+                </div>
+                <div class="form-group">
+                    <label>Body * <span class="field-hint">(use toolbar to format, click variable buttons to insert)</span></label>
+                    
+                    <!-- Rich Text Editor Toolbar -->
+                    <div class="rte-toolbar">
+                        <div class="rte-toolbar-group">
+                            <button type="button" class="rte-btn" onclick="formatText('bold')" title="Bold (Ctrl+B)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></svg>
+                            </button>
+                            <button type="button" class="rte-btn" onclick="formatText('italic')" title="Italic (Ctrl+I)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg>
+                            </button>
+                            <button type="button" class="rte-btn" onclick="formatText('underline')" title="Underline (Ctrl+U)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"/><line x1="4" y1="21" x2="20" y2="21"/></svg>
+                            </button>
+                        </div>
+                        <div class="rte-toolbar-group">
+                            <button type="button" class="rte-btn" onclick="formatText('insertUnorderedList')" title="Bullet List">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="12" r="1" fill="currentColor"/><circle cx="4" cy="18" r="1" fill="currentColor"/></svg>
+                            </button>
+                            <button type="button" class="rte-btn" onclick="formatText('insertOrderedList')" title="Numbered List">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><text x="4" y="7" font-size="6" fill="currentColor">1</text><text x="4" y="13" font-size="6" fill="currentColor">2</text><text x="4" y="19" font-size="6" fill="currentColor">3</text></svg>
+                            </button>
+                        </div>
+                        <div class="rte-toolbar-group">
+                            <button type="button" class="rte-btn" onclick="insertLink()" title="Insert Link">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                            </button>
+                            <button type="button" class="rte-btn" onclick="removeLink()" title="Remove Link">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/><line x1="4" y1="4" x2="20" y2="20" stroke="#DC3545"/></svg>
+                            </button>
+                        </div>
+                        <div class="rte-toolbar-group">
+                            <label class="rte-color-label" title="Text Color">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h16"/><path d="M9.5 4L5 16h2l1-3h6l1 3h2L12.5 4z"/></svg>
+                                <input type="color" id="textColorPicker" value="#1A365C" onchange="applyTextColor(this.value)">
+                            </label>
+                            <label class="rte-color-label" title="Highlight Color">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" fill="#FFF3CD"/><path d="M9.5 8L5 18h2l1-2.5h6l1 2.5h2L12.5 8z"/></svg>
+                                <input type="color" id="highlightColorPicker" value="#FFF3CD" onchange="applyHighlightColor(this.value)">
+                            </label>
+                        </div>
+                        <div class="rte-toolbar-group">
+                            <select onchange="applyHeading(this.value); this.value='';" class="rte-select" title="Text Style">
+                                <option value="">Style</option>
+                                <option value="p">Normal</option>
+                                <option value="h2">Heading</option>
+                                <option value="h3">Subheading</option>
+                            </select>
+                        </div>
+                        <div class="rte-toolbar-group rte-toolbar-right">
+                            <button type="button" class="rte-btn rte-btn-text" onclick="toggleHtmlView()" title="View/Edit HTML">
+                                &lt;/&gt; HTML
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Rich Text Editor Content Area -->
+                    <div id="tplBody" class="rte-editor" contenteditable="true" placeholder="Dear {{first_name}},
+
+Write your email content here..."></div>
+                    
+                    <!-- HTML Source View (hidden by default) -->
+                    <textarea id="tplBodyHtml" class="rte-html-source" style="display: none;" placeholder="HTML source code..."></textarea>
+                </div>
+                <div class="form-group"><label>Warning Level</label><select id="tplWarningLevel"><option value="0">Not a Warning</option><option value="1">Level 1</option><option value="2">Level 2</option><option value="3">Level 3</option><option value="4">Final</option></select></div>
+            </div>
+            <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('templateModal')">Cancel</button><button class="btn btn-primary" onclick="saveTemplate()">Save</button></div>
+        </div>
+    </div>
+    
+    <!-- Alias Modal -->
+    <div class="modal" id="aliasModal">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header"><h2>Add Alias</h2><button class="modal-close" onclick="closeModal('aliasModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+            <div class="modal-body">
+                <div class="form-group"><label>Name *</label><input type="text" id="aliasName" placeholder="HR Department"></div>
+                <div class="form-group"><label>Email *</label><input type="email" id="aliasEmail" placeholder="hr@alice.care"></div>
+            </div>
+            <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('aliasModal')">Cancel</button><button class="btn btn-primary" onclick="saveAlias()">Save</button></div>
+        </div>
+    </div>
+    
+    <!-- View Log Modal -->
+    <div class="modal" id="logModal">
+        <div class="modal-content">
+            <div class="modal-header"><h2>Email Details</h2><button class="modal-close" onclick="closeModal('logModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+            <div class="modal-body" id="logModalContent"></div>
+            <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('logModal')">Close</button><button class="btn btn-primary" onclick="resendFromLog()">Resend</button></div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // STATE
+        // ============================================
+        const STORAGE_KEY = 'alicecare_webapp_url';
+        let WEB_APP_URL = '';
+        let employees = [];
+        let templates = [];
+        let emailLogs = [];
+        let aliases = [];
+        let settings = {};
+        let selectedEmployeeIds = new Set();
+        let selectedTemplate = null;
+        let variableValues = {};
+        let testMode = false;
+        let viewingLogId = null;
+        
+        // ============================================
+        // HELPERS
+        // ============================================
+        function escapeHtml(text) { 
+            if (!text) return ''; 
+            return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); 
+        }
+        function isValidEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+        function formatDate(d) { if (!d) return 'N/A'; return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); }
+        function formatDateTime(d) { if (!d) return 'N/A'; return new Date(d).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }); }
+        function getFullName(emp) { 
+            // Handle both old (name) and new (firstName/lastName) structures
+            if (emp.firstName || emp.lastName) {
+                return ((emp.firstName || '') + ' ' + (emp.lastName || '')).trim() || 'Unknown';
+            }
+            return emp.name || 'Unknown';
+        }
+        function getInitials(emp) { 
+            if (emp.firstName || emp.lastName) {
+                return ((emp.firstName?.[0] || '') + (emp.lastName?.[0] || '')).toUpperCase() || '?';
+            }
+            // Fallback for old 'name' field
+            if (emp.name) {
+                const parts = emp.name.trim().split(/\s+/);
+                return ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase() || '?';
+            }
+            return '?';
+        }
+        
+        function getEmployeeWarningLevel(empId) {
+            const id = String(empId);
+            const logs = emailLogs.filter(l => String(l.employeeId) === id && parseInt(l.warningLevel) > 0);
+            if (logs.length === 0) return 0;
+            return Math.max(...logs.map(l => parseInt(l.warningLevel) || 0));
+        }
+        
+        function getLastEmailDate(empId) {
+            const id = String(empId);
+            const logs = emailLogs.filter(l => String(l.employeeId) === id).sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt));
+            return logs.length > 0 ? logs[0].sentAt : null;
+        }
+        
+        // ============================================
+        // API - Using JSONP for all requests to avoid CORS
+        // ============================================
+        let jsonpCounter = 0;
+        
+        function apiCall(params, method = 'GET') {
+            return new Promise((resolve, reject) => {
+                const cb = 'cb_' + (++jsonpCounter) + '_' + Date.now();
+                const timeout = setTimeout(() => { 
+                    delete window[cb]; 
+                    reject(new Error('Request timeout - check your connection')); 
+                }, 30000);
+                
+                window[cb] = (data) => { 
+                    clearTimeout(timeout); 
+                    delete window[cb]; 
+                    resolve(data); 
+                };
+                
+                // Always use JSONP (GET) to avoid CORS issues with local files
+                const url = new URL(WEB_APP_URL);
+                url.searchParams.append('callback', cb);
+                
+                // For POST data, encode it as a URL parameter
+                if (method === 'POST') {
+                    // Send data as base64 encoded JSON to handle special characters
+                    const jsonData = JSON.stringify(params);
+                    const encodedData = btoa(unescape(encodeURIComponent(jsonData)));
+                    url.searchParams.append('postData', encodedData);
+                    url.searchParams.append('method', 'POST');
+                } else {
+                    // For GET, add params directly
+                    Object.entries(params).forEach(([k, v]) => url.searchParams.append(k, v));
+                }
+                
+                const script = document.createElement('script');
+                script.src = url.toString();
+                script.onerror = () => { 
+                    clearTimeout(timeout); 
+                    delete window[cb]; 
+                    reject(new Error('Network error - check Web App URL')); 
+                };
+                document.body.appendChild(script);
+                script.onload = () => script.remove();
+            });
+        }
+        
+        // ============================================
+        // TOAST & LOADING
+        // ============================================
+        function showToast(msg, type = 'info') {
+            const icons = { success: '✓', error: '✗', warning: '⚠', info: 'ℹ' };
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<div class="toast-icon">${icons[type]}</div><div class="toast-message">${msg}</div>`;
+            document.getElementById('toastContainer').appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 4000);
+        }
+        
+        function showLoading(show, text = 'Loading...', subtext = '') {
+            document.getElementById('loadingOverlay').classList.toggle('active', show);
+            document.getElementById('loadingText').textContent = text;
+            document.getElementById('loadingSubtext').textContent = subtext;
+        }
+        
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        
+        // ============================================
+        // INIT & CONNECTION
+        // ============================================
+        async function init() {
+            WEB_APP_URL = localStorage.getItem(STORAGE_KEY) || '';
+            if (!WEB_APP_URL) {
+                document.getElementById('setupScreen').style.display = 'block';
+                document.getElementById('mainApp').style.display = 'none';
+                return;
+            }
+            document.getElementById('setupScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            document.getElementById('connectedUrl').textContent = WEB_APP_URL;
+            await loadAllData();
+            setupEventListeners();
+        }
+        
+        function setupEventListeners() {
+            // Tab buttons
+            document.querySelectorAll('.tab-btn[data-tab]').forEach(btn => {
+                btn.addEventListener('click', () => showTab(btn.dataset.tab));
+            });
+            
+            // Search inputs with debounce
+            const empSearch = document.getElementById('employeeSearch');
+            const empDirSearch = document.getElementById('employeeDirectorySearch');
+            let searchTimeout;
+            
+            empSearch.addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => renderEmployeeList(), 150);
+            });
+            
+            empDirSearch.addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => renderEmployeeDirectory(), 150);
+            });
+        }
+        
+        async function connectToSheet() {
+            const url = document.getElementById('setupWebAppUrl').value.trim();
+            if (!url || !url.startsWith('https://script.google.com/')) {
+                showToast('Please enter a valid Google Apps Script URL', 'error');
+                return;
+            }
+            
+            showLoading(true, 'Connecting...');
+            WEB_APP_URL = url;
+            
+            try {
+                const check = await apiCall({ action: 'checkInitialized' });
+                if (!check.success) throw new Error(check.error || 'Connection failed');
+                
+                if (!check.initialized) {
+                    showLoading(true, 'Initializing...', 'Creating sheet structure');
+                    const init = await apiCall({ action: 'initialize' });
+                    if (!init.success) throw new Error(init.error);
+                    showToast('Sheet initialized!', 'success');
+                }
+                
+                localStorage.setItem(STORAGE_KEY, url);
+                showToast('Connected!', 'success');
+                await init();
+            } catch (e) {
+                showToast('Failed: ' + e.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        function disconnectSheet() {
+            if (!confirm('Disconnect from Google Sheet?')) return;
+            localStorage.removeItem(STORAGE_KEY);
+            location.reload();
+        }
+        
+        async function loadAllData() {
+            showLoading(true, 'Loading data...');
+            try {
+                const result = await apiCall({ action: 'getAllData' });
+                console.log('Raw API result:', result);
+                if (!result.success) throw new Error(result.error);
+                
+                employees = result.data.employees || [];
+                templates = result.data.templates || [];
+                emailLogs = result.data.emailLogs || [];
+                aliases = result.data.aliases || [];
+                settings = result.data.settings || {};
+                
+                console.log('Loaded employees:', employees);
+                console.log('First employee structure:', employees[0]);
+                console.log('Loaded templates:', templates.length);
+                console.log('Loaded logs:', emailLogs.length);
+                
+                renderEmployeeList();
+                renderTemplateList();
+                updatePreview();
+            } catch (e) {
+                console.error('Load error:', e);
+                showToast('Load failed: ' + e.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        async function refreshAllData() { await loadAllData(); showToast('Refreshed!', 'success'); }
+        
+        // ============================================
+        // TABS
+        // ============================================
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            document.querySelector(`.tab-btn[data-tab="${tabName}"]`).classList.add('active');
+            
+            if (tabName === 'compose') { renderEmployeeList(); renderTemplateList(); }
+            else if (tabName === 'templates') renderTemplatesGrid();
+            else if (tabName === 'employees') { renderEmployeeDirectory(); updateStats(); }
+            else if (tabName === 'logs') { populateLogFilters(); renderLogs(); }
+            else if (tabName === 'settings') renderAliases();
+        }
+        
+        // ============================================
+        // COMPOSE - EMPLOYEES
+        // ============================================
+        function renderEmployeeList() {
+            const container = document.getElementById('employeeList');
+            const search = (document.getElementById('employeeSearch')?.value || '').toLowerCase().trim();
+            
+            let filtered = employees;
+            if (search) {
+                filtered = employees.filter(e => {
+                    const name = getFullName(e).toLowerCase();
+                    const email = (e.email || '').toLowerCase();
+                    const dept = (e.department || '').toLowerCase();
+                    return name.includes(search) || email.includes(search) || dept.includes(search);
+                });
+            }
+            
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><h3>${employees.length ? 'No Results' : 'No Employees'}</h3><p>${employees.length ? 'Try different search' : 'Add employees first'}</p></div>`;
+                updateSelectedCount();
+                return;
+            }
+            
+            container.innerHTML = filtered.map(emp => {
+                const empIdStr = String(emp.id);
+                const isSelected = selectedEmployeeIds.has(empIdStr);
+                const level = getEmployeeWarningLevel(emp.id);
+                const badge = level > 0 ? `<span class="badge badge-warning-${Math.min(level, 3)} employee-badge">${level >= 4 ? 'Final' : 'L' + level}</span>` : '';
+                
+                return `<div class="employee-card ${isSelected ? 'selected' : ''}" data-id="${empIdStr}">
+                    <div class="employee-card-inner">
+                        <div class="employee-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                        <div class="employee-avatar">${getInitials(emp)}</div>
+                        <div class="employee-details">
+                            <h3>${escapeHtml(getFullName(emp))}</h3>
+                            <p>${escapeHtml(emp.email || 'No email')}</p>
+                        </div>
+                        ${badge}
+                    </div>
+                </div>`;
+            }).join('');
+            
+            // Add click handlers
+            container.querySelectorAll('.employee-card').forEach(card => {
+                card.addEventListener('click', () => toggleEmployee(card.dataset.id));
+            });
+            
+            updateSelectedCount();
+        }
+        
+        function toggleEmployee(empId) {
+            const id = String(empId);
+            if (selectedEmployeeIds.has(id)) {
+                selectedEmployeeIds.delete(id);
+            } else {
+                selectedEmployeeIds.add(id);
+            }
+            renderEmployeeList();
+            updateRecipientsDisplay();
+            updatePreview();
+            checkCanSend();
+            
+            // Update variables for single selection
+            if (selectedEmployeeIds.size === 1) {
+                const emp = employees.find(e => String(e.id) === [...selectedEmployeeIds][0]);
+                if (emp) {
+                    variableValues['first_name'] = emp.firstName || '';
+                    variableValues['last_name'] = emp.lastName || '';
+                    variableValues['supervisor_name'] = emp.supervisor || '';
+                }
+            }
+            extractVariables();
+        }
+        
+        function selectAllEmployees() {
+            const search = (document.getElementById('employeeSearch')?.value || '').toLowerCase().trim();
+            let filtered = employees;
+            if (search) {
+                filtered = employees.filter(e => {
+                    const name = getFullName(e).toLowerCase();
+                    return name.includes(search) || (e.email || '').toLowerCase().includes(search) || (e.department || '').toLowerCase().includes(search);
+                });
+            }
+            filtered.forEach(e => selectedEmployeeIds.add(String(e.id)));
+            renderEmployeeList();
+            updateRecipientsDisplay();
+            updatePreview();
+            checkCanSend();
+        }
+        
+        function clearEmployeeSelection() {
+            selectedEmployeeIds.clear();
+            renderEmployeeList();
+            updateRecipientsDisplay();
+            updatePreview();
+            checkCanSend();
+        }
+        
+        function removeRecipient(empId) {
+            selectedEmployeeIds.delete(String(empId));
+            renderEmployeeList();
+            updateRecipientsDisplay();
+            updatePreview();
+            checkCanSend();
+        }
+        
+        function updateSelectedCount() {
+            document.getElementById('selectedCount').textContent = selectedEmployeeIds.size;
+        }
+        
+        function updateRecipientsDisplay() {
+            const display = document.getElementById('recipientsDisplay');
+            const list = document.getElementById('recipientsList');
+            const count = document.getElementById('recipientCount');
+            
+            if (selectedEmployeeIds.size === 0) {
+                display.style.display = 'none';
+                return;
+            }
+            
+            display.style.display = 'block';
+            count.textContent = selectedEmployeeIds.size;
+            
+            const selected = employees.filter(e => selectedEmployeeIds.has(String(e.id)));
+            list.innerHTML = selected.map(emp => 
+                `<div class="recipient-tag">${escapeHtml(getFullName(emp))}<span class="remove-recipient" onclick="event.stopPropagation(); removeRecipient('${emp.id}')">×</span></div>`
+            ).join('');
+        }
+        
+        // ============================================
+        // COMPOSE - TEMPLATES
+        // ============================================
+        function renderTemplateList() {
+            const container = document.getElementById('templateList');
+            const cat = document.getElementById('templateCategory')?.value || '';
+            const filtered = templates.filter(t => !cat || t.category === cat);
+            
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg><h3>No Templates</h3><p>Create templates first</p></div>`;
+                return;
+            }
+            
+            container.innerHTML = filtered.map(t => {
+                const isSelected = selectedTemplate && selectedTemplate.id === t.id;
+                const preview = (t.body || '').substring(0, 60) + ((t.body || '').length > 60 ? '...' : '');
+                return `<div class="template-card ${isSelected ? 'selected' : ''}" data-id="${t.id}">
+                    <div class="template-header"><div class="template-name">${escapeHtml(t.name)}</div><div class="template-category">${t.category}</div></div>
+                    <div class="template-preview">${escapeHtml(preview)}</div>
+                </div>`;
+            }).join('');
+            
+            container.querySelectorAll('.template-card').forEach(card => {
+                card.addEventListener('click', () => selectTemplate(card.dataset.id));
+            });
+        }
+        
+        function selectTemplate(tplId) {
+            selectedTemplate = templates.find(t => t.id === tplId);
+            renderTemplateList();
+            extractVariables();
+            updatePreview();
+            checkCanSend();
+        }
+        
+        // ============================================
+        // COMPOSE - VARIABLES & PREVIEW
+        // ============================================
+        function extractVariables() {
+            const panel = document.getElementById('variablesPanel');
+            const inputs = document.getElementById('variableInputs');
+            
+            if (!selectedTemplate) { panel.style.display = 'none'; return; }
+            
+            const text = (selectedTemplate.subject || '') + ' ' + (selectedTemplate.body || '');
+            const matches = [...text.matchAll(/\{\{(\w+)\}\}/g)];
+            const vars = [...new Set(matches.map(m => m[1]))];
+            
+            if (vars.length === 0) { panel.style.display = 'none'; return; }
+            
+            // Set defaults
+            variableValues['date'] = variableValues['date'] || new Date().toLocaleDateString();
+            if (selectedEmployeeIds.size === 1) {
+                const emp = employees.find(e => String(e.id) === [...selectedEmployeeIds][0]);
+                if (emp) {
+                    variableValues['first_name'] = emp.firstName || '';
+                    variableValues['last_name'] = emp.lastName || '';
+                    variableValues['supervisor_name'] = emp.supervisor || '';
+                }
+            }
+            
+            panel.style.display = 'block';
+            inputs.innerHTML = vars.map(v => {
+                const val = variableValues[v] || '';
+                const isAuto = (v === 'first_name' || v === 'last_name') && selectedEmployeeIds.size > 1;
+                return `<div class="variable-input">
+                    <label>{{${v}}}</label>
+                    <input type="text" value="${escapeHtml(val)}" ${isAuto ? 'disabled placeholder="Auto per employee"' : ''} oninput="updateVariable('${v}', this.value)">
+                </div>`;
+            }).join('');
+        }
+        
+        function updateVariable(name, value) { variableValues[name] = value; updatePreview(); }
+        
+        function replaceVars(text, empOverride = null) {
+            return text.replace(/\{\{(\w+)\}\}/g, (match, v) => {
+                if (empOverride) {
+                    if (v === 'first_name') return empOverride.firstName || match;
+                    if (v === 'last_name') return empOverride.lastName || match;
+                    if (v === 'supervisor_name') return empOverride.supervisor || variableValues[v] || match;
+                }
+                return variableValues[v] || match;
+            });
+        }
+        
+        function updatePreview() {
+            const toEl = document.getElementById('previewTo');
+            const fromEl = document.getElementById('previewFrom');
+            const subjEl = document.getElementById('previewSubject');
+            const bodyEl = document.getElementById('previewBody');
+            
+            fromEl.textContent = settings.defaultAlias || 'hr@alice.care';
+            
+            if (testMode) {
+                toEl.textContent = (document.getElementById('testEmailAddress').value || 'test@example.com') + ' (Test)';
+            } else if (selectedEmployeeIds.size === 0) {
+                toEl.textContent = 'Select employee(s)';
+            } else if (selectedEmployeeIds.size === 1) {
+                const emp = employees.find(e => String(e.id) === [...selectedEmployeeIds][0]);
+                toEl.textContent = emp ? emp.email : 'Unknown';
+            } else {
+                toEl.textContent = selectedEmployeeIds.size + ' employees';
+            }
+            
+            if (selectedTemplate) {
+                const emp = selectedEmployeeIds.size === 1 ? employees.find(e => String(e.id) === [...selectedEmployeeIds][0]) : null;
+                subjEl.textContent = replaceVars(selectedTemplate.subject || '', emp);
+                // Render HTML content in preview
+                bodyEl.innerHTML = replaceVars(selectedTemplate.body || '', emp);
+            } else {
+                subjEl.textContent = 'Select a template';
+                bodyEl.innerHTML = 'Select employee(s) and a template to preview the email.';
+            }
+        }
+        
+        function checkCanSend() {
+            const can = selectedEmployeeIds.size > 0 && selectedTemplate;
+            document.getElementById('sendBtn').disabled = !can;
+            document.getElementById('sendBtnText').textContent = selectedEmployeeIds.size > 1 ? `Send to ${selectedEmployeeIds.size} Employees` : 'Send Email';
+        }
+        
+        function resetCompose() {
+            selectedEmployeeIds.clear();
+            selectedTemplate = null;
+            variableValues = {};
+            document.getElementById('employeeSearch').value = '';
+            document.getElementById('templateCategory').value = '';
+            document.getElementById('variablesPanel').style.display = 'none';
+            document.getElementById('recipientsDisplay').style.display = 'none';
+            renderEmployeeList();
+            renderTemplateList();
+            updatePreview();
+            checkCanSend();
+        }
+        
+        // ============================================
+        // TEST MODE
+        // ============================================
+        function toggleTestMode() {
+            testMode = !testMode;
+            document.getElementById('testModeToggle').classList.toggle('active', testMode);
+            document.getElementById('testModeBanner').style.display = testMode ? 'flex' : 'none';
+            document.getElementById('testSendBtn').style.display = testMode ? 'inline-flex' : 'none';
+            updatePreview();
+        }
+        
+        async function sendTestEmail() {
+            const testEmail = document.getElementById('testEmailAddress').value.trim();
+            if (!testEmail || !isValidEmail(testEmail)) { showToast('Enter valid test email', 'error'); return; }
+            if (!selectedTemplate) { showToast('Select a template', 'error'); return; }
+            
+            showLoading(true, 'Sending test...');
+            try {
+                const data = {
+                    action: 'sendEmail',
+                    employeeId: 'TEST',
+                    employeeName: 'Test User',
+                    employeeEmail: testEmail,
+                    templateId: selectedTemplate.id,
+                    templateName: '[TEST] ' + selectedTemplate.name,
+                    templateCategory: selectedTemplate.category,
+                    warningLevel: 0,
+                    subject: '[TEST] ' + replaceVars(selectedTemplate.subject || ''),
+                    body: replaceVars(selectedTemplate.body || ''),
+                    variables: { ...variableValues },
+                    sentFrom: settings.defaultAlias || 'hr@alice.care'
+                };
+                
+                const result = await apiCall(data, 'POST');
+                if (!result.success) throw new Error(result.error);
+                showToast('Test email sent!', 'success');
+            } catch (e) {
+                showToast('Failed: ' + e.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        async function sendEmails() {
+            if (selectedEmployeeIds.size === 0 || !selectedTemplate) return;
+            
+            const selected = employees.filter(e => selectedEmployeeIds.has(String(e.id)));
+            if (selected.length > 1 && !confirm(`Send to ${selected.length} employees?`)) return;
+            
+            showLoading(true, 'Sending...', `0 of ${selected.length}`);
+            let sent = 0, failed = 0;
+            
+            for (const emp of selected) {
+                try {
+                    const data = {
+                        action: 'sendEmail',
+                        employeeId: emp.id,
+                        employeeName: getFullName(emp),
+                        employeeEmail: emp.email,
+                        templateId: selectedTemplate.id,
+                        templateName: selectedTemplate.name,
+                        templateCategory: selectedTemplate.category,
+                        warningLevel: selectedTemplate.warningLevel || 0,
+                        subject: replaceVars(selectedTemplate.subject || '', emp),
+                        body: replaceVars(selectedTemplate.body || '', emp),
+                        variables: { ...variableValues, first_name: emp.firstName, last_name: emp.lastName },
+                        sentFrom: settings.defaultAlias || 'hr@alice.care'
+                    };
+                    
+                    const result = await apiCall(data, 'POST');
+                    if (result.success) {
+                        emailLogs.unshift({ ...data, id: result.data?.id, sentAt: new Date().toISOString() });
+                        sent++;
+                    } else {
+                        failed++;
+                    }
+                } catch (e) {
+                    failed++;
+                }
+                document.getElementById('loadingSubtext').textContent = `${sent} of ${selected.length}`;
+            }
+            
+            showLoading(false);
+            showToast(failed ? `${sent} sent, ${failed} failed` : `${sent} email(s) sent!`, failed ? 'warning' : 'success');
+            resetCompose();
+        }
+        
+        // ============================================
+        // TEMPLATES TAB
+        // ============================================
+        function renderTemplatesGrid() {
+            const container = document.getElementById('templatesGrid');
+            if (templates.length === 0) {
+                container.innerHTML = '<div class="empty-state"><h3>No Templates</h3><p>Click Add Template to create one</p></div>';
+                return;
+            }
+            
+            container.innerHTML = templates.map(t => {
+                // Strip HTML for preview text
+                const plainBody = (t.body || '').replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ');
+                const preview = plainBody.substring(0, 100) + (plainBody.length > 100 ? '...' : '');
+                const badge = parseInt(t.warningLevel) > 0 ? `<span class="badge badge-warning-${Math.min(parseInt(t.warningLevel), 3)}">${parseInt(t.warningLevel) >= 4 ? 'Final' : 'Level ' + t.warningLevel}</span>` : '';
+                return `<div class="card">
+                    <div class="card-header">
+                        <div><div class="card-title">${escapeHtml(t.name)}</div><div style="margin-top: 5px;"><span class="template-category">${t.category}</span> ${badge}</div></div>
+                        <div class="action-buttons">
+                            <button class="btn btn-small btn-outline" onclick="editTemplate('${t.id}')">Edit</button>
+                            <button class="btn btn-small btn-danger" onclick="deleteTemplate('${t.id}')">Delete</button>
+                        </div>
+                    </div>
+                    <div style="font-size: 13px;"><strong>Subject:</strong> ${escapeHtml(t.subject)}</div>
+                    <div style="color: #666; font-size: 13px; margin-top: 10px;">${escapeHtml(preview)}</div>
+                </div>`;
+            }).join('');
+        }
+        
+        function openTemplateModal(tplId = null) {
+            document.getElementById('templateModalTitle').textContent = tplId ? 'Edit Template' : 'Add Template';
+            document.getElementById('editTemplateId').value = tplId || '';
+            
+            // Reset HTML view if active
+            if (isHtmlView) {
+                toggleHtmlView();
+            }
+            
+            if (tplId) {
+                const t = templates.find(x => x.id === tplId);
+                if (t) {
+                    document.getElementById('tplName').value = t.name || '';
+                    document.getElementById('tplCategory').value = t.category || 'warning';
+                    document.getElementById('tplSubject').value = t.subject || '';
+                    // Convert plain text to HTML if needed (preserve line breaks)
+                    let bodyContent = t.body || '';
+                    if (!bodyContent.includes('<') && bodyContent.includes('\n')) {
+                        bodyContent = bodyContent.replace(/\n/g, '<br>');
+                    }
+                    setEditorContent(bodyContent);
+                    document.getElementById('tplWarningLevel').value = t.warningLevel || '0';
+                }
+            } else {
+                document.getElementById('tplName').value = '';
+                document.getElementById('tplCategory').value = 'warning';
+                document.getElementById('tplSubject').value = '';
+                setEditorContent('');
+                document.getElementById('tplWarningLevel').value = '0';
+            }
+            
+            // Reset custom variable input
+            document.getElementById('customVariableName').value = '';
+            
+            // Reset last focused field and set up listeners
+            lastFocusedField = document.getElementById('tplBody');
+            setupVariableInsertion();
+            
+            document.getElementById('templateModal').classList.add('active');
+            
+            // Focus body field by default for immediate variable insertion
+            setTimeout(() => { document.getElementById('tplBody').focus(); }, 100);
+        }
+        
+        function editTemplate(id) { openTemplateModal(id); }
+        
+        // Track last focused field for variable insertion
+        let lastFocusedField = null;
+        
+        function setupVariableInsertion() {
+            const subjectField = document.getElementById('tplSubject');
+            const bodyField = document.getElementById('tplBody');
+            const htmlSource = document.getElementById('tplBodyHtml');
+            
+            subjectField.addEventListener('focus', () => { lastFocusedField = subjectField; });
+            bodyField.addEventListener('focus', () => { lastFocusedField = bodyField; });
+            htmlSource.addEventListener('focus', () => { lastFocusedField = htmlSource; });
+        }
+        
+        function insertVariable(varName) {
+            const variable = `{{${varName}}}`;
+            insertTextAtCursor(variable);
+        }
+        
+        function insertCustomVariable() {
+            const input = document.getElementById('customVariableName');
+            const varName = input.value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_');
+            if (!varName) {
+                showToast('Enter a variable name', 'warning');
+                return;
+            }
+            insertVariable(varName);
+            input.value = '';
+        }
+        
+        function insertTextAtCursor(text) {
+            // Use last focused field, default to body
+            let field = lastFocusedField;
+            if (!field || (field.id !== 'tplSubject' && field.id !== 'tplBody' && field.id !== 'tplBodyHtml')) {
+                field = isHtmlView ? document.getElementById('tplBodyHtml') : document.getElementById('tplBody');
+            }
+            
+            // Focus the field
+            field.focus();
+            
+            // For contenteditable div (tplBody)
+            if (field.id === 'tplBody' && field.contentEditable === 'true') {
+                document.execCommand('insertText', false, text);
+            } else if (field.tagName === 'INPUT' || field.tagName === 'TEXTAREA') {
+                // For input/textarea (including HTML source)
+                const start = field.selectionStart;
+                const end = field.selectionEnd;
+                const value = field.value;
+                field.value = value.substring(0, start) + text + value.substring(end);
+                const newPos = start + text.length;
+                field.setSelectionRange(newPos, newPos);
+            }
+            
+            // Flash effect to show insertion
+            field.style.backgroundColor = '#FFF8E0';
+            setTimeout(() => { field.style.backgroundColor = ''; }, 200);
+            
+            showToast(`Inserted ${text}`, 'success');
+        }
+        
+        // ============================================
+        // RICH TEXT EDITOR FUNCTIONS
+        // ============================================
+        let isHtmlView = false;
+        
+        function formatText(command) {
+            const editor = document.getElementById('tplBody');
+            editor.focus();
+            document.execCommand(command, false, null);
+        }
+        
+        function insertLink() {
+            const url = prompt('Enter URL:', 'https://');
+            if (url) {
+                const editor = document.getElementById('tplBody');
+                editor.focus();
+                document.execCommand('createLink', false, url);
+            }
+        }
+        
+        function removeLink() {
+            const editor = document.getElementById('tplBody');
+            editor.focus();
+            document.execCommand('unlink', false, null);
+        }
+        
+        function applyTextColor(color) {
+            const editor = document.getElementById('tplBody');
+            editor.focus();
+            document.execCommand('foreColor', false, color);
+        }
+        
+        function applyHighlightColor(color) {
+            const editor = document.getElementById('tplBody');
+            editor.focus();
+            document.execCommand('hiliteColor', false, color);
+        }
+        
+        function applyHeading(tag) {
+            if (!tag) return;
+            const editor = document.getElementById('tplBody');
+            editor.focus();
+            document.execCommand('formatBlock', false, tag);
+        }
+        
+        function toggleHtmlView() {
+            const editor = document.getElementById('tplBody');
+            const htmlSource = document.getElementById('tplBodyHtml');
+            const toolbar = document.querySelector('.rte-toolbar');
+            
+            isHtmlView = !isHtmlView;
+            
+            if (isHtmlView) {
+                // Switch to HTML view
+                htmlSource.value = editor.innerHTML;
+                editor.style.display = 'none';
+                htmlSource.style.display = 'block';
+                // Disable toolbar buttons except HTML toggle
+                toolbar.querySelectorAll('.rte-btn:not(.rte-btn-text), .rte-select, .rte-color-label').forEach(btn => {
+                    btn.style.opacity = '0.5';
+                    btn.style.pointerEvents = 'none';
+                });
+            } else {
+                // Switch back to rich text view
+                editor.innerHTML = htmlSource.value;
+                htmlSource.style.display = 'none';
+                editor.style.display = 'block';
+                // Re-enable toolbar buttons
+                toolbar.querySelectorAll('.rte-btn:not(.rte-btn-text), .rte-select, .rte-color-label').forEach(btn => {
+                    btn.style.opacity = '1';
+                    btn.style.pointerEvents = 'auto';
+                });
+            }
+        }
+        
+        function getEditorContent() {
+            const editor = document.getElementById('tplBody');
+            const htmlSource = document.getElementById('tplBodyHtml');
+            
+            if (isHtmlView) {
+                return htmlSource.value;
+            }
+            return editor.innerHTML;
+        }
+        
+        function setEditorContent(html) {
+            const editor = document.getElementById('tplBody');
+            const htmlSource = document.getElementById('tplBodyHtml');
+            
+            editor.innerHTML = html || '';
+            htmlSource.value = html || '';
+        }
+        
+        async function saveTemplate() {
+            const id = document.getElementById('editTemplateId').value;
+            const name = document.getElementById('tplName').value.trim();
+            const category = document.getElementById('tplCategory').value;
+            const subject = document.getElementById('tplSubject').value.trim();
+            const body = getEditorContent().trim();
+            const warningLevel = parseInt(document.getElementById('tplWarningLevel').value);
+            
+            if (!name || !subject || !body) { showToast('Fill required fields', 'error'); return; }
+            
+            showLoading(true, 'Saving...');
+            try {
+                const data = { action: id ? 'updateTemplate' : 'addTemplate', id: id || undefined, name, category, subject, body, warningLevel };
+                const result = await apiCall(data, 'POST');
+                if (!result.success) throw new Error(result.error);
+                
+                if (id) {
+                    const idx = templates.findIndex(t => String(t.id) === String(id));
+                    if (idx !== -1) templates[idx] = { ...templates[idx], name, category, subject, body, warningLevel };
+                } else {
+                    templates.push({ id: result.data.id, name, category, subject, body, warningLevel });
+                }
+                
+                closeModal('templateModal');
+                renderTemplatesGrid();
+                showToast('Template saved!', 'success');
+            } catch (e) {
+                showToast('Failed: ' + e.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        async function deleteTemplate(id) {
+            if (!confirm('Delete template?')) return;
+            showLoading(true, 'Deleting...');
+            try {
+                const result = await apiCall({ action: 'deleteTemplate', id }, 'POST');
+                if (!result.success) throw new Error(result.error);
+                templates = templates.filter(t => t.id !== id);
+                renderTemplatesGrid();
+                showToast('Deleted', 'success');
+            } catch (e) {
+                showToast('Failed: ' + e.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // ============================================
+        // EMPLOYEES TAB
+        // ============================================
+        function renderEmployeeDirectory() {
+            const container = document.getElementById('employeeTableBody');
+            const search = (document.getElementById('employeeDirectorySearch')?.value || '').toLowerCase().trim();
+            
+            let filtered = employees;
+            if (search) {
+                filtered = employees.filter(e => {
+                    const name = getFullName(e).toLowerCase();
+                    return name.includes(search) || (e.email || '').toLowerCase().includes(search) || (e.department || '').toLowerCase().includes(search);
+                });
+            }
+            
+            if (filtered.length === 0) {
+                container.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 40px;">${employees.length ? 'No results' : 'No employees yet'}</td></tr>`;
+                return;
+            }
+            
+            container.innerHTML = filtered.map(emp => {
+                const level = getEmployeeWarningLevel(emp.id);
+                const lastEmail = getLastEmailDate(emp.id);
+                let badge = '<span class="badge badge-success">Clear</span>';
+                if (level === 1) badge = '<span class="badge badge-warning-1">Level 1</span>';
+                else if (level === 2) badge = '<span class="badge badge-warning-2">Level 2</span>';
+                else if (level === 3) badge = '<span class="badge badge-warning-3">Level 3</span>';
+                else if (level >= 4) badge = '<span class="badge badge-final">Final</span>';
+                
+                return `<tr>
+                    <td><div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="employee-avatar" style="width: 36px; height: 36px; font-size: 14px;">${getInitials(emp)}</div>
+                        <div><div style="font-weight: 600;">${escapeHtml(getFullName(emp))}</div><div style="font-size: 12px; color: #666;">${escapeHtml(emp.position || '')}</div></div>
+                    </div></td>
+                    <td>${escapeHtml(emp.email || 'N/A')}</td>
+                    <td>${escapeHtml(emp.department || 'N/A')}</td>
+                    <td>${badge}</td>
+                    <td>${lastEmail ? formatDate(lastEmail) : 'Never'}</td>
+                    <td><div class="action-buttons">
+                        <button class="btn btn-small btn-outline" onclick="editEmployee('${emp.id}')">Edit</button>
+                        <button class="btn btn-small btn-danger" onclick="deleteEmployee('${emp.id}')">Delete</button>
+                    </div></td>
+                </tr>`;
+            }).join('');
+        }
+        
+        function updateStats() {
+            const thirtyDaysAgo = new Date(); thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            const recentEmails = emailLogs.filter(l => new Date(l.sentAt) >= thirtyDaysAgo);
+            let warnings = 0, final = 0;
+            employees.forEach(e => {
+                const level = getEmployeeWarningLevel(e.id);
+                if (level > 0 && level < 4) warnings++;
+                if (level >= 4) final++;
+            });
+            
+            document.getElementById('statTotal').textContent = employees.length;
+            document.getElementById('statWarnings').textContent = warnings;
+            document.getElementById('statFinal').textContent = final;
+            document.getElementById('statEmails').textContent = recentEmails.length;
+        }
+        
+        function openEmployeeModal(empId = null) {
+            document.getElementById('employeeModalTitle').textContent = empId ? 'Edit Employee' : 'Add Employee';
+            document.getElementById('editEmployeeId').value = empId || '';
+            
+            // Clear fields first
+            document.getElementById('empFirstName').value = '';
+            document.getElementById('empLastName').value = '';
+            document.getElementById('empEmail').value = '';
+            document.getElementById('empDepartment').value = '';
+            document.getElementById('empPosition').value = '';
+            document.getElementById('empSupervisor').value = '';
+            
+            if (empId) {
+                // Convert to string for comparison (handles both number and string IDs)
+                const searchId = String(empId);
+                const emp = employees.find(e => String(e.id) === searchId);
+                console.log('Looking for employee ID:', empId, '(as string:', searchId, ')');
+                console.log('Found employee:', emp);
+                
+                if (emp) {
+                    // Handle both old structure (name) and new structure (firstName/lastName)
+                    let firstName = emp.firstName || '';
+                    let lastName = emp.lastName || '';
+                    
+                    // If using old 'name' field, try to split it
+                    if (!firstName && !lastName && emp.name) {
+                        const parts = String(emp.name).trim().split(/\s+/);
+                        firstName = parts[0] || '';
+                        lastName = parts.slice(1).join(' ') || '';
+                    }
+                    
+                    document.getElementById('empFirstName').value = firstName;
+                    document.getElementById('empLastName').value = lastName;
+                    document.getElementById('empEmail').value = emp.email || '';
+                    document.getElementById('empDepartment').value = emp.department || '';
+                    document.getElementById('empPosition').value = emp.position || '';
+                    document.getElementById('empSupervisor').value = emp.supervisor || '';
+                    
+                    console.log('Populated fields:', { firstName, lastName, email: emp.email, department: emp.department });
+                } else {
+                    console.error('Employee not found in local array!');
+                    console.log('Available IDs:', employees.map(e => e.id));
+                    showToast('Employee not found - try refreshing', 'error');
+                }
+            }
+            document.getElementById('employeeModal').classList.add('active');
+        }
+        
+        function editEmployee(id) { 
+            console.log('Edit button clicked for ID:', id);
+            openEmployeeModal(id); 
+        }
+        
+        async function saveEmployee() {
+            const id = document.getElementById('editEmployeeId').value;
+            const firstName = document.getElementById('empFirstName').value.trim();
+            const lastName = document.getElementById('empLastName').value.trim();
+            const email = document.getElementById('empEmail').value.trim();
+            const department = document.getElementById('empDepartment').value.trim();
+            const position = document.getElementById('empPosition').value.trim();
+            const supervisor = document.getElementById('empSupervisor').value.trim();
+            
+            if (!firstName || !lastName || !email) { showToast('First name, last name, and email required', 'error'); return; }
+            if (!isValidEmail(email)) { showToast('Invalid email', 'error'); return; }
+            
+            // Check for duplicate email - use String() for ID comparison, handle null emails
+            const dup = employees.find(e => e.email && e.email.toLowerCase() === email.toLowerCase() && String(e.id) !== String(id));
+            if (dup) { showToast('Email already exists for another employee', 'error'); return; }
+            
+            showLoading(true, 'Saving...');
+            try {
+                const data = { action: id ? 'updateEmployee' : 'addEmployee', id: id || undefined, firstName, lastName, email, department, position, supervisor };
+                const result = await apiCall(data, 'POST');
+                if (!result.success) throw new Error(result.error);
+                
+                if (id) {
+                    const idx = employees.findIndex(e => String(e.id) === String(id));
+                    if (idx !== -1) employees[idx] = { ...employees[idx], firstName, lastName, email, department, position, supervisor };
+                } else {
+                    employees.push({ id: result.data.id, firstName, lastName, email, department, position, supervisor });
+                }
+                
+                closeModal('employeeModal');
+                renderEmployeeDirectory();
+                updateStats();
+                showToast('Employee saved!', 'success');
+            } catch (e) {
+                showToast('Failed: ' + e.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        async function deleteEmployee(id) {
+            if (!confirm('Delete employee?')) return;
+            showLoading(true, 'Deleting...');
+            try {
+                const result = await apiCall({ action: 'deleteEmployee', id }, 'POST');
+                if (!result.success) throw new Error(result.error);
+                employees = employees.filter(e => e.id !== id);
+                renderEmployeeDirectory();
+                updateStats();
+                showToast('Deleted', 'success');
+            } catch (e) {
+                showToast('Failed: ' + e.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // ============================================
+        // LOGS TAB
+        // ============================================
+        function populateLogFilters() {
+            // Populate department filter
+            const deptSelect = document.getElementById('logDepartmentFilter');
+            const departments = [...new Set(employees.map(e => e.department).filter(Boolean))].sort();
+            deptSelect.innerHTML = '<option value="">All Departments</option>' + 
+                departments.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
+            
+            // Populate template filter
+            const tplSelect = document.getElementById('logTemplateFilter');
+            tplSelect.innerHTML = '<option value="">All Templates</option>' + 
+                templates.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
+        }
+        
+        function clearLogFilters() {
+            document.getElementById('logSearchInput').value = '';
+            document.getElementById('logDepartmentFilter').value = '';
+            document.getElementById('logTemplateFilter').value = '';
+            document.getElementById('logCategoryFilter').value = '';
+            document.getElementById('logDateFilter').value = '30';
+            renderLogs();
+        }
+        
+        function renderLogs() {
+            const container = document.getElementById('logsTableBody');
+            const searchInput = document.getElementById('logSearchInput').value.toLowerCase().trim();
+            const deptFilter = document.getElementById('logDepartmentFilter').value;
+            const tplFilter = document.getElementById('logTemplateFilter').value;
+            const catFilter = document.getElementById('logCategoryFilter').value;
+            const dateFilter = document.getElementById('logDateFilter').value;
+            
+            let filtered = emailLogs;
+            
+            // Search filter (name or email)
+            if (searchInput) {
+                filtered = filtered.filter(l => {
+                    const name = (l.employeeName || '').toLowerCase();
+                    const email = (l.employeeEmail || '').toLowerCase();
+                    return name.includes(searchInput) || email.includes(searchInput);
+                });
+            }
+            
+            // Department filter
+            if (deptFilter) {
+                filtered = filtered.filter(l => {
+                    const emp = employees.find(e => String(e.id) === String(l.employeeId));
+                    return emp && emp.department === deptFilter;
+                });
+            }
+            
+            // Template filter
+            if (tplFilter) filtered = filtered.filter(l => String(l.templateId) === String(tplFilter));
+            
+            // Category filter
+            if (catFilter) filtered = filtered.filter(l => l.templateCategory === catFilter);
+            
+            // Date filter
+            if (dateFilter !== 'all') {
+                const days = parseInt(dateFilter);
+                const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - days);
+                filtered = filtered.filter(l => new Date(l.sentAt) >= cutoff);
+            }
+            
+            // Sort by date descending
+            filtered.sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt));
+            
+            // Update results count
+            const countEl = document.getElementById('logResultsCount');
+            countEl.innerHTML = `<strong>${filtered.length}</strong> email${filtered.length !== 1 ? 's' : ''} found`;
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #666;">No emails match your filters</td></tr>';
+                return;
+            }
+            
+            container.innerHTML = filtered.map(log => {
+                const emp = employees.find(e => String(e.id) === String(log.employeeId));
+                const dept = emp?.department || '-';
+                return `<tr>
+                    <td>${formatDateTime(log.sentAt)}</td>
+                    <td><div style="font-weight: 600;">${escapeHtml(log.employeeName)}</div><div style="font-size: 12px; color: #666;">${escapeHtml(log.employeeEmail)}</div></td>
+                    <td>${escapeHtml(dept)}</td>
+                    <td><span class="template-category">${log.templateCategory || ''}</span> ${escapeHtml(log.templateName)}</td>
+                    <td style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(log.subject)}</td>
+                    <td><button class="btn btn-small btn-outline" onclick="viewLog('${log.id}')">View</button></td>
+                </tr>`;
+            }).join('');
+        }
+        
+        function viewLog(logId) {
+            viewingLogId = logId;
+            const log = emailLogs.find(l => l.id === logId);
+            if (!log) return;
+            
+            document.getElementById('logModalContent').innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                    <div><label style="font-size: 11px; color: #666; text-transform: uppercase;">To</label><p style="font-weight: 600;">${escapeHtml(log.employeeName)}</p><p style="font-size: 13px; color: #666;">${escapeHtml(log.employeeEmail)}</p></div>
+                    <div><label style="font-size: 11px; color: #666; text-transform: uppercase;">From</label><p>${escapeHtml(log.sentFrom)}</p></div>
+                    <div><label style="font-size: 11px; color: #666; text-transform: uppercase;">Date</label><p>${formatDateTime(log.sentAt)}</p></div>
+                    <div><label style="font-size: 11px; color: #666; text-transform: uppercase;">Template</label><p>${escapeHtml(log.templateName)}</p></div>
+                </div>
+                <div class="preview-panel">
+                    <div class="preview-header">Email Content</div>
+                    <div class="preview-content">
+                        <div class="preview-subject">Subject: ${escapeHtml(log.subject)}</div>
+                        <div class="preview-body" style="max-height: 300px; overflow-y: auto;">${log.body}</div>
+                    </div>
+                </div>`;
+            document.getElementById('logModal').classList.add('active');
+        }
+        
+        function resendFromLog() {
+            const log = emailLogs.find(l => l.id === viewingLogId);
+            if (!log) return;
+            
+            const emp = employees.find(e => String(e.id) === String(log.employeeId));
+            const tpl = templates.find(t => t.id === log.templateId);
+            
+            if (emp) { selectedEmployeeIds.clear(); selectedEmployeeIds.add(String(emp.id)); }
+            if (tpl) selectedTemplate = tpl;
+            variableValues = log.variables || {};
+            
+            closeModal('logModal');
+            showTab('compose');
+            renderEmployeeList();
+            renderTemplateList();
+            extractVariables();
+            updateRecipientsDisplay();
+            updatePreview();
+            checkCanSend();
+            showToast('Loaded for resending', 'info');
+        }
+        
+        // ============================================
+        // SETTINGS TAB
+        // ============================================
+        function renderAliases() {
+            const container = document.getElementById('aliasesList');
+            const select = document.getElementById('defaultAlias');
+            
+            if (aliases.length === 0) {
+                container.innerHTML = '<p style="color: #666;">No aliases</p>';
+            } else {
+                container.innerHTML = aliases.map(a => `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #E5ECF3;">
+                        <div><div style="font-weight: 600;">${escapeHtml(a.name)}</div><div style="font-size: 13px; color: #666;">${escapeHtml(a.email)}</div></div>
+                        <button class="btn btn-small btn-danger" onclick="deleteAlias('${a.id}')">Delete</button>
+                    </div>`).join('');
+            }
+            
+            select.innerHTML = aliases.map(a => `<option value="${a.email}" ${settings.defaultAlias === a.email ? 'selected' : ''}>${escapeHtml(a.name)} (${escapeHtml(a.email)})</option>`).join('');
+        }
+        
+        function openAliasModal() {
+            document.getElementById('aliasName').value = '';
+            document.getElementById('aliasEmail').value = '';
+            document.getElementById('aliasModal').classList.add('active');
+        }
+        
+        async function saveAlias() {
+            const name = document.getElementById('aliasName').value.trim();
+            const email = document.getElementById('aliasEmail').value.trim();
+            if (!name || !email || !isValidEmail(email)) { showToast('Valid name and email required', 'error'); return; }
+            if (aliases.find(a => a.email && a.email.toLowerCase() === email.toLowerCase())) { showToast('Alias exists', 'error'); return; }
+            
+            showLoading(true, 'Saving...');
+            try {
+                const result = await apiCall({ action: 'addAlias', name, email }, 'POST');
+                if (!result.success) throw new Error(result.error);
+                aliases.push({ id: result.data.id, name, email });
+                closeModal('aliasModal');
+                renderAliases();
+                showToast('Alias added!', 'success');
+            } catch (e) {
+                showToast('Failed: ' + e.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        async function deleteAlias(id) {
+            if (!confirm('Delete alias?')) return;
+            showLoading(true, 'Deleting...');
+            try {
+                const result = await apiCall({ action: 'deleteAlias', id }, 'POST');
+                if (!result.success) throw new Error(result.error);
+                aliases = aliases.filter(a => a.id !== id);
+                renderAliases();
+                showToast('Deleted', 'success');
+            } catch (e) {
+                showToast('Failed: ' + e.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        async function saveDefaultAlias() {
+            const value = document.getElementById('defaultAlias').value;
+            showLoading(true, 'Saving...');
+            try {
+                const result = await apiCall({ action: 'updateSetting', key: 'defaultAlias', value }, 'POST');
+                if (!result.success) throw new Error(result.error);
+                settings.defaultAlias = value;
+                showToast('Saved', 'success');
+            } catch (e) {
+                showToast('Failed: ' + e.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // ============================================
+        // DATA MANAGEMENT
+        // ============================================
+        function exportData() {
+            const data = { employees, templates, logs: emailLogs, aliases, settings, exportedAt: new Date().toISOString() };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `alicecare-export-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            showToast('Exported!', 'success');
+        }
+        
+        async function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (!confirm('Replace all data?')) return;
+                    showLoading(true, 'Importing...');
+                    const result = await apiCall({ action: 'importData', ...data }, 'POST');
+                    if (!result.success) throw new Error(result.error);
+                    await loadAllData();
+                    showToast('Imported!', 'success');
+                } catch (e) {
+                    showToast('Failed: ' + e.message, 'error');
+                } finally {
+                    showLoading(false);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+        
+        async function confirmClearData() {
+            if (!confirm('Clear ALL data?')) return;
+            if (!confirm('Are you sure?')) return;
+            showLoading(true, 'Clearing...');
+            try {
+                const result = await apiCall({ action: 'clearAllData' }, 'POST');
+                if (!result.success) throw new Error(result.error);
+                await loadAllData();
+                showToast('Data cleared', 'success');
+            } catch (e) {
+                showToast('Failed: ' + e.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // Init
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
