@@ -702,7 +702,10 @@
                                     <p id="connectedUrl" style="word-break: break-all; font-size: 11px;"></p>
                                 </div>
                             </div>
-                            <button class="btn btn-danger btn-small" onclick="disconnectSheet()">Disconnect</button>
+                            <div class="action-buttons">
+                                <button class="btn btn-outline btn-small" onclick="showChangeUrlModal()">Change URL</button>
+                                <button class="btn btn-danger btn-small" onclick="disconnectSheet()">Reset Connection</button>
+                            </div>
                         </div>
                         
                         <h3 class="section-title" style="margin-top: 25px;">Email Aliases</h3>
@@ -1236,16 +1239,24 @@ Write your email content here..."></div>
         // ============================================
         // INIT & CONNECTION
         // ============================================
+        
+        // Default Web App URL - change this to your deployed Google Apps Script URL
+        const DEFAULT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzPAaZv4xOUiUIP_OV1PZuDPDSMJIM965pRNaw2jVc3iaXuj9dwiW800qABEj-_i3uZxA/exec';
+        
         async function init() {
-            WEB_APP_URL = localStorage.getItem(STORAGE_KEY) || '';
-            if (!WEB_APP_URL) {
-                document.getElementById('setupScreen').style.display = 'block';
-                document.getElementById('mainApp').style.display = 'none';
-                return;
-            }
+            // Use saved URL or default
+            WEB_APP_URL = localStorage.getItem(STORAGE_KEY) || DEFAULT_WEB_APP_URL;
+            
+            // Always go to main app (no setup screen)
             document.getElementById('setupScreen').style.display = 'none';
             document.getElementById('mainApp').style.display = 'block';
             document.getElementById('connectedUrl').textContent = WEB_APP_URL;
+            
+            // Save the URL if not already saved
+            if (!localStorage.getItem(STORAGE_KEY) && WEB_APP_URL) {
+                localStorage.setItem(STORAGE_KEY, WEB_APP_URL);
+            }
+            
             await loadAllData();
             setupEventListeners();
         }
@@ -1304,9 +1315,31 @@ Write your email content here..."></div>
         }
         
         function disconnectSheet() {
-            if (!confirm('Disconnect from Google Sheet?')) return;
+            if (!confirm('Reset connection? This will clear your saved URL and reload the page.')) return;
             localStorage.removeItem(STORAGE_KEY);
             location.reload();
+        }
+        
+        function showChangeUrlModal() {
+            const currentUrl = WEB_APP_URL || '';
+            const newUrl = prompt('Enter Google Apps Script Web App URL:', currentUrl);
+            
+            if (newUrl === null) return; // Cancelled
+            
+            if (!newUrl || !newUrl.startsWith('https://script.google.com/')) {
+                showToast('Please enter a valid Google Apps Script URL', 'error');
+                return;
+            }
+            
+            if (newUrl === currentUrl) {
+                showToast('URL unchanged', 'info');
+                return;
+            }
+            
+            // Save and reload
+            localStorage.setItem(STORAGE_KEY, newUrl);
+            showToast('URL updated! Reloading...', 'success');
+            setTimeout(() => location.reload(), 1000);
         }
         
         async function loadAllData() {
