@@ -84,6 +84,27 @@
         .badge-success { background: #D4EDDA; color: #155724; }
         .badge-info { background: #D1ECF1; color: #0C5460; }
         
+        /* Date Status Styles */
+        .date-cell { font-size: 13px; white-space: nowrap; }
+        .date-status { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; }
+        .date-status.ok { background: #D4EDDA; color: #155724; }
+        .date-status.warning { background: #FFF3CD; color: #856404; }
+        .date-status.urgent { background: #FFE0B2; color: #E65100; }
+        .date-status.overdue { background: #F8D7DA; color: #721C24; }
+        .date-status.na { background: #F9FAFB; color: #999; }
+        .date-status svg { width: 14px; height: 14px; }
+        .date-sub { font-size: 10px; color: #666; margin-top: 2px; }
+        
+        /* HCA Tracker Integration Styles */
+        .hca-mismatch { background: #FFF3CD !important; }
+        .hca-mismatch .employee-name { color: #856404; position: relative; }
+        .hca-mismatch .employee-name::after { content: '⚠'; margin-left: 6px; font-size: 12px; }
+        .hca-link { cursor: pointer; text-decoration: none; }
+        .hca-link:hover { text-decoration: underline; }
+        .hca-sync-info { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #666; }
+        .hca-sync-info svg { width: 14px; height: 14px; color: #28A745; }
+        .hca-sync-info.stale svg { color: #F57600; }
+        
         /* Employee Card with Checkbox */
         .employee-card { background: white; border: 2px solid #E5ECF3; border-radius: 12px; padding: 15px; margin-bottom: 10px; transition: all 0.3s; cursor: pointer; user-select: none; }
         .employee-card:hover { border-color: #F57600; background: #FFFAF5; }
@@ -538,7 +559,7 @@
                                     </div>
                                     <div class="email-preview-meta">
                                         <div class="preview-meta-row"><span class="preview-meta-label">To:</span><span class="preview-meta-value" id="previewTo">Select employee(s)</span></div>
-                                        <div class="preview-meta-row"><span class="preview-meta-label">From:</span><span class="preview-meta-value" id="previewFrom">hr@alice.care</span></div>
+                                        <div class="preview-meta-row"><span class="preview-meta-label">From:</span><span class="preview-meta-value" id="previewFrom"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="71190331101d1812145f12100314">[email&#160;protected]</a></span></div>
                                         <div class="preview-meta-row"><span class="preview-meta-label">Subject:</span><span class="preview-meta-value" id="previewSubject">Select a template</span></div>
                                     </div>
                                     <div class="email-preview-body" id="previewBody">Select employee(s) and a template to preview the email.</div>
@@ -596,10 +617,20 @@
             <div class="tab-content" id="tab-employees">
                 <div class="card-header" style="margin-bottom: 20px;">
                     <h3 class="section-title" style="margin: 0;">Employee Directory</h3>
-                    <button class="btn btn-primary" onclick="openEmployeeModal()">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                        Add Employee
-                    </button>
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <div class="hca-sync-info" id="hcaSyncInfo" style="display: none;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span id="hcaSyncStatus">HCA synced</span>
+                        </div>
+                        <button class="btn btn-outline btn-small" onclick="syncHCAData()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>
+                            Sync HCA
+                        </button>
+                        <button class="btn btn-primary" onclick="openEmployeeModal()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Add Employee
+                        </button>
+                    </div>
                 </div>
                 <div class="stats-row">
                     <div class="stat-card"><div class="stat-value" id="statTotal">0</div><div class="stat-label">Total Employees</div></div>
@@ -613,7 +644,7 @@
                 </div>
                 <div style="overflow-x: auto;">
                     <table class="data-table">
-                        <thead><tr><th>Employee</th><th>Email</th><th>Department</th><th>Warning Level</th><th>Last Email</th><th>Actions</th></tr></thead>
+                        <thead><tr><th>Employee</th><th>Email</th><th>Warning Level</th><th>HCA Expiration</th><th>TB Date</th><th>Training</th><th>Actions</th></tr></thead>
                         <tbody id="employeeTableBody"></tbody>
                     </table>
                 </div>
@@ -702,7 +733,10 @@
                                     <p id="connectedUrl" style="word-break: break-all; font-size: 11px;"></p>
                                 </div>
                             </div>
-                            <button class="btn btn-danger btn-small" onclick="disconnectSheet()">Disconnect</button>
+                            <div class="action-buttons">
+                                <button class="btn btn-outline btn-small" onclick="showChangeUrlModal()">Change URL</button>
+                                <button class="btn btn-danger btn-small" onclick="disconnectSheet()">Reset Connection</button>
+                            </div>
                         </div>
                         
                         <h3 class="section-title" style="margin-top: 25px;">Email Aliases</h3>
@@ -759,7 +793,7 @@
                     
                     <div class="automation-info">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                        <p>Automated emails are sent daily to <strong>active employees only</strong>. Set up triggers to automatically send emails based on important dates. You must run the automation manually or set up a daily trigger in Google Apps Script.</p>
+                        <p>Automated emails are sent daily to <strong>active employees only</strong>. The "days before due" settings also control the <strong>color warning thresholds</strong> in the Employee Directory table. You must run the automation manually or set up a daily trigger in Google Apps Script.</p>
                     </div>
                     
                     <div class="automation-triggers">
@@ -1107,7 +1141,7 @@ Write your email content here..."></div>
         </div>
     </div>
 
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // ============================================
         // STATE
         // ============================================
@@ -1123,6 +1157,12 @@ Write your email content here..."></div>
         let variableValues = {};
         let testMode = false;
         let viewingLogId = null;
+        
+        // HCA Tracker Integration
+        const HCA_TRACKER_SHEET_ID = '1m5Pr9aYo314GJ-rPX9wVha-wClXMXwaHOBks0ZU4Amg';
+        const HCA_TRACKER_URL = `https://docs.google.com/spreadsheets/d/${HCA_TRACKER_SHEET_ID}/edit`;
+        let hcaTrackerData = []; // Stores { firstName, lastName, expirationDate } from HCA Tracker
+        let hcaLastSync = null;
         
         // ============================================
         // HELPERS
@@ -1236,16 +1276,24 @@ Write your email content here..."></div>
         // ============================================
         // INIT & CONNECTION
         // ============================================
+        
+        // Default Web App URL - change this to your deployed Google Apps Script URL
+        const DEFAULT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzPAaZv4xOUiUIP_OV1PZuDPDSMJIM965pRNaw2jVc3iaXuj9dwiW800qABEj-_i3uZxA/exec';
+        
         async function init() {
-            WEB_APP_URL = localStorage.getItem(STORAGE_KEY) || '';
-            if (!WEB_APP_URL) {
-                document.getElementById('setupScreen').style.display = 'block';
-                document.getElementById('mainApp').style.display = 'none';
-                return;
-            }
+            // Use saved URL or default
+            WEB_APP_URL = localStorage.getItem(STORAGE_KEY) || DEFAULT_WEB_APP_URL;
+            
+            // Always go to main app (no setup screen)
             document.getElementById('setupScreen').style.display = 'none';
             document.getElementById('mainApp').style.display = 'block';
             document.getElementById('connectedUrl').textContent = WEB_APP_URL;
+            
+            // Save the URL if not already saved
+            if (!localStorage.getItem(STORAGE_KEY) && WEB_APP_URL) {
+                localStorage.setItem(STORAGE_KEY, WEB_APP_URL);
+            }
+            
             await loadAllData();
             setupEventListeners();
         }
@@ -1304,9 +1352,31 @@ Write your email content here..."></div>
         }
         
         function disconnectSheet() {
-            if (!confirm('Disconnect from Google Sheet?')) return;
+            if (!confirm('Reset connection? This will clear your saved URL and reload the page.')) return;
             localStorage.removeItem(STORAGE_KEY);
             location.reload();
+        }
+        
+        function showChangeUrlModal() {
+            const currentUrl = WEB_APP_URL || '';
+            const newUrl = prompt('Enter Google Apps Script Web App URL:', currentUrl);
+            
+            if (newUrl === null) return; // Cancelled
+            
+            if (!newUrl || !newUrl.startsWith('https://script.google.com/')) {
+                showToast('Please enter a valid Google Apps Script URL', 'error');
+                return;
+            }
+            
+            if (newUrl === currentUrl) {
+                showToast('URL unchanged', 'info');
+                return;
+            }
+            
+            // Save and reload
+            localStorage.setItem(STORAGE_KEY, newUrl);
+            showToast('URL updated! Reloading...', 'success');
+            setTimeout(() => location.reload(), 1000);
         }
         
         async function loadAllData() {
@@ -1987,9 +2057,93 @@ Write your email content here..."></div>
         // ============================================
         // EMPLOYEES TAB
         // ============================================
+        
+        // Helper: Calculate date status for compliance dates
+        function getDateStatus(dateStr, yearsValid, warningDays) {
+            if (!dateStr) return { status: 'na', label: 'N/A', daysLeft: null, dueDate: null };
+            
+            try {
+                const date = new Date(dateStr);
+                if (isNaN(date.getTime())) return { status: 'na', label: 'Invalid', daysLeft: null, dueDate: null };
+                
+                const dueDate = new Date(date);
+                dueDate.setFullYear(dueDate.getFullYear() + yearsValid);
+                
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                dueDate.setHours(0, 0, 0, 0);
+                
+                const daysLeft = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+                
+                let status = 'ok';
+                if (daysLeft < 0) {
+                    status = 'overdue';
+                } else if (daysLeft <= Math.floor(warningDays / 2)) {
+                    status = 'urgent';
+                } else if (daysLeft <= warningDays) {
+                    status = 'warning';
+                }
+                
+                return { 
+                    status, 
+                    daysLeft, 
+                    dueDate,
+                    label: daysLeft < 0 ? `${Math.abs(daysLeft)}d overdue` : 
+                           daysLeft === 0 ? 'Due today' :
+                           daysLeft <= warningDays ? `${daysLeft}d left` : ''
+                };
+            } catch (e) {
+                return { status: 'na', label: 'Error', daysLeft: null, dueDate: null };
+            }
+        }
+        
+        // Helper: Format date for display
+        function formatDateShort(date) {
+            if (!date) return '';
+            const d = date instanceof Date ? date : new Date(date);
+            if (isNaN(d.getTime())) return '';
+            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+        
+        // Helper: Get icon SVG for date status
+        function getStatusIcon(status) {
+            if (status === 'ok') return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
+            if (status === 'warning') return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+            if (status === 'urgent') return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+            if (status === 'overdue') return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+            return '';
+        }
+        
+        // Helper: Render date cell with status
+        function renderDateCell(dateStr, yearsValid, warningDays, showExpiration = false) {
+            const statusInfo = getDateStatus(dateStr, yearsValid, warningDays);
+            
+            if (statusInfo.status === 'na') {
+                return '<span class="date-status na">N/A</span>';
+            }
+            
+            const displayDate = showExpiration && statusInfo.dueDate ? 
+                formatDateShort(statusInfo.dueDate) : 
+                formatDateShort(dateStr);
+            
+            const icon = getStatusIcon(statusInfo.status);
+            const labelHtml = statusInfo.label ? `<div class="date-sub">${statusInfo.label}</div>` : '';
+            
+            return `<div class="date-cell">
+                <span class="date-status ${statusInfo.status}">${icon}${displayDate}</span>
+                ${labelHtml}
+            </div>`;
+        }
+        
         function renderEmployeeDirectory() {
             const container = document.getElementById('employeeTableBody');
             const search = (document.getElementById('employeeDirectorySearch')?.value || '').toLowerCase().trim();
+            
+            // Get warning day thresholds from automation settings (with safe defaults if not yet loaded)
+            const autoSettings = typeof automationSettings !== 'undefined' ? automationSettings : {};
+            const hcaDays = autoSettings.hcaReminder?.daysBefore || 60;
+            const tbDays = autoSettings.tbReminder?.daysBefore || 30;
+            const trainingDays = autoSettings.trainingReminder?.daysBefore || 30;
             
             let filtered = employees;
             if (search) {
@@ -2000,34 +2154,180 @@ Write your email content here..."></div>
             }
             
             if (filtered.length === 0) {
-                container.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 40px;">${employees.length ? 'No results' : 'No employees yet'}</td></tr>`;
+                container.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;">${employees.length ? 'No results' : 'No employees yet'}</td></tr>`;
                 return;
             }
             
             container.innerHTML = filtered.map(emp => {
                 const level = getEmployeeWarningLevel(emp.id);
-                const lastEmail = getLastEmailDate(emp.id);
                 let badge = '<span class="badge badge-success">Clear</span>';
                 if (level === 1) badge = '<span class="badge badge-warning-1">Level 1</span>';
                 else if (level === 2) badge = '<span class="badge badge-warning-2">Level 2</span>';
                 else if (level === 3) badge = '<span class="badge badge-warning-3">Level 3</span>';
                 else if (level >= 4) badge = '<span class="badge badge-final">Final</span>';
                 
-                return `<tr>
+                // Look up HCA data from HCA Tracker
+                const hcaMatch = findHCATrackerMatch(emp.firstName, emp.lastName);
+                const hasHCASync = hcaTrackerData.length > 0;
+                const hcaMismatch = hasHCASync && !hcaMatch;
+                
+                // Use HCA Tracker expiration if available, otherwise use local hcaDate
+                // Note: HCA Tracker stores expiration directly, local hcaDate needs +2 years
+                let hcaCell;
+                if (hcaMatch && hcaMatch.expirationDate) {
+                    // HCA Tracker provides expiration date directly
+                    hcaCell = renderHCADateCell(hcaMatch.expirationDate, hcaDays);
+                } else if (emp.hcaDate) {
+                    // Fallback to local date (add 2 years for expiration)
+                    hcaCell = renderDateCell(emp.hcaDate, 2, hcaDays, true);
+                } else {
+                    hcaCell = '<span class="date-status na">N/A</span>';
+                }
+                
+                // TB: Shows date taken, warns when approaching 2-year renewal
+                const tbCell = renderDateCell(emp.tbDate, 2, tbDays, false);
+                
+                // Training: Shows last training, warns when approaching 1-year renewal
+                const trainingCell = renderDateCell(emp.trainingDate, 1, trainingDays, false);
+                
+                // Row class for mismatch highlighting
+                const rowClass = hcaMismatch ? 'hca-mismatch' : '';
+                const nameClass = hcaMismatch ? 'employee-name' : '';
+                const mismatchTitle = hcaMismatch ? 'title="Not found in HCA Tracker - verify name spelling"' : '';
+                
+                return `<tr class="${rowClass}">
                     <td><div style="display: flex; align-items: center; gap: 10px;">
                         <div class="employee-avatar" style="width: 36px; height: 36px; font-size: 14px;">${getInitials(emp)}</div>
-                        <div><div style="font-weight: 600;">${escapeHtml(getFullName(emp))}</div><div style="font-size: 12px; color: #666;">${escapeHtml(emp.position || '')}</div></div>
+                        <div><div style="font-weight: 600;" class="${nameClass}" ${mismatchTitle}>${escapeHtml(getFullName(emp))}</div><div style="font-size: 12px; color: #666;">${escapeHtml(emp.position || emp.department || '')}</div></div>
                     </div></td>
                     <td>${escapeHtml(emp.email || 'N/A')}</td>
-                    <td>${escapeHtml(emp.department || 'N/A')}</td>
                     <td>${badge}</td>
-                    <td>${lastEmail ? formatDate(lastEmail) : 'Never'}</td>
+                    <td>${hcaCell}</td>
+                    <td>${tbCell}</td>
+                    <td>${trainingCell}</td>
                     <td><div class="action-buttons">
                         <button class="btn btn-small btn-outline" onclick="editEmployee('${emp.id}')">Edit</button>
                         <button class="btn btn-small btn-danger" onclick="deleteEmployee('${emp.id}')">Delete</button>
                     </div></td>
                 </tr>`;
             }).join('');
+            
+            // Update HCA sync status indicator
+            updateHCASyncStatus();
+        }
+        
+        // Helper: Find matching HCA Tracker entry by name
+        function findHCATrackerMatch(firstName, lastName) {
+            if (!hcaTrackerData.length) return null;
+            
+            const empFirst = (firstName || '').toLowerCase().trim();
+            const empLast = (lastName || '').toLowerCase().trim();
+            
+            return hcaTrackerData.find(hca => {
+                const hcaFirst = (hca.firstName || '').toLowerCase().trim();
+                const hcaLast = (hca.lastName || '').toLowerCase().trim();
+                return hcaFirst === empFirst && hcaLast === empLast;
+            });
+        }
+        
+        // Helper: Render HCA date cell with direct expiration date (from HCA Tracker)
+        function renderHCADateCell(expirationDateStr, warningDays) {
+            if (!expirationDateStr) return '<span class="date-status na">N/A</span>';
+            
+            try {
+                const expDate = new Date(expirationDateStr);
+                if (isNaN(expDate.getTime())) return '<span class="date-status na">Invalid</span>';
+                
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                expDate.setHours(0, 0, 0, 0);
+                
+                const daysLeft = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+                
+                let status = 'ok';
+                if (daysLeft < 0) {
+                    status = 'overdue';
+                } else if (daysLeft <= Math.floor(warningDays / 2)) {
+                    status = 'urgent';
+                } else if (daysLeft <= warningDays) {
+                    status = 'warning';
+                }
+                
+                const label = daysLeft < 0 ? `${Math.abs(daysLeft)}d overdue` : 
+                              daysLeft === 0 ? 'Due today' :
+                              daysLeft <= warningDays ? `${daysLeft}d left` : '';
+                
+                const icon = getStatusIcon(status);
+                const displayDate = formatDateShort(expDate);
+                const labelHtml = label ? `<div class="date-sub">${label}</div>` : '';
+                
+                return `<div class="date-cell">
+                    <a href="${HCA_TRACKER_URL}" target="_blank" class="hca-link date-status ${status}" title="Click to open HCA Tracker">${icon}${displayDate}</a>
+                    ${labelHtml}
+                </div>`;
+            } catch (e) {
+                return '<span class="date-status na">Error</span>';
+            }
+        }
+        
+        // Update HCA sync status indicator
+        function updateHCASyncStatus() {
+            const infoEl = document.getElementById('hcaSyncInfo');
+            const statusEl = document.getElementById('hcaSyncStatus');
+            
+            if (!infoEl || !statusEl) return;
+            
+            if (hcaTrackerData.length > 0 && hcaLastSync) {
+                infoEl.style.display = 'flex';
+                const mismatchCount = countHCAMismatches();
+                if (mismatchCount > 0) {
+                    statusEl.textContent = `${mismatchCount} name mismatch${mismatchCount > 1 ? 'es' : ''}`;
+                    infoEl.classList.add('stale');
+                } else {
+                    statusEl.textContent = `HCA synced (${hcaTrackerData.length})`;
+                    infoEl.classList.remove('stale');
+                }
+            } else {
+                infoEl.style.display = 'none';
+            }
+        }
+        
+        // Count employees not found in HCA Tracker
+        function countHCAMismatches() {
+            if (!hcaTrackerData.length) return 0;
+            return employees.filter(emp => !findHCATrackerMatch(emp.firstName, emp.lastName)).length;
+        }
+        
+        // Sync HCA data from HCA Tracker Google Sheet
+        async function syncHCAData() {
+            showLoading(true, 'Syncing HCA data...', 'Fetching from HCA Tracker');
+            
+            try {
+                const result = await apiCall({ action: 'getHCATrackerData' }, 'POST');
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'Failed to fetch HCA data');
+                }
+                
+                hcaTrackerData = result.data || [];
+                hcaLastSync = new Date();
+                
+                // Re-render the employee directory with HCA data
+                renderEmployeeDirectory();
+                
+                const mismatchCount = countHCAMismatches();
+                if (mismatchCount > 0) {
+                    showToast(`HCA synced: ${hcaTrackerData.length} records. ${mismatchCount} employee${mismatchCount > 1 ? 's' : ''} not found in HCA Tracker.`, 'warning');
+                } else {
+                    showToast(`HCA synced: ${hcaTrackerData.length} records`, 'success');
+                }
+                
+            } catch (e) {
+                console.error('HCA Sync error:', e);
+                showToast('HCA sync failed: ' + e.message, 'error');
+            } finally {
+                showLoading(false);
+            }
         }
         
         function updateStats() {
@@ -2473,6 +2773,11 @@ Write your email content here..."></div>
             } else {
                 statusEl.innerHTML = `<span class="status-dot"></span><span>Configure triggers below</span>`;
                 statusEl.classList.remove('active');
+            }
+            
+            // Refresh employee table to update date colors based on new thresholds
+            if (document.getElementById('employeeTableBody')) {
+                renderEmployeeDirectory();
             }
         }
         
