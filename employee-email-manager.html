@@ -1356,9 +1356,16 @@ Write your email content here..."></div>
                             .trim();
                     }
                     
+                    // Also compress bodyChunk for chunked uploads
+                    if (params.bodyChunk && typeof params.bodyChunk === 'string') {
+                        params.bodyChunk = params.bodyChunk
+                            .replace(/\r\n/g, '\n')
+                            .replace(/\s{2,}/g, ' ');
+                    }
+                    
                     // Send data as base64 encoded JSON to handle special characters
                     const jsonData = JSON.stringify(params);
-                    const encodedData = btoa(unescape(encodeURIComponent(jsonData)));
+                    const encodedData = utf8ToBase64(jsonData);
                     
                     url.searchParams.append('postData', encodedData);
                     url.searchParams.append('method', 'POST');
@@ -1377,6 +1384,23 @@ Write your email content here..."></div>
                 document.body.appendChild(script);
                 script.onload = () => script.remove();
             });
+        }
+        
+        // Safe UTF-8 to Base64 encoding (handles Unicode properly)
+        function utf8ToBase64(str) {
+            try {
+                // Use TextEncoder for proper UTF-8 encoding
+                const encoder = new TextEncoder();
+                const bytes = encoder.encode(str);
+                let binary = '';
+                for (let i = 0; i < bytes.length; i++) {
+                    binary += String.fromCharCode(bytes[i]);
+                }
+                return btoa(binary);
+            } catch (e) {
+                // Fallback: escape Unicode characters
+                return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_, p1) => String.fromCharCode(parseInt(p1, 16))));
+            }
         }
         
         // ============================================
@@ -1983,39 +2007,68 @@ Write your email content here..."></div>
             
             showLoading(true, 'Sending...', `0 of ${selected.length}`);
             let sent = 0, failed = 0;
+            const failedReasons = [];
             
             for (const emp of selected) {
                 try {
+                    // Check for incomplete template (from failed chunked save)
+                    if (selectedTemplate.body === '[Loading...]' || !selectedTemplate.body) {
+                        console.error('Template body is empty or incomplete');
+                        failedReasons.push('Template body is empty - try re-saving the template');
+                        failed++;
+                        continue;
+                    }
+                    
+                    // Send minimal data - server will look up template body
                     const data = {
-                        action: 'sendEmail',
+                        action: 'sendEmailByTemplate',
                         employeeId: emp.id,
-                        employeeName: getFullName(emp),
-                        employeeEmail: emp.email,
                         templateId: selectedTemplate.id,
-                        templateName: selectedTemplate.name,
-                        templateCategory: selectedTemplate.category,
-                        warningLevel: selectedTemplate.warningLevel || 0,
-                        subject: replaceVars(selectedTemplate.subject || '', emp),
-                        body: replaceVars(selectedTemplate.body || '', emp),
-                        variables: { ...variableValues, first_name: emp.firstName, last_name: emp.lastName },
+                        variables: { 
+                            ...variableValues, 
+                            first_name: emp.firstName, 
+                            last_name: emp.lastName,
+                            supervisor_name: emp.supervisor || ''
+                        },
                         sentFrom: settings.defaultAlias || 'hr@alice.care'
                     };
                     
                     const result = await apiCall(data, 'POST');
                     if (result.success) {
-                        emailLogs.unshift({ ...data, id: result.data?.id, sentAt: new Date().toISOString() });
+                        emailLogs.unshift({ 
+                            employeeId: emp.id,
+                            employeeName: getFullName(emp),
+                            employeeEmail: emp.email,
+                            templateId: selectedTemplate.id,
+                            templateName: selectedTemplate.name,
+                            templateCategory: selectedTemplate.category,
+                            warningLevel: selectedTemplate.warningLevel || 0,
+                            subject: result.data?.subject || selectedTemplate.subject,
+                            body: result.data?.body || selectedTemplate.body,
+                            id: result.data?.id, 
+                            sentAt: new Date().toISOString() 
+                        });
                         sent++;
                     } else {
+                        console.error('Send failed:', result.error);
+                        failedReasons.push(result.error || 'Unknown error');
                         failed++;
                     }
                 } catch (e) {
+                    console.error('Send exception:', e);
+                    failedReasons.push(e.message || 'Network error');
                     failed++;
                 }
                 document.getElementById('loadingSubtext').textContent = `${sent} of ${selected.length}`;
             }
             
             showLoading(false);
-            showToast(failed ? `${sent} sent, ${failed} failed` : `${sent} email(s) sent!`, failed ? 'warning' : 'success');
+            if (failed) {
+                const uniqueReasons = [...new Set(failedReasons)];
+                showToast(`${sent} sent, ${failed} failed: ${uniqueReasons[0] || 'Unknown error'}`, 'error');
+            } else {
+                showToast(`${sent} email(s) sent!`, 'success');
+            }
             resetCompose();
         }
         
@@ -2269,7 +2322,7 @@ Write your email content here..."></div>
                 
                 // Check if payload is too large - if so, use chunked save
                 const testPayload = JSON.stringify({ action: 'updateTemplate', id, name, category, subject, body: compressedBody, warningLevel });
-                const encodedSize = btoa(unescape(encodeURIComponent(testPayload))).length;
+                const encodedSize = utf8ToBase64(testPayload).length;
                 
                 if (encodedSize > 5000) {
                     // Chunked save: First save metadata, then body separately
