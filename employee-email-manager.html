@@ -295,6 +295,8 @@
         .variable-chip { background: white; border: 1px solid #B3D4FC; border-radius: 15px; padding: 4px 10px; font-size: 11px; font-family: 'Courier New', monospace; color: #1A365C; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
         .variable-chip:hover { background: #1A365C; color: white; border-color: #1A365C; transform: translateY(-1px); }
         .variable-chip:active { transform: translateY(0); }
+        .variable-chip.auto-var { background: #E8F5E9; border-color: #4CAF50; color: #2E7D32; }
+        .variable-chip.auto-var:hover { background: #4CAF50; color: white; border-color: #4CAF50; }
         .variable-chip.custom-add { background: #F57600; color: white; border-color: #F57600; font-family: 'Poppins', sans-serif; font-weight: 600; }
         .variable-chip.custom-add:hover { background: #E06900; border-color: #E06900; }
         .custom-variable-input { padding: 4px 10px; border: 1px solid #B3D4FC; border-radius: 15px; font-size: 11px; font-family: 'Courier New', monospace; width: 100px; }
@@ -1135,6 +1137,15 @@
                             <button type="button" class="variable-chip" onclick="insertVariable('training_link')">{{training_link}}</button>
                         </div>
                         <div class="variable-chip-group">
+                            <span class="chip-group-label">Compliance (Auto-filled)</span>
+                            <button type="button" class="variable-chip auto-var" onclick="insertVariable('hca_expiration_date')" title="Auto-filled from HCA Tracker or employee record">{{hca_expiration_date}}</button>
+                            <button type="button" class="variable-chip auto-var" onclick="insertVariable('days_until_hca_expiration')" title="Auto-calculated days remaining">{{days_until_hca_expiration}}</button>
+                            <button type="button" class="variable-chip auto-var" onclick="insertVariable('tb_due_date')" title="Auto-calculated: TB date + 2 years">{{tb_due_date}}</button>
+                            <button type="button" class="variable-chip auto-var" onclick="insertVariable('days_until_tb_due')" title="Auto-calculated days remaining">{{days_until_tb_due}}</button>
+                            <button type="button" class="variable-chip auto-var" onclick="insertVariable('training_due_date')" title="Auto-calculated: Training date + 1 year">{{training_due_date}}</button>
+                            <button type="button" class="variable-chip auto-var" onclick="insertVariable('days_until_training_due')" title="Auto-calculated days remaining">{{days_until_training_due}}</button>
+                        </div>
+                        <div class="variable-chip-group">
                             <span class="chip-group-label">Custom</span>
                             <input type="text" id="customVariableName" placeholder="custom_var" class="custom-variable-input">
                             <button type="button" class="variable-chip custom-add" onclick="insertCustomVariable()">+ Add</button>
@@ -1328,118 +1339,43 @@ Write your email content here..."></div>
                     resolve(data); 
                 };
                 
-                // For POST data, encode it
+                // Always use JSONP (GET) to avoid CORS issues with local files
+                const url = new URL(WEB_APP_URL);
+                url.searchParams.append('callback', cb);
+                
+                // For POST data, encode it as a URL parameter
                 if (method === 'POST') {
-                    // Compress HTML content in templates to reduce payload size
+                    // Aggressively compress HTML content to reduce payload size
                     if (params.body && typeof params.body === 'string') {
                         params.body = params.body
+                            .replace(/\r\n/g, '\n')
                             .replace(/\n\s+/g, '\n')
+                            .replace(/\s+\n/g, '\n')
                             .replace(/>\s+</g, '><')
+                            .replace(/\s{2,}/g, ' ')
                             .trim();
                     }
                     
+                    // Send data as base64 encoded JSON to handle special characters
                     const jsonData = JSON.stringify(params);
                     const encodedData = btoa(unescape(encodeURIComponent(jsonData)));
                     
-                    // Check URL length - if too large, use form POST via iframe
-                    const testUrl = WEB_APP_URL + '?callback=' + cb + '&postData=' + encodedData + '&method=POST';
-                    
-                    if (testUrl.length > 7500) {
-                        // Use hidden iframe with form POST for large payloads
-                        const iframeName = 'apiFrame_' + cb;
-                        const iframe = document.createElement('iframe');
-                        iframe.name = iframeName;
-                        iframe.style.cssText = 'position:absolute;width:0;height:0;border:0;visibility:hidden;';
-                        document.body.appendChild(iframe);
-                        
-                        const form = document.createElement('form');
-                        form.method = 'POST';
-                        form.action = WEB_APP_URL;
-                        form.target = iframeName;
-                        form.style.display = 'none';
-                        form.acceptCharset = 'UTF-8';
-                        
-                        // Add form fields
-                        const addField = (name, value) => {
-                            const input = document.createElement('input');
-                            input.type = 'hidden';
-                            input.name = name;
-                            input.value = value;
-                            form.appendChild(input);
-                        };
-                        
-                        addField('callback', cb);
-                        addField('postData', encodedData);
-                        addField('method', 'POST');
-                        addField('useIframe', 'true');
-                        
-                        document.body.appendChild(form);
-                        
-                        // Clean up function
-                        const cleanup = () => {
-                            setTimeout(() => {
-                                if (form.parentNode) form.remove();
-                                if (iframe.parentNode) iframe.remove();
-                            }, 500);
-                        };
-                        
-                        // Listen for response message from iframe
-                        const messageHandler = (event) => {
-                            try {
-                                if (event.data && event.data.callback === cb) {
-                                    window.removeEventListener('message', messageHandler);
-                                    clearTimeout(timeout);
-                                    delete window[cb];
-                                    cleanup();
-                                    resolve(event.data.response);
-                                }
-                            } catch (e) {}
-                        };
-                        window.addEventListener('message', messageHandler);
-                        
-                        // Also set up callback in case Apps Script calls it directly
-                        const origCb = window[cb];
-                        window[cb] = (data) => {
-                            window.removeEventListener('message', messageHandler);
-                            cleanup();
-                            origCb(data);
-                        };
-                        
-                        form.submit();
-                        return;
-                    }
-                    
-                    // For smaller payloads, use JSONP
-                    const url = new URL(WEB_APP_URL);
-                    url.searchParams.append('callback', cb);
                     url.searchParams.append('postData', encodedData);
                     url.searchParams.append('method', 'POST');
-                    
-                    const script = document.createElement('script');
-                    script.src = url.toString();
-                    script.onerror = () => { 
-                        clearTimeout(timeout); 
-                        delete window[cb]; 
-                        reject(new Error('Network error - check Web App URL')); 
-                    };
-                    document.body.appendChild(script);
-                    script.onload = () => script.remove();
                 } else {
-                    // For GET, use JSONP
-                    const url = new URL(WEB_APP_URL);
-                    url.searchParams.append('callback', cb);
+                    // For GET, add params directly
                     Object.entries(params).forEach(([k, v]) => url.searchParams.append(k, v));
-                    
-                    const script = document.createElement('script');
-                    script.src = url.toString();
-                    script.onerror = () => { 
-                        clearTimeout(timeout); 
-                        delete window[cb]; 
-                        reject(new Error('Network error - check Web App URL')); 
-                    };
-                    document.body.appendChild(script);
-                    script.onload = () => script.remove();
                 }
+                
+                const script = document.createElement('script');
+                script.src = url.toString();
+                script.onerror = () => { 
+                    clearTimeout(timeout); 
+                    delete window[cb]; 
+                    reject(new Error('Network error - check Web App URL')); 
+                };
+                document.body.appendChild(script);
+                script.onload = () => script.remove();
             });
         }
         
@@ -1686,9 +1622,71 @@ Write your email content here..."></div>
                     variableValues['first_name'] = emp.firstName || '';
                     variableValues['last_name'] = emp.lastName || '';
                     variableValues['supervisor_name'] = emp.supervisor || '';
+                    
+                    // Auto-calculate compliance dates
+                    populateComplianceDates(emp);
                 }
             }
             extractVariables();
+        }
+        
+        // Helper: Populate auto-calculated compliance date variables
+        function populateComplianceDates(emp) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // HCA Expiration - from HCA Tracker or calculated
+            const hcaMatch = findHCATrackerMatch(emp.firstName, emp.lastName);
+            let hcaExpDate = null;
+            if (hcaMatch && hcaMatch.expirationDate) {
+                hcaExpDate = new Date(hcaMatch.expirationDate);
+                variableValues['hca_expiration_date'] = formatDateForDisplay(hcaExpDate);
+            } else if (emp.hcaDate) {
+                hcaExpDate = new Date(emp.hcaDate);
+                hcaExpDate.setFullYear(hcaExpDate.getFullYear() + 2);
+                variableValues['hca_expiration_date'] = formatDateForDisplay(hcaExpDate);
+            } else {
+                variableValues['hca_expiration_date'] = 'N/A';
+            }
+            
+            if (hcaExpDate && !isNaN(hcaExpDate.getTime())) {
+                const daysUntilHCA = Math.ceil((hcaExpDate - today) / (1000 * 60 * 60 * 24));
+                variableValues['days_until_hca_expiration'] = daysUntilHCA > 0 ? daysUntilHCA + ' days' : (daysUntilHCA === 0 ? 'Today' : Math.abs(daysUntilHCA) + ' days overdue');
+            } else {
+                variableValues['days_until_hca_expiration'] = 'N/A';
+            }
+            
+            // TB Due Date - tbDate + 2 years
+            if (emp.tbDate) {
+                const tbDueDate = new Date(emp.tbDate);
+                tbDueDate.setFullYear(tbDueDate.getFullYear() + 2);
+                variableValues['tb_due_date'] = formatDateForDisplay(tbDueDate);
+                
+                const daysUntilTB = Math.ceil((tbDueDate - today) / (1000 * 60 * 60 * 24));
+                variableValues['days_until_tb_due'] = daysUntilTB > 0 ? daysUntilTB + ' days' : (daysUntilTB === 0 ? 'Today' : Math.abs(daysUntilTB) + ' days overdue');
+            } else {
+                variableValues['tb_due_date'] = 'N/A';
+                variableValues['days_until_tb_due'] = 'N/A';
+            }
+            
+            // Training Due Date - trainingDate + 1 year
+            if (emp.trainingDate) {
+                const trainingDueDate = new Date(emp.trainingDate);
+                trainingDueDate.setFullYear(trainingDueDate.getFullYear() + 1);
+                variableValues['training_due_date'] = formatDateForDisplay(trainingDueDate);
+                
+                const daysUntilTraining = Math.ceil((trainingDueDate - today) / (1000 * 60 * 60 * 24));
+                variableValues['days_until_training_due'] = daysUntilTraining > 0 ? daysUntilTraining + ' days' : (daysUntilTraining === 0 ? 'Today' : Math.abs(daysUntilTraining) + ' days overdue');
+            } else {
+                variableValues['training_due_date'] = 'N/A';
+                variableValues['days_until_training_due'] = 'N/A';
+            }
+        }
+        
+        // Helper: Format date for display (MM/DD/YYYY)
+        function formatDateForDisplay(date) {
+            if (!date || isNaN(date.getTime())) return 'N/A';
+            return (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear();
         }
         
         function selectAllEmployees() {
@@ -1821,13 +1819,66 @@ Write your email content here..."></div>
         function updateVariable(name, value) { variableValues[name] = value; updatePreview(); }
         
         function replaceVars(text, empOverride = null) {
-            return text.replace(/\{\{(\w+)\}\}/g, (match, v) => {
-                if (empOverride) {
-                    if (v === 'first_name') return empOverride.firstName || match;
-                    if (v === 'last_name') return empOverride.lastName || match;
-                    if (v === 'supervisor_name') return empOverride.supervisor || variableValues[v] || match;
+            // Build complete variable values including auto-calculated compliance dates
+            let vars = { ...variableValues };
+            
+            if (empOverride) {
+                vars['first_name'] = empOverride.firstName || '';
+                vars['last_name'] = empOverride.lastName || '';
+                vars['supervisor_name'] = empOverride.supervisor || vars['supervisor_name'] || '';
+                
+                // Calculate compliance dates for this specific employee
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                // HCA Expiration
+                const hcaMatch = findHCATrackerMatch(empOverride.firstName, empOverride.lastName);
+                let hcaExpDate = null;
+                if (hcaMatch && hcaMatch.expirationDate) {
+                    hcaExpDate = new Date(hcaMatch.expirationDate);
+                    vars['hca_expiration_date'] = formatDateForDisplay(hcaExpDate);
+                } else if (empOverride.hcaDate) {
+                    hcaExpDate = new Date(empOverride.hcaDate);
+                    hcaExpDate.setFullYear(hcaExpDate.getFullYear() + 2);
+                    vars['hca_expiration_date'] = formatDateForDisplay(hcaExpDate);
+                } else {
+                    vars['hca_expiration_date'] = 'N/A';
                 }
-                return variableValues[v] || match;
+                
+                if (hcaExpDate && !isNaN(hcaExpDate.getTime())) {
+                    const daysUntilHCA = Math.ceil((hcaExpDate - today) / (1000 * 60 * 60 * 24));
+                    vars['days_until_hca_expiration'] = daysUntilHCA > 0 ? daysUntilHCA + ' days' : (daysUntilHCA === 0 ? 'Today' : Math.abs(daysUntilHCA) + ' days overdue');
+                } else {
+                    vars['days_until_hca_expiration'] = 'N/A';
+                }
+                
+                // TB Due Date
+                if (empOverride.tbDate) {
+                    const tbDueDate = new Date(empOverride.tbDate);
+                    tbDueDate.setFullYear(tbDueDate.getFullYear() + 2);
+                    vars['tb_due_date'] = formatDateForDisplay(tbDueDate);
+                    const daysUntilTB = Math.ceil((tbDueDate - today) / (1000 * 60 * 60 * 24));
+                    vars['days_until_tb_due'] = daysUntilTB > 0 ? daysUntilTB + ' days' : (daysUntilTB === 0 ? 'Today' : Math.abs(daysUntilTB) + ' days overdue');
+                } else {
+                    vars['tb_due_date'] = 'N/A';
+                    vars['days_until_tb_due'] = 'N/A';
+                }
+                
+                // Training Due Date
+                if (empOverride.trainingDate) {
+                    const trainingDueDate = new Date(empOverride.trainingDate);
+                    trainingDueDate.setFullYear(trainingDueDate.getFullYear() + 1);
+                    vars['training_due_date'] = formatDateForDisplay(trainingDueDate);
+                    const daysUntilTraining = Math.ceil((trainingDueDate - today) / (1000 * 60 * 60 * 24));
+                    vars['days_until_training_due'] = daysUntilTraining > 0 ? daysUntilTraining + ' days' : (daysUntilTraining === 0 ? 'Today' : Math.abs(daysUntilTraining) + ' days overdue');
+                } else {
+                    vars['training_due_date'] = 'N/A';
+                    vars['days_until_training_due'] = 'N/A';
+                }
+            }
+            
+            return text.replace(/\{\{(\w+)\}\}/g, (match, v) => {
+                return vars[v] !== undefined ? vars[v] : match;
             });
         }
         
@@ -2207,15 +2258,80 @@ Write your email content here..."></div>
             
             showLoading(true, 'Saving...');
             try {
-                const data = { action: id ? 'updateTemplate' : 'addTemplate', id: id || undefined, name, category, subject, body, warningLevel };
-                const result = await apiCall(data, 'POST');
-                if (!result.success) throw new Error(result.error);
+                // Compress body for size check
+                const compressedBody = body
+                    .replace(/\r\n/g, '\n')
+                    .replace(/\n\s+/g, '\n')
+                    .replace(/\s+\n/g, '\n')
+                    .replace(/>\s+</g, '><')
+                    .replace(/\s{2,}/g, ' ')
+                    .trim();
                 
-                if (id) {
-                    const idx = templates.findIndex(t => String(t.id) === String(id));
-                    if (idx !== -1) templates[idx] = { ...templates[idx], name, category, subject, body, warningLevel };
+                // Check if payload is too large - if so, use chunked save
+                const testPayload = JSON.stringify({ action: 'updateTemplate', id, name, category, subject, body: compressedBody, warningLevel });
+                const encodedSize = btoa(unescape(encodeURIComponent(testPayload))).length;
+                
+                if (encodedSize > 5000) {
+                    // Chunked save: First save metadata, then body separately
+                    showLoading(true, 'Saving template...');
+                    
+                    // Step 1: Save/create template with placeholder body
+                    const metaData = { 
+                        action: id ? 'updateTemplate' : 'addTemplate', 
+                        id: id || undefined, 
+                        name, 
+                        category, 
+                        subject, 
+                        body: '[Loading...]', // Placeholder
+                        warningLevel 
+                    };
+                    const metaResult = await apiCall(metaData, 'POST');
+                    if (!metaResult.success) throw new Error(metaResult.error);
+                    
+                    const templateId = id || metaResult.data.id;
+                    
+                    // Step 2: Update body in chunks if needed
+                    showLoading(true, 'Saving content...');
+                    const chunkSize = 3000; // Characters per chunk
+                    const chunks = [];
+                    for (let i = 0; i < compressedBody.length; i += chunkSize) {
+                        chunks.push(compressedBody.substring(i, i + chunkSize));
+                    }
+                    
+                    // Send body chunks
+                    for (let i = 0; i < chunks.length; i++) {
+                        showLoading(true, `Saving content (${i + 1}/${chunks.length})...`);
+                        const chunkData = {
+                            action: 'updateTemplateBody',
+                            id: templateId,
+                            bodyChunk: chunks[i],
+                            chunkIndex: i,
+                            totalChunks: chunks.length,
+                            isLast: i === chunks.length - 1
+                        };
+                        const chunkResult = await apiCall(chunkData, 'POST');
+                        if (!chunkResult.success) throw new Error(chunkResult.error);
+                    }
+                    
+                    // Update local state
+                    if (id) {
+                        const idx = templates.findIndex(t => String(t.id) === String(id));
+                        if (idx !== -1) templates[idx] = { ...templates[idx], name, category, subject, body: compressedBody, warningLevel };
+                    } else {
+                        templates.push({ id: templateId, name, category, subject, body: compressedBody, warningLevel });
+                    }
                 } else {
-                    templates.push({ id: result.data.id, name, category, subject, body, warningLevel });
+                    // Small payload - single request
+                    const data = { action: id ? 'updateTemplate' : 'addTemplate', id: id || undefined, name, category, subject, body: compressedBody, warningLevel };
+                    const result = await apiCall(data, 'POST');
+                    if (!result.success) throw new Error(result.error);
+                    
+                    if (id) {
+                        const idx = templates.findIndex(t => String(t.id) === String(id));
+                        if (idx !== -1) templates[idx] = { ...templates[idx], name, category, subject, body: compressedBody, warningLevel };
+                    } else {
+                        templates.push({ id: result.data.id, name, category, subject, body: compressedBody, warningLevel });
+                    }
                 }
                 
                 closeModal('templateModal');
@@ -3334,9 +3450,9 @@ Write your email content here..."></div>
                 {
                     name: 'TB Test Reminder',
                     category: 'reminder',
-                    subject: 'TB Test Due Soon - Action Required',
+                    subject: 'TB Test Due {{tb_due_date}} - Action Required',
                     body: `<p>Dear {{first_name}},</p>
-<p>This is a friendly reminder that your <strong>TB (Tuberculosis) test is due soon</strong>.</p>
+<p>This is a friendly reminder that your <strong>TB (Tuberculosis) test is due on {{tb_due_date}}</strong> ({{days_until_tb_due}} remaining).</p>
 <p>As a healthcare worker, maintaining current TB testing is a requirement for your continued employment and ensures the safety of our clients.</p>
 <p><strong>Please schedule your TB test as soon as possible.</strong></p>
 <p>Once completed, please provide a copy of your results to HR so we can update your records.</p>
@@ -3350,9 +3466,9 @@ alice.care</p>`,
                 {
                     name: 'Annual Training Reminder',
                     category: 'reminder',
-                    subject: 'Annual Training Due - Action Required',
+                    subject: 'Annual Training Due {{training_due_date}} - Action Required',
                     body: `<p>Dear {{first_name}},</p>
-<p>This is a reminder that your <strong>annual training is due for renewal</strong>.</p>
+<p>This is a reminder that your <strong>annual training is due on {{training_due_date}}</strong> ({{days_until_training_due}} remaining).</p>
 <p>Completing your required training ensures you have the latest knowledge and skills to provide the best care to our clients, and is a requirement for continued employment.</p>
 <p><strong>Please complete your training at your earliest convenience.</strong></p>
 <p>If you have any questions about the training requirements or need access to training materials, please contact HR.</p>
@@ -3365,9 +3481,9 @@ alice.care</p>`,
                 {
                     name: 'HCA Certification Renewal Reminder',
                     category: 'reminder',
-                    subject: 'HCA Certification Renewal Required',
+                    subject: 'HCA Certification Expires {{hca_expiration_date}} - Action Required',
                     body: `<p>Dear {{first_name}},</p>
-<p>This is an important reminder that your <strong>HCA (Home Care Aide) certification is approaching its renewal date</strong>.</p>
+<p>This is an important reminder that your <strong>HCA (Home Care Aide) certification expires on {{hca_expiration_date}}</strong> ({{days_until_hca_expiration}} remaining).</p>
 <p>Maintaining a valid HCA certification is essential for your role at alice.care and is required by California state regulations.</p>
 <p><strong>Please take steps to renew your certification before it expires.</strong></p>
 <p>This may include completing continuing education requirements and submitting your renewal application to the appropriate state agency.</p>
