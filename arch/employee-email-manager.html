@@ -70,11 +70,16 @@
         .card-title { font-size: 16px; font-weight: 600; color: #1A365C; }
         
         .data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        .data-table th { background: #1A365C; color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .data-table th { background: #1A365C; color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; position: sticky; top: 0; z-index: 10; }
         .data-table th:first-child { border-radius: 8px 0 0 0; }
         .data-table th:last-child { border-radius: 0 8px 0 0; }
-        .data-table td { padding: 12px 16px; border-bottom: 1px solid #E5ECF3; color: #333; }
-        .data-table tbody tr:hover { background: #F9FAFB; }
+        .data-table td { padding: 12px 16px; border-bottom: 1px solid #E5ECF3; color: #333; background: white; }
+        .data-table tbody tr:hover td { background: #F9FAFB; }
+        
+        /* Scrollable table container for sticky header */
+        .table-container { max-height: 600px; overflow-y: auto; border-radius: 8px; border: 1px solid #E5ECF3; }
+        .table-container .data-table th:first-child { border-radius: 0; }
+        .table-container .data-table th:last-child { border-radius: 0; }
         
         .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
         .badge-warning-1 { background: #FFF3CD; color: #856404; }
@@ -221,7 +226,16 @@
         .scrollable-list::-webkit-scrollbar-track { background: #E5ECF3; border-radius: 3px; }
         .scrollable-list::-webkit-scrollbar-thumb { background: #1A365C; border-radius: 3px; }
         
-        .action-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+        .action-buttons { display: flex; gap: 8px; flex-wrap: nowrap; white-space: nowrap; }
+        
+        /* Employee Directory Filters */
+        .employee-filters { display: flex; gap: 12px; margin-bottom: 15px; flex-wrap: wrap; align-items: center; }
+        .employee-filters .filter-group { display: flex; flex-direction: column; gap: 4px; }
+        .employee-filters .filter-group label { font-size: 11px; font-weight: 600; color: #666; text-transform: uppercase; }
+        .employee-filters .filter-group select { padding: 8px 12px; border: 2px solid #E5ECF3; border-radius: 6px; font-family: 'Poppins', sans-serif; font-size: 13px; min-width: 140px; cursor: pointer; transition: all 0.2s; background: white; }
+        .employee-filters .filter-group select:focus { outline: none; border-color: #F57600; }
+        .employee-filters .filter-group select:hover { border-color: #1A365C; }
+        .employee-filters .clear-filters { align-self: flex-end; padding: 8px 14px; }
         
         .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
         .stat-card { background: white; border-radius: 12px; padding: 20px; border: 1px solid #E5ECF3; text-align: center; }
@@ -642,9 +656,53 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                     <input type="text" id="employeeDirectorySearch" placeholder="Search by name, email, department...">
                 </div>
-                <div style="overflow-x: auto;">
+                <div class="employee-filters">
+                    <div class="filter-group">
+                        <label>HCA Sync Status</label>
+                        <select id="filterMismatch" onchange="renderEmployeeDirectory()">
+                            <option value="">All Employees</option>
+                            <option value="mismatch">⚠ Mismatch Only</option>
+                            <option value="matched">✓ Matched Only</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>HCA Expiration</label>
+                        <select id="filterHCA" onchange="renderEmployeeDirectory()">
+                            <option value="">All Statuses</option>
+                            <option value="overdue">🔴 Overdue</option>
+                            <option value="urgent">🟠 Urgent</option>
+                            <option value="warning">🟡 Warning</option>
+                            <option value="ok">🟢 OK</option>
+                            <option value="na">N/A</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>TB Test Due</label>
+                        <select id="filterTB" onchange="renderEmployeeDirectory()">
+                            <option value="">All Statuses</option>
+                            <option value="overdue">🔴 Overdue</option>
+                            <option value="urgent">🟠 Urgent</option>
+                            <option value="warning">🟡 Warning</option>
+                            <option value="ok">🟢 OK</option>
+                            <option value="na">N/A</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Training Due</label>
+                        <select id="filterTraining" onchange="renderEmployeeDirectory()">
+                            <option value="">All Statuses</option>
+                            <option value="overdue">🔴 Overdue</option>
+                            <option value="urgent">🟠 Urgent</option>
+                            <option value="warning">🟡 Warning</option>
+                            <option value="ok">🟢 OK</option>
+                            <option value="na">N/A</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-small btn-outline clear-filters" onclick="clearEmployeeFilters()">Clear Filters</button>
+                </div>
+                <div class="table-container" style="overflow-x: auto;">
                     <table class="data-table">
-                        <thead><tr><th>Employee</th><th>Email</th><th>Warning Level</th><th>HCA Expiration</th><th>TB Date</th><th>Training</th><th>Actions</th></tr></thead>
+                        <thead><tr><th>Employee</th><th>Email</th><th>Warning Level</th><th>HCA Expiration</th><th>TB Date Taken</th><th>Training Taken</th><th>Actions</th></tr></thead>
                         <tbody id="employeeTableBody"></tbody>
                     </table>
                 </div>
@@ -1160,7 +1218,7 @@ Write your email content here..."></div>
         
         // HCA Tracker Integration
         const HCA_TRACKER_SHEET_ID = '1m5Pr9aYo314GJ-rPX9wVha-wClXMXwaHOBks0ZU4Amg';
-        const HCA_TRACKER_URL = `https://docs.google.com/spreadsheets/d/${HCA_TRACKER_SHEET_ID}/edit`;
+        const HCA_TRACKER_URL = 'https://alicecare2032.github.io/alice-care-timeoff/hca-tracker-dashboard.html';
         let hcaTrackerData = []; // Stores { firstName, lastName, expirationDate } from HCA Tracker
         let hcaLastSync = null;
         
@@ -2115,7 +2173,7 @@ Write your email content here..."></div>
         }
         
         // Helper: Render date cell with status
-        function renderDateCell(dateStr, yearsValid, warningDays, showExpiration = false) {
+        function renderDateCell(dateStr, yearsValid, warningDays, showExpiration = false, showDueDateBelow = false) {
             const statusInfo = getDateStatus(dateStr, yearsValid, warningDays);
             
             if (statusInfo.status === 'na') {
@@ -2127,7 +2185,14 @@ Write your email content here..."></div>
                 formatDateShort(dateStr);
             
             const icon = getStatusIcon(statusInfo.status);
-            const labelHtml = statusInfo.label ? `<div class="date-sub">${statusInfo.label}</div>` : '';
+            
+            // Show due date below if requested, otherwise show days left label
+            let labelHtml = '';
+            if (showDueDateBelow && statusInfo.dueDate) {
+                labelHtml = `<div class="date-sub">Due: ${formatDateShort(statusInfo.dueDate)}${statusInfo.label ? ' (' + statusInfo.label + ')' : ''}</div>`;
+            } else if (statusInfo.label) {
+                labelHtml = `<div class="date-sub">${statusInfo.label}</div>`;
+            }
             
             return `<div class="date-cell">
                 <span class="date-status ${statusInfo.status}">${icon}${displayDate}</span>
@@ -2139,22 +2204,96 @@ Write your email content here..."></div>
             const container = document.getElementById('employeeTableBody');
             const search = (document.getElementById('employeeDirectorySearch')?.value || '').toLowerCase().trim();
             
+            // Get filter values
+            const filterMismatch = document.getElementById('filterMismatch')?.value || '';
+            const filterHCA = document.getElementById('filterHCA')?.value || '';
+            const filterTB = document.getElementById('filterTB')?.value || '';
+            const filterTraining = document.getElementById('filterTraining')?.value || '';
+            
             // Get warning day thresholds from automation settings (with safe defaults if not yet loaded)
             const autoSettings = typeof automationSettings !== 'undefined' ? automationSettings : {};
             const hcaDays = autoSettings.hcaReminder?.daysBefore || 60;
             const tbDays = autoSettings.tbReminder?.daysBefore || 30;
             const trainingDays = autoSettings.trainingReminder?.daysBefore || 30;
             
+            // Helper to get HCA status for an employee
+            function getEmployeeHCAStatus(emp) {
+                const hcaMatch = findHCATrackerMatch(emp.firstName, emp.lastName);
+                if (hcaMatch && hcaMatch.expirationDate) {
+                    return getHCADateStatus(hcaMatch.expirationDate, hcaDays);
+                } else if (emp.hcaDate) {
+                    return getDateStatus(emp.hcaDate, 2, hcaDays);
+                }
+                return { status: 'na' };
+            }
+            
+            // Helper to get HCA date status (for direct expiration date)
+            function getHCADateStatus(expirationDateStr, warningDays) {
+                if (!expirationDateStr) return { status: 'na' };
+                try {
+                    const expDate = new Date(expirationDateStr);
+                    if (isNaN(expDate.getTime())) return { status: 'na' };
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    expDate.setHours(0, 0, 0, 0);
+                    const daysLeft = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+                    let status = 'ok';
+                    if (daysLeft < 0) status = 'overdue';
+                    else if (daysLeft <= Math.floor(warningDays / 2)) status = 'urgent';
+                    else if (daysLeft <= warningDays) status = 'warning';
+                    return { status, daysLeft };
+                } catch (e) {
+                    return { status: 'na' };
+                }
+            }
+            
             let filtered = employees;
+            
+            // Apply text search filter
             if (search) {
-                filtered = employees.filter(e => {
+                filtered = filtered.filter(e => {
                     const name = getFullName(e).toLowerCase();
                     return name.includes(search) || (e.email || '').toLowerCase().includes(search) || (e.department || '').toLowerCase().includes(search);
                 });
             }
             
+            // Apply mismatch filter
+            if (filterMismatch && hcaTrackerData.length > 0) {
+                filtered = filtered.filter(e => {
+                    const hasMatch = !!findHCATrackerMatch(e.firstName, e.lastName);
+                    if (filterMismatch === 'mismatch') return !hasMatch;
+                    if (filterMismatch === 'matched') return hasMatch;
+                    return true;
+                });
+            }
+            
+            // Apply HCA status filter
+            if (filterHCA) {
+                filtered = filtered.filter(e => {
+                    const hcaStatus = getEmployeeHCAStatus(e);
+                    return hcaStatus.status === filterHCA;
+                });
+            }
+            
+            // Apply TB status filter
+            if (filterTB) {
+                filtered = filtered.filter(e => {
+                    const tbStatus = getDateStatus(e.tbDate, 2, tbDays);
+                    return tbStatus.status === filterTB;
+                });
+            }
+            
+            // Apply Training status filter
+            if (filterTraining) {
+                filtered = filtered.filter(e => {
+                    const trainingStatus = getDateStatus(e.trainingDate, 1, trainingDays);
+                    return trainingStatus.status === filterTraining;
+                });
+            }
+            
             if (filtered.length === 0) {
-                container.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;">${employees.length ? 'No results' : 'No employees yet'}</td></tr>`;
+                const hasFilters = search || filterMismatch || filterHCA || filterTB || filterTraining;
+                container.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;">${employees.length ? (hasFilters ? 'No employees match filters' : 'No results') : 'No employees yet'}</td></tr>`;
                 return;
             }
             
@@ -2185,10 +2324,10 @@ Write your email content here..."></div>
                 }
                 
                 // TB: Shows date taken, warns when approaching 2-year renewal
-                const tbCell = renderDateCell(emp.tbDate, 2, tbDays, false);
+                const tbCell = renderDateCell(emp.tbDate, 2, tbDays, false, true);
                 
                 // Training: Shows last training, warns when approaching 1-year renewal
-                const trainingCell = renderDateCell(emp.trainingDate, 1, trainingDays, false);
+                const trainingCell = renderDateCell(emp.trainingDate, 1, trainingDays, false, true);
                 
                 // Row class for mismatch highlighting
                 const rowClass = hcaMismatch ? 'hca-mismatch' : '';
@@ -2290,6 +2429,16 @@ Write your email content here..."></div>
             } else {
                 infoEl.style.display = 'none';
             }
+        }
+        
+        // Clear all employee directory filters
+        function clearEmployeeFilters() {
+            document.getElementById('employeeDirectorySearch').value = '';
+            document.getElementById('filterMismatch').value = '';
+            document.getElementById('filterHCA').value = '';
+            document.getElementById('filterTB').value = '';
+            document.getElementById('filterTraining').value = '';
+            renderEmployeeDirectory();
         }
         
         // Count employees not found in HCA Tracker

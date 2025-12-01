@@ -237,6 +237,21 @@
         .employee-filters .filter-group select:hover { border-color: #1A365C; }
         .employee-filters .clear-filters { align-self: flex-end; padding: 8px 14px; }
         
+        /* HCA Only Alert */
+        .hca-only-alert { background: #E8F4FD; border: 2px solid #B3D9F7; border-radius: 10px; padding: 15px; margin-bottom: 15px; }
+        .hca-only-header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .hca-only-header svg { width: 20px; height: 20px; color: #0C5460; flex-shrink: 0; }
+        .hca-only-header span { flex: 1; color: #0C5460; font-size: 14px; }
+        .hca-only-header strong { color: #F57600; }
+        .hca-only-details { margin-top: 15px; padding-top: 15px; border-top: 1px solid #B3D9F7; }
+        .hca-only-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+        .hca-only-item { background: white; border: 1px solid #B3D9F7; border-radius: 8px; padding: 12px; display: flex; align-items: center; gap: 10px; }
+        .hca-only-item .hca-avatar { width: 36px; height: 36px; background: #0C5460; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+        .hca-only-item .hca-info { flex: 1; min-width: 0; }
+        .hca-only-item .hca-name { font-weight: 600; color: #1A365C; font-size: 13px; }
+        .hca-only-item .hca-exp { font-size: 11px; color: #666; }
+        .hca-only-item .hca-note { font-size: 10px; color: #F57600; margin-top: 2px; }
+        
         .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
         .stat-card { background: white; border-radius: 12px; padding: 20px; border: 1px solid #E5ECF3; text-align: center; }
         .stat-card .stat-value { font-size: 28px; font-weight: 700; color: #1A365C; margin-bottom: 5px; }
@@ -658,11 +673,20 @@
                 </div>
                 <div class="employee-filters">
                     <div class="filter-group">
+                        <label>Position</label>
+                        <select id="filterPosition" onchange="renderEmployeeDirectory()">
+                            <option value="">All Positions</option>
+                            <option value="HCA" selected>HCA Only</option>
+                            <option value="other">Non-HCA Only</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
                         <label>HCA Sync Status</label>
                         <select id="filterMismatch" onchange="renderEmployeeDirectory()">
                             <option value="">All Employees</option>
-                            <option value="mismatch">⚠ Mismatch Only</option>
-                            <option value="matched">✓ Matched Only</option>
+                            <option value="mismatch">⚠ Not in HCA Tracker</option>
+                            <option value="matched">✓ Matched in HCA</option>
+                            <option value="hca-only">📋 In HCA Only (not here)</option>
                         </select>
                     </div>
                     <div class="filter-group">
@@ -684,6 +708,7 @@
                             <option value="urgent">🟠 Urgent</option>
                             <option value="warning">🟡 Warning</option>
                             <option value="ok">🟢 OK</option>
+                            <option value="xray">✓ X-Ray</option>
                             <option value="na">N/A</option>
                         </select>
                     </div>
@@ -700,9 +725,20 @@
                     </div>
                     <button class="btn btn-small btn-outline clear-filters" onclick="clearEmployeeFilters()">Clear Filters</button>
                 </div>
+                <!-- HCA Only Alert -->
+                <div class="hca-only-alert" id="hcaOnlyAlert" style="display: none;">
+                    <div class="hca-only-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                        <span><strong id="hcaOnlyCount">0</strong> employees in HCA Tracker not in this list</span>
+                        <button class="btn btn-small btn-outline" onclick="toggleHCAOnlyDetails()">Show Details</button>
+                    </div>
+                    <div class="hca-only-details" id="hcaOnlyDetails" style="display: none;">
+                        <div class="hca-only-list" id="hcaOnlyList"></div>
+                    </div>
+                </div>
                 <div class="table-container" style="overflow-x: auto;">
                     <table class="data-table">
-                        <thead><tr><th>Employee</th><th>Email</th><th>Warning Level</th><th>HCA Expiration</th><th>TB Date Taken</th><th>Training Taken</th><th>Actions</th></tr></thead>
+                        <thead><tr><th>Employee</th><th>Position</th><th>Warning Level</th><th>HCA Expiration</th><th>TB Date Taken</th><th>Training Taken</th><th>Actions</th></tr></thead>
                         <tbody id="employeeTableBody"></tbody>
                     </table>
                 </div>
@@ -851,7 +887,7 @@
                     
                     <div class="automation-info">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                        <p>Automated emails are sent daily to <strong>active employees only</strong>. The "days before due" settings also control the <strong>color warning thresholds</strong> in the Employee Directory table. You must run the automation manually or set up a daily trigger in Google Apps Script.</p>
+                        <p>Automated emails are sent daily to <strong>active employees only</strong>. The "days before due" settings also control the <strong>color warning thresholds</strong> in the Employee Directory table. <strong>TB, Training, and HCA reminders are sent only to employees with "HCA" in their position.</strong> You must run the automation manually or set up a daily trigger in Google Apps Script.</p>
                     </div>
                     
                     <div class="automation-triggers">
@@ -903,7 +939,7 @@
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
                                     TB Test Reminder
                                 </div>
-                                <div class="trigger-description">Remind employee when TB test is due (2 years from last test or hire date)</div>
+                                <div class="trigger-description">Remind employee when TB test is due - <strong style="color: #F57600;">HCA positions only</strong> (excludes X-Ray)</div>
                             </div>
                             <div class="trigger-template">
                                 <select id="templateTBReminder" onchange="saveAutomationSettings()">
@@ -926,7 +962,7 @@
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
                                     Training Reminder
                                 </div>
-                                <div class="trigger-description">Remind employee when annual training is due</div>
+                                <div class="trigger-description">Remind employee when annual training is due - <strong style="color: #F57600;">HCA positions only</strong></div>
                             </div>
                             <div class="trigger-template">
                                 <select id="templateTrainingReminder" onchange="saveAutomationSettings()">
@@ -949,7 +985,7 @@
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                                     HCA Certification Reminder
                                 </div>
-                                <div class="trigger-description">Remind employee when HCA certification renewal is approaching</div>
+                                <div class="trigger-description">Remind employee when HCA certification renewal is approaching - <strong style="color: #F57600;">HCA positions only</strong></div>
                             </div>
                             <div class="trigger-template">
                                 <select id="templateHCAReminder" onchange="saveAutomationSettings()">
@@ -1024,7 +1060,10 @@
                     <div class="form-group">
                         <label>TB Test Date</label>
                         <input type="date" id="empTBDate">
-                        <span class="field-hint">Last TB test date</span>
+                        <div class="checkbox-row" style="margin-top: 8px;">
+                            <input type="checkbox" id="empTBXray" style="width: auto; margin-right: 8px;">
+                            <label for="empTBXray" style="font-weight: 400; font-size: 13px; color: #666; margin: 0; cursor: pointer;">X-Ray (no renewal required)</label>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>Training Date</label>
@@ -1264,6 +1303,12 @@ Write your email content here..."></div>
             return logs.length > 0 ? logs[0].sentAt : null;
         }
         
+        // Check if employee has HCA position (for TB, Training, HCA notifications)
+        function isHCAPosition(emp) {
+            const position = (emp.position || '').toLowerCase();
+            return position.includes('hca') || position.includes('home care aide');
+        }
+        
         // ============================================
         // API - Using JSONP for all requests to avoid CORS
         // ============================================
@@ -1283,31 +1328,118 @@ Write your email content here..."></div>
                     resolve(data); 
                 };
                 
-                // Always use JSONP (GET) to avoid CORS issues with local files
-                const url = new URL(WEB_APP_URL);
-                url.searchParams.append('callback', cb);
-                
-                // For POST data, encode it as a URL parameter
+                // For POST data, encode it
                 if (method === 'POST') {
-                    // Send data as base64 encoded JSON to handle special characters
+                    // Compress HTML content in templates to reduce payload size
+                    if (params.body && typeof params.body === 'string') {
+                        params.body = params.body
+                            .replace(/\n\s+/g, '\n')
+                            .replace(/>\s+</g, '><')
+                            .trim();
+                    }
+                    
                     const jsonData = JSON.stringify(params);
                     const encodedData = btoa(unescape(encodeURIComponent(jsonData)));
+                    
+                    // Check URL length - if too large, use form POST via iframe
+                    const testUrl = WEB_APP_URL + '?callback=' + cb + '&postData=' + encodedData + '&method=POST';
+                    
+                    if (testUrl.length > 7500) {
+                        // Use hidden iframe with form POST for large payloads
+                        const iframeName = 'apiFrame_' + cb;
+                        const iframe = document.createElement('iframe');
+                        iframe.name = iframeName;
+                        iframe.style.cssText = 'position:absolute;width:0;height:0;border:0;visibility:hidden;';
+                        document.body.appendChild(iframe);
+                        
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = WEB_APP_URL;
+                        form.target = iframeName;
+                        form.style.display = 'none';
+                        form.acceptCharset = 'UTF-8';
+                        
+                        // Add form fields
+                        const addField = (name, value) => {
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = name;
+                            input.value = value;
+                            form.appendChild(input);
+                        };
+                        
+                        addField('callback', cb);
+                        addField('postData', encodedData);
+                        addField('method', 'POST');
+                        addField('useIframe', 'true');
+                        
+                        document.body.appendChild(form);
+                        
+                        // Clean up function
+                        const cleanup = () => {
+                            setTimeout(() => {
+                                if (form.parentNode) form.remove();
+                                if (iframe.parentNode) iframe.remove();
+                            }, 500);
+                        };
+                        
+                        // Listen for response message from iframe
+                        const messageHandler = (event) => {
+                            try {
+                                if (event.data && event.data.callback === cb) {
+                                    window.removeEventListener('message', messageHandler);
+                                    clearTimeout(timeout);
+                                    delete window[cb];
+                                    cleanup();
+                                    resolve(event.data.response);
+                                }
+                            } catch (e) {}
+                        };
+                        window.addEventListener('message', messageHandler);
+                        
+                        // Also set up callback in case Apps Script calls it directly
+                        const origCb = window[cb];
+                        window[cb] = (data) => {
+                            window.removeEventListener('message', messageHandler);
+                            cleanup();
+                            origCb(data);
+                        };
+                        
+                        form.submit();
+                        return;
+                    }
+                    
+                    // For smaller payloads, use JSONP
+                    const url = new URL(WEB_APP_URL);
+                    url.searchParams.append('callback', cb);
                     url.searchParams.append('postData', encodedData);
                     url.searchParams.append('method', 'POST');
+                    
+                    const script = document.createElement('script');
+                    script.src = url.toString();
+                    script.onerror = () => { 
+                        clearTimeout(timeout); 
+                        delete window[cb]; 
+                        reject(new Error('Network error - check Web App URL')); 
+                    };
+                    document.body.appendChild(script);
+                    script.onload = () => script.remove();
                 } else {
-                    // For GET, add params directly
+                    // For GET, use JSONP
+                    const url = new URL(WEB_APP_URL);
+                    url.searchParams.append('callback', cb);
                     Object.entries(params).forEach(([k, v]) => url.searchParams.append(k, v));
+                    
+                    const script = document.createElement('script');
+                    script.src = url.toString();
+                    script.onerror = () => { 
+                        clearTimeout(timeout); 
+                        delete window[cb]; 
+                        reject(new Error('Network error - check Web App URL')); 
+                    };
+                    document.body.appendChild(script);
+                    script.onload = () => script.remove();
                 }
-                
-                const script = document.createElement('script');
-                script.src = url.toString();
-                script.onerror = () => { 
-                    clearTimeout(timeout); 
-                    delete window[cb]; 
-                    reject(new Error('Network error - check Web App URL')); 
-                };
-                document.body.appendChild(script);
-                script.onload = () => script.remove();
             });
         }
         
@@ -2205,6 +2337,7 @@ Write your email content here..."></div>
             const search = (document.getElementById('employeeDirectorySearch')?.value || '').toLowerCase().trim();
             
             // Get filter values
+            const filterPosition = document.getElementById('filterPosition')?.value || '';
             const filterMismatch = document.getElementById('filterMismatch')?.value || '';
             const filterHCA = document.getElementById('filterHCA')?.value || '';
             const filterTB = document.getElementById('filterTB')?.value || '';
@@ -2257,8 +2390,42 @@ Write your email content here..."></div>
                 });
             }
             
+            // Apply position filter
+            if (filterPosition) {
+                filtered = filtered.filter(e => {
+                    const position = (e.position || '').toLowerCase();
+                    if (filterPosition === 'HCA') {
+                        return position.includes('hca') || position.includes('home care aide');
+                    } else if (filterPosition === 'other') {
+                        return !position.includes('hca') && !position.includes('home care aide');
+                    }
+                    return true;
+                });
+            }
+            
             // Apply mismatch filter
             if (filterMismatch && hcaTrackerData.length > 0) {
+                if (filterMismatch === 'hca-only') {
+                    // For HCA-only, clear the table and show alert
+                    const hcaOnly = getHCAOnlyEmployees();
+                    if (hcaOnly.length > 0) {
+                        container.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;">
+                            <div style="color: #0C5460;">
+                                <strong>${hcaOnly.length} employee${hcaOnly.length > 1 ? 's' : ''}</strong> found in HCA Tracker but not in Email Manager.<br>
+                                <span style="font-size: 13px;">See the blue alert above for details.</span>
+                            </div>
+                        </td></tr>`;
+                        updateHCAOnlyAlert();
+                        // Show the details automatically
+                        document.getElementById('hcaOnlyDetails').style.display = 'block';
+                        const btn = document.querySelector('#hcaOnlyAlert button');
+                        if (btn) btn.textContent = 'Hide Details';
+                        return;
+                    } else {
+                        container.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;">All HCA Tracker employees are in this list</td></tr>`;
+                        return;
+                    }
+                }
                 filtered = filtered.filter(e => {
                     const hasMatch = !!findHCATrackerMatch(e.firstName, e.lastName);
                     if (filterMismatch === 'mismatch') return !hasMatch;
@@ -2278,6 +2445,14 @@ Write your email content here..."></div>
             // Apply TB status filter
             if (filterTB) {
                 filtered = filtered.filter(e => {
+                    // Handle X-Ray filter
+                    if (filterTB === 'xray') {
+                        return e.tbXray === true || e.tbXray === 'true';
+                    }
+                    // If employee has X-Ray, they don't match other TB statuses
+                    if (e.tbXray === true || e.tbXray === 'true') {
+                        return false;
+                    }
                     const tbStatus = getDateStatus(e.tbDate, 2, tbDays);
                     return tbStatus.status === filterTB;
                 });
@@ -2292,7 +2467,7 @@ Write your email content here..."></div>
             }
             
             if (filtered.length === 0) {
-                const hasFilters = search || filterMismatch || filterHCA || filterTB || filterTraining;
+                const hasFilters = search || filterPosition || filterMismatch || filterHCA || filterTB || filterTraining;
                 container.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;">${employees.length ? (hasFilters ? 'No employees match filters' : 'No results') : 'No employees yet'}</td></tr>`;
                 return;
             }
@@ -2323,8 +2498,16 @@ Write your email content here..."></div>
                     hcaCell = '<span class="date-status na">N/A</span>';
                 }
                 
-                // TB: Shows date taken, warns when approaching 2-year renewal
-                const tbCell = renderDateCell(emp.tbDate, 2, tbDays, false, true);
+                // TB: Shows date taken, warns when approaching 2-year renewal (unless X-Ray)
+                let tbCell;
+                if (emp.tbXray === true || emp.tbXray === 'true') {
+                    // X-Ray - always valid, no renewal required
+                    tbCell = `<div class="date-cell">
+                        <span class="date-status ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>X-Ray</span>
+                    </div>`;
+                } else {
+                    tbCell = renderDateCell(emp.tbDate, 2, tbDays, false, true);
+                }
                 
                 // Training: Shows last training, warns when approaching 1-year renewal
                 const trainingCell = renderDateCell(emp.trainingDate, 1, trainingDays, false, true);
@@ -2337,9 +2520,9 @@ Write your email content here..."></div>
                 return `<tr class="${rowClass}">
                     <td><div style="display: flex; align-items: center; gap: 10px;">
                         <div class="employee-avatar" style="width: 36px; height: 36px; font-size: 14px;">${getInitials(emp)}</div>
-                        <div><div style="font-weight: 600;" class="${nameClass}" ${mismatchTitle}>${escapeHtml(getFullName(emp))}</div><div style="font-size: 12px; color: #666;">${escapeHtml(emp.position || emp.department || '')}</div></div>
+                        <div><div style="font-weight: 600;" class="${nameClass}" ${mismatchTitle}>${escapeHtml(getFullName(emp))}</div><div style="font-size: 12px; color: #666;">${escapeHtml(emp.email || '')}</div></div>
                     </div></td>
-                    <td>${escapeHtml(emp.email || 'N/A')}</td>
+                    <td>${escapeHtml(emp.position || 'N/A')}</td>
                     <td>${badge}</td>
                     <td>${hcaCell}</td>
                     <td>${tbCell}</td>
@@ -2353,6 +2536,9 @@ Write your email content here..."></div>
             
             // Update HCA sync status indicator
             updateHCASyncStatus();
+            
+            // Update HCA Only alert
+            updateHCAOnlyAlert();
         }
         
         // Helper: Find matching HCA Tracker entry by name
@@ -2431,9 +2617,10 @@ Write your email content here..."></div>
             }
         }
         
-        // Clear all employee directory filters
+        // Clear all employee directory filters (reset to defaults)
         function clearEmployeeFilters() {
             document.getElementById('employeeDirectorySearch').value = '';
+            document.getElementById('filterPosition').value = 'HCA'; // Default to HCA
             document.getElementById('filterMismatch').value = '';
             document.getElementById('filterHCA').value = '';
             document.getElementById('filterTB').value = '';
@@ -2445,6 +2632,72 @@ Write your email content here..."></div>
         function countHCAMismatches() {
             if (!hcaTrackerData.length) return 0;
             return employees.filter(emp => !findHCATrackerMatch(emp.firstName, emp.lastName)).length;
+        }
+        
+        // Get HCA Tracker entries not found in Email Manager
+        function getHCAOnlyEmployees() {
+            if (!hcaTrackerData.length) return [];
+            return hcaTrackerData.filter(hca => {
+                const hcaFirst = (hca.firstName || '').toLowerCase().trim();
+                const hcaLast = (hca.lastName || '').toLowerCase().trim();
+                return !employees.find(emp => {
+                    const empFirst = (emp.firstName || '').toLowerCase().trim();
+                    const empLast = (emp.lastName || '').toLowerCase().trim();
+                    return empFirst === hcaFirst && empLast === hcaLast;
+                });
+            });
+        }
+        
+        // Count HCA-only employees
+        function countHCAOnlyEmployees() {
+            return getHCAOnlyEmployees().length;
+        }
+        
+        // Update HCA Only alert display
+        function updateHCAOnlyAlert() {
+            const alertEl = document.getElementById('hcaOnlyAlert');
+            const countEl = document.getElementById('hcaOnlyCount');
+            const listEl = document.getElementById('hcaOnlyList');
+            
+            if (!alertEl) return;
+            
+            const hcaOnly = getHCAOnlyEmployees();
+            
+            if (hcaOnly.length > 0) {
+                alertEl.style.display = 'block';
+                countEl.textContent = hcaOnly.length;
+                
+                // Render the list
+                listEl.innerHTML = hcaOnly.map(hca => {
+                    const initials = ((hca.firstName || '').charAt(0) + (hca.lastName || '').charAt(0)).toUpperCase();
+                    const name = `${hca.firstName || ''} ${hca.lastName || ''}`.trim();
+                    const exp = hca.expirationDate ? `Exp: ${formatDateShort(hca.expirationDate)}` : 'No expiration';
+                    return `<div class="hca-only-item">
+                        <div class="hca-avatar">${initials}</div>
+                        <div class="hca-info">
+                            <div class="hca-name">${escapeHtml(name)}</div>
+                            <div class="hca-exp">${exp}</div>
+                            <div class="hca-note">In HCA Tracker, not in Email Manager</div>
+                        </div>
+                    </div>`;
+                }).join('');
+            } else {
+                alertEl.style.display = 'none';
+            }
+        }
+        
+        // Toggle HCA Only details visibility
+        function toggleHCAOnlyDetails() {
+            const detailsEl = document.getElementById('hcaOnlyDetails');
+            const btn = document.querySelector('#hcaOnlyAlert button');
+            
+            if (detailsEl.style.display === 'none') {
+                detailsEl.style.display = 'block';
+                btn.textContent = 'Hide Details';
+            } else {
+                detailsEl.style.display = 'none';
+                btn.textContent = 'Show Details';
+            }
         }
         
         // Sync HCA data from HCA Tracker Google Sheet
@@ -2510,6 +2763,7 @@ Write your email content here..."></div>
             document.getElementById('empHireDate').value = '';
             document.getElementById('empBirthDate').value = '';
             document.getElementById('empTBDate').value = '';
+            document.getElementById('empTBXray').checked = false;
             document.getElementById('empTrainingDate').value = '';
             document.getElementById('empHCADate').value = '';
             
@@ -2544,6 +2798,7 @@ Write your email content here..."></div>
                     document.getElementById('empHireDate').value = formatDateForInput(emp.hireDate);
                     document.getElementById('empBirthDate').value = formatDateForInput(emp.birthDate);
                     document.getElementById('empTBDate').value = formatDateForInput(emp.tbDate);
+                    document.getElementById('empTBXray').checked = emp.tbXray === true || emp.tbXray === 'true';
                     document.getElementById('empTrainingDate').value = formatDateForInput(emp.trainingDate);
                     document.getElementById('empHCADate').value = formatDateForInput(emp.hcaDate);
                     
@@ -2585,6 +2840,7 @@ Write your email content here..."></div>
             const hireDate = document.getElementById('empHireDate').value || null;
             const birthDate = document.getElementById('empBirthDate').value || null;
             const tbDate = document.getElementById('empTBDate').value || null;
+            const tbXray = document.getElementById('empTBXray').checked;
             const trainingDate = document.getElementById('empTrainingDate').value || null;
             const hcaDate = document.getElementById('empHCADate').value || null;
             
@@ -2601,12 +2857,12 @@ Write your email content here..."></div>
                     action: id ? 'updateEmployee' : 'addEmployee', 
                     id: id || undefined, 
                     firstName, lastName, email, status, department, position, supervisor,
-                    hireDate, birthDate, tbDate, trainingDate, hcaDate
+                    hireDate, birthDate, tbDate, tbXray, trainingDate, hcaDate
                 };
                 const result = await apiCall(data, 'POST');
                 if (!result.success) throw new Error(result.error);
                 
-                const empData = { firstName, lastName, email, status, department, position, supervisor, hireDate, birthDate, tbDate, trainingDate, hcaDate };
+                const empData = { firstName, lastName, email, status, department, position, supervisor, hireDate, birthDate, tbDate, tbXray, trainingDate, hcaDate };
                 if (id) {
                     const idx = employees.findIndex(e => String(e.id) === String(id));
                     if (idx !== -1) employees[idx] = { ...employees[idx], ...empData };
@@ -2968,7 +3224,22 @@ Write your email content here..."></div>
             
             showLoading(true, 'Running automation...');
             try {
-                const result = await apiCall({ action: 'runAutomation', settings: automationSettings }, 'POST');
+                // Get HCA employee IDs for TB, Training, HCA notifications
+                const hcaEmployeeIds = employees
+                    .filter(e => e.status === 'active' && isHCAPosition(e))
+                    .map(e => e.id);
+                
+                // Get non-X-Ray employee IDs for TB notifications
+                const tbEligibleIds = employees
+                    .filter(e => e.status === 'active' && isHCAPosition(e) && !(e.tbXray === true || e.tbXray === 'true'))
+                    .map(e => e.id);
+                
+                const result = await apiCall({ 
+                    action: 'runAutomation', 
+                    settings: automationSettings,
+                    hcaEmployeeIds: hcaEmployeeIds,
+                    tbEligibleIds: tbEligibleIds
+                }, 'POST');
                 if (!result.success) throw new Error(result.error);
                 
                 const sent = result.data?.emailsSent || 0;
@@ -2986,7 +3257,22 @@ Write your email content here..."></div>
         async function previewAutomation() {
             showLoading(true, 'Checking pending emails...');
             try {
-                const result = await apiCall({ action: 'previewAutomation', settings: automationSettings }, 'POST');
+                // Get HCA employee IDs for TB, Training, HCA notifications
+                const hcaEmployeeIds = employees
+                    .filter(e => e.status === 'active' && isHCAPosition(e))
+                    .map(e => e.id);
+                
+                // Get non-X-Ray employee IDs for TB notifications
+                const tbEligibleIds = employees
+                    .filter(e => e.status === 'active' && isHCAPosition(e) && !(e.tbXray === true || e.tbXray === 'true'))
+                    .map(e => e.id);
+                
+                const result = await apiCall({ 
+                    action: 'previewAutomation', 
+                    settings: automationSettings,
+                    hcaEmployeeIds: hcaEmployeeIds,
+                    tbEligibleIds: tbEligibleIds
+                }, 'POST');
                 if (!result.success) throw new Error(result.error);
                 
                 const pending = result.data?.pending || [];
