@@ -2635,11 +2635,6 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                 </button>
             </div>
             <div class="modal-body">
-                <div class="notice-box" style="background: #FFF3E0; border-left-color: #F57600;">
-                    <h3>⚠️ Testing Mode</h3>
-                    <p>Automated reports are currently disabled. Only <strong>Tommaso Esmanech</strong> can receive test reports.</p>
-                </div>
-                
                 <p style="margin-bottom: 15px; color: #3D3D3D;">
                     Select the time period for the report to be sent to: <strong id="sendReportClientName">Client</strong>
                 </p>
@@ -4201,12 +4196,6 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
         async function confirmSendReport() {
             if (!selectedClient || !selectedClient['Customer Name']) {
                 showToast('No customer name available', 'error');
-                return;
-            }
-            
-            // Testing mode - only allow Tommaso Esmanech
-            if (selectedClient['Customer Name'] !== 'Tommaso Esmanech') {
-                showToast('Testing mode: Only Tommaso Esmanech can receive test reports', 'warning');
                 return;
             }
             
