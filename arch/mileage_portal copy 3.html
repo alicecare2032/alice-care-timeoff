@@ -1729,7 +1729,7 @@
             const endMiles = parseFloat(document.getElementById('tripEndMiles').value) || 0;
             
             if (endMiles > startMiles) {
-                const total = (endMiles - startMiles).toFixed(1);
+                const total = (endMiles - startMiles).toFixed(2);
                 document.getElementById('tripCalculatedMileage').innerHTML = `${total} <span class="unit">mi</span>`;
             } else {
                 document.getElementById('tripCalculatedMileage').innerHTML = '0.0 <span class="unit">mi</span>';
@@ -1850,19 +1850,19 @@
             const totalMileage = endMilesNum - startMiles;
             
             if (totalMileage > 500) {
-                if (!confirm(`Total mileage is ${totalMileage.toFixed(1)} miles. Is this correct?`)) {
+                if (!confirm(`Total mileage is ${totalMileage.toFixed(2)} miles. Is this correct?`)) {
                     return;
                 }
             }
             
-            showLoading('Completing Trip...', `Submitting ${totalMileage.toFixed(1)} miles`);
+            showLoading('Completing Trip...', `Submitting ${totalMileage.toFixed(2)} miles`);
             
             // Update trip with end data
             const completedTrip = {
                 ...currentTripInProgress,
                 endMiles: endMiles,
                 endDateTime: new Date().toISOString(),
-                totalMileage: totalMileage.toFixed(1)
+                totalMileage: totalMileage.toFixed(2)
             };
             
             // Save to Google Sheet as "Submitted"
@@ -1883,7 +1883,7 @@
                     // Show success
                     document.getElementById('submitSuccess').classList.remove('hidden');
                     document.getElementById('successMessage').textContent = 
-                        `Trip to ${completedTrip.clientName} completed: ${totalMileage.toFixed(1)} miles recorded.`;
+                        `Trip to ${completedTrip.clientName} completed: ${totalMileage.toFixed(2)} miles recorded.`;
                     
                     setTimeout(() => {
                         document.getElementById('submitSuccess').classList.add('hidden');
@@ -2216,7 +2216,7 @@
             }
             
             document.getElementById('calculatedMileage').innerHTML = 
-                difference.toFixed(1) + ' <span class="unit">mi</span>';
+                difference.toFixed(2) + ' <span class="unit">mi</span>';
         }
         
         // ==========================================
@@ -2312,7 +2312,7 @@
             const startMiles = parseFloat(document.getElementById('startMiles').value) || 0;
             const endMiles = parseFloat(document.getElementById('endMiles').value) || 0;
             
-            const totalMileage = (endMiles - startMiles).toFixed(1);
+            const totalMileage = (endMiles - startMiles).toFixed(2);
             
             // Show loading overlay
             showLoading('Submitting Mileage...', `Recording ${totalMileage} miles for ${clientName}`);
@@ -2705,7 +2705,7 @@
                             ${entry.reason || '-'}
                         </td>
                         <td style="padding: 12px; font-size: 14px; color: #1A365C; font-weight: 600; text-align: right;">
-                            ${parseFloat(entry.totalMileage || 0).toFixed(1)} mi
+                            ${parseFloat(entry.totalMileage || 0).toFixed(2)} mi
                         </td>
                         <td style="padding: 12px; text-align: center;">
                             <span style="background: #D4F4E2; color: #62B790; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600;">
@@ -2723,7 +2723,7 @@
                             MANUAL ENTRIES TOTAL
                         </td>
                         <td style="padding: 12px; font-weight: 700; font-size: 16px; color: #F57600; text-align: right;">
-                            ${totalMileage.toFixed(1)} mi
+                            ${totalMileage.toFixed(2)} mi
                         </td>
                         <td style="padding: 12px; font-size: 12px; color: #3D3D3D; text-align: center;">
                             ${entries.length} entr${entries.length !== 1 ? 'ies' : 'y'}
@@ -2742,7 +2742,7 @@
                 </div>
                 <div class="manual-stat-item">
                     <div class="stat-label">Total Miles</div>
-                    <div class="stat-value highlight">${totalMileage.toFixed(1)}</div>
+                    <div class="stat-value highlight">${totalMileage.toFixed(2)}</div>
                 </div>
             `;
         }
@@ -2810,11 +2810,10 @@
                     adjustedMileageCell = `<span style="font-weight: 600; color: #1A365C;">${parseFloat(adjValue).toFixed(2)}</span>`;
                 } else {
                     // Show editable input for pending reports
-                    const inputValue = parseFloat(service.Adjusted_Mileage || service.Mileage).toFixed(2);
                     adjustedMileageCell = `<input type="number" 
                         id="adj_${index}" 
-                        value="${inputValue}" 
-                        step="0.01" 
+                        value="${service.Adjusted_Mileage || service.Mileage}" 
+                        step="0.1" 
                         min="0"
                         style="width: 70px; padding: 6px 8px; border: 1px solid #D3D7DF; border-radius: 6px; font-size: 13px; text-align: center;"
                         onchange="updateAdjustment(${index}, this.value)">`;
@@ -2913,21 +2912,13 @@
         }
 
         function updateAdjustment(index, value) {
-            const inputEl = document.getElementById('adj_' + index);
-            
             if (!value || value === '') {
                 delete adjustments[index];
             } else {
                 if (!adjustments[index]) {
                     adjustments[index] = {};
                 }
-                const parsedValue = parseFloat(value);
-                adjustments[index].adjustedMileage = parsedValue;
-                
-                // Format the input to 2 decimal places
-                if (inputEl) {
-                    inputEl.value = parsedValue.toFixed(2);
-                }
+                adjustments[index].adjustedMileage = parseFloat(value);
             }
             
             // Recalculate total adjusted mileage (excluding commute services)
