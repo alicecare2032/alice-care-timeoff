@@ -3304,9 +3304,19 @@ Write your email content here..."></div>
         }
         
         function renderAutomationUI() {
+            // Explicit mapping from settings keys to element ID suffixes
+            const toggleIdMap = {
+                'hireAnniversary': 'HireAnniversary',
+                'birthday': 'Birthday',
+                'tbReminder': 'TBReminder',
+                'trainingReminder': 'TrainingReminder',
+                'hcaReminder': 'HCAReminder'
+            };
+            
             // Update toggle states
             Object.keys(automationSettings).forEach(key => {
-                const toggle = document.getElementById('trigger' + key.charAt(0).toUpperCase() + key.slice(1));
+                const toggleId = 'trigger' + toggleIdMap[key];
+                const toggle = document.getElementById(toggleId);
                 if (toggle) {
                     toggle.classList.toggle('active', automationSettings[key].enabled);
                 }
@@ -3316,11 +3326,20 @@ Write your email content here..."></div>
             const templateOptions = '<option value="">Select template...</option>' + 
                 templates.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
             
-            ['HireAnniversary', 'Birthday', 'TBReminder', 'TrainingReminder', 'HCAReminder'].forEach(name => {
+            // Use explicit mapping to avoid case-sensitivity issues with keys like TBReminder/tbReminder
+            const dropdownKeyMap = {
+                'HireAnniversary': 'hireAnniversary',
+                'Birthday': 'birthday',
+                'TBReminder': 'tbReminder',
+                'TrainingReminder': 'trainingReminder',
+                'HCAReminder': 'hcaReminder'
+            };
+            
+            Object.keys(dropdownKeyMap).forEach(name => {
                 const select = document.getElementById('template' + name);
                 if (select) {
                     select.innerHTML = templateOptions;
-                    const key = name.charAt(0).toLowerCase() + name.slice(1);
+                    const key = dropdownKeyMap[name];
                     if (automationSettings[key]?.templateId) {
                         select.value = automationSettings[key].templateId;
                     }
