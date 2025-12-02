@@ -2996,14 +2996,6 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                     <p style="margin: 0; font-size: 13px;" id="testClientName">--</p>
                     <p style="margin: 5px 0 0; font-size: 12px; color: #666;" id="testClientEmail">--</p>
                     <p style="margin: 5px 0 0; font-size: 12px; color: #666;" id="testClientSubscription">--</p>
-                    
-                    <!-- Invoice Preview Section -->
-                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #E5ECF3;">
-                        <button onclick="previewInvoice()" class="btn btn-secondary" style="font-size: 12px; padding: 8px 12px;">
-                            🧾 Preview Invoice Info
-                        </button>
-                        <div id="invoicePreviewResult" style="display: none; margin-top: 10px;"></div>
-                    </div>
                 </div>
                 
                 <div class="filter-group" style="margin-bottom: 20px;">
@@ -6744,82 +6736,6 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
             document.getElementById('testClientEmail').textContent = 'Email: ' + (client['email'] || 'Not set');
             document.getElementById('testClientSubscription').textContent = 'Subscription: ' + (client['Subscription'] || 'None');
             document.getElementById('testClientInfo').style.display = 'block';
-            
-            // Reset invoice preview
-            document.getElementById('invoicePreviewResult').style.display = 'none';
-        }
-        
-        // Preview Invoice Info for selected client
-        async function previewInvoice() {
-            const customerName = document.getElementById('testClientSelected').value;
-            
-            if (!customerName) {
-                showToast('Please select a client first', 'warning');
-                return;
-            }
-            
-            const resultDiv = document.getElementById('invoicePreviewResult');
-            resultDiv.innerHTML = '<div style="color: #666; font-size: 12px;"><span class="spinner" style="width:14px;height:14px;display:inline-block;margin-right:8px;"></span> Loading invoice info...</div>';
-            resultDiv.style.display = 'block';
-            
-            try {
-                const result = await jsonpFetch({
-                    action: 'previewInvoice',
-                    customerName: customerName
-                });
-                
-                if (result.success) {
-                    const info = result.invoiceInfo;
-                    
-                    let html = '<div style="background: white; border: 1px solid #E5ECF3; border-radius: 6px; padding: 12px; font-size: 12px;">';
-                    html += '<div style="font-weight: 600; color: #1A365C; margin-bottom: 10px;">📋 Invoice Preview</div>';
-                    
-                    // AOB Status
-                    html += `<div style="margin-bottom: 8px;">
-                        <span style="color: #666;">Assignment of Benefits:</span> 
-                        <span style="font-weight: 600; color: ${info.isAOB ? '#059669' : '#666'};">${info.isAOB ? '✓ Yes' : '✗ No'}</span>
-                    </div>`;
-                    
-                    // Insurance
-                    html += `<div style="margin-bottom: 8px;">
-                        <span style="color: #666;">Insurance:</span> 
-                        <span style="font-weight: 600;">${info.insuranceName || 'N/A'}</span>
-                        ${info.isExempt ? '<span style="background: #FEE2E2; color: #991B1B; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-left: 6px;">EXEMPT</span>' : ''}
-                    </div>`;
-                    
-                    // Invoice Number
-                    if (info.willGetInvoice) {
-                        html += `<div style="background: #FFF7ED; border: 1px solid #F57600; border-radius: 6px; padding: 10px; margin-top: 10px;">
-                            <div style="color: #F57600; font-weight: 600;">🧾 Invoice Number: #${info.nextInvoiceNumber}</div>
-                            <div style="font-size: 11px; color: #666; margin-top: 4px;">This client WILL receive an invoice number on their next report.</div>
-                        </div>`;
-                    } else {
-                        html += `<div style="background: #F3F4F6; border: 1px solid #D1D5DB; border-radius: 6px; padding: 10px; margin-top: 10px;">
-                            <div style="color: #666; font-weight: 600;">No Invoice Number</div>
-                            <div style="font-size: 11px; color: #999; margin-top: 4px;">
-                                ${!info.isAOB ? 'Reason: Not an Assignment of Benefits client' : ''}
-                                ${info.isAOB && info.isExempt ? 'Reason: Insurance is in exemption list' : ''}
-                            </div>
-                        </div>`;
-                    }
-                    
-                    // Email Routing
-                    html += `<div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid #E5ECF3;">
-                        <div style="font-weight: 600; color: #1A365C; margin-bottom: 6px;">📧 Email Routing</div>
-                        <div style="font-size: 11px; color: #666;">
-                            <div><strong>TO:</strong> ${info.emailTo || 'Insurance email'}</div>
-                            <div><strong>BCC:</strong> ${info.emailBcc || 'Client email'}</div>
-                        </div>
-                    </div>`;
-                    
-                    html += '</div>';
-                    resultDiv.innerHTML = html;
-                } else {
-                    resultDiv.innerHTML = `<div style="color: #DC2626; font-size: 12px;">❌ Error: ${result.error || 'Failed to load invoice info'}</div>`;
-                }
-            } catch (e) {
-                resultDiv.innerHTML = `<div style="color: #DC2626; font-size: 12px;">❌ Error: ${e.message}</div>`;
-            }
         }
         
         async function sendTestReportFromModal() {
