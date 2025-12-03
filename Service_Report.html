@@ -1245,29 +1245,28 @@
     
     <!-- Tab Navigation -->
     <nav class="nav-tabs">
-<button class="tab-btn active" data-tab="dashboard">
+        <button class="tab-btn active" data-tab="report">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="7" height="7"/>
-                <rect x="14" y="3" width="7" height="7"/>
-                <rect x="14" y="14" width="7" height="7"/>
-                <rect x="3" y="14" width="7" height="7"/>
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
             </svg>
-            Dashboard
+            Service Report
         </button>
-        <button class="tab-btn" data-tab="clientInsights">
+        <button class="tab-btn" data-tab="client">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                <path d="M12 8v4"/>
-                <path d="M8 12h8"/>
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
             </svg>
-            Client Insights
+            Clients
         </button>
     </nav>
 
     <div style="max-width: 1200px; margin: 0 auto 10px auto; text-align: right; font-size: 13px; color: #1A365C;">
-        Need service reports, client management, or automation settings?
-        <a href="Service_Report.html" style="color: #F57600; font-weight: 600; text-decoration: none; margin-left: 6px;">
-            Go to Service_Report →
+        Looking for dashboards and client insights?
+        <a href="reporting.html" style="color: #F57600; font-weight: 600; text-decoration: none; margin-left: 6px;">
+            Open Dashboard & Client Insights →
         </a>
     </div>
     
@@ -1295,1282 +1294,201 @@
         
         <!-- Content -->
         <div class="content">
-<!-- Dashboard Tab -->
-            <div class="tab-panel active" id="dashboard-panel">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2 class="section-title" style="margin-bottom: 0;">Executive Dashboard</h2>
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        <select id="dashboardYear" onchange="loadDashboardData()" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px;">
-                            <option value="2025">2025</option>
-                            <option value="2024">2024</option>
-                            <option value="2023">2023</option>
+            <!-- Report Tab -->
+            <div class="tab-panel active" id="report-panel">
+                <h2 class="section-title">Service Report</h2>
+                
+                <div class="filters">
+                    <div class="filter-group">
+                        <label>Client Name</label>
+                        <input type="text" id="filterClient" placeholder="Search client...">
+                    </div>
+                    <div class="filter-group">
+                         <label>Week Number <a href="week_number_reference.html" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: #F57600; color: white; text-decoration: none; border-radius: 50%; font-weight: bold; font-size: 16px;" title="Find Week Number">?</a></span></label>
+                        <input type="number" id="filterWeek" placeholder="Week #" min="1" max="53">
+                    </div>
+                    <div class="filter-group">
+                        <label>Month</label>
+                        <select id="filterMonth">
+                            <option value="">All Months</option>
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
                         </select>
-                        <button class="btn btn-secondary" onclick="loadDashboardData()" style="padding: 8px 12px;">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
-                                <polyline points="23 4 23 10 17 10"/>
-                                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
-                            </svg>
-                            Refresh
-                        </button>
+                    </div>
+                    <div class="filter-group">
+                        <label>Year</label>
+                        <select id="filterYear">
+                            <option value="">All Years</option>
+                            <option value="2024">2024</option>
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Status</label>
+                        <select id="filterStatus">
+                            <option value="">All Status</option>
+                            <option value="COMPLETED">Completed</option>
+                            <option value="ASSIGNED">Assigned</option>
+                            <option value="UNASSIGNED">Unassigned</option>
+                            <option value="CANCELLED_BY_CUSTOMER">Cancelled by Customer</option>
+                            <option value="CANCELLED_BY_PROVIDER">Cancelled by Provider</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="filters" style="margin-top: -10px; padding-top: 15px;">
+                    <div class="filter-group">
+                        <label>Start Date</label>
+                        <input type="date" id="filterStartDate">
+                    </div>
+                    <div class="filter-group">
+                        <label>End Date</label>
+                        <input type="date" id="filterEndDate">
+                    </div>
+                    <div class="filter-buttons">
+                        <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+                        <button class="btn btn-secondary" onclick="clearFilters()">Clear</button>
                     </div>
                 </div>
                 
-                <!-- Year-to-Date KPIs -->
-                <div style="background: linear-gradient(135deg, #1A365C 0%, #2D4A7C 100%); border-radius: 16px; padding: 30px; margin-bottom: 30px; color: white;">
-                    <h3 style="margin: 0 0 20px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8;">
-                        <span id="dashboardYearLabel">2025</span> Year-to-Date Performance
-                    </h3>
-                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px;">
-                        <div>
-                            <div style="font-size: 12px; opacity: 0.7; margin-bottom: 5px;">Total Services</div>
-                            <div style="font-size: 36px; font-weight: 700;" id="ytdServices">--</div>
-                            <div style="font-size: 12px; margin-top: 5px;" id="ytdServicesChange">
-                                <span style="color: #62B790;">↑ 0%</span> vs last year
-                            </div>
-                        </div>
-                        <div>
-                            <div style="font-size: 12px; opacity: 0.7; margin-bottom: 5px;">Total Hours</div>
-                            <div style="font-size: 36px; font-weight: 700;" id="ytdHours">--</div>
-                            <div style="font-size: 12px; margin-top: 5px;" id="ytdHoursChange">
-                                <span style="color: #62B790;">↑ 0%</span> vs last year
-                            </div>
-                        </div>
-                        <div>
-                            <div style="font-size: 12px; opacity: 0.7; margin-bottom: 5px;">Total Revenue</div>
-                            <div style="font-size: 36px; font-weight: 700;" id="ytdRevenue">--</div>
-                            <div style="font-size: 12px; margin-top: 5px;" id="ytdRevenueChange">
-                                <span style="color: #62B790;">↑ 0%</span> vs last year
-                            </div>
-                        </div>
-                        <div>
-                            <div style="font-size: 12px; opacity: 0.7; margin-bottom: 5px;">Avg Revenue/Service</div>
-                            <div style="font-size: 36px; font-weight: 700;" id="ytdAvgRevenue">--</div>
-                            <div style="font-size: 12px; margin-top: 5px;" id="ytdAvgRevenueChange">
-                                <span style="color: #62B790;">↑ 0%</span> vs last year
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Last Completed Period Stats -->
-                <div class="stats-row" style="margin-bottom: 30px;">
-                    <div class="stat-card">
-                        <h3>Last Week <span id="lastWeekLabel" style="font-weight: 400; color: #999; font-size: 11px;">(Week --)</span></h3>
-                        <div style="display: flex; gap: 15px; align-items: baseline; margin-bottom: 5px;">
-                            <div>
-                                <span style="font-size: 11px; color: #666; text-transform: uppercase;">Revenue</span>
-                                <div style="font-size: 22px; font-weight: 700; color: #1A365C;">$<span id="weekRevenue">--</span></div>
-                            </div>
-                            <div style="border-left: 1px solid #E5ECF3; padding-left: 15px;">
-                                <span style="font-size: 11px; color: #666; text-transform: uppercase;">Hours</span>
-                                <div style="font-size: 22px; font-weight: 700; color: #1A365C;"><span id="weekHours">--</span></div>
-                            </div>
-                        </div>
-                        <div class="subtitle"><span id="weekServices">--</span> services completed</div>
-                        <div id="weekChange" style="font-size: 11px; margin-top: 5px;"></div>
-                    </div>
-                    <div class="stat-card green">
-                        <h3>Last Month <span id="lastMonthLabel" style="font-weight: 400; color: #999; font-size: 11px;">(--)</span></h3>
-                        <div style="display: flex; gap: 15px; align-items: baseline; margin-bottom: 5px;">
-                            <div>
-                                <span style="font-size: 11px; color: #666; text-transform: uppercase;">Revenue</span>
-                                <div style="font-size: 22px; font-weight: 700; color: #1A365C;">$<span id="monthRevenue">--</span></div>
-                            </div>
-                            <div style="border-left: 1px solid #E5ECF3; padding-left: 15px;">
-                                <span style="font-size: 11px; color: #666; text-transform: uppercase;">Hours</span>
-                                <div style="font-size: 22px; font-weight: 700; color: #1A365C;"><span id="monthHours">--</span></div>
-                            </div>
-                        </div>
-                        <div class="subtitle"><span id="monthServices">--</span> services completed</div>
-                        <div id="monthChange" style="font-size: 11px; margin-top: 5px;"></div>
-                    </div>
-                    <div class="stat-card blue">
-                        <h3>Last Quarter <span id="lastQuarterLabel" style="font-weight: 400; color: #999; font-size: 11px;">(--)</span></h3>
-                        <div style="display: flex; gap: 15px; align-items: baseline; margin-bottom: 5px;">
-                            <div>
-                                <span style="font-size: 11px; color: #666; text-transform: uppercase;">Revenue</span>
-                                <div style="font-size: 22px; font-weight: 700; color: #1A365C;">$<span id="quarterRevenue">--</span></div>
-                            </div>
-                            <div style="border-left: 1px solid #E5ECF3; padding-left: 15px;">
-                                <span style="font-size: 11px; color: #666; text-transform: uppercase;">Hours</span>
-                                <div style="font-size: 22px; font-weight: 700; color: #1A365C;"><span id="quarterHours">--</span></div>
-                            </div>
-                        </div>
-                        <div class="subtitle"><span id="quarterServices">--</span> services completed</div>
-                        <div id="quarterChange" style="font-size: 11px; margin-top: 5px;"></div>
-                    </div>
-                    <div class="stat-card" style="border-left-color: #9C27B0;">
-                        <h3>Active Clients</h3>
-                        <div class="number" id="activeClients">--</div>
-                        <div class="subtitle">With services this year</div>
-                    </div>
-                </div>
-                
-                <!-- Row 1: Weekly Charts -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 30px;">
-                    <div style="background: white; border: 1px solid #E5ECF3; border-radius: 12px; padding: 20px;">
-                        <h3 style="color: #1A365C; margin: 0 0 5px 0; font-size: 16px;">Weekly Revenue</h3>
-                        <p style="color: #666; font-size: 11px; margin: 0 0 15px 0;">Last 12 weeks through <span id="weeklyChartEndLabel">last week</span></p>
-                        <div style="height: 220px; position: relative;">
-                            <canvas id="weeklyRevenueChart"></canvas>
-                        </div>
-                    </div>
-                    <div style="background: white; border: 1px solid #E5ECF3; border-radius: 12px; padding: 20px;">
-                        <h3 style="color: #1A365C; margin: 0 0 5px 0; font-size: 16px;">Weekly Volume</h3>
-                        <p style="color: #666; font-size: 11px; margin: 0 0 15px 0;">Services &amp; Hours (through <span id="weeklyVolumeEndLabel">last week</span>)</p>
-                        <div style="height: 220px; position: relative;">
-                            <canvas id="weeklyVolumeChart"></canvas>
-                        </div>
-                    </div>
-                    <div style="background: white; border: 1px solid #E5ECF3; border-radius: 12px; padding: 20px;">
-                        <h3 style="color: #1A365C; margin: 0 0 20px 0; font-size: 16px;">Peak Hours (12 Week Avg)</h3>
-                        <div style="height: 220px; position: relative;">
-                            <canvas id="peakHoursChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Row 2: Monthly Charts -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 30px;">
-                    <div style="background: white; border: 1px solid #E5ECF3; border-radius: 12px; padding: 20px;">
-                        <h3 style="color: #1A365C; margin: 0 0 20px 0; font-size: 16px;">Monthly Revenue (Last 13 Months)</h3>
-                        <div style="height: 220px; position: relative;">
-                            <canvas id="monthlyRevenueChart"></canvas>
-                        </div>
-                    </div>
-                    <div style="background: white; border: 1px solid #E5ECF3; border-radius: 12px; padding: 20px;">
-                        <h3 style="color: #1A365C; margin: 0 0 20px 0; font-size: 16px;">Monthly Volume (Last 13 Months)</h3>
-                        <div style="height: 220px; position: relative;">
-                            <canvas id="monthlyVolumeChart"></canvas>
-                        </div>
-                    </div>
-                    <div style="background: white; border: 1px solid #E5ECF3; border-radius: 12px; padding: 20px;">
-                        <h3 style="color: #1A365C; margin: 0 0 20px 0; font-size: 16px;">Quarterly Revenue Comparison</h3>
-                        <div style="height: 220px; position: relative;">
-                            <canvas id="quarterlyChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Row 3: Top Paying Clients -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
-                    <div style="background: white; border: 1px solid #E5ECF3; border-radius: 12px; padding: 20px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                            <h3 style="color: #1A365C; margin: 0; font-size: 16px;">🏆 Top Clients Last Week <span id="topClientsWeekLabel" style="font-weight: 400; color: #666;">(Week --)</span></h3>
-                            <select id="topClientsWeekLimit" onchange="updateTopClientsDisplay('week')" style="padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
-                                <option value="5" selected>Top 5</option>
-                                <option value="10">Top 10</option>
-                                <option value="15">Top 15</option>
-                                <option value="20">Top 20</option>
-                            </select>
-                        </div>
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <thead>
-                                <tr style="background: #F9FAFB;">
-                                    <th style="padding: 8px 10px; text-align: left; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">#</th>
-                                    <th style="padding: 8px 10px; text-align: left; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">Client</th>
-                                    <th style="padding: 8px 10px; text-align: center; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">Svcs</th>
-                                    <th style="padding: 8px 10px; text-align: right; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">Revenue</th>
-                                </tr>
-                            </thead>
-                            <tbody id="topClientsWeek">
-                                <tr><td colspan="4" style="text-align: center; color: #999; padding: 20px;">Loading...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div style="background: white; border: 1px solid #E5ECF3; border-radius: 12px; padding: 20px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                            <h3 style="color: #1A365C; margin: 0; font-size: 16px;">🏆 Top Clients This Month <span id="topClientsMonthLabel" style="font-weight: 400; color: #666;">(--)</span></h3>
-                            <select id="topClientsMonthLimit" onchange="updateTopClientsDisplay('month')" style="padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
-                                <option value="5" selected>Top 5</option>
-                                <option value="10">Top 10</option>
-                                <option value="15">Top 15</option>
-                                <option value="20">Top 20</option>
-                            </select>
-                        </div>
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <thead>
-                                <tr style="background: #F9FAFB;">
-                                    <th style="padding: 8px 10px; text-align: left; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">#</th>
-                                    <th style="padding: 8px 10px; text-align: left; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">Client</th>
-                                    <th style="padding: 8px 10px; text-align: center; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">Svcs</th>
-                                    <th style="padding: 8px 10px; text-align: right; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">Revenue</th>
-                                </tr>
-                            </thead>
-                            <tbody id="topClientsMonth">
-                                <tr><td colspan="4" style="text-align: center; color: #999; padding: 20px;">Loading...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <!-- Row 4: Top Providers Section with Filters -->
-                <div style="background: white; border: 1px solid #E5ECF3; border-radius: 12px; padding: 20px; margin-bottom: 30px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
-                        <h3 style="color: #1A365C; margin: 0; font-size: 18px;">👤 Top Providers</h3>
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <select id="providerDisplayLimit" onchange="updateProviderTables()" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px;">
-                                <option value="5" selected>Top 5</option>
-                                <option value="10">Top 10</option>
-                                <option value="15">Top 15</option>
-                                <option value="20">Top 20</option>
-                            </select>
-                            <select id="providerFilterType" onchange="updateProviderFilter()" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px;">
-                                <option value="year">Year</option>
-                                <option value="month">Month</option>
-                                <option value="week">Week</option>
-                            </select>
-                            <select id="providerFilterYear" onchange="updateProviderTables()" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px;">
-                                <option value="2025">2025</option>
-                                <option value="2024">2024</option>
-                                <option value="2023">2023</option>
-                            </select>
-                            <select id="providerFilterMonth" onchange="updateProviderTables()" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; display: none;">
-                                <option value="1">January</option>
-                                <option value="2">February</option>
-                                <option value="3">March</option>
-                                <option value="4">April</option>
-                                <option value="5">May</option>
-                                <option value="6">June</option>
-                                <option value="7">July</option>
-                                <option value="8">August</option>
-                                <option value="9">September</option>
-                                <option value="10">October</option>
-                                <option value="11">November</option>
-                                <option value="12">December</option>
-                            </select>
-                            <select id="providerFilterWeek" onchange="updateProviderTables()" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; display: none;">
-                            </select>
-                        </div>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                        <div>
-                            <h4 style="color: #1A365C; margin: 0 0 12px 0; font-size: 14px; font-weight: 600;">By Hours</h4>
-                            <table style="width: 100%; border-collapse: collapse;">
-                                <thead>
-                                    <tr style="background: #F9FAFB;">
-                                        <th style="padding: 8px 10px; text-align: left; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">#</th>
-                                        <th style="padding: 8px 10px; text-align: left; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">Provider</th>
-                                        <th style="padding: 8px 10px; text-align: center; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">Svcs</th>
-                                        <th style="padding: 8px 10px; text-align: right; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">Hours</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="topProvidersByHours">
-                                    <tr><td colspan="4" style="text-align: center; color: #999; padding: 20px;">Loading...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div>
-                            <h4 style="color: #1A365C; margin: 0 0 12px 0; font-size: 14px; font-weight: 600;">By Services</h4>
-                            <table style="width: 100%; border-collapse: collapse;">
-                                <thead>
-                                    <tr style="background: #F9FAFB;">
-                                        <th style="padding: 8px 10px; text-align: left; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">#</th>
-                                        <th style="padding: 8px 10px; text-align: left; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">Provider</th>
-                                        <th style="padding: 8px 10px; text-align: center; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">Svcs</th>
-                                        <th style="padding: 8px 10px; text-align: right; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">Hours</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="topProvidersByServices">
-                                    <tr><td colspan="4" style="text-align: center; color: #999; padding: 20px;">Loading...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Row 5: Provider Activity Monitor -->
-                <div style="background: white; border: 1px solid #E5ECF3; border-radius: 12px; padding: 20px; margin-bottom: 30px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
-                        <div>
-                            <h3 style="color: #1A365C; margin: 0; font-size: 18px;">📊 Provider Activity Monitor</h3>
-                            <p style="font-size: 12px; color: #666; margin: 5px 0 0 0;">Comparing recent activity vs prior period to identify declining engagement</p>
-                        </div>
-                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                            <div style="display: flex; align-items: center; gap: 5px;">
-                                <label style="font-size: 12px; color: #666;">Period:</label>
-                                <select id="activityPeriodDays" onchange="updateProviderActivityMonitor()" style="padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
-                                    <option value="30">30 days</option>
-                                    <option value="45" selected>45 days</option>
-                                    <option value="60">60 days</option>
-                                </select>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 5px;">
-                                <label style="font-size: 12px; color: #666;">Show:</label>
-                                <select id="activityStatusFilter" onchange="updateProviderActivityMonitor()" style="padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
-                                    <option value="concerns">⚠️ Concerns Only</option>
-                                    <option value="all">All Providers</option>
-                                    <option value="inactive">🔴 Inactive</option>
-                                    <option value="atrisk">🟠 At Risk</option>
-                                    <option value="declining">🟡 Declining</option>
-                                </select>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 5px;">
-                                <label style="font-size: 12px; color: #666;">Limit:</label>
-                                <select id="activityDisplayLimit" onchange="updateProviderActivityMonitor()" style="padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
-                                    <option value="10" selected>10</option>
-                                    <option value="20">20</option>
-                                    <option value="50">50</option>
-                                    <option value="all">All</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Search Box -->
-                    <div style="margin-bottom: 15px;">
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <input type="text" id="providerActivitySearch" placeholder="Search provider name..." 
-                                   style="flex: 1; max-width: 300px; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;"
-                                   onkeyup="if(event.key === 'Enter') searchProviderActivity()">
-                            <button class="btn btn-secondary" onclick="searchProviderActivity()" style="padding: 8px 12px;">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
-                                    <circle cx="11" cy="11" r="8"/>
-                                    <path d="m21 21-4.35-4.35"/>
-                                </svg>
-                                Search
-                            </button>
-                            <button class="btn btn-secondary" onclick="clearProviderActivitySearch()" style="padding: 8px 12px;">Clear</button>
-                        </div>
-                    </div>
-                    
-                    <!-- Status Legend -->
-                    <div style="display: flex; gap: 20px; margin-bottom: 15px; padding: 10px 15px; background: #F9FAFB; border-radius: 8px; font-size: 12px; flex-wrap: wrap;">
-                        <span><span style="display: inline-block; width: 12px; height: 12px; background: #4CAF50; border-radius: 50%; margin-right: 5px;"></span> <strong>Active</strong> - Stable or increased</span>
-                        <span><span style="display: inline-block; width: 12px; height: 12px; background: #FFC107; border-radius: 50%; margin-right: 5px;"></span> <strong>Declining</strong> - 25-50% drop</span>
-                        <span><span style="display: inline-block; width: 12px; height: 12px; background: #FF9800; border-radius: 50%; margin-right: 5px;"></span> <strong>At Risk</strong> - 50-99% drop</span>
-                        <span><span style="display: inline-block; width: 12px; height: 12px; background: #F44336; border-radius: 50%; margin-right: 5px;"></span> <strong>Inactive</strong> - 100% drop</span>
-                    </div>
-                    
-                    <!-- Summary Stats - Clickable to filter -->
-                    <div id="activitySummaryStats" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px;">
-                        <div onclick="filterByStatus('active')" style="background: #E8F5E9; padding: 12px; border-radius: 8px; text-align: center; cursor: pointer; transition: transform 0.1s, box-shadow 0.1s;" onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
-                            <div style="font-size: 24px; font-weight: 700; color: #4CAF50;" id="activeProvidersCount">--</div>
-                            <div style="font-size: 11px; color: #666; text-transform: uppercase;">Active</div>
-                        </div>
-                        <div onclick="filterByStatus('declining')" style="background: #FFF8E1; padding: 12px; border-radius: 8px; text-align: center; cursor: pointer; transition: transform 0.1s, box-shadow 0.1s;" onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
-                            <div style="font-size: 24px; font-weight: 700; color: #FFC107;" id="decliningProvidersCount">--</div>
-                            <div style="font-size: 11px; color: #666; text-transform: uppercase;">Declining</div>
-                        </div>
-                        <div onclick="filterByStatus('atrisk')" style="background: #FFF3E0; padding: 12px; border-radius: 8px; text-align: center; cursor: pointer; transition: transform 0.1s, box-shadow 0.1s;" onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
-                            <div style="font-size: 24px; font-weight: 700; color: #FF9800;" id="atRiskProvidersCount">--</div>
-                            <div style="font-size: 11px; color: #666; text-transform: uppercase;">At Risk</div>
-                        </div>
-                        <div onclick="filterByStatus('inactive')" style="background: #FFEBEE; padding: 12px; border-radius: 8px; text-align: center; cursor: pointer; transition: transform 0.1s, box-shadow 0.1s;" onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
-                            <div style="font-size: 24px; font-weight: 700; color: #F44336;" id="inactiveProvidersCount">--</div>
-                            <div style="font-size: 11px; color: #666; text-transform: uppercase;">Inactive</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Provider Activity Table -->
-                    <div style="overflow-x: auto;">
-                        <table style="width: 100%; border-collapse: collapse; min-width: 850px;">
-                            <thead>
-                                <tr style="background: #F9FAFB;">
-                                    <th onclick="sortProviderActivity('status')" style="padding: 10px 12px; text-align: left; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3; cursor: pointer; user-select: none;" title="Click to sort">
-                                        Status <span id="sort-status" style="margin-left: 4px; color: #1A365C;"></span>
-                                    </th>
-                                    <th onclick="sortProviderActivity('name')" style="padding: 10px 12px; text-align: left; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3; cursor: pointer; user-select: none;" title="Click to sort">
-                                        Provider Name <span id="sort-name" style="margin-left: 4px; color: #1A365C;"></span>
-                                    </th>
-                                    <th onclick="sortProviderActivity('lastPeriodHours')" style="padding: 10px 12px; text-align: center; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3; cursor: pointer; user-select: none;" colspan="2">
-                                        Last Period 
-                                        <span id="lastPeriodInfo" title="" style="display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; background: #E5ECF3; color: #666; border-radius: 50%; font-size: 10px; cursor: help; margin-left: 4px; font-style: italic; font-weight: normal;">i</span>
-                                        <span id="sort-lastPeriodHours" style="margin-left: 4px; color: #1A365C;"></span>
-                                    </th>
-                                    <th onclick="sortProviderActivity('priorPeriodHours')" style="padding: 10px 12px; text-align: center; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3; cursor: pointer; user-select: none;" colspan="2">
-                                        Prior Period 
-                                        <span id="priorPeriodInfo" title="" style="display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; background: #E5ECF3; color: #666; border-radius: 50%; font-size: 10px; cursor: help; margin-left: 4px; font-style: italic; font-weight: normal;">i</span>
-                                        <span id="sort-priorPeriodHours" style="margin-left: 4px; color: #1A365C;"></span>
-                                    </th>
-                                    <th onclick="sortProviderActivity('change')" style="padding: 10px 12px; text-align: center; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3; cursor: pointer; user-select: none;" title="Click to sort">
-                                        Change <span id="sort-change" style="margin-left: 4px; color: #1A365C;"></span>
-                                    </th>
-                                    <th onclick="sortProviderActivity('lastService')" style="padding: 10px 12px; text-align: center; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3; cursor: pointer; user-select: none;" title="Click to sort">
-                                        Last Service <span id="sort-lastService" style="margin-left: 4px; color: #1A365C;"></span>
-                                    </th>
-                                    <th onclick="sortProviderActivity('ytdHours')" style="padding: 10px 12px; text-align: right; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3; cursor: pointer; user-select: none;" colspan="2" title="Click to sort by hours">
-                                        YTD Total <span id="sort-ytdHours" style="margin-left: 4px; color: #1A365C;"></span>
-                                    </th>
-                                </tr>
-                                <tr style="background: #F9FAFB;">
-                                    <th style="padding: 4px 12px; border-bottom: 1px solid #E5ECF3;"></th>
-                                    <th style="padding: 4px 12px; border-bottom: 1px solid #E5ECF3;"></th>
-                                    <th style="padding: 4px 12px; text-align: center; font-size: 10px; color: #999; border-bottom: 1px solid #E5ECF3;">Svcs</th>
-                                    <th style="padding: 4px 12px; text-align: center; font-size: 10px; color: #999; border-bottom: 1px solid #E5ECF3;">Hours</th>
-                                    <th style="padding: 4px 12px; text-align: center; font-size: 10px; color: #999; border-bottom: 1px solid #E5ECF3;">Svcs</th>
-                                    <th style="padding: 4px 12px; text-align: center; font-size: 10px; color: #999; border-bottom: 1px solid #E5ECF3;">Hours</th>
-                                    <th style="padding: 4px 12px; text-align: center; font-size: 10px; color: #999; border-bottom: 1px solid #E5ECF3;">Hours</th>
-                                    <th style="padding: 4px 12px; border-bottom: 1px solid #E5ECF3;"></th>
-                                    <th style="padding: 4px 12px; text-align: right; font-size: 10px; color: #999; border-bottom: 1px solid #E5ECF3;">Svcs</th>
-                                    <th style="padding: 4px 12px; text-align: right; font-size: 10px; color: #999; border-bottom: 1px solid #E5ECF3;">Hours</th>
-                                </tr>
-                            </thead>
-                            <tbody id="providerActivityList">
-                                <tr><td colspan="10" style="text-align: center; color: #999; padding: 20px;">Loading...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div id="providerActivityFooter" style="margin-top: 10px; font-size: 12px; color: #666; text-align: right;"></div>
-                </div>
-<!-- Historical Archive Section -->
-                <div id="archiveSection" style="background: #E8F5E9; border: 1px solid #A5D6A7; border-radius: 12px; padding: 20px; margin-bottom: 30px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <h3 style="color: #1A365C; margin: 0; font-size: 16px;">📊 Data Cache Status</h3>
-                        <button class="btn btn-secondary" onclick="clearDashboardCache()" style="padding: 8px 12px;">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
-                                <polyline points="1 4 1 10 7 10"/>
-                                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
-                            </svg>
-                            Refresh Data
-                        </button>
-                    </div>
-                    <div id="cacheStatusContent" style="font-size: 13px; color: #666;">
-                        <p>Data is loaded by year for faster performance. Select a year from the dropdown above to view historical data.</p>
-                        <div id="cachedYearsInfo" style="margin-top: 10px; font-size: 12px;"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Client Insights Tab -->
-            <div class="tab-panel" id="clientInsights-panel">
-                <div style="padding: 20px 0;">
-                    <!-- Header -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
-                        <div>
-                            <h2 style="color: #1A365C; margin: 0; font-size: 24px;">📊 Client Insights</h2>
-                            <p style="color: #666; margin: 5px 0 0 0; font-size: 14px;">Deep dive into client lifecycle, value, and care progression</p>
-                        </div>
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <label style="font-size: 13px; color: #666;">Analysis Year:</label>
-                            <select id="insightsYearSelect" onchange="loadClientInsights()" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
-                                <option value="">Loading...</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <!-- Loading State -->
-                    <div id="insightsLoading" style="display: none; text-align: center; padding: 60px 20px;">
-                        <div class="spinner"></div>
-                        <p style="color: #666; margin-top: 15px;">Analyzing client data...</p>
-                    </div>
-                    
-                    <!-- Insights Content -->
-                    <div id="insightsContent" style="display: none;">
-                        
-                        <!-- Row 1: Investor-Grade LTV Metrics -->
-                        <div style="background: white; border: 1px solid #E5ECF3; border-radius: 12px; padding: 20px; margin-bottom: 30px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                                <h3 style="color: #1A365C; margin: 0; font-size: 16px;">📊 Investor-Grade LTV Analysis</h3>
-                                <div style="display: flex; gap: 15px; align-items: center;">
-                                    <label style="font-size: 12px; color: #666;">
-                                        Gross Margin %: 
-                                        <input type="number" id="ltvGrossMargin" value="70" min="0" max="100" step="5" 
-                                            style="width: 60px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;"
-                                            onchange="recalculateLTV()">
-                                    </label>
-                                    <button onclick="recalculateLTV()" style="background: #1A365C; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer;">
-                                        Recalculate
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <!-- Main LTV Display -->
-                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-                                <div style="background: linear-gradient(135deg, #1A365C 0%, #2D4A7C 100%); padding: 20px; border-radius: 12px; color: white;">
-                                    <div style="font-size: 12px; text-transform: uppercase; opacity: 0.8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-                                        LTV (Gross Margin Basis)
-                                        <span class="info-tooltip" style="cursor: help; opacity: 0.7; font-size: 14px;" title="LTV = ARPU × Gross Margin × Customer Lifespan
-
-Formula: Monthly ARPU × (Gross Margin %) × (1 ÷ Monthly Churn Rate)
-
-This is the investor-standard calculation using contribution margin, not top-line revenue.">ⓘ</span>
-                                    </div>
-                                    <div id="insightsLTV" style="font-size: 32px; font-weight: 700;">--</div>
-                                    <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Per client lifetime value</div>
-                                </div>
-                                <div style="background: linear-gradient(135deg, #62B790 0%, #4A9A73 100%); padding: 20px; border-radius: 12px; color: white;">
-                                    <div style="font-size: 12px; text-transform: uppercase; opacity: 0.8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-                                        ARPU (Monthly)
-                                        <span class="info-tooltip" style="cursor: help; opacity: 0.7; font-size: 14px;" title="ARPU = Total Monthly Revenue ÷ Active Customers
-
-Average Revenue Per User, calculated on a monthly basis from the last 3 months of active client data.">ⓘ</span>
-                                    </div>
-                                    <div id="insightsARPU" style="font-size: 32px; font-weight: 700;">--</div>
-                                    <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Avg revenue per client/month</div>
-                                </div>
-                                <div style="background: linear-gradient(135deg, #F57600 0%, #E06500 100%); padding: 20px; border-radius: 12px; color: white;">
-                                    <div style="font-size: 12px; text-transform: uppercase; opacity: 0.8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-                                        Monthly Churn Rate
-                                        <span class="info-tooltip" style="cursor: help; opacity: 0.7; font-size: 14px;" title="Churn Rate = Clients Lost ÷ Total Clients (per month)
-
-Calculated from cohort analysis: percentage of clients who stopped service each month over the past 12 months.
-
-Customer Lifespan = 1 ÷ Monthly Churn Rate">ⓘ</span>
-                                    </div>
-                                    <div id="insightsChurnRate" style="font-size: 32px; font-weight: 700;">--</div>
-                                    <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Avg monthly client loss rate</div>
-                                </div>
-                                <div style="background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%); padding: 20px; border-radius: 12px; color: white;">
-                                    <div style="font-size: 12px; text-transform: uppercase; opacity: 0.8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-                                        Avg Retention
-                                        <span class="info-tooltip" style="cursor: help; opacity: 0.7; font-size: 14px;" title="Average Retention = 1 ÷ Monthly Churn Rate
-
-Also known as Customer Lifespan. Based on real cohort retention data from historical client behavior.">ⓘ</span>
-                                    </div>
-                                    <div id="insightsRetention" style="font-size: 32px; font-weight: 700;">--</div>
-                                    <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Expected months retained</div>
-                                </div>
-                            </div>
-                            
-                            <!-- LTV Assumptions & Sensitivity -->
-                            <div style="background: #F8FAFC; border-radius: 8px; padding: 15px;">
-                                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
-                                    <!-- Assumptions Panel -->
-                                    <div>
-                                        <div style="font-size: 12px; font-weight: 600; color: #1A365C; margin-bottom: 10px;">📋 LTV ASSUMPTIONS</div>
-                                        <div id="ltvAssumptions" style="font-size: 12px; color: #666; line-height: 1.8;">
-                                            Loading assumptions...
-                                        </div>
-                                    </div>
-                                    <!-- Sensitivity Panel -->
-                                    <div>
-                                        <div style="font-size: 12px; font-weight: 600; color: #1A365C; margin-bottom: 10px;">📈 SENSITIVITY ANALYSIS</div>
-                                        <div id="ltvSensitivity" style="font-size: 11px; color: #666;">
-                                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; text-align: center;">
-                                                <div style="background: #FEE2E2; padding: 8px; border-radius: 6px;">
-                                                    <div style="font-size: 10px; color: #991B1B;">WORST</div>
-                                                    <div id="ltvWorst" style="font-weight: 700; color: #DC2626;">--</div>
-                                                    <div style="font-size: 9px; color: #999;">+50% churn</div>
-                                                </div>
-                                                <div style="background: #DBEAFE; padding: 8px; border-radius: 6px;">
-                                                    <div style="font-size: 10px; color: #1E40AF;">BASE</div>
-                                                    <div id="ltvBase" style="font-weight: 700; color: #1A365C;">--</div>
-                                                    <div style="font-size: 9px; color: #999;">current</div>
-                                                </div>
-                                                <div style="background: #D1FAE5; padding: 8px; border-radius: 6px;">
-                                                    <div style="font-size: 10px; color: #065F46;">BEST</div>
-                                                    <div id="ltvBest" style="font-weight: 700; color: #059669;">--</div>
-                                                    <div style="font-size: 9px; color: #999;">-25% churn</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Investor-Ready Summary Line -->
-                                <div id="ltvSummaryLine" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #E5ECF3; font-size: 13px; font-weight: 500; color: #1A365C;">
-                                    Loading investor summary...
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Row 2: Secondary Metrics -->
-                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px;">
-                            <div style="background: white; border: 1px solid #E5ECF3; padding: 20px; border-radius: 12px;">
-                                <div style="font-size: 12px; color: #666; text-transform: uppercase; margin-bottom: 8px;">Total Clients (All Time)</div>
-                                <div id="insightsTotalClients" style="font-size: 28px; font-weight: 700; color: #1A365C;">--</div>
-                            </div>
-                            <div style="background: white; border: 1px solid #E5ECF3; padding: 20px; border-radius: 12px;">
-                                <div style="font-size: 12px; color: #666; text-transform: uppercase; margin-bottom: 8px;">Active Clients (30 days)</div>
-                                <div id="insightsActiveClients" style="font-size: 28px; font-weight: 700; color: #62B790;">--</div>
-                            </div>
-                            <div style="background: white; border: 1px solid #E5ECF3; padding: 20px; border-radius: 12px;">
-                                <div style="font-size: 12px; color: #666; text-transform: uppercase; margin-bottom: 8px;">Avg Tenure</div>
-                                <div id="insightsAvgTenure" style="font-size: 28px; font-weight: 700; color: #F57600;">--</div>
-                            </div>
-                            <div style="background: white; border: 1px solid #E5ECF3; padding: 20px; border-radius: 12px;">
-                                <div style="font-size: 12px; color: #666; text-transform: uppercase; margin-bottom: 8px;">Total Lifetime Revenue</div>
-                                <div id="insightsTotalRevenue" style="font-size: 28px; font-weight: 700; color: #9C27B0;">--</div>
-                            </div>
-                        </div>
-                        
-                        <!-- Investor Relations Section -->
-                        <div style="background: linear-gradient(135deg, #1A365C 0%, #2D4A7C 100%); border-radius: 12px; padding: 25px; margin-bottom: 30px; color: white;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                                <div>
-                                    <h3 style="margin: 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
-                                        📧 Investor Relations
-                                        <span style="background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 400;">
-                                            Q<span id="irCurrentQuarter">--</span> <span id="irCurrentYear">----</span>
-                                        </span>
-                                    </h3>
-                                    <p style="margin: 5px 0 0 0; opacity: 0.8; font-size: 13px;">Log events, generate updates, and manage investor communications</p>
-                                </div>
-                                <div style="display: flex; gap: 10px;">
-                                    <button id="btnLogEvent" onclick="showLogEventModal()" style="background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 10px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 6px;">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                        Log Event
-                                    </button>
-                                    <button id="btnGenerateUpdate" onclick="generateInvestorEmail()" style="background: #F57600; color: white; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 6px;">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                                        Generate Update
-                                    </button>
-                                    <button id="btnEmailHistory" onclick="showEmailHistoryModal()" style="background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 10px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 6px;">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                        History
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <!-- Quarter Events List -->
-                            <div style="background: rgba(255,255,255,0.1); border-radius: 8px; padding: 15px;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                    <span style="font-size: 12px; text-transform: uppercase; opacity: 0.8;">📋 Quarter Events (<span id="irEventCount">0</span>)</span>
-                                    <button onclick="showLogEventModal()" style="background: none; border: none; color: rgba(255,255,255,0.7); cursor: pointer; font-size: 11px;">+ Add Event</button>
-                                </div>
-                                <div id="irEventsList" style="max-height: 150px; overflow-y: auto;">
-                                    <div style="text-align: center; color: rgba(255,255,255,0.5); padding: 20px; font-size: 13px;">
-                                        No events logged for this quarter yet.<br>
-                                        <span style="font-size: 11px;">Click "Log Event" to add milestones, wins, or notable updates.</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Row 2: Top Clients Last Week & This Month -->
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
-                            <!-- Top Clients Last Week -->
-                            <div style="background: white; border: 1px solid #E5ECF3; border-radius: 12px; padding: 20px;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                                    <h3 id="insightsWeekTitle" style="color: #1A365C; margin: 0; font-size: 16px;">🏆 Top Clients Last Week</h3>
-                                    <select id="insightsWeekLimit" onchange="renderInsightsTopClients()" style="padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
-                                        <option value="5" selected>Top 5</option>
-                                        <option value="10">Top 10</option>
-                                    </select>
-                                </div>
-                                <table style="width: 100%; border-collapse: collapse;">
-                                    <thead>
-                                        <tr style="background: #F9FAFB;">
-                                            <th style="padding: 8px 10px; text-align: left; font-size: 11px; color: #666; text-transform: uppercase;">#</th>
-                                            <th style="padding: 8px 10px; text-align: left; font-size: 11px; color: #666; text-transform: uppercase;">Client</th>
-                                            <th style="padding: 8px 10px; text-align: center; font-size: 11px; color: #666; text-transform: uppercase;">Services</th>
-                                            <th style="padding: 8px 10px; text-align: right; font-size: 11px; color: #666; text-transform: uppercase;">Hours</th>
-                                            <th style="padding: 8px 10px; text-align: right; font-size: 11px; color: #666; text-transform: uppercase;">Revenue</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="insightsTopClientsWeek">
-                                        <tr><td colspan="5" style="text-align: center; color: #999; padding: 20px;">Loading...</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            
-                            <!-- Top Clients This Month -->
-                            <div style="background: white; border: 1px solid #E5ECF3; border-radius: 12px; padding: 20px;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                                    <h3 style="color: #1A365C; margin: 0; font-size: 16px;">🏆 Top Clients This Month</h3>
-                                    <select id="insightsMonthLimit" onchange="renderInsightsTopClients()" style="padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
-                                        <option value="5" selected>Top 5</option>
-                                        <option value="10">Top 10</option>
-                                    </select>
-                                </div>
-                                <table style="width: 100%; border-collapse: collapse;">
-                                    <thead>
-                                        <tr style="background: #F9FAFB;">
-                                            <th style="padding: 8px 10px; text-align: left; font-size: 11px; color: #666; text-transform: uppercase;">#</th>
-                                            <th style="padding: 8px 10px; text-align: left; font-size: 11px; color: #666; text-transform: uppercase;">Client</th>
-                                            <th style="padding: 8px 10px; text-align: center; font-size: 11px; color: #666; text-transform: uppercase;">Services</th>
-                                            <th style="padding: 8px 10px; text-align: right; font-size: 11px; color: #666; text-transform: uppercase;">Hours</th>
-                                            <th style="padding: 8px 10px; text-align: right; font-size: 11px; color: #666; text-transform: uppercase;">Revenue</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="insightsTopClientsMonth">
-                                        <tr><td colspan="5" style="text-align: center; color: #999; padding: 20px;">Loading...</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        
-                        <!-- Row 3: Client Journey Analysis -->
-                        <div style="background: white; border: 1px solid #E5ECF3; border-radius: 12px; padding: 20px; margin-bottom: 30px;">
-                            <h3 style="color: #1A365C; margin: 0 0 10px 0; font-size: 16px;">📈 Client Care Journey</h3>
-                            <p style="font-size: 13px; color: #666; margin: 0 0 20px 0;">How clients progress from initial short services to longer care arrangements</p>
-                            
-                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 20px;">
-                                <div style="background: #F0F9FF; padding: 15px; border-radius: 8px; text-align: center;">
-                                    <div style="font-size: 11px; color: #666; text-transform: uppercase; margin-bottom: 5px;">Avg First Month</div>
-                                    <div id="insightsFirstMonthHours" style="font-size: 24px; font-weight: 700; color: #1A365C;">--</div>
-                                    <div style="font-size: 11px; color: #999;">hours/week</div>
-                                </div>
-                                <div style="background: #F0FFF4; padding: 15px; border-radius: 8px; text-align: center;">
-                                    <div style="font-size: 11px; color: #666; text-transform: uppercase; margin-bottom: 5px;">Avg 3rd Month</div>
-                                    <div id="insightsThirdMonthHours" style="font-size: 24px; font-weight: 700; color: #62B790;">--</div>
-                                    <div style="font-size: 11px; color: #999;">hours/week</div>
-                                </div>
-                                <div style="background: #FFF7ED; padding: 15px; border-radius: 8px; text-align: center;">
-                                    <div style="font-size: 11px; color: #666; text-transform: uppercase; margin-bottom: 5px;">Avg 6th Month</div>
-                                    <div id="insightsSixthMonthHours" style="font-size: 24px; font-weight: 700; color: #F57600;">--</div>
-                                    <div style="font-size: 11px; color: #999;">hours/week</div>
-                                </div>
-                                <div style="background: #FDF4FF; padding: 15px; border-radius: 8px; text-align: center;">
-                                    <div style="font-size: 11px; color: #666; text-transform: uppercase; margin-bottom: 5px;">Avg Peak</div>
-                                    <div id="insightsPeakHours" style="font-size: 24px; font-weight: 700; color: #9C27B0;">--</div>
-                                    <div style="font-size: 11px; color: #999;">hours/week</div>
-                                </div>
-                            </div>
-                            
-                            <div style="background: #F9FAFB; padding: 15px; border-radius: 8px;">
-                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                                    <span style="font-size: 13px; color: #666;">📊 Progression Rate:</span>
-                                    <span id="insightsProgressionRate" style="font-size: 16px; font-weight: 600; color: #1A365C;">--</span>
-                                    <span style="font-size: 12px; color: #999;">of clients increase hours after 3 months</span>
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <span style="font-size: 13px; color: #666;">⏱️ Avg Time to Peak:</span>
-                                    <span id="insightsTimeToPeak" style="font-size: 16px; font-weight: 600; color: #1A365C;">--</span>
-                                    <span style="font-size: 12px; color: #999;">months from first service</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Row 4: End of Care Analysis -->
-                        <div style="background: white; border: 1px solid #E5ECF3; border-radius: 12px; padding: 20px; margin-bottom: 30px;">
-                            <h3 style="color: #1A365C; margin: 0 0 10px 0; font-size: 16px;">⏳ End of Care Analysis</h3>
-                            <p style="font-size: 13px; color: #666; margin: 0 0 20px 0;">Understanding client transitions when care needs increase significantly</p>
-                            
-                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px;">
-                                <div style="background: #FEF2F2; border: 1px solid #FECACA; padding: 15px; border-radius: 8px;">
-                                    <div style="font-size: 11px; color: #991B1B; text-transform: uppercase; margin-bottom: 5px;">High Care Threshold</div>
-                                    <div style="font-size: 13px; color: #666; margin-bottom: 10px;">Clients exceeding 30+ hours/week</div>
-                                    <div id="insightsHighCareCount" style="font-size: 28px; font-weight: 700; color: #DC2626;">--</div>
-                                    <div style="font-size: 11px; color: #999;">clients historically</div>
-                                </div>
-                                <div style="background: #FEF3C7; border: 1px solid #FDE68A; padding: 15px; border-radius: 8px;">
-                                    <div style="font-size: 11px; color: #92400E; text-transform: uppercase; margin-bottom: 5px;">Avg Time After Peak</div>
-                                    <div style="font-size: 13px; color: #666; margin-bottom: 10px;">From peak hours to end of service</div>
-                                    <div id="insightsTimeAfterPeak" style="font-size: 28px; font-weight: 700; color: #D97706;">--</div>
-                                    <div style="font-size: 11px; color: #999;">months average</div>
-                                </div>
-                                <div style="background: #ECFDF5; border: 1px solid #A7F3D0; padding: 15px; border-radius: 8px;">
-                                    <div style="font-size: 11px; color: #065F46; text-transform: uppercase; margin-bottom: 5px;">Still Active</div>
-                                    <div style="font-size: 13px; color: #666; margin-bottom: 10px;">High-care clients with recent service</div>
-                                    <div id="insightsHighCareActive" style="font-size: 28px; font-weight: 700; color: #059669;">--</div>
-                                    <div style="font-size: 11px; color: #999;">clients</div>
-                                </div>
-                            </div>
-                            
-                            <!-- Clients Approaching Transition -->
-                            <div style="background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 15px;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                    <h4 style="color: #92400E; margin: 0; font-size: 14px;">⚠️ Clients Potentially Approaching Transition</h4>
-                                    <span style="font-size: 11px; color: #666;">Based on historical patterns</span>
-                                </div>
-                                <p style="font-size: 12px; color: #666; margin: 0 0 15px 0;">Clients with 25+ hours/week who may be nearing end of home care based on typical progression patterns.</p>
-                                <table style="width: 100%; border-collapse: collapse;">
-                                    <thead>
-                                        <tr style="background: rgba(251, 191, 36, 0.2);">
-                                            <th style="padding: 8px 10px; text-align: left; font-size: 11px; color: #92400E; text-transform: uppercase;">Client</th>
-                                            <th style="padding: 8px 10px; text-align: center; font-size: 11px; color: #92400E; text-transform: uppercase;">Current Hrs/Wk</th>
-                                            <th style="padding: 8px 10px; text-align: center; font-size: 11px; color: #92400E; text-transform: uppercase;">Peak Hrs/Wk</th>
-                                            <th style="padding: 8px 10px; text-align: center; font-size: 11px; color: #92400E; text-transform: uppercase;">Tenure</th>
-                                            <th style="padding: 8px 10px; text-align: center; font-size: 11px; color: #92400E; text-transform: uppercase;">Est. Transition Window</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="insightsTransitionRisk">
-                                        <tr><td colspan="5" style="text-align: center; color: #999; padding: 20px;">Loading...</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        
-                        <!-- Row 5: Client Lifetime Value Table -->
-                        <div style="background: white; border: 1px solid #E5ECF3; border-radius: 12px; padding: 20px; margin-bottom: 30px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                                <div>
-                                    <h3 style="color: #1A365C; margin: 0; font-size: 16px;">💰 Client Lifetime Value Rankings</h3>
-                                    <p style="font-size: 12px; color: #666; margin: 5px 0 0 0;">All-time revenue and engagement metrics by client</p>
-                                </div>
-                                <div style="display: flex; gap: 10px; align-items: center;">
-                                    <input type="text" id="insightsLTVSearch" placeholder="Search client..." 
-                                           style="padding: 6px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; width: 200px;"
-                                           onkeyup="filterLTVTable()">
-                                    <select id="insightsLTVLimit" onchange="renderLTVTable()" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
-                                        <option value="10" selected>Top 10</option>
-                                        <option value="25">Top 25</option>
-                                        <option value="50">Top 50</option>
-                                        <option value="all">All</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div style="overflow-x: auto;">
-                                <table style="width: 100%; border-collapse: collapse; min-width: 700px;">
-                                    <thead>
-                                        <tr style="background: #F9FAFB;">
-                                            <th style="padding: 10px 12px; text-align: left; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">#</th>
-                                            <th style="padding: 10px 12px; text-align: left; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">Client Name</th>
-                                            <th style="padding: 10px 12px; text-align: right; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">Lifetime Revenue</th>
-                                            <th style="padding: 10px 12px; text-align: center; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">Total Services</th>
-                                            <th style="padding: 10px 12px; text-align: center; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">Total Hours</th>
-                                            <th style="padding: 10px 12px; text-align: center; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">Tenure</th>
-                                            <th style="padding: 10px 12px; text-align: center; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">Status</th>
-                                            <th style="padding: 10px 12px; text-align: center; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">Last Service</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="insightsLTVTable">
-                                        <tr><td colspan="8" style="text-align: center; color: #999; padding: 20px;">Loading...</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Sidebar Overlay -->
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeClientDetail()"></div>
-    
-    <!-- Client Detail Sidebar -->
-    <div class="client-sidebar" id="clientSidebar">
-        <div class="sidebar-header">
-            <button class="close-sidebar" onclick="closeClientDetail()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"/>
-                    <line x1="6" y1="6" x2="18" y2="18"/>
-                </svg>
-            </button>
-            <h2 id="detailClientName">Client Name</h2>
-            <p id="detailCustomerName">Customer Name (links to Report)</p>
-        </div>
-        <div class="sidebar-body">
-            <!-- Email Routing Section -->
-            <div class="sidebar-section">
-                <h3>Email Routing</h3>
-                <div id="emailRouteIndicator" style="display: flex; align-items: center; gap: 10px; padding: 15px; border-radius: 8px; background: #E3F2FD; border: 1px solid #2196F3;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="2" style="width: 24px; height: 24px;">
-                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                        <polyline points="22,6 12,13 2,6"/>
-                    </svg>
-                    <div>
-                        <div id="routeType" style="font-weight: 600; font-size: 13px; color: #1A365C;">Routing to Insurance</div>
-                        <div id="routeEmail" style="font-size: 12px; color: #666;">billing@alicecare.com</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Contact Information -->
-            <div class="sidebar-section">
-                <h3>Contact Information</h3>
-                <div class="detail-row" style="flex-direction: column; align-items: stretch;">
-                    <span class="label">Client Email</span>
-                    <div style="display: flex; gap: 8px; align-items: center;">
-                        <input type="text" id="sidebarClientEmail" style="flex: 1; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;" placeholder="email1@example.com, email2@example.com">
-                        <button onclick="updateClientEmail()" class="btn btn-primary" style="padding: 8px 12px; font-size: 12px;">Save</button>
-                    </div>
-                    <p style="font-size: 10px; color: #999; margin-top: 4px;">Multiple emails separated by comma</p>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Phone</span>
-                    <span class="value" id="detailPhone">--</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Address</span>
-                    <span class="value" id="detailAddress">--</span>
-                </div>
-            </div>
-            
-            <!-- Insurance Information -->
-            <div class="sidebar-section">
-                <h3>Insurance Information</h3>
-                <div class="detail-row">
-                    <span class="label">Insurance Name</span>
-                    <span class="value" id="detailInsurance">--</span>
-                </div>
-                <div class="detail-row" style="flex-direction: column; align-items: stretch;">
-                    <span class="label">Insurance Email</span>
-                    <div style="display: flex; gap: 8px; align-items: center;">
-                        <input type="text" id="sidebarInsuranceEmail" style="flex: 1; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;" placeholder="claims@ins.com, adjuster@ins.com">
-                        <button onclick="updateInsuranceEmail()" class="btn btn-primary" style="padding: 8px 12px; font-size: 12px;">Save</button>
-                    </div>
-                    <p style="font-size: 10px; color: #999; margin-top: 4px;">Multiple emails separated by comma</p>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Policy #</span>
-                    <span class="value" id="detailPolicy">--</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Claim #</span>
-                    <span class="value" id="detailClaim">--</span>
-                </div>
-                <div id="emailSaveStatus" style="font-size: 11px; color: #62B790; margin-top: 8px; display: none;">
-                    ✓ Email updated
-                </div>
-            </div>
-            
-            <!-- Service Codes -->
-            <div class="sidebar-section">
-                <h3>Service Codes</h3>
-                <div id="detailServiceCodes" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-                    <!-- Populated by JS -->
-                </div>
-            </div>
-            
-            <div class="sidebar-section">
-                <h3>Service Summary</h3>
-                <div class="detail-row">
-                    <span class="label">Total Services</span>
-                    <span class="value" id="detailTotalServices">--</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Completed</span>
-                    <span class="value" id="detailCompleted">--</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Total Hours</span>
-                    <span class="value" id="detailTotalHours">--</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Total Spent</span>
-                    <span class="value" id="detailTotalSpent">--</span>
-                </div>
-            </div>
-            
-            <!-- Report Subscription -->
-            <div class="sidebar-section">
-                <h3>Report Subscription</h3>
-                <p style="font-size: 13px; color: #999; margin-bottom: 15px;">
-                    Select which reports to auto-send.
-                </p>
-                <div style="display: flex; flex-direction: column; gap: 10px; padding: 15px; border-radius: 8px; background: #F9FAFB;">
-                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                        <input type="checkbox" id="sidebarSubWeekly" onchange="updateSubscription()" style="width: 18px; height: 18px; accent-color: #2196F3;">
-                        <span style="background: #E3F2FD; color: #2196F3; padding: 4px 12px; border-radius: 4px; font-size: 13px; font-weight: 500;">Weekly</span>
-                        <span style="font-size: 11px; color: #999;">Every Monday</span>
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                        <input type="checkbox" id="sidebarSubMonthly" onchange="updateSubscription()" style="width: 18px; height: 18px; accent-color: #62B790;">
-                        <span style="background: #E0F1E9; color: #62B790; padding: 4px 12px; border-radius: 4px; font-size: 13px; font-weight: 500;">Monthly</span>
-                        <span style="font-size: 11px; color: #999;">1st of month</span>
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                        <input type="checkbox" id="sidebarSubYearly" onchange="updateSubscription()" style="width: 18px; height: 18px; accent-color: #F57600;">
-                        <span style="background: #FFF3E0; color: #F57600; padding: 4px 12px; border-radius: 4px; font-size: 13px; font-weight: 500;">Yearly</span>
-                        <span style="font-size: 11px; color: #999;">January 1st</span>
-                    </label>
-                </div>
-                <div id="subscriptionSaveStatus" style="font-size: 11px; color: #62B790; margin-top: 8px; display: none;">
-                    ✓ Subscription updated
-                </div>
-            </div>
-            
-            <!-- Actions -->
-            <div class="sidebar-section">
-                <h3>Actions</h3>
-                <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <button class="btn btn-primary" style="width: 100%;" onclick="sendClientReport()">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
-                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                            <polyline points="22,6 12,13 2,6"/>
-                        </svg>
-                        Send Report/Invoice
-                    </button>
-                    <button class="btn btn-secondary" style="width: 100%;" onclick="viewClientReports()">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14 2 14 8 20 8"/>
-                        </svg>
-                        View All Reports
-                    </button>
-                    <button class="btn btn-green" style="width: 100%;" onclick="editClient()">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                        </svg>
-                        Edit Client
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add/Edit Client Modal -->
-    <div class="modal-overlay" id="clientModal">
-        <div class="modal-content" style="max-width: 700px;">
-            <div class="modal-header">
-                <h2 id="clientModalTitle">Add New Client</h2>
-                <button class="close-modal" onclick="closeClientModal()">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="clientForm">
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
-                        <div class="filter-group">
-                            <label>First Name *</label>
-                            <input type="text" id="formFName" required>
-                        </div>
-                        <div class="filter-group">
-                            <label>Last Name *</label>
-                            <input type="text" id="formLName" required>
-                        </div>
-                        <div class="filter-group" style="grid-column: 1 / -1;">
-                            <label>Address</label>
-                            <input type="text" id="formAddress" placeholder="Street address, City, State ZIP">
-                        </div>
-                        <div class="filter-group">
-                            <label>Email</label>
-                            <input type="text" id="formEmail" placeholder="email1@example.com, email2@example.com">
-                            <p style="font-size: 10px; color: #999; margin-top: 2px;">Multiple emails separated by comma</p>
-                        </div>
-                        <div class="filter-group">
-                            <label>Phone</label>
-                            <input type="tel" id="formPhone" placeholder="(555) 123-4567">
-                        </div>
-                        <div class="filter-group" style="position: relative;">
-                            <label>Insurance Name</label>
-                            <input type="text" id="formInsuranceName" placeholder="Start typing to search..." autocomplete="off" oninput="searchInsurance(this.value)" onfocus="searchInsurance(this.value)">
-                            <div id="insuranceDropdown" class="autocomplete-dropdown" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-radius: 8px; max-height: 200px; overflow-y: auto; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.15);"></div>
-                        </div>
-                        <div class="filter-group">
-                            <label>Insurance Email</label>
-                            <input type="text" id="formInsuranceEmail" placeholder="claims@ins.com, adjuster@ins.com">
-                            <p style="font-size: 10px; color: #999; margin-top: 2px;">Auto-filled when selecting insurance, or enter manually</p>
-                        </div>
-                        <div class="filter-group">
-                            <label>Policy #</label>
-                            <input type="text" id="formPolicy" placeholder="Policy number">
-                        </div>
-                        <div class="filter-group">
-                            <label>Claim #</label>
-                            <input type="text" id="formClaim" placeholder="Claim number">
-                        </div>
-                        <div class="filter-group">
-                            <label>Assignment</label>
-                            <select id="formAssignment">
-                                <option value="0">0 - Route to Insurance</option>
-                                <option value="1">1 - Route to Billing</option>
-                            </select>
-                        </div>
-                        <div class="filter-group" style="grid-column: 1 / -1;">
-                            <label>Report Subscription</label>
-                            <div style="display: flex; gap: 20px; padding: 12px; background: #F9FAFB; border-radius: 8px;">
-                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: normal;">
-                                    <input type="checkbox" id="formSubWeekly" style="width: 18px; height: 18px; accent-color: #2196F3;">
-                                    <span style="background: #E3F2FD; color: #2196F3; padding: 2px 8px; border-radius: 4px; font-size: 12px;">Weekly</span>
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: normal;">
-                                    <input type="checkbox" id="formSubMonthly" style="width: 18px; height: 18px; accent-color: #62B790;">
-                                    <span style="background: #E0F1E9; color: #62B790; padding: 2px 8px; border-radius: 4px; font-size: 12px;">Monthly</span>
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: normal;">
-                                    <input type="checkbox" id="formSubYearly" style="width: 18px; height: 18px; accent-color: #F57600;">
-                                    <span style="background: #FFF3E0; color: #F57600; padding: 2px 8px; border-radius: 4px; font-size: 12px;">Yearly</span>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="filter-group" style="grid-column: 1 / -1;">
-                            <label>Customer Name (Links to Reports)</label>
-                            <input type="text" id="formCustomerName" placeholder="Must match Customer Name in Report tab">
-                            <p style="font-size: 11px; color: #999; margin-top: 4px;">This field links the client to their service reports</p>
-                        </div>
-                    </div>
-                    
-                    <h4 style="color: #1A365C; margin: 20px 0 15px; font-size: 14px;">Service Codes</h4>
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; background: #F9FAFB; padding: 15px; border-radius: 8px;">
-                        <div class="filter-group" style="margin-bottom: 0;">
-                            <label style="font-size: 12px;">BA</label>
-                            <input type="text" id="formBA" style="padding: 8px;">
-                        </div>
-                        <div class="filter-group" style="margin-bottom: 0;">
-                            <label style="font-size: 12px;">DR</label>
-                            <input type="text" id="formDR" style="padding: 8px;">
-                        </div>
-                        <div class="filter-group" style="margin-bottom: 0;">
-                            <label style="font-size: 12px;">TR</label>
-                            <input type="text" id="formTR" style="padding: 8px;">
-                        </div>
-                        <div class="filter-group" style="margin-bottom: 0;">
-                            <label style="font-size: 12px;">CO</label>
-                            <input type="text" id="formCO" style="padding: 8px;">
-                        </div>
-                        <div class="filter-group" style="margin-bottom: 0;">
-                            <label style="font-size: 12px;">TO</label>
-                            <input type="text" id="formTO" style="padding: 8px;">
-                        </div>
-                        <div class="filter-group" style="margin-bottom: 0;">
-                            <label style="font-size: 12px;">EA</label>
-                            <input type="text" id="formEA" style="padding: 8px;">
-                        </div>
-                        <div class="filter-group" style="margin-bottom: 0;">
-                            <label style="font-size: 12px;">AM</label>
-                            <input type="text" id="formAM" style="padding: 8px;">
-                        </div>
-                        <div class="filter-group" style="margin-bottom: 0;">
-                            <label style="font-size: 12px;">CS</label>
-                            <input type="text" id="formCS" style="padding: 8px;">
-                        </div>
-                        <div class="filter-group" style="margin-bottom: 0;">
-                            <label style="font-size: 12px;">HM</label>
-                            <input type="text" id="formHM" style="padding: 8px;">
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeClientModal()">Cancel</button>
-                <button class="btn btn-primary" id="saveClientBtn" onclick="saveClient()">Save Client</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Send Report Modal -->
-    <div class="modal-overlay" id="sendReportModal">
-        <div class="modal-content" style="max-width: 500px;">
-            <div class="modal-header">
-                <h2>Send Report</h2>
-                <button class="close-modal" onclick="closeSendReportModal()">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p style="margin-bottom: 15px; color: #3D3D3D;">
-                    Select the time period for the report to be sent to: <strong id="sendReportClientName">Client</strong>
-                </p>
-                
-                <div class="filter-group" style="margin-bottom: 15px;">
-                    <label>Report Type</label>
-                    <select id="reportPeriodType" onchange="toggleReportPeriodInputs()">
-                        <option value="week">Weekly Report</option>
-                        <option value="month">Monthly Report</option>
-                        <option value="year">Yearly Report</option>
-                    </select>
-                </div>
-                
-                <div id="weekInputGroup" class="filter-group" style="margin-bottom: 15px;">
-                    <label>Week Number</label>
-                    <input type="number" id="reportWeekNumber" placeholder="Enter week number (1-53)" min="1" max="53">
-                </div>
-                
-                <div id="monthInputGroup" class="filter-group" style="margin-bottom: 15px; display: none;">
-                    <label>Month</label>
-                    <select id="reportMonth">
-                        <option value="1">January</option>
-                        <option value="2">February</option>
-                        <option value="3">March</option>
-                        <option value="4">April</option>
-                        <option value="5">May</option>
-                        <option value="6">June</option>
-                        <option value="7">July</option>
-                        <option value="8">August</option>
-                        <option value="9">September</option>
-                        <option value="10">October</option>
-                        <option value="11">November</option>
-                        <option value="12">December</option>
-                    </select>
-                </div>
-                
-                <div id="yearInputGroup" class="filter-group" style="margin-bottom: 15px;">
-                    <label>Year</label>
-                    <select id="reportYear">
-                        <option value="2024">2024</option>
-                        <option value="2025" selected>2025</option>
-                    </select>
-                </div>
-                
-                <div id="yearlyReportNote" style="display: none; padding: 12px; background: #E8F5E9; border-radius: 8px; margin-bottom: 15px; font-size: 13px; color: #2E7D32;">
-                    📊 Yearly reports include a summary of all services for the selected year.
-                </div>
-                
-                <div id="sendReportDestination" style="padding: 15px; border-radius: 8px; background: #E3F2FD; margin-top: 15px;">
-                    <div style="font-size: 13px; color: #666;">Report will be sent to:</div>
-                    <div id="sendReportEmail" style="font-weight: 600; color: #1A365C; margin-top: 5px;">billing@alicecare.com</div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeSendReportModal()">Cancel</button>
-                <button class="btn btn-primary" id="confirmSendReportBtn" onclick="confirmSendReport()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
-                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                        <polyline points="22,6 12,13 2,6"/>
-                    </svg>
-                    Send Report
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Upload CSV Modal -->
-    <div class="modal-overlay" id="uploadModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Upload Service Report CSV</h2>
-                <button class="close-modal" onclick="closeUploadModal()">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="notice-box">
-                    <h3>📋 Upload Instructions</h3>
-                    <p>Upload your service report CSV file. The data will replace existing records, and formula columns (Week, Month, Year, StartTIME, EndTIME, STxTime, ETxTime) will be automatically extended to all new rows.</p>
-                    <p><strong>Expected columns:</strong> Customer Name, Scheduled Date, Scheduled Time, Provider Name, Start Time, Completion Time, Service Duration, Provider Pay, Cost To Customer, Service Plan, Payment Status, Status</p>
-                </div>
-                
-                <div class="upload-area" id="uploadArea">
-                    <input type="file" id="csvFileInput" accept=".csv" onchange="handleFileSelect(event)" style="display: none;">
-                    <div class="upload-dropzone" onclick="document.getElementById('csvFileInput').click()">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 48px; height: 48px; margin-bottom: 15px; stroke: #F57600;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                    <button class="btn btn-primary" onclick="showUploadModal()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                             <polyline points="17 8 12 3 7 8"/>
                             <line x1="12" y1="3" x2="12" y2="15"/>
                         </svg>
-                        <p style="font-weight: 600; color: #1A365C; margin-bottom: 5px;">Click to select CSV file</p>
-                        <p style="font-size: 13px; color: #999;">or drag and drop here</p>
-                    </div>
-                </div>
-                
-                <div id="filePreview" style="display: none; margin-top: 20px;">
-                    <div class="file-info">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 24px; height: 24px; stroke: #62B790;">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14 2 14 8 20 8"/>
+                        Upload CSV
+                    </button>
+                    <button class="btn btn-green" onclick="exportReport()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
                         </svg>
-                        <div>
-                            <p id="fileName" style="font-weight: 600; color: #1A365C;"></p>
-                            <p id="fileSize" style="font-size: 12px; color: #999;"></p>
-                        </div>
-                        <button class="btn btn-secondary" style="margin-left: auto; padding: 6px 12px;" onclick="clearFileSelection()">Remove</button>
+                        Export CSV
+                    </button>
+                </div>
+                
+                <div id="reportTableContainer">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading service report...</p>
                     </div>
-                    <div id="previewStats" style="margin-top: 15px; padding: 15px; background: #E5ECF3; border-radius: 8px;">
-                        <p style="font-size: 13px; color: #3D3D3D;"><strong>Rows detected:</strong> <span id="rowCount">0</span></p>
-                        <p style="font-size: 13px; color: #3D3D3D;"><strong>Columns:</strong> <span id="colCount">0</span></p>
+                </div>
+
+                <div class="pagination" id="reportPagination"></div>
+
+                <!-- Automation Status Summary (collapsed view) -->
+                <div id="automationStatusSummary" style="background: #F9FAFB; border: 1px solid #E5ECF3; border-radius: 12px; padding: 20px; margin: 30px 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 style="color: #1A365C; margin: 0; font-size: 16px;">📊 Report Automation Status</h3>
+                        <button class="btn btn-secondary" onclick="openAutomationSettings()" style="padding: 8px 12px;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+                                <circle cx="12" cy="12" r="3"/>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                            </svg>
+                            Settings
+                        </button>
+                    </div>
+                    <div id="automationStatusContent" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Client Tab -->
+            <div class="tab-panel" id="client-panel">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 class="section-title" style="margin-bottom: 0;">Client Directory</h2>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-secondary" onclick="showLTCImportModal()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Import from LTC
+                        </button>
+                        <button class="btn btn-primary" onclick="showAddClientModal()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"/>
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                            </svg>
+                            Add Client
+                        </button>
                     </div>
                 </div>
                 
-                <div class="upload-options" style="margin-top: 20px;">
-                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                        <input type="radio" name="uploadMode" value="replace" checked style="accent-color: #F57600;">
-                        <span><strong>Replace</strong> - Clear existing data and upload new</span>
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin-top: 10px;">
-                        <input type="radio" name="uploadMode" value="append" style="accent-color: #F57600;">
-                        <span><strong>Append</strong> - Add to existing data</span>
-                    </label>
+                <div class="notice-box">
+                    <h3>📋 Email Routing Information</h3>
+                    <p><strong>Assignment = 1:</strong> Reports/invoices are sent to <strong id="configBillingEmail">billing@alicecare.com</strong></p>
+                    <p><strong>Assignment = 0:</strong> Reports/invoices are sent to the <strong>Insurance Email</strong> specified for each client</p>
                 </div>
+                
+                <div class="stats-row" id="clientStats">
+                    <div class="stat-card">
+                        <h3>Total Clients</h3>
+                        <div class="number" id="totalClientsCount">--</div>
+                        <div class="subtitle">In directory</div>
+                    </div>
+                    <div class="stat-card" style="border-left-color: #9C27B0;">
+                        <h3>Assignment Benefits</h3>
+                        <div class="number" id="billingAssignedCount">--</div>
+                        <div class="subtitle">Routed to billing</div>
+                    </div>
+                    <div class="stat-card blue">
+                        <h3>CC Pay</h3>
+                        <div class="number" id="insuranceAssignedCount">--</div>
+                        <div class="subtitle">Direct payment</div>
+                    </div>
+                </div>
+                
+                <div class="filters">
+                    <div class="filter-group">
+                        <label>Search Client</label>
+                        <input type="text" id="filterClientName" placeholder="Name, email, or customer name..." oninput="applyClientFilters()" onkeypress="if(event.key==='Enter') applyClientFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <label>Insurance</label>
+                        <select id="filterInsurance" onchange="applyClientFilters()">
+                            <option value="">All Insurance</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Assignment</label>
+                        <select id="filterAssignment" onchange="applyClientFilters()">
+                            <option value="">All Assignments</option>
+                            <option value="1">Assignment Benefits (1)</option>
+                            <option value="0">CC Pay (0)</option>
+                        </select>
+                    </div>
+                    <div class="filter-buttons">
+                        <button class="btn btn-primary" onclick="applyClientFilters()">Apply</button>
+                        <button class="btn btn-secondary" onclick="clearClientFilters()">Clear</button>
+                    </div>
+                </div>
+                
+                <div id="clientTableContainer">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading clients...</p>
+                    </div>
+                </div>
+                
+                <div class="pagination" id="clientPagination"></div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeUploadModal()">Cancel</button>
-                <button class="btn btn-primary" id="uploadBtn" onclick="uploadCSVFile()" disabled>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
-                        <polyline points="17 8 12 3 7 8"/>
-                        <line x1="12" y1="3" x2="12" y2="15"/>
-                    </svg>
-                    Upload
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Automation Settings Modal -->
+<!-- Automation Settings Modal -->
     <div class="modal-overlay" id="automationModal">
         <div class="modal-content" style="max-width: 900px;">
             <div class="modal-header">
@@ -3137,6 +2055,231 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
         </div>
     </div>
 
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeClientDetail()"></div>
+
+    <!-- Client Detail Sidebar -->
+    <div class="client-sidebar" id="clientSidebar">
+        <div class="sidebar-header">
+            <button class="close-sidebar" onclick="closeClientDetail()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+            <h2 id="detailClientName">Client Name</h2>
+            <p id="detailCustomerName">Customer Name (links to Report)</p>
+        </div>
+        <div class="sidebar-body">
+            <!-- Email Routing Section -->
+            <div class="sidebar-section">
+                <h3>Email Routing</h3>
+                <div id="emailRouteIndicator" style="display: flex; align-items: center; gap: 10px; padding: 15px; border-radius: 8px; background: #E3F2FD; border: 1px solid #2196F3;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="2" style="width: 24px; height: 24px;">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                        <polyline points="22,6 12,13 2,6"/>
+                    </svg>
+                    <div>
+                        <div id="routeType" style="font-weight: 600; font-size: 13px; color: #1A365C;">Routing to Insurance</div>
+                        <div id="routeEmail" style="font-size: 12px; color: #666;">billing@alicecare.com</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact & Insurance -->
+            <div class="sidebar-section">
+                <h3>Client Information</h3>
+                <div style="display: grid; grid-template-columns: 1fr; gap: 12px;">
+                    <div>
+                        <label class="input-label">Primary Email</label>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <input type="email" id="sidebarClientEmail" placeholder="client@email.com" style="flex: 1;">
+                            <button class="btn btn-secondary" onclick="saveSidebarEmail('client')" style="padding: 8px 12px; font-size: 12px;">Save</button>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div>
+                            <label class="input-label">Phone</label>
+                            <div id="detailPhone" class="detail-value">--</div>
+                        </div>
+                        <div>
+                            <label class="input-label">Insurance</label>
+                            <div id="detailInsurance" class="detail-value">--</div>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div>
+                            <label class="input-label">Policy</label>
+                            <div id="detailPolicy" class="detail-value">--</div>
+                        </div>
+                        <div>
+                            <label class="input-label">Claim</label>
+                            <div id="detailClaim" class="detail-value">--</div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="input-label">Insurance Email</label>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <input type="email" id="sidebarInsuranceEmail" placeholder="insurance@email.com" style="flex: 1;">
+                            <button class="btn btn-secondary" onclick="saveSidebarEmail('insurance')" style="padding: 8px 12px; font-size: 12px;">Save</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="input-label">Address</label>
+                        <div id="detailAddress" class="detail-value">--</div>
+                    </div>
+                    <div id="emailSaveStatus" style="display: none; font-size: 12px; color: #62B790;">Saved!</div>
+                </div>
+            </div>
+
+            <!-- Subscription Preferences -->
+            <div class="sidebar-section">
+                <h3>Subscriptions</h3>
+                <div class="subscription-options">
+                    <div class="subscription-option">
+                        <input type="checkbox" id="sidebarSubWeekly">
+                        <label for="sidebarSubWeekly">
+                            <span class="icon">📅</span>
+                            <div>
+                                <div class="name">Weekly</div>
+                                <div class="desc">Updates every week</div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="subscription-option">
+                        <input type="checkbox" id="sidebarSubMonthly">
+                        <label for="sidebarSubMonthly">
+                            <span class="icon">📆</span>
+                            <div>
+                                <div class="name">Monthly</div>
+                                <div class="desc">Monthly summaries</div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="subscription-option">
+                        <input type="checkbox" id="sidebarSubYearly">
+                        <label for="sidebarSubYearly">
+                            <span class="icon">🗓️</span>
+                            <div>
+                                <div class="name">Yearly</div>
+                                <div class="desc">Annual statements</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="updateSubscription()">Save Subscription</button>
+                    <span id="subscriptionSaveStatus" style="display: none; color: #62B790; font-size: 12px;">Saved!</span>
+                </div>
+            </div>
+
+            <!-- Service Codes -->
+            <div class="sidebar-section">
+                <h3>Service Codes</h3>
+                <div id="detailServiceCodes" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px;">
+                    <div style="text-align: center; color: #999; padding: 15px;">No service codes available</div>
+                </div>
+            </div>
+
+            <!-- Service Summary -->
+            <div class="sidebar-section">
+                <h3>Service Summary</h3>
+                <div id="detailServiceSummary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px;">
+                    <div style="text-align: center; color: #999; padding: 15px;">No service data available</div>
+                </div>
+            </div>
+
+            <!-- Financial Snapshot -->
+            <div class="sidebar-section">
+                <h3>Financial Snapshot</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Services</div>
+                        <div class="stat-value" id="detailTotalServices">--</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Completed</div>
+                        <div class="stat-value" id="detailCompleted">--</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total Hours</div>
+                        <div class="stat-value" id="detailTotalHours">--</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total Billed</div>
+                        <div class="stat-value" id="detailTotalSpent">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Service Timeline -->
+            <div class="sidebar-section">
+                <h3>Service Timeline</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div>
+                        <label class="input-label">Last Service</label>
+                        <div id="detailLastService" class="detail-value">--</div>
+                    </div>
+                    <div>
+                        <label class="input-label">Next Service</label>
+                        <div id="detailNextService" class="detail-value">--</div>
+                    </div>
+                    <div>
+                        <label class="input-label">Tenure</label>
+                        <div id="detailTenure" class="detail-value">--</div>
+                    </div>
+                    <div>
+                        <label class="input-label">Top Aides</label>
+                        <div id="detailTopAides" class="detail-value">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="sidebar-section">
+                <h3>Quick Actions</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                    <button class="btn btn-primary" style="background: #1A365C;" onclick="copyClientReportLinks()">📋 Copy Report Links</button>
+                    <button class="btn btn-primary" style="background: #62B790;" onclick="openInvestorRelationsTab()">📈 View Investor Relations</button>
+                    <a id="reportLinks" href="#" target="_blank" class="btn btn-secondary" style="text-align: center;">Open Latest Report</a>
+                </div>
+                <div id="clientReportsList" style="margin-top: 10px; font-size: 13px; color: #1A365C;"></div>
+            </div>
+
+            <!-- Notes -->
+            <div class="sidebar-section">
+                <h3>Client Notes</h3>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-secondary" onclick="addStructuredNote('followup')">Follow-up</button>
+                    <button class="btn btn-secondary" onclick="addStructuredNote('billing')">Billing</button>
+                    <button class="btn btn-secondary" onclick="addStructuredNote('insurance')">Insurance</button>
+                    <button class="btn btn-secondary" onclick="addStructuredNote('schedule')">Schedule</button>
+                </div>
+                <textarea id="detailNotes" placeholder="Add a note..." style="margin-top: 10px; height: 120px;"></textarea>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                    <span style="font-size: 12px; color: #666;">Markdown supported • Last saved: just now</span>
+                    <button class="btn btn-primary" onclick="saveClientNotes()">Save Note</button>
+                </div>
+            </div>
+
+            <!-- Status -->
+            <div class="sidebar-section">
+                <h3>Client Status</h3>
+                <select id="detailStatus" onchange="updateClientStatus()" style="width: 100%;">
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Transitioning">Transitioning</option>
+                    <option value="On Hold">On Hold</option>
+                </select>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 12px;">
+                    <button class="btn btn-secondary" onclick="sendClientEmail('insurance')">✉️ Send Insurance Update</button>
+                    <button class="btn btn-secondary" onclick="sendClientEmail('billing')">💲 Send Billing Update</button>
+                    <button class="btn btn-secondary" onclick="sendClientEmail('schedule')">🗓️ Send Schedule Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ============================================
         // CONFIGURATION
@@ -3150,8 +2293,7 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
         let selectedLTCRecord = null;
         
         // State
-        // Default to dashboard/client insights experience for this page
-        let currentTab = 'dashboard';
+        let currentTab = 'report';
         let reportData = [];
         let clientData = [];
         let currentPage = 1;
@@ -3317,20 +2459,14 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                 panel.classList.toggle('active', panel.id === `${tab}-panel`);
             });
             
-            if (tab === 'report' && reportData.length === 0) {
-                showReportFilterPrompt();  // Show filter prompt instead of loading all data
+            if (tab === 'report') {
+                if (reportData.length === 0) {
+                    showReportFilterPrompt();  // Show filter prompt instead of loading all data
+                }
+
+                loadAutomationConfig();
             } else if (tab === 'client' && clientData.length === 0) {
                 loadClientData();
-            } else if (tab === 'dashboard') {
-                // Load available years first if not loaded, then load dashboard data
-                if (availableYears.length === 0) {
-                    loadAvailableYears().then(() => loadDashboardData());
-                } else {
-                    loadDashboardData();
-                }
-            } else if (tab === 'clientInsights') {
-                // Load client insights data
-                loadClientInsights();
             }
         }
         
@@ -7465,7 +6601,7 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
             if (e.key === 'Enter') {
                 const query = this.value.trim();
                 if (query) {
-                    switchTab('dashboard');
+                    switchTab('report');
                     document.getElementById('quickLookupInput').value = query;
                     quickClientLookup();
                 }
@@ -7908,17 +7044,32 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                 });
             });
             
+            // Load initial data
+            loadConfig();
+            
             // Default to Dashboard tab on page load
-            switchTab('dashboard');
+            switchTab('report');
             
             // Global search handler
             const globalSearchInput = document.getElementById('globalSearch');
             if (globalSearchInput) {
-                globalSearchInput.placeholder = 'Press Enter to open Client Insights';
-
                 globalSearchInput.addEventListener('keypress', function(e) {
                     if (e.key === 'Enter') {
-                        switchTab('clientInsights');
+                        const query = this.value.trim();
+                        if (query) {
+                            // Switch to client tab and search
+                            switchTab('client');
+                            
+                            if (clientData.length === 0) {
+                                loadClientData().then(() => {
+                                    document.getElementById('filterClientName').value = query;
+                                    applyClientFilters();
+                                });
+                            } else {
+                                document.getElementById('filterClientName').value = query;
+                                applyClientFilters();
+                            }
+                        }
                     }
                 });
             }
