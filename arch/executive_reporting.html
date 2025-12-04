@@ -1480,7 +1480,7 @@
                     </div>
                     <div style="background: white; border: 1px solid #E5ECF3; border-radius: 12px; padding: 20px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                            <h3 style="color: #1A365C; margin: 0; font-size: 16px;">🏆 Top Clients Last Month <span id="topClientsMonthLabel" style="font-weight: 400; color: #666;">(--)</span></h3>
+                            <h3 style="color: #1A365C; margin: 0; font-size: 16px;">🏆 Top Clients This Month <span id="topClientsMonthLabel" style="font-weight: 400; color: #666;">(--)</span></h3>
                             <select id="topClientsMonthLimit" onchange="updateTopClientsDisplay('month')" style="padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
                                 <option value="5" selected>Top 5</option>
                                 <option value="10">Top 10</option>
@@ -1927,7 +1927,7 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                             </div>
                         </div>
                         
-                        <!-- Row 2: Top Clients Last Week & Last Month -->
+                        <!-- Row 2: Top Clients Last Week & This Month -->
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
                             <!-- Top Clients Last Week -->
                             <div style="background: white; border: 1px solid #E5ECF3; border-radius: 12px; padding: 20px;">
@@ -1954,10 +1954,10 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                                 </table>
                             </div>
                             
-                            <!-- Top Clients Last Month -->
+                            <!-- Top Clients This Month -->
                             <div style="background: white; border: 1px solid #E5ECF3; border-radius: 12px; padding: 20px;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                                    <h3 style="color: #1A365C; margin: 0; font-size: 16px;">🏆 Top Clients Last Month <span id="insightsMonthLabel" style="font-weight: 400; color: #666;">(--)</span></h3>
+                                    <h3 style="color: #1A365C; margin: 0; font-size: 16px;">🏆 Top Clients This Month</h3>
                                     <select id="insightsMonthLimit" onchange="renderInsightsTopClients()" style="padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
                                         <option value="5" selected>Top 5</option>
                                         <option value="10">Top 10</option>
@@ -2144,7 +2144,7 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                     </svg>
                     <div>
                         <div id="routeType" style="font-weight: 600; font-size: 13px; color: #1A365C;">Routing to Insurance</div>
-                        <div id="routeEmail" style="font-size: 12px; color: #666;"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="12707b7e7e7b7c7552737e7b7177717360773c717d7f">[email&#160;protected]</a></div>
+                        <div id="routeEmail" style="font-size: 12px; color: #666;">billing@alicecare.com</div>
                     </div>
                 </div>
             </div>
@@ -2480,7 +2480,7 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                 
                 <div id="sendReportDestination" style="padding: 15px; border-radius: 8px; background: #E3F2FD; margin-top: 15px;">
                     <div style="font-size: 13px; color: #666;">Report will be sent to:</div>
-                    <div id="sendReportEmail" style="font-weight: 600; color: #1A365C; margin-top: 5px;"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5133383d3d383f3611303d383234323023347f323e3c">[email&#160;protected]</a></div>
+                    <div id="sendReportEmail" style="font-weight: 600; color: #1A365C; margin-top: 5px;">billing@alicecare.com</div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -3137,7 +3137,7 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
         </div>
     </div>
 
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    <script>
         // ============================================
         // CONFIGURATION
         // ============================================
@@ -7278,18 +7278,10 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
             const lastWeek = getWeekNumber(lastWeekDate);
             const lastWeekYear = lastWeekDate.getFullYear();
             
-            // Calculate last month (previous completed month)
-            const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-            const lastMonth = lastMonthDate.getMonth() + 1;
-            const lastMonthYear = lastMonthDate.getFullYear();
-            const lastMonthName = lastMonthDate.toLocaleString('default', { month: 'long' });
-            
             const yearData = dashboardDataCache[currentYear] || [];
             // Also check previous year data if we're at the beginning of the year
             const prevYearData = currentYear !== lastWeekYear ? (dashboardDataCache[lastWeekYear] || []) : [];
-            // Also get last month's year data if different
-            const lastMonthYearData = lastMonthYear !== currentYear && lastMonthYear !== lastWeekYear ? (dashboardDataCache[lastMonthYear] || []) : [];
-            const allYearData = [...yearData, ...prevYearData, ...lastMonthYearData];
+            const allYearData = [...yearData, ...prevYearData];
             
             // Calculate weekly and monthly client stats
             const weeklyClients = {};
@@ -7317,8 +7309,8 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                     weeklyClients[clientName].revenue += revenue;
                 }
                 
-                // Last month (not current month - we want completed month data)
-                if (year === lastMonthYear && month === lastMonth) {
+                // This month
+                if (year === currentYear && month === currentMonth) {
                     if (!monthlyClients[clientName]) {
                         monthlyClients[clientName] = { name: clientName, services: 0, hours: 0, revenue: 0 };
                     }
@@ -7342,12 +7334,6 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                 weekTitleEl.textContent = `🏆 Top Clients Last Week (Week ${lastWeek})`;
             }
             
-            // Update the month header to show month name
-            const monthLabelEl = document.getElementById('insightsMonthLabel');
-            if (monthLabelEl) {
-                monthLabelEl.textContent = `(${lastMonthName})`;
-            }
-            
             // Render weekly
             const weekContainer = document.getElementById('insightsTopClientsWeek');
             if (topWeekly.length === 0) {
@@ -7369,7 +7355,7 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
             // Render monthly
             const monthContainer = document.getElementById('insightsTopClientsMonth');
             if (topMonthly.length === 0) {
-                monthContainer.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #999; padding: 20px;">No data for ${lastMonthName}</td></tr>`;
+                monthContainer.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999; padding: 20px;">No data for this month</td></tr>';
             } else {
                 monthContainer.innerHTML = topMonthly.map((c, i) => `
                     <tr>
@@ -9084,10 +9070,15 @@ This update contains confidential information intended for investors only.`;
         }
         
         // Legacy single file import (kept for backward compatibility)
-        function importSingleEmail(event) {
-            // Redirect to the bulk import handler
+        function importPastEmail(event) {
             importPastEmails(event);
         }
+        
+        // Initialize IR when Client Insights loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize on page load if on client insights
+            setTimeout(initInvestorRelations, 500);
+        });
     </script>
 </body>
 </html>
