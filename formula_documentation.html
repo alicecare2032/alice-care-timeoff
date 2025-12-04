@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formula Documentation | Alice Care Executive Reporting</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #F8FAFC 0%, #E5ECF3 100%);
+            min-height: 100vh;
+            color: #1A365C;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1A365C 0%, #2D4A7C 100%);
+            color: white;
+            padding: 30px 40px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(26, 54, 92, 0.3);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+            font-size: 13px;
+            margin-top: 15px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        
+        .back-link:hover {
+            background: rgba(255,255,255,0.25);
+        }
+        
+        .tab-section {
+            background: white;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        
+        .tab-header {
+            background: linear-gradient(135deg, #F57600 0%, #FF8C00 100%);
+            color: white;
+            padding: 18px 25px;
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tab-header.dashboard { background: linear-gradient(135deg, #F57600 0%, #FF8C00 100%); }
+        .tab-header.client { background: linear-gradient(135deg, #62B790 0%, #4CA877 100%); }
+        .tab-header.provider { background: linear-gradient(135deg, #1A365C 0%, #2D4A7C 100%); }
+        
+        .formula-card {
+            border-bottom: 1px solid #E5ECF3;
+            padding: 20px 25px;
+        }
+        
+        .formula-card:last-child {
+            border-bottom: none;
+        }
+        
+        .formula-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1A365C;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .formula-box {
+            background: #F8FAFC;
+            border: 1px solid #E5ECF3;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: 13px;
+            color: #0369A1;
+            margin-bottom: 12px;
+            overflow-x: auto;
+        }
+        
+        .description {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .description strong {
+            color: #1A365C;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .badge-kpi { background: #DCFCE7; color: #166534; }
+        .badge-chart { background: #E0F2FE; color: #0369A1; }
+        .badge-table { background: #FEF3C7; color: #92400E; }
+        
+        .note {
+            background: #FEF3C7;
+            border-left: 4px solid #F57600;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #92400E;
+            margin-top: 10px;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .toc {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        
+        .toc h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #1A365C;
+        }
+        
+        .toc-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 10px;
+        }
+        
+        .toc-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #1A365C;
+            transition: all 0.2s;
+        }
+        
+        .toc-item:hover {
+            background: #F8FAFC;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 12px;
+        }
+        
+        @media print {
+            body { background: white; }
+            .back-link { display: none; }
+            .tab-section { break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Formula Documentation</h1>
+            <p>Complete reference for all calculations, metrics, and formulas used in Alice Care Executive Reporting</p>
+            <a href="javascript:history.back()" class="back-link">← Back to Dashboard</a>
+        </div>
+
+        <!-- Table of Contents -->
+        <div class="toc">
+            <h2>📑 Quick Navigation</h2>
+            <div class="toc-list">
+                <a href="#dashboard" class="toc-item">🟠 Dashboard Tab</a>
+                <a href="#client-insights" class="toc-item">🟢 Client Insights Tab</a>
+                <a href="#provider-insights" class="toc-item">🔵 Provider Insights Tab</a>
+                <a href="#oncall" class="toc-item">⏱️ On-Call Utilization</a>
+            </div>
+        </div>
+
+        <!-- ================================ -->
+        <!-- DASHBOARD TAB -->
+        <!-- ================================ -->
+        <div class="tab-section" id="dashboard">
+            <div class="tab-header dashboard">🏠 Dashboard Tab</div>
+
+            <!-- YTD Revenue -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-kpi">KPI</span>
+                    YTD Revenue
+                </div>
+                <div class="formula-box">
+                    YTD Revenue = SUM(Cost To Customer) WHERE Year = Current Year AND Status = 'COMPLETED'
+                </div>
+                <div class="description">
+                    Total revenue generated from all completed services year-to-date. Only includes services with status "COMPLETED".
+                </div>
+            </div>
+
+            <!-- YTD Hours -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-kpi">KPI</span>
+                    YTD Hours
+                </div>
+                <div class="formula-box">
+                    YTD Hours = SUM(Service Duration / 60) WHERE Year = Current Year AND Status = 'COMPLETED'
+                </div>
+                <div class="description">
+                    Total service hours delivered year-to-date. Service Duration is stored in minutes, converted to hours by dividing by 60.
+                </div>
+            </div>
+
+            <!-- YTD Services -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-kpi">KPI</span>
+                    YTD Services
+                </div>
+                <div class="formula-box">
+                    YTD Services = COUNT(*) WHERE Year = Current Year AND Status = 'COMPLETED'
+                </div>
+                <div class="description">
+                    Total number of completed service records year-to-date.
+                </div>
+            </div>
+
+            <!-- Average Revenue -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-kpi">KPI</span>
+                    Avg Revenue (per service)
+                </div>
+                <div class="formula-box">
+                    Avg Revenue = YTD Revenue / YTD Services
+                </div>
+                <div class="description">
+                    Average revenue per completed service. Useful for identifying pricing trends and service mix changes.
+                </div>
+            </div>
+
+            <!-- YoY Change -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-kpi">KPI</span>
+                    Year-over-Year (YoY) Change %
+                </div>
+                <div class="formula-box">
+                    YoY Change % = ((Current Year Value - Prior Year Value) / Prior Year Value) × 100
+                </div>
+                <div class="description">
+                    Percentage change comparing current YTD to same period last year. <strong>Green ↑</strong> indicates growth, <strong>Red ↓</strong> indicates decline.
+                </div>
+            </div>
+
+            <!-- Last Week/Month/Quarter -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-kpi">KPI</span>
+                    Last Week / Month / Quarter Revenue
+                </div>
+                <div class="formula-box">
+                    Period Revenue = SUM(Cost To Customer) WHERE Date IN [Period Range] AND Status = 'COMPLETED'
+                </div>
+                <div class="description">
+                    <strong>Last Week:</strong> Prior complete week (Sunday-Saturday)<br>
+                    <strong>Last Month:</strong> Prior complete calendar month<br>
+                    <strong>Last Quarter:</strong> Prior complete quarter (Q1=Jan-Mar, Q2=Apr-Jun, etc.)<br>
+                    Change % compares to the period before it.
+                </div>
+            </div>
+
+            <!-- Weekly Revenue Chart -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-chart">Chart</span>
+                    Weekly Revenue (Line Chart)
+                </div>
+                <div class="formula-box">
+                    Weekly Revenue[week] = SUM(Cost To Customer) WHERE Week = [week] AND Status = 'COMPLETED'
+                </div>
+                <div class="description">
+                    Shows last 12 weeks of revenue. Line chart with revenue on Y-axis, week labels on X-axis.
+                </div>
+            </div>
+
+            <!-- Weekly Volume Chart -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-chart">Chart</span>
+                    Weekly Volume (Combo Chart)
+                </div>
+                <div class="formula-box">
+                    Weekly Services[week] = COUNT(*) WHERE Week = [week] AND Status = 'COMPLETED'<br>
+                    Weekly Hours[week] = SUM(Service Duration / 60) WHERE Week = [week] AND Status = 'COMPLETED'
+                </div>
+                <div class="description">
+                    Combination chart: Bars represent service count (left Y-axis), line represents hours (right Y-axis). Shows last 12 weeks.
+                </div>
+            </div>
+
+            <!-- Peak Hours Chart -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-chart">Chart</span>
+                    Peak Hours (12 Week Average)
+                </div>
+                <div class="formula-box">
+                    Avg Services[hour] = (Total services starting at [hour] in last 12 weeks) / (Number of days in last 12 weeks)
+                </div>
+                <div class="description">
+                    Shows average daily service volume by start hour. Hours are grouped from service start times (converted from "StartTIME" column). 
+                    <strong>Orange bars</strong> = peak hours (>70% of max), <strong>Navy bars</strong> = moderate (40-70%), <strong>Gray bars</strong> = low (<40%).
+                </div>
+            </div>
+
+            <!-- Monthly Revenue Chart -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-chart">Chart</span>
+                    Monthly Revenue (Last 13 Months)
+                </div>
+                <div class="formula-box">
+                    Monthly Revenue[month] = SUM(Cost To Customer) WHERE Month = [month] AND Status = 'COMPLETED'
+                </div>
+                <div class="description">
+                    Rolling 13-month view of revenue. Includes current month plus 12 prior months.
+                </div>
+            </div>
+
+            <!-- Quarterly Revenue Chart -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-chart">Chart</span>
+                    Quarterly Revenue Comparison
+                </div>
+                <div class="formula-box">
+                    Quarterly Revenue[Q] = SUM(Cost To Customer) WHERE Quarter = Q AND Status = 'COMPLETED'
+                </div>
+                <div class="description">
+                    Compares Q1, Q2, Q3, Q4 revenue for current and prior year side-by-side.
+                </div>
+            </div>
+
+            <!-- Top Clients Tables -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-table">Table</span>
+                    Top Clients (Last Week / Last Month)
+                </div>
+                <div class="formula-box">
+                    Revenue[client] = SUM(Cost To Customer) WHERE Customer Name = [client] AND Date IN [Period]<br>
+                    Hours[client] = SUM(Service Duration / 60) WHERE Customer Name = [client] AND Date IN [Period]
+                </div>
+                <div class="description">
+                    Ranks clients by revenue for the selected period. Shows client name, revenue, and hours. Default shows top 5, expandable to 10.
+                </div>
+            </div>
+
+            <!-- Top Providers Table -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-table">Table</span>
+                    Top Providers
+                </div>
+                <div class="formula-box">
+                    Hours[provider] = SUM(Service Duration / 60) WHERE Provider Name = [provider]<br>
+                    Services[provider] = COUNT(*) WHERE Provider Name = [provider]<br>
+                    Revenue[provider] = SUM(Cost To Customer) WHERE Provider Name = [provider]
+                </div>
+                <div class="description">
+                    Ranks providers by hours or services (toggle). Can filter by week, month, or YTD. Uses fuzzy matching to merge similar provider name variations.
+                </div>
+            </div>
+
+            <!-- Provider Activity Monitor -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-table">Table</span>
+                    Provider Activity Monitor
+                </div>
+                <div class="formula-box">
+                    Change % = ((Last Period Hours - Prior Period Hours) / Prior Period Hours) × 100<br><br>
+                    Status Logic:<br>
+                    • Active (🟢): Change ≥ -25% OR new provider with hours<br>
+                    • Declining (🟡): -50% < Change ≤ -25%<br>
+                    • At Risk (🟠): Change ≤ -50% (but still has hours)<br>
+                    • Inactive (🔴): 100% drop (no hours in last period)
+                </div>
+                <div class="description">
+                    Monitors provider hour changes between periods. <strong>Minimum threshold:</strong> Provider must have ≥10 hours in prior period to be evaluated. 
+                    Helps identify caregivers who may be churning or reducing availability.
+                </div>
+                <div class="note">
+                    ⚠️ Providers with <10 hours in prior period are classified as "Minimal Activity" and excluded from decline calculations to avoid false positives.
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================ -->
+        <!-- CLIENT INSIGHTS TAB -->
+        <!-- ================================ -->
+        <div class="tab-section" id="client-insights">
+            <div class="tab-header client">👥 Client Insights Tab</div>
+
+            <!-- LTV -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-kpi">KPI</span>
+                    LTV (Lifetime Value)
+                </div>
+                <div class="formula-box">
+                    LTV = ARPU × Gross Margin × Customer Lifespan<br><br>
+                    Where:<br>
+                    • ARPU = Average Monthly Revenue per Active Client (last 3 months)<br>
+                    • Gross Margin = User-configurable (default 70%)<br>
+                    • Customer Lifespan = 1 / Monthly Churn Rate
+                </div>
+                <div class="description">
+                    Investor-grade lifetime value calculation. Represents the gross profit expected from an average client over their entire relationship. 
+                    Uses real cohort data for churn rate calculation.
+                </div>
+            </div>
+
+            <!-- ARPU -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-kpi">KPI</span>
+                    ARPU (Average Revenue Per User)
+                </div>
+                <div class="formula-box">
+                    ARPU = (Sum of revenue from active clients in last 3 months) / (Total client-months in last 3 months)
+                </div>
+                <div class="description">
+                    Monthly average revenue per active client. Uses last 3 months of data for active clients to smooth out seasonality. 
+                    Calculated using each client's average hourly rate × monthly hours.
+                </div>
+            </div>
+
+            <!-- Churn Rate -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-kpi">KPI</span>
+                    Monthly Churn Rate
+                </div>
+                <div class="formula-box">
+                    Monthly Churn Rate = Churned Clients / Total Client-Months<br><br>
+                    Where:<br>
+                    • Churned Clients = Clients who started 6+ months ago AND are now inactive<br>
+                    • Total Client-Months = Sum of tenure months for all mature clients<br>
+                    • Capped between 1% - 20% monthly
+                </div>
+                <div class="description">
+                    Calculated from cohort analysis of "mature" clients (those with 6+ months history). A client is considered <strong>inactive</strong> if they have no services in the last 90 days.
+                </div>
+                <div class="note">
+                    ⚠️ Default 5% used if insufficient data. Rate is capped to prevent extreme values from distorting LTV.
+                </div>
+            </div>
+
+            <!-- Customer Lifespan -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-kpi">KPI</span>
+                    Customer Lifespan (Retention)
+                </div>
+                <div class="formula-box">
+                    Customer Lifespan = 1 / Monthly Churn Rate
+                </div>
+                <div class="description">
+                    Expected duration of client relationship in months. Based on inverse of churn rate. Example: 5% monthly churn = 20 month expected lifespan.
+                </div>
+            </div>
+
+            <!-- LTV Sensitivity -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-kpi">KPI</span>
+                    LTV Sensitivity Analysis
+                </div>
+                <div class="formula-box">
+                    Worst Case LTV = ARPU × Gross Margin × (1 / (Churn Rate × 1.5))  [+50% churn]<br>
+                    Base Case LTV = ARPU × Gross Margin × (1 / Churn Rate)<br>
+                    Best Case LTV = ARPU × Gross Margin × (1 / (Churn Rate × 0.75))  [-25% churn]
+                </div>
+                <div class="description">
+                    Shows LTV range under different churn scenarios. Useful for investor presentations and financial planning.
+                </div>
+            </div>
+
+            <!-- Client Care Journey -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-chart">Chart</span>
+                    Client Care Journey
+                </div>
+                <div class="formula-box">
+                    First Month Avg = AVG(First Month Hours / 4) for clients with tenure ≥ 3 months<br>
+                    Third Month Avg = AVG(Third Month Hours / 4) for clients with 3rd month data<br>
+                    Sixth Month Avg = AVG(Sixth Month Hours / 4) for clients with tenure ≥ 6 months<br>
+                    Peak Weekly Avg = AVG(Peak Weekly Hours) for all clients<br><br>
+                    Progression Rate = (Clients who increased hours from 1st to 3rd month) / (All clients with 3+ months tenure) × 100
+                </div>
+                <div class="description">
+                    Tracks typical client ramp-up pattern. Shows average weekly hours at different lifecycle stages. 
+                    <strong>Progression Rate</strong> indicates what % of clients increase their care usage over time.
+                </div>
+            </div>
+
+            <!-- End of Care Analysis -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-table">Table</span>
+                    End of Care Analysis
+                </div>
+                <div class="formula-box">
+                    High Care Client = Client with Peak Weekly Hours ≥ 30<br>
+                    Time After Peak = Months since client reached peak weekly hours<br>
+                    Avg Time After Peak = AVG(Time After Peak) for inactive high-care clients
+                </div>
+                <div class="description">
+                    Identifies clients receiving 30+ hours/week (high-care) and tracks their journey toward care transition. 
+                    Useful for anticipating end-of-care events (death, facility placement, family assumption of care).
+                </div>
+            </div>
+
+            <!-- Client LTV Rankings Table -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-table">Table</span>
+                    Client Lifetime Value Rankings
+                </div>
+                <div class="formula-box">
+                    Lifetime Revenue = SUM(Cost To Customer) for all-time services per client<br>
+                    Lifetime Hours = SUM(Service Duration / 60) for all-time services per client<br>
+                    Tenure = Months between first and last service date<br>
+                    Avg Monthly = Lifetime Revenue / Max(Tenure, 1)
+                </div>
+                <div class="description">
+                    Ranks clients by total revenue across all years. Shows tenure, average monthly spend, and active/inactive status. 
+                    Uses fuzzy matching to consolidate client name variations.
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================ -->
+        <!-- PROVIDER INSIGHTS TAB -->
+        <!-- ================================ -->
+        <div class="tab-section" id="provider-insights">
+            <div class="tab-header provider">👷 Provider Insights Tab</div>
+
+            <!-- Provider Status -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-kpi">KPI</span>
+                    Provider Status Classification
+                </div>
+                <div class="formula-box">
+                    Days Since Last Service = Today - Last Service Date<br><br>
+                    Status Logic:<br>
+                    • Active: Days Since Last Service ≤ 30<br>
+                    • Declining: 30 < Days Since Last Service ≤ 60<br>
+                    • At-Risk: 60 < Days Since Last Service ≤ 90<br>
+                    • Inactive: Days Since Last Service > 90
+                </div>
+                <div class="description">
+                    Classifies providers based on recency of their last completed service. Different from Dashboard's Activity Monitor which uses hour change %.
+                </div>
+            </div>
+
+            <!-- Provider Retention Rate -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-kpi">KPI</span>
+                    Provider Retention Rate
+                </div>
+                <div class="formula-box">
+                    Retention Rate = (Providers active in prior month who are also active this month) / (Providers active in prior month) × 100
+                </div>
+                <div class="description">
+                    Month-over-month provider retention. Measures workforce stability. "Active" means the provider had at least one service in that month.
+                </div>
+            </div>
+
+            <!-- Avg Hours Per Provider -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-kpi">KPI</span>
+                    Avg Hours Per Provider
+                </div>
+                <div class="formula-box">
+                    Avg Hours = SUM(Active Provider Avg Monthly Hours) / COUNT(Active Providers)<br><br>
+                    Where:<br>
+                    Avg Monthly Hours per Provider = Total Hours / Tenure Months
+                </div>
+                <div class="description">
+                    Average monthly hours worked by active providers. Indicates workforce utilization and provider engagement.
+                </div>
+            </div>
+
+            <!-- Provider Tenure Distribution -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-chart">Chart</span>
+                    Provider Tenure Distribution
+                </div>
+                <div class="formula-box">
+                    Tenure = Months between First Service Date and Last Service Date + 1<br><br>
+                    Buckets:<br>
+                    • 0-3 months<br>
+                    • 3-6 months<br>
+                    • 6-12 months<br>
+                    • 1-2 years<br>
+                    • 2+ years
+                </div>
+                <div class="description">
+                    Distribution of provider workforce by tenure. Helps understand workforce maturity and identify turnover patterns.
+                </div>
+            </div>
+
+            <!-- Top Performers -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-table">Table</span>
+                    Top Performers
+                </div>
+                <div class="formula-box">
+                    Monthly Revenue = SUM(Cost To Customer) WHERE Month = Last Month<br>
+                    Monthly Hours = SUM(Service Duration / 60) WHERE Month = Last Month
+                </div>
+                <div class="description">
+                    Ranks providers by revenue generated in the last complete month. Shows hours and unique clients served.
+                </div>
+            </div>
+
+            <!-- At-Risk Providers -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-table">Table</span>
+                    At-Risk Providers
+                </div>
+                <div class="formula-box">
+                    At-Risk = Status = 'At-Risk' (60-90 days since last service)<br>
+                    Last Activity = Last Service Date<br>
+                    Lifetime Hours = Total hours worked across all time
+                </div>
+                <div class="description">
+                    Lists providers who haven't worked in 60-90 days but have historical activity. These providers may need outreach to prevent churn.
+                </div>
+            </div>
+
+            <!-- New Providers -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-table">Table</span>
+                    New Providers (Last 90 Days)
+                </div>
+                <div class="formula-box">
+                    New Provider = First Service Date within last 90 days<br>
+                    Ramp-Up = Total Hours in first 90 days
+                </div>
+                <div class="description">
+                    Providers who started within the last 90 days. Shows their onboarding progress and initial utilization.
+                </div>
+            </div>
+
+            <!-- Recently Churned -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-table">Table</span>
+                    Recently Churned
+                </div>
+                <div class="formula-box">
+                    Churned = Status = 'Inactive' (90+ days since last service)<br>
+                    Lifetime Value = Total Revenue generated by provider<br>
+                    Tenure = Duration from first to last service
+                </div>
+                <div class="description">
+                    Providers who have become inactive (no services in 90+ days). Shows their lifetime contribution to help prioritize re-engagement efforts.
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================ -->
+        <!-- ON-CALL UTILIZATION -->
+        <!-- ================================ -->
+        <div class="tab-section" id="oncall">
+            <div class="tab-header provider">⏱️ On-Call Staff Utilization</div>
+
+            <!-- Scheduled Hours -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-kpi">KPI</span>
+                    Scheduled Hours
+                </div>
+                <div class="formula-box">
+                    Scheduled Hours = SUM(On-Call Window Duration) from On-Call Schedule Sheet<br><br>
+                    Window Duration = End Time - Start Time for each scheduled on-call shift
+                </div>
+                <div class="description">
+                    Total hours providers were scheduled to be available for on-call services. Pulled from the On-Call schedule Google Sheet.
+                </div>
+            </div>
+
+            <!-- Service Hours (Within Window) -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-kpi">KPI</span>
+                    Service Hours Worked
+                </div>
+                <div class="formula-box">
+                    Service Hours = SUM(Service Duration / 60) WHERE:<br>
+                    • Provider matches On-Call Provider<br>
+                    • Service Date matches On-Call Date<br>
+                    • Service Start Time falls within On-Call Window
+                </div>
+                <div class="description">
+                    Hours of actual services delivered during on-call windows. Only counts services where the start time falls within the provider's scheduled on-call window.
+                </div>
+            </div>
+
+            <!-- Utilization % -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-kpi">KPI</span>
+                    Utilization %
+                </div>
+                <div class="formula-box">
+                    Utilization % = (Service Hours Worked / Scheduled Hours) × 100
+                </div>
+                <div class="description">
+                    Percentage of scheduled on-call time spent delivering services. Key efficiency metric for on-call staffing decisions.
+                    <br><br>
+                    <strong>Trend Classification:</strong><br>
+                    • 🔥 High: ≥70% utilization<br>
+                    • ✓ Good: 40-69% utilization<br>
+                    • ⚠ Low: 20-39% utilization<br>
+                    • ⚡ Very Low: <20% utilization
+                </div>
+            </div>
+
+            <!-- Idle Hours -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-kpi">KPI</span>
+                    Idle Hours
+                </div>
+                <div class="formula-box">
+                    Idle Hours = MAX(0, Scheduled Hours - Service Hours Worked)
+                </div>
+                <div class="description">
+                    Time providers were on-call but not actively delivering services. Represents potential inefficiency or necessary buffer capacity. 
+                    Cannot be negative (capped at 0 if service hours exceed scheduled hours).
+                </div>
+                <div class="note">
+                    💡 <strong>This is what you asked about!</strong> Idle Hours = the "unused" portion of on-call scheduled time.
+                </div>
+            </div>
+
+            <!-- Services Outside Window -->
+            <div class="formula-card">
+                <div class="formula-title">
+                    <span class="badge badge-table">Table</span>
+                    Services Outside On-Call Window
+                </div>
+                <div class="formula-box">
+                    Services Outside = Services by provider on on-call date BUT:<br>
+                    • Service Start Time < On-Call Window Start, OR<br>
+                    • Service Start Time > On-Call Window End
+                </div>
+                <div class="description">
+                    Identifies services that providers delivered on days they were on-call, but outside their scheduled on-call hours. 
+                    These are tracked separately and don't count toward utilization %.
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            Alice Care Executive Reporting Formula Documentation<br>
+            Last Updated: December 2025
+        </div>
+    </div>
+</body>
+</html>
