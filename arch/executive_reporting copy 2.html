@@ -1314,13 +1314,12 @@
                             <option value="2024">2024</option>
                             <option value="2023">2023</option>
                         </select>
-                        <button class="btn btn-secondary" onclick="refreshAllData()" style="padding: 8px 12px;">
+                        <button class="btn btn-secondary" onclick="loadDashboardData()" style="padding: 8px 12px;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
                                 <polyline points="23 4 23 10 17 10"/>
                                 <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
                             </svg>
                             Refresh
-                        </button>
                         </button>
                     </div>
                 </div>
@@ -1756,13 +1755,6 @@
                             <select id="insightsYearSelect" onchange="loadClientInsights()" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
                                 <option value="">Loading...</option>
                             </select>
-                            <button class="btn btn-secondary" onclick="refreshAllData()" style="padding: 8px 12px;">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
-                                    <polyline points="23 4 23 10 17 10"/>
-                                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
-                                </svg>
-                                Refresh
-                            </button>
                         </div>
                     </div>
                     
@@ -2147,13 +2139,6 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                             <select id="providerInsightsYearSelect" onchange="loadProviderInsights()" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
                                 <option value="">Loading...</option>
                             </select>
-                            <button class="btn btn-secondary" onclick="refreshAllData()" style="padding: 8px 12px;">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
-                                    <polyline points="23 4 23 10 17 10"/>
-                                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
-                                </svg>
-                                Refresh
-                            </button>
                         </div>
                     </div>
                     
@@ -2407,7 +2392,12 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                                 </div>
                                 <div style="display: flex; gap: 10px; align-items: center;">
                                     <select id="oncallPeriodFilter" onchange="loadOncallUtilization()" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px;">
-                                        <!-- Will be populated dynamically with week numbers -->
+                                        <option value="7">Last Week</option>
+                                        <option value="30">Last 30 Days</option>
+                                        <option value="60">Last 60 Days</option>
+                                        <option value="90" selected>Last 90 Days</option>
+                                        <option value="180">Last 6 Months</option>
+                                        <option value="365">Last Year</option>
                                     </select>
                                     <button onclick="loadOncallUtilization()" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">
                                         🔄 Refresh
@@ -2418,7 +2408,7 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                             <!-- On-Call KPIs -->
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                                 <span id="oncallPeriodLabel" style="font-size: 12px; color: #666; font-weight: 500;">Showing: Last 90 Days</span>
-                                <span style="font-size: 11px; color: #999;">Utilization = Service Hours ÷ Actual Hours (from Time Card)</span>
+                                <span style="font-size: 11px; color: #999;">Utilization = Service Hours ÷ Scheduled Hours</span>
                             </div>
                             <div id="oncallKPIs" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px;">
                                 <div style="background: #F0F9FF; padding: 15px; border-radius: 8px; text-align: center;">
@@ -2426,7 +2416,7 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                                     <div style="font-size: 24px; font-weight: 700; color: #0369A1;" id="oncallTotalStaff">--</div>
                                 </div>
                                 <div style="background: #FEF3C7; padding: 15px; border-radius: 8px; text-align: center;">
-                                    <div style="font-size: 11px; text-transform: uppercase; color: #92400E; margin-bottom: 5px;">Actual Hours</div>
+                                    <div style="font-size: 11px; text-transform: uppercase; color: #92400E; margin-bottom: 5px;">Scheduled Hours</div>
                                     <div style="font-size: 24px; font-weight: 700; color: #92400E;" id="oncallScheduledHours">--</div>
                                 </div>
                                 <div style="background: #DCFCE7; padding: 15px; border-radius: 8px; text-align: center;">
@@ -2460,7 +2450,7 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                                                 <th style="padding: 10px 12px; text-align: left; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">Provider</th>
                                                 <th style="padding: 10px 12px; text-align: center; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">On-Call Shifts</th>
                                                 <th style="padding: 10px 12px; text-align: center; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">Services Worked</th>
-                                                <th style="padding: 10px 12px; text-align: right; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">Actual Hours</th>
+                                                <th style="padding: 10px 12px; text-align: right; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">Scheduled Hours</th>
                                                 <th style="padding: 10px 12px; text-align: right; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">Service Hours</th>
                                                 <th style="padding: 10px 12px; text-align: center; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">Utilization</th>
                                                 <th style="padding: 10px 12px; text-align: right; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 2px solid #E5ECF3;">Idle Hours</th>
@@ -3535,19 +3525,6 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
         let dashboardDataCache = {};
         let availableYears = [];
         
-        // Track which tabs have been rendered with current cache
-        let tabsRendered = {
-            dashboard: false,
-            clientInsights: false,
-            providerInsights: false
-        };
-        
-        // Track if initial data load has happened
-        let initialDataLoaded = false;
-        
-        // On-call data cache
-        let oncallDataCache = null;
-        
         // LocalStorage keys for persistent caching
         const CACHE_STORAGE_KEY = 'aliceCare_dashboardCache';
         const CACHE_TIMESTAMP_KEY = 'aliceCare_cacheTimestamp';
@@ -3555,9 +3532,6 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
         const CURRENT_CACHE_VERSION = '1.0'; // Increment to invalidate old caches
         
         // Initialize cache from localStorage on page load
-        // Cache freshness threshold in hours (data older than this will be refreshed)
-        const CACHE_FRESHNESS_HOURS = 4;
-        
         function initializeCacheFromStorage() {
             try {
                 const storedVersion = localStorage.getItem(CACHE_VERSION_KEY);
@@ -3576,22 +3550,15 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                     });
                     
                     const timestamp = storedTimestamp ? new Date(storedTimestamp) : null;
-                    const cacheAgeHours = timestamp ? (new Date() - timestamp) / (1000 * 60 * 60) : null;
-                    const isFresh = cacheAgeHours !== null && cacheAgeHours < CACHE_FRESHNESS_HOURS;
+                    const cacheAge = timestamp ? Math.floor((new Date() - timestamp) / (1000 * 60 * 60)) : null;
                     
-                    console.log(`Loaded cache from localStorage: ${Object.keys(dashboardDataCache).length} years, ${cacheAgeHours !== null ? cacheAgeHours.toFixed(1) + ' hours old' : 'unknown age'}, fresh: ${isFresh}`);
-                    
-                    return {
-                        loaded: true,
-                        isFresh: isFresh,
-                        ageHours: cacheAgeHours,
-                        years: Object.keys(dashboardDataCache).map(y => parseInt(y))
-                    };
+                    console.log(`Loaded cache from localStorage: ${Object.keys(dashboardDataCache).length} years, ${cacheAge !== null ? cacheAge + ' hours old' : 'unknown age'}`);
+                    return true;
                 }
             } catch (e) {
                 console.warn('Failed to load cache from localStorage:', e);
             }
-            return { loaded: false, isFresh: false, ageHours: null, years: [] };
+            return false;
         }
         
         // Save cache to localStorage - only cache current year to avoid quota issues
@@ -3718,69 +3685,19 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
             } else if (tab === 'client' && clientData.length === 0) {
                 loadClientData();
             } else if (tab === 'dashboard') {
-                // Only load if not already rendered with current cache
-                if (!tabsRendered.dashboard) {
-                    if (availableYears.length === 0) {
-                        loadAvailableYears().then(() => loadDashboardData());
-                    } else {
-                        loadDashboardData();
-                    }
-                    tabsRendered.dashboard = true;
+                // Load available years first if not loaded, then load dashboard data
+                if (availableYears.length === 0) {
+                    loadAvailableYears().then(() => loadDashboardData());
+                } else {
+                    loadDashboardData();
                 }
             } else if (tab === 'clientInsights') {
-                // Only load if not already rendered with current cache
-                if (!tabsRendered.clientInsights) {
-                    loadClientInsights();
-                    tabsRendered.clientInsights = true;
-                }
+                // Load client insights data
+                loadClientInsights();
             } else if (tab === 'providerInsights') {
-                // Only load if not already rendered with current cache
-                if (!tabsRendered.providerInsights) {
-                    loadProviderInsights();
-                    tabsRendered.providerInsights = true;
-                }
+                // Load provider insights data
+                loadProviderInsights();
             }
-        }
-        
-        /**
-         * Refresh all data - clears cache and reloads from all sources
-         */
-        async function refreshAllData() {
-            // Show loading toast
-            showToast('Refreshing all data...', 'info');
-            
-            // Clear all caches
-            dashboardDataCache = {};
-            oncallDataCache = null;
-            providerInsightsData = null;
-            
-            // Clear localStorage cache
-            localStorage.removeItem(CACHE_STORAGE_KEY);
-            localStorage.removeItem(CACHE_TIMESTAMP_KEY);
-            
-            // Reset tab render flags
-            tabsRendered = {
-                dashboard: false,
-                clientInsights: false,
-                providerInsights: false
-            };
-            
-            // Reload available years
-            await loadAvailableYears();
-            
-            // Reload the current tab
-            if (currentTab === 'dashboard') {
-                tabsRendered.dashboard = true;
-                await loadDashboardData();
-            } else if (currentTab === 'clientInsights') {
-                tabsRendered.clientInsights = true;
-                await loadClientInsights();
-            } else if (currentTab === 'providerInsights') {
-                tabsRendered.providerInsights = true;
-                await loadProviderInsights(true); // force refresh
-            }
-            
-            showToast('Data refreshed successfully!', 'success');
         }
         
         // ============================================
@@ -4864,11 +4781,9 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
             document.getElementById('dashboardYearLabel').textContent = selectedYear;
             
             // Check if we have cached data for this year (memory or localStorage)
-            const hasCachedData = dashboardDataCache[selectedYear] && dashboardDataCache[selectedYear].length > 0;
-            
-            if (hasCachedData) {
+            if (dashboardDataCache[selectedYear]) {
                 console.log(`Using cached data for ${selectedYear} (${dashboardDataCache[selectedYear].length} records)`);
-                // Don't show loading for cached data - render immediately
+                showLoading('Loading Dashboard', 'Using cached data...');
             } else {
                 showLoading('Loading Dashboard', `Fetching ${selectedYear} data...`);
             }
@@ -7292,6 +7207,9 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
             const contentEl = document.getElementById('insightsContent');
             const yearSelect = document.getElementById('insightsYearSelect');
             
+            loadingEl.style.display = 'block';
+            contentEl.style.display = 'none';
+            
             try {
                 // Populate year dropdown if not done
                 if (yearSelect.options.length <= 1 || yearSelect.options[0].value === '') {
@@ -7311,11 +7229,8 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                 const yearsToLoad = availableYears.filter(year => !dashboardDataCache[year]);
                 console.log('Years to load:', yearsToLoad);
                 
-                // Only show loading if we need to fetch data
+                // Load all missing years IN PARALLEL (much faster than sequential)
                 if (yearsToLoad.length > 0) {
-                    loadingEl.style.display = 'block';
-                    contentEl.style.display = 'none';
-                    
                     console.log('Fetching missing years data...');
                     await Promise.all(yearsToLoad.map(year => loadDashboardDataForYear(year)));
                     // Save to localStorage after loading all years
@@ -8373,35 +8288,8 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                 });
             });
             
-            // Try to load cache from localStorage first
-            const cacheStatus = initializeCacheFromStorage();
-            
-            if (cacheStatus.loaded && cacheStatus.isFresh) {
-                // Cache is fresh - use it without fetching
-                console.log('Using fresh cache from localStorage');
-                initialDataLoaded = true;
-                
-                // Pre-populate available years from cache
-                availableYears = cacheStatus.years.sort((a, b) => b - a);
-                if (availableYears.length === 0) {
-                    availableYears = [new Date().getFullYear()];
-                }
-                
-                // Update year selectors
-                updateYearSelectors();
-                
-                // Load dashboard with cached data (no fetch)
-                switchTab('dashboard');
-                
-                // Show toast indicating cached data
-                setTimeout(() => {
-                    showToast(`Using cached data (${cacheStatus.ageHours.toFixed(1)} hours old). Click Refresh to update.`, 'info');
-                }, 500);
-            } else {
-                // Cache is stale or doesn't exist - fetch fresh data
-                console.log('Cache stale or missing, fetching fresh data');
-                switchTab('dashboard');
-            }
+            // Default to Dashboard tab on page load
+            switchTab('dashboard');
             
             // Global search handler
             const globalSearchInput = document.getElementById('globalSearch');
@@ -8415,22 +8303,6 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                 });
             }
         });
-        
-        // Update all year selector dropdowns
-        function updateYearSelectors() {
-            const currentYear = new Date().getFullYear();
-            const yearsHtml = availableYears.map(y => 
-                `<option value="${y}" ${y === currentYear ? 'selected' : ''}>${y}</option>`
-            ).join('');
-            
-            const dashboardYearSelect = document.getElementById('dashboardYear');
-            const insightsYearSelect = document.getElementById('insightsYearSelect');
-            const providerYearSelect = document.getElementById('providerInsightsYearSelect');
-            
-            if (dashboardYearSelect) dashboardYearSelect.innerHTML = yearsHtml;
-            if (insightsYearSelect) insightsYearSelect.innerHTML = yearsHtml;
-            if (providerYearSelect) providerYearSelect.innerHTML = yearsHtml;
-        }
         
         // ============================================
         // LTC IMPORT FUNCTIONS
@@ -8725,7 +8597,7 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
         let providerInsightsData = null;
         let piTrendsChart = null;
         
-        async function loadProviderInsights(forceRefresh = false) {
+        async function loadProviderInsights() {
             const loadingEl = document.getElementById('providerInsightsLoading');
             const contentEl = document.getElementById('providerInsightsContent');
             const yearSelect = document.getElementById('providerInsightsYearSelect');
@@ -8740,21 +8612,14 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                 ).join('');
             }
             
+            loadingEl.style.display = 'block';
+            contentEl.style.display = 'none';
+            
             const selectedYear = parseInt(yearSelect.value) || new Date().getFullYear();
-            const prevYear = selectedYear - 1;
-            
-            // Check if we need to fetch data
-            const needsFetch = forceRefresh || !dashboardDataCache[selectedYear] || !dashboardDataCache[prevYear];
-            
-            // Only show loading if we need to fetch data
-            if (needsFetch) {
-                loadingEl.style.display = 'block';
-                contentEl.style.display = 'none';
-            }
             
             try {
-                // Load data for the selected year if not cached or force refresh
-                if (!dashboardDataCache[selectedYear] || forceRefresh) {
+                // Load data for the selected year if not cached
+                if (!dashboardDataCache[selectedYear]) {
                     const result = await jsonpFetch({ action: 'getDashboardData', year: selectedYear });
                     if (result.success) {
                         dashboardDataCache[selectedYear] = result.data;
@@ -8762,7 +8627,8 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                 }
                 
                 // Also load previous year for comparison
-                if (!dashboardDataCache[prevYear] || forceRefresh) {
+                const prevYear = selectedYear - 1;
+                if (!dashboardDataCache[prevYear]) {
                     const result = await jsonpFetch({ action: 'getDashboardData', year: prevYear });
                     if (result.success) {
                         dashboardDataCache[prevYear] = result.data;
@@ -8776,7 +8642,7 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                 contentEl.style.display = 'block';
                 
                 // Also load on-call utilization data
-                loadOncallUtilization(forceRefresh);
+                loadOncallUtilization();
                 
             } catch (error) {
                 console.error('Error loading provider insights:', error);
@@ -9258,91 +9124,67 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
         // ============================================
         
         const ONCALL_SHEET_ID = '1Z8AJQbIVMP-12IKjTuMHCwu_szLcjtCOv1nAgTIviqw';
+        let oncallDataCache = null;
         
-        async function loadOncallUtilization(forceRefresh = false) {
+        async function loadOncallUtilization() {
             const loadingEl = document.getElementById('oncallLoading');
             const tableContainer = document.getElementById('oncallTableContainer');
             const noDataEl = document.getElementById('oncallNoData');
             const periodLabel = document.getElementById('oncallPeriodLabel');
-            const periodFilter = document.getElementById('oncallPeriodFilter');
-            
-            // Populate week dropdown if empty
-            if (periodFilter && periodFilter.options.length === 0) {
-                populateOncallWeekDropdown();
-            }
             
             loadingEl.style.display = 'block';
             tableContainer.style.display = 'none';
             noDataEl.style.display = 'none';
             
-            // Get the period filter value
-            const filterValue = periodFilter?.value || 'last-month';
-            
-            // Calculate date range based on filter
-            let cutoffDate, endDate, periodLabelText;
-            const now = new Date();
-            
-            if (filterValue === 'last-month') {
-                // Last month
-                const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-                const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0);
-                lastMonthEnd.setHours(23, 59, 59, 999); // End of day
-                cutoffDate = lastMonth;
-                endDate = lastMonthEnd;
-                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
-                                   'July', 'August', 'September', 'October', 'November', 'December'];
-                periodLabelText = `${monthNames[lastMonth.getMonth()]} ${lastMonth.getFullYear()}`;
-            } else {
-                // Week number - format: "week-YYYY-WW"
-                const [, year, week] = filterValue.split('-');
-                const weekDates = getWeekDateRange(parseInt(year), parseInt(week));
-                cutoffDate = weekDates.start;
-                endDate = weekDates.end;
-                periodLabelText = `Week ${week} (${formatShortDate(weekDates.start)} - ${formatShortDate(weekDates.end)})`;
-            }
-            
+            // Get the period filter and update label
+            const days = parseInt(document.getElementById('oncallPeriodFilter')?.value || 90);
+            const periodLabels = {
+                7: 'Last Week',
+                30: 'Last 30 Days',
+                60: 'Last 60 Days',
+                90: 'Last 90 Days',
+                180: 'Last 6 Months',
+                365: 'Last Year'
+            };
             if (periodLabel) {
-                periodLabel.textContent = 'Showing: ' + periodLabelText;
+                periodLabel.textContent = 'Showing: ' + (periodLabels[days] || `Last ${days} Days`);
             }
             
             try {
-                // Fetch on-call schedule data (use cache if available and not forcing refresh)
-                let oncallData;
-                if (oncallDataCache && !forceRefresh) {
-                    oncallData = oncallDataCache;
-                } else {
-                    oncallData = await fetchOncallScheduleData();
-                    oncallDataCache = oncallData; // Cache the data
-                }
+                // Fetch on-call schedule data
+                const oncallData = await fetchOncallScheduleData();
                 
                 if (!oncallData || oncallData.length === 0) {
                     loadingEl.style.display = 'none';
                     noDataEl.style.display = 'block';
-                    updateOncallKPIs([]);
+                    updateOncallKPIs([], {});
                     return;
                 }
                 
-                // Filter on-call data by date range
+                const cutoffDate = new Date();
+                cutoffDate.setDate(cutoffDate.getDate() - days);
+                
+                // Filter on-call data by date
                 const filteredOncall = oncallData.filter(row => {
                     const scheduleDate = parseOncallDate(row.scheduleDate);
-                    return scheduleDate && scheduleDate >= cutoffDate && scheduleDate <= endDate;
+                    return scheduleDate && scheduleDate >= cutoffDate;
                 });
                 
                 if (filteredOncall.length === 0) {
                     loadingEl.style.display = 'none';
                     noDataEl.style.display = 'block';
-                    updateOncallKPIs([]);
+                    updateOncallKPIs([], {});
                     return;
                 }
                 
-                // Get service data for the same period (pass oncall data to match time windows)
-                const serviceByProvider = getServiceDataForDateRange(cutoffDate, endDate, filteredOncall);
+                // Get service data for the same period from providerInsightsData
+                const serviceByProvider = getServiceDataForPeriod(cutoffDate);
                 
                 // Calculate utilization
                 const utilization = calculateOncallUtilization(filteredOncall, serviceByProvider);
                 
                 // Update KPIs
-                updateOncallKPIs(utilization);
+                updateOncallKPIs(utilization, serviceByProvider);
                 
                 // Render table
                 renderOncallUtilizationTable(utilization);
@@ -9356,345 +9198,6 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                 noDataEl.style.display = 'block';
                 document.querySelector('#oncallNoData p').textContent = 'Error loading on-call data: ' + error.message;
             }
-        }
-        
-        function populateOncallWeekDropdown() {
-            const periodFilter = document.getElementById('oncallPeriodFilter');
-            if (!periodFilter) return;
-            
-            const now = new Date();
-            const options = [];
-            
-            // Add last month option
-            const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
-                               'July', 'August', 'September', 'October', 'November', 'December'];
-            options.push(`<option value="last-month">Last Month (${monthNames[lastMonth.getMonth()]})</option>`);
-            
-            // Add last 8 weeks
-            for (let i = 1; i <= 8; i++) {
-                const weekDate = new Date(now);
-                weekDate.setDate(weekDate.getDate() - (i * 7));
-                const weekNum = getISOWeek(weekDate);
-                const weekYear = getISOWeekYear(weekDate);
-                const weekDates = getWeekDateRange(weekYear, weekNum);
-                
-                const label = `Week ${weekNum} (${formatShortDate(weekDates.start)} - ${formatShortDate(weekDates.end)})`;
-                options.push(`<option value="week-${weekYear}-${weekNum}">${label}</option>`);
-            }
-            
-            periodFilter.innerHTML = options.join('');
-        }
-        
-        function getISOWeek(date) {
-            const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-            const dayNum = d.getDay() || 7;
-            d.setDate(d.getDate() + 4 - dayNum);
-            const yearStart = new Date(d.getFullYear(), 0, 1);
-            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-        }
-        
-        function getISOWeekYear(date) {
-            const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-            const dayNum = d.getDay() || 7;
-            d.setDate(d.getDate() + 4 - dayNum);
-            return d.getFullYear();
-        }
-        
-        function getWeekDateRange(year, week) {
-            // Find the first Thursday of the year (ISO week 1 contains the first Thursday)
-            const jan4 = new Date(year, 0, 4);
-            const dayOfWeek = jan4.getDay() || 7;
-            const firstMonday = new Date(jan4);
-            firstMonday.setDate(jan4.getDate() - dayOfWeek + 1);
-            
-            // Calculate the Monday of the requested week
-            const weekStart = new Date(firstMonday);
-            weekStart.setDate(firstMonday.getDate() + (week - 1) * 7);
-            
-            // Sunday is 6 days after Monday
-            const weekEnd = new Date(weekStart);
-            weekEnd.setDate(weekStart.getDate() + 6);
-            // Set to end of day for proper comparison
-            weekEnd.setHours(23, 59, 59, 999);
-            
-            return { start: weekStart, end: weekEnd };
-        }
-        
-        function formatShortDate(date) {
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-                           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            return `${months[date.getMonth()]} ${date.getDate()}`;
-        }
-        
-        function getServiceDataForDateRange(startDate, endDate, oncallData) {
-            // Get service data from the dashboardDataCache for the specific date range
-            // Returns services grouped by provider with details for expandable view
-            const serviceByProvider = {};
-            
-            // First, build a lookup of on-call time segments by provider and date
-            // Now using Time Card (actual worked time) instead of planned start/end
-            const oncallWindows = {};
-            
-            oncallData.forEach(row => {
-                const provider = row.provider?.trim();
-                const scheduleDate = parseOncallDate(row.scheduleDate);
-                if (!provider || !scheduleDate) return;
-                
-                const dateKey = scheduleDate.toDateString();
-                const key = `${provider}|||${dateKey}`;
-                
-                if (!oncallWindows[key]) {
-                    oncallWindows[key] = [];
-                }
-                
-                // Parse Time Card segments (e.g., "08:00-10:40,10:55-16:15,17:00-17:00")
-                const timeCard = row.timeCard || '';
-                if (timeCard) {
-                    const segments = parseTimeCardSegments(timeCard);
-                    segments.forEach(seg => {
-                        oncallWindows[key].push({
-                            start: seg.start,
-                            end: seg.end,
-                            startStr: seg.startStr,
-                            endStr: seg.endStr
-                        });
-                    });
-                } else {
-                    // Fall back to planned start/end if no time card
-                    oncallWindows[key].push({
-                        start: parseOncallTime(row.startTime),
-                        end: parseOncallTime(row.endTime),
-                        startStr: row.startTime,
-                        endStr: row.endTime
-                    });
-                }
-            });
-            
-            // Aggregate from all cached years
-            Object.values(dashboardDataCache).forEach(yearData => {
-                if (!Array.isArray(yearData)) return;
-                
-                yearData.forEach(r => {
-                    const providerName = r['Provider Name'];
-                    if (!providerName || providerName === 'Unassigned' || providerName === 'Unknown') return;
-                    
-                    // Only count COMPLETED services
-                    const status = (r['Status'] || r.Status || '').toUpperCase();
-                    if (status !== 'COMPLETED') return;
-                    
-                    const serviceDate = new Date(r['Scheduled Date']);
-                    if (serviceDate < startDate || serviceDate > endDate) return;
-                    
-                    // Service Duration is in minutes, convert to hours
-                    const hours = (parseFloat(r['Service Duration']) || 0) / 60;
-                    // Scheduled Time from Reports tab Column C
-                    const serviceTime = r['Scheduled Time'] || r['Start Time'] || r['STxTime'] || r['StartTIME'] || '';
-                    const clientName = r['Customer Name'] || 'Unknown';
-                    
-                    // Check if this provider has on-call windows for this date
-                    const dateKey = serviceDate.toDateString();
-                    const windowKey = `${providerName}|||${dateKey}`;
-                    const windows = oncallWindows[windowKey] || [];
-                    
-                    // Parse service time
-                    const parsedServiceTime = parseServiceTime(serviceTime);
-                    
-                    // Check if service falls within any on-call window segment
-                    let isWithinWindow = false;
-                    let matchedWindow = null;
-                    
-                    if (windows.length > 0 && parsedServiceTime) {
-                        for (const window of windows) {
-                            if (window.start && window.end && isTimeWithinWindow(parsedServiceTime, window.start, window.end)) {
-                                isWithinWindow = true;
-                                matchedWindow = window;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    // Initialize provider data structure
-                    if (!serviceByProvider[providerName]) {
-                        serviceByProvider[providerName] = {
-                            services: 0,
-                            hours: 0,
-                            servicesOutside: 0,
-                            hoursOutside: 0,
-                            details: [],
-                            detailsOutside: []
-                        };
-                    }
-                    
-                    const serviceDetail = {
-                        date: serviceDate.toLocaleDateString(),
-                        time: serviceTime,
-                        client: clientName,
-                        hours: hours,
-                        window: matchedWindow ? `${matchedWindow.startStr}-${matchedWindow.endStr}` : null
-                    };
-                    
-                    if (isWithinWindow) {
-                        // Service is within on-call window - count it
-                        serviceByProvider[providerName].services++;
-                        serviceByProvider[providerName].hours += hours;
-                        serviceByProvider[providerName].details.push(serviceDetail);
-                    } else if (windows.length > 0) {
-                        // Provider has on-call windows but service is outside - track separately
-                        serviceByProvider[providerName].servicesOutside++;
-                        serviceByProvider[providerName].hoursOutside += hours;
-                        serviceByProvider[providerName].detailsOutside.push(serviceDetail);
-                    }
-                    // If no windows exist for this provider on this date, we don't count it at all
-                });
-            });
-            
-            return serviceByProvider;
-        }
-        
-        function parseTimeCardSegments(timeCard) {
-            // Parse Time Card format: "08:00-10:40,10:55-16:15,17:00-17:00"
-            // Returns array of { start, end, startStr, endStr }
-            const segments = [];
-            
-            if (!timeCard) return segments;
-            
-            const parts = timeCard.split(',');
-            
-            parts.forEach(part => {
-                const trimmed = part.trim();
-                if (!trimmed) return;
-                
-                // Split by dash to get start and end
-                const times = trimmed.split('-');
-                if (times.length >= 2) {
-                    const startStr = times[0].trim();
-                    const endStr = times[1].trim();
-                    
-                    const start = parseOncallTime(startStr);
-                    const end = parseOncallTime(endStr);
-                    
-                    if (start && end) {
-                        segments.push({
-                            start,
-                            end,
-                            startStr,
-                            endStr
-                        });
-                    }
-                }
-            });
-            
-            return segments;
-        }
-        
-        function calculateTimeCardHours(timeCard) {
-            // Calculate total hours from time card segments
-            const segments = parseTimeCardSegments(timeCard);
-            let totalHours = 0;
-            
-            segments.forEach(seg => {
-                if (seg.start && seg.end) {
-                    let startMinutes = seg.start.hours * 60 + seg.start.minutes;
-                    let endMinutes = seg.end.hours * 60 + seg.end.minutes;
-                    
-                    // Handle overnight shifts
-                    if (endMinutes < startMinutes) {
-                        endMinutes += 24 * 60;
-                    }
-                    
-                    const segmentHours = (endMinutes - startMinutes) / 60;
-                    if (segmentHours > 0) {
-                        totalHours += segmentHours;
-                    }
-                }
-            });
-            
-            return totalHours;
-        }
-        
-        function parseServiceTime(timeStr) {
-            if (!timeStr) return null;
-            
-            const str = timeStr.toString().trim();
-            
-            // Handle ISO datetime format: "2025-11-30T14:55:00.000Z"
-            // The Z means UTC - need to convert to local time
-            if (str.includes('T')) {
-                try {
-                    const date = new Date(str);
-                    if (!isNaN(date.getTime())) {
-                        return { 
-                            hours: date.getHours(),  // getHours() returns local time
-                            minutes: date.getMinutes() 
-                        };
-                    }
-                } catch (e) {
-                    // Fall through to other parsing methods
-                }
-            }
-            
-            // Handle various time formats: "8:00 AM", "14:30", "2:30 PM", "8:00:00 AM", etc.
-            const upperStr = str.toUpperCase();
-            
-            // Try HH:MM:SS AM/PM or HH:MM AM/PM format
-            const ampmMatch = upperStr.match(/(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)?/i);
-            if (ampmMatch) {
-                let hours = parseInt(ampmMatch[1]);
-                const minutes = parseInt(ampmMatch[2]);
-                const ampm = ampmMatch[3];
-                
-                if (ampm === 'PM' && hours < 12) hours += 12;
-                if (ampm === 'AM' && hours === 12) hours = 0;
-                
-                return { hours, minutes };
-            }
-            
-            return null;
-        }
-        
-        function formatServiceTime(timeStr) {
-            // Format time for display in local time
-            if (!timeStr) return '-';
-            
-            const str = timeStr.toString().trim();
-            
-            // Handle ISO datetime format - convert to local time
-            if (str.includes('T')) {
-                try {
-                    const date = new Date(str);
-                    if (!isNaN(date.getTime())) {
-                        let hours = date.getHours();
-                        const minutes = date.getMinutes().toString().padStart(2, '0');
-                        const ampm = hours >= 12 ? 'PM' : 'AM';
-                        if (hours > 12) hours -= 12;
-                        if (hours === 0) hours = 12;
-                        return `${hours}:${minutes} ${ampm}`;
-                    }
-                } catch (e) {
-                    // Fall through
-                }
-            }
-            
-            // Already in readable format
-            return str;
-        }
-        
-        function isTimeWithinWindow(serviceTime, windowStart, windowEnd) {
-            if (!serviceTime || !windowStart || !windowEnd) return false;
-            
-            const serviceMinutes = serviceTime.hours * 60 + serviceTime.minutes;
-            const startMinutes = windowStart.hours * 60 + windowStart.minutes;
-            const endMinutes = windowEnd.hours * 60 + windowEnd.minutes;
-            
-            // Handle overnight shifts (e.g., 22:00 - 06:00)
-            if (endMinutes < startMinutes) {
-                // Overnight shift - service is within if it's after start OR before end
-                return serviceMinutes >= startMinutes || serviceMinutes <= endMinutes;
-            }
-            
-            // Regular shift - service must be between start and end
-            return serviceMinutes >= startMinutes && serviceMinutes <= endMinutes;
         }
         
         async function fetchOncallScheduleData() {
@@ -9784,64 +9287,117 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
             return (endMinutes - startMinutes) / 60;
         }
         
-        function calculateOncallUtilization(oncallData, serviceByProvider) {
-            // Group on-call shifts by provider and sum actual worked hours from Time Card
+        function getServiceDataForPeriod(cutoffDate) {
+            // Get service data from the dashboardDataCache with detailed timing
+            const servicesByProviderDate = {};
+            const now = new Date();
+            
+            // Aggregate from all cached years
+            Object.values(dashboardDataCache).forEach(yearData => {
+                if (!Array.isArray(yearData)) return;
+                
+                yearData.forEach(r => {
+                    const providerName = r['Provider Name'];
+                    if (!providerName || providerName === 'Unassigned' || providerName === 'Unknown') return;
+                    
+                    const serviceDate = new Date(r['Scheduled Date']);
+                    if (serviceDate < cutoffDate || serviceDate > now) return;
+                    
+                    const hours = (parseFloat(r['Service Duration']) || 0) / 60;
+                    const scheduledTime = r['Scheduled Time'] || r['Start Time'] || '';
+                    
+                    // Create a key combining provider and date
+                    const dateKey = serviceDate.toDateString();
+                    const key = `${providerName}|||${dateKey}`;
+                    
+                    if (!servicesByProviderDate[key]) {
+                        servicesByProviderDate[key] = {
+                            provider: providerName,
+                            date: serviceDate,
+                            dateKey: dateKey,
+                            services: []
+                        };
+                    }
+                    
+                    servicesByProviderDate[key].services.push({
+                        hours: hours,
+                        scheduledTime: scheduledTime,
+                        duration: parseFloat(r['Service Duration']) || 0
+                    });
+                });
+            });
+            
+            return servicesByProviderDate;
+        }
+        
+        function calculateOncallUtilization(oncallData, servicesByProviderDate) {
+            // Group on-call shifts by provider
             const oncallByProvider = {};
             
             oncallData.forEach(row => {
                 const provider = row.provider?.trim();
                 if (!provider) return;
                 
-                // Use Time Card for actual worked hours, fall back to planned if not available
-                const timeCard = row.timeCard || '';
-                let shiftHours;
-                let shiftDisplay;
-                
-                if (timeCard) {
-                    shiftHours = calculateTimeCardHours(timeCard);
-                    shiftDisplay = timeCard; // Show actual time card segments
-                } else {
-                    shiftHours = calculateShiftHours(row.startTime, row.endTime);
-                    shiftDisplay = `${row.startTime}-${row.endTime}`;
-                }
-                
+                const shiftHours = calculateShiftHours(row.startTime, row.endTime);
                 const scheduleDate = parseOncallDate(row.scheduleDate);
+                const dateKey = scheduleDate ? scheduleDate.toDateString() : null;
                 
                 if (!oncallByProvider[provider]) {
                     oncallByProvider[provider] = {
                         provider,
                         shifts: 0,
                         scheduledHours: 0,
-                        shiftDetails: []
+                        servicesDuringOncall: 0,
+                        hoursDuringOncall: 0,
+                        dates: []
                     };
                 }
                 
                 oncallByProvider[provider].shifts++;
                 oncallByProvider[provider].scheduledHours += shiftHours;
-                oncallByProvider[provider].shiftDetails.push({
-                    date: scheduleDate ? scheduleDate.toLocaleDateString() : row.scheduleDate,
-                    timeCard: shiftDisplay,
-                    hours: shiftHours
-                });
+                
+                // Find services for this provider on this date that fall within the on-call window
+                if (dateKey) {
+                    const serviceKey = `${provider}|||${dateKey}`;
+                    const dayServices = servicesByProviderDate[serviceKey];
+                    
+                    if (dayServices && dayServices.services) {
+                        const startTime = parseOncallTime(row.startTime);
+                        const endTime = parseOncallTime(row.endTime);
+                        
+                        dayServices.services.forEach(svc => {
+                            const serviceTime = parseServiceTime(svc.scheduledTime);
+                            
+                            // Check if service falls within on-call window
+                            if (serviceTime && startTime && endTime) {
+                                if (isTimeWithinWindow(serviceTime, startTime, endTime)) {
+                                    oncallByProvider[provider].servicesDuringOncall++;
+                                    oncallByProvider[provider].hoursDuringOncall += svc.hours;
+                                }
+                            } else {
+                                // If we can't parse times, include the service (conservative approach)
+                                oncallByProvider[provider].servicesDuringOncall++;
+                                oncallByProvider[provider].hoursDuringOncall += svc.hours;
+                            }
+                        });
+                    }
+                    
+                    oncallByProvider[provider].dates.push({
+                        date: dateKey,
+                        start: row.startTime,
+                        end: row.endTime,
+                        shiftHours: shiftHours
+                    });
+                }
             });
             
             // Calculate utilization for each on-call provider
             const utilization = Object.values(oncallByProvider).map(oncall => {
-                // Get the actual worked hours from service data
-                const serviceData = serviceByProvider[oncall.provider] || { 
-                    services: 0, 
-                    hours: 0, 
-                    servicesOutside: 0, 
-                    hoursOutside: 0,
-                    details: [],
-                    detailsOutside: []
-                };
-                
                 const utilizationPct = oncall.scheduledHours > 0 
-                    ? (serviceData.hours / oncall.scheduledHours) * 100 
+                    ? (oncall.hoursDuringOncall / oncall.scheduledHours) * 100 
                     : 0;
                 
-                const idleHours = Math.max(0, oncall.scheduledHours - serviceData.hours);
+                const idleHours = Math.max(0, oncall.scheduledHours - oncall.hoursDuringOncall);
                 
                 // Calculate trend based on utilization percentage
                 let trend = 'stable';
@@ -9854,17 +9410,11 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                     provider: oncall.provider,
                     shifts: oncall.shifts,
                     scheduledHours: oncall.scheduledHours,
-                    services: serviceData.services,
-                    serviceHours: serviceData.hours,
-                    servicesOutside: serviceData.servicesOutside,
-                    hoursOutside: serviceData.hoursOutside,
+                    services: oncall.servicesDuringOncall,
+                    serviceHours: oncall.hoursDuringOncall,
                     utilization: utilizationPct,
                     idleHours,
-                    trend,
-                    // Details for expandable view
-                    shiftDetails: oncall.shiftDetails,
-                    serviceDetails: serviceData.details,
-                    serviceDetailsOutside: serviceData.detailsOutside
+                    trend
                 };
             });
             
@@ -9872,7 +9422,46 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
             return utilization.sort((a, b) => b.scheduledHours - a.scheduledHours);
         }
         
-        function updateOncallKPIs(utilization) {
+        function parseServiceTime(timeStr) {
+            if (!timeStr) return null;
+            
+            // Handle various time formats: "8:00 AM", "14:30", "2:30 PM", etc.
+            const str = timeStr.toString().trim().toUpperCase();
+            
+            // Try HH:MM AM/PM format
+            const ampmMatch = str.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+            if (ampmMatch) {
+                let hours = parseInt(ampmMatch[1]);
+                const minutes = parseInt(ampmMatch[2]);
+                const ampm = ampmMatch[3];
+                
+                if (ampm === 'PM' && hours < 12) hours += 12;
+                if (ampm === 'AM' && hours === 12) hours = 0;
+                
+                return { hours, minutes };
+            }
+            
+            return null;
+        }
+        
+        function isTimeWithinWindow(serviceTime, windowStart, windowEnd) {
+            if (!serviceTime || !windowStart || !windowEnd) return false;
+            
+            const serviceMinutes = serviceTime.hours * 60 + serviceTime.minutes;
+            let startMinutes = windowStart.hours * 60 + windowStart.minutes;
+            let endMinutes = windowEnd.hours * 60 + windowEnd.minutes;
+            
+            // Handle overnight shifts
+            if (endMinutes < startMinutes) {
+                // Overnight shift - service is within if it's after start OR before end
+                return serviceMinutes >= startMinutes || serviceMinutes <= endMinutes;
+            }
+            
+            // Regular shift - service must be between start and end
+            return serviceMinutes >= startMinutes && serviceMinutes <= endMinutes;
+        }
+        
+        function updateOncallKPIs(utilization, servicesByProviderDate) {
             const totalStaff = utilization.length;
             const totalScheduled = utilization.reduce((sum, u) => sum + u.scheduledHours, 0);
             const totalWorked = utilization.reduce((sum, u) => sum + u.serviceHours, 0);
@@ -9906,109 +9495,15 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                 'stable': { color: '#666', bg: '#F3F4F6', label: '— Stable', icon: '→' }
             };
             
-            container.innerHTML = limitedData.map((u, idx) => {
+            container.innerHTML = limitedData.map(u => {
                 const trend = trendConfig[u.trend] || trendConfig['stable'];
                 const utilizationColor = u.utilization >= 70 ? '#059669' : 
                                         u.utilization >= 40 ? '#0369A1' : 
                                         u.utilization >= 20 ? '#D97706' : '#DC2626';
                 
-                const hasDetails = (u.serviceDetails && u.serviceDetails.length > 0) || 
-                                  (u.serviceDetailsOutside && u.serviceDetailsOutside.length > 0) ||
-                                  (u.shiftDetails && u.shiftDetails.length > 0);
-                
-                // Build expandable details section
-                let detailsHtml = '';
-                if (hasDetails) {
-                    detailsHtml = `
-                        <tr id="oncall-details-${idx}" style="display: none;">
-                            <td colspan="8" style="padding: 0; background: #F8FAFC;">
-                                <div style="padding: 15px 20px; border-bottom: 2px solid #E5ECF3;">
-                                    ${u.shiftDetails && u.shiftDetails.length > 0 ? `
-                                    <div style="margin-bottom: 15px;">
-                                        <div style="font-weight: 600; color: #1A365C; margin-bottom: 8px; font-size: 12px;">📅 Actual Time Card (${u.shiftDetails.length} days)</div>
-                                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                                            ${u.shiftDetails.map(s => `
-                                                <span style="background: #FEF3C7; color: #92400E; padding: 4px 10px; border-radius: 6px; font-size: 11px;" title="${s.timeCard}">
-                                                    ${s.date} • ${s.timeCard.length > 25 ? s.timeCard.substring(0, 25) + '...' : s.timeCard} (${s.hours.toFixed(1)}h)
-                                                </span>
-                                            `).join('')}
-                                        </div>
-                                    </div>
-                                    ` : ''}
-                                    
-                                    ${u.serviceDetails && u.serviceDetails.length > 0 ? `
-                                    <div style="margin-bottom: 15px;">
-                                        <div style="font-weight: 600; color: #166534; margin-bottom: 8px; font-size: 12px;">✅ Services Within On-Call Window (${u.serviceDetails.length})</div>
-                                        <div style="max-height: 200px; overflow-y: auto;">
-                                            <table style="width: 100%; font-size: 11px; border-collapse: collapse;">
-                                                <thead>
-                                                    <tr style="background: #DCFCE7;">
-                                                        <th style="padding: 6px 8px; text-align: left;">Date</th>
-                                                        <th style="padding: 6px 8px; text-align: left;">Time</th>
-                                                        <th style="padding: 6px 8px; text-align: left;">Client</th>
-                                                        <th style="padding: 6px 8px; text-align: right;">Hours</th>
-                                                        <th style="padding: 6px 8px; text-align: left;">Window</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    ${u.serviceDetails.map(s => `
-                                                        <tr style="border-bottom: 1px solid #E5ECF3;">
-                                                            <td style="padding: 5px 8px;">${s.date}</td>
-                                                            <td style="padding: 5px 8px;">${formatServiceTime(s.time)}</td>
-                                                            <td style="padding: 5px 8px;">${escapeHtml(s.client)}</td>
-                                                            <td style="padding: 5px 8px; text-align: right; font-weight: 500;">${s.hours.toFixed(2)}</td>
-                                                            <td style="padding: 5px 8px; color: #166534;">${s.window || '-'}</td>
-                                                        </tr>
-                                                    `).join('')}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                    ` : '<div style="color: #999; font-size: 12px; margin-bottom: 15px;">No services within on-call windows</div>'}
-                                    
-                                    ${u.serviceDetailsOutside && u.serviceDetailsOutside.length > 0 ? `
-                                    <div>
-                                        <div style="font-weight: 600; color: #DC2626; margin-bottom: 8px; font-size: 12px;">⚠️ Services Outside On-Call Window (${u.serviceDetailsOutside.length}) - Not Counted</div>
-                                        <div style="max-height: 150px; overflow-y: auto;">
-                                            <table style="width: 100%; font-size: 11px; border-collapse: collapse; opacity: 0.8;">
-                                                <thead>
-                                                    <tr style="background: #FEE2E2;">
-                                                        <th style="padding: 6px 8px; text-align: left;">Date</th>
-                                                        <th style="padding: 6px 8px; text-align: left;">Time</th>
-                                                        <th style="padding: 6px 8px; text-align: left;">Client</th>
-                                                        <th style="padding: 6px 8px; text-align: right;">Hours</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    ${u.serviceDetailsOutside.map(s => `
-                                                        <tr style="border-bottom: 1px solid #FECACA; color: #991B1B;">
-                                                            <td style="padding: 5px 8px;">${s.date}</td>
-                                                            <td style="padding: 5px 8px;">${formatServiceTime(s.time)}</td>
-                                                            <td style="padding: 5px 8px;">${escapeHtml(s.client)}</td>
-                                                            <td style="padding: 5px 8px; text-align: right;">${s.hours.toFixed(2)}</td>
-                                                        </tr>
-                                                    `).join('')}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <div style="margin-top: 8px; font-size: 11px; color: #991B1B;">
-                                            Total outside window: ${u.servicesOutside} services, ${u.hoursOutside.toFixed(1)} hours
-                                        </div>
-                                    </div>
-                                    ` : ''}
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                }
-                
                 return `
-                    <tr style="cursor: ${hasDetails ? 'pointer' : 'default'};" onclick="${hasDetails ? `toggleOncallDetails(${idx})` : ''}">
-                        <td style="padding: 10px 12px; border-bottom: 1px solid #E5ECF3; font-weight: 500;">
-                            ${hasDetails ? `<span id="oncall-toggle-${idx}" style="display: inline-block; width: 18px; color: #0369A1; font-weight: bold;">+</span>` : '<span style="display: inline-block; width: 18px;"></span>'}
-                            ${escapeHtml(u.provider)}
-                            ${u.servicesOutside > 0 ? `<span style="color: #DC2626; font-size: 10px; margin-left: 5px;" title="${u.servicesOutside} services outside window">(+${u.servicesOutside})</span>` : ''}
-                        </td>
+                    <tr>
+                        <td style="padding: 10px 12px; border-bottom: 1px solid #E5ECF3; font-weight: 500;">${escapeHtml(u.provider)}</td>
                         <td style="padding: 10px 12px; border-bottom: 1px solid #E5ECF3; text-align: center;">${u.shifts}</td>
                         <td style="padding: 10px 12px; border-bottom: 1px solid #E5ECF3; text-align: center;">${u.services}</td>
                         <td style="padding: 10px 12px; border-bottom: 1px solid #E5ECF3; text-align: right; font-weight: 600; color: #92400E;">${u.scheduledHours.toFixed(1)}</td>
@@ -10021,22 +9516,8 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                             <span style="background: ${trend.bg}; color: ${trend.color}; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500;">${trend.label}</span>
                         </td>
                     </tr>
-                    ${detailsHtml}
                 `;
             }).join('');
-        }
-        
-        function toggleOncallDetails(idx) {
-            const detailsRow = document.getElementById(`oncall-details-${idx}`);
-            const toggleBtn = document.getElementById(`oncall-toggle-${idx}`);
-            
-            if (detailsRow) {
-                const isHidden = detailsRow.style.display === 'none';
-                detailsRow.style.display = isHidden ? 'table-row' : 'none';
-                if (toggleBtn) {
-                    toggleBtn.textContent = isHidden ? '−' : '+';
-                }
-            }
         }
         
         // ============================================
