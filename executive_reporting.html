@@ -3558,6 +3558,150 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
         // Cache freshness threshold in hours (data older than this will be refreshed)
         const CACHE_FRESHNESS_HOURS = 4;
         
+        // ============================================
+        // GOOGLE SHEETS CACHE FUNCTIONS
+        // ============================================
+        
+        /**
+         * Try to load dashboard data from Google Sheets cache first
+         * This allows all users to benefit from pre-calculated data
+         */
+        async function loadFromGoogleSheetsCache(year) {
+            try {
+                console.log(`Checking Google Sheets cache for year ${year}...`);
+                
+                const result = await jsonpFetch({
+                    action: 'getDashboardCache',
+                    dataType: 'dashboard',
+                    year: year.toString()
+                });
+                
+                if (result.success && result.found && result.data) {
+                    console.log(`Google Sheets cache hit for ${year}: ${result.cacheAgeHours} hours old, fresh: ${result.isFresh}`);
+                    return {
+                        success: true,
+                        data: result.data,
+                        isFresh: result.isFresh,
+                        lastUpdated: result.lastUpdated,
+                        cacheAgeHours: parseFloat(result.cacheAgeHours)
+                    };
+                }
+                
+                console.log(`Google Sheets cache miss for ${year}: ${result.reason || 'Not found'}`);
+                return { success: false, reason: result.reason || 'Not found' };
+                
+            } catch (error) {
+                console.warn('Error loading from Google Sheets cache:', error);
+                return { success: false, reason: error.message };
+            }
+        }
+        
+        /**
+         * Update the Google Sheets cache (triggers server-side refresh)
+         * The server fetches and caches the data itself to avoid URL length limits
+         */
+        async function updateGoogleSheetsCache(year) {
+            try {
+                console.log(`Triggering server-side cache update for ${year}...`);
+                
+                const result = await jsonpFetch({
+                    action: 'updateDashboardCache',
+                    dataType: 'dashboard',
+                    year: year.toString()
+                });
+                
+                if (result.success) {
+                    console.log(`Google Sheets cache updated for ${year} (${result.recordCount} records)`);
+                    return { success: true, lastUpdated: result.lastUpdated };
+                }
+                
+                console.warn('Failed to update Google Sheets cache:', result.error);
+                return { success: false, error: result.error };
+                
+            } catch (error) {
+                console.warn('Error updating Google Sheets cache:', error);
+                return { success: false, error: error.message };
+            }
+        }
+        
+        /**
+         * Simple hash function for detecting data changes (kept for local use)
+         */
+        function simpleHash(str) {
+            let hash = 0;
+            const len = Math.min(str.length, 10000); // Limit for performance
+            for (let i = 0; i < len; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return hash.toString(16);
+        }
+        
+        /**
+         * Smart data loading - tries Google Sheets cache first, then source
+         */
+        async function loadDashboardDataSmart(year, forceRefresh = false) {
+            // If forcing refresh, skip cache and go straight to source
+            if (!forceRefresh) {
+                // Try Google Sheets cache first (shared across all users)
+                const cacheResult = await loadFromGoogleSheetsCache(year);
+                
+                if (cacheResult.success && cacheResult.isFresh) {
+                    // Cache hit and fresh - use it!
+                    dashboardDataCache[year] = cacheResult.data;
+                    
+                    // Also update localStorage for offline/faster subsequent loads
+                    saveCacheToStorage();
+                    
+                    return {
+                        source: 'google_sheets_cache',
+                        data: cacheResult.data,
+                        cacheAgeHours: cacheResult.cacheAgeHours
+                    };
+                }
+                
+                // Check localStorage as fallback (individual user cache)
+                if (dashboardDataCache[year] && dashboardDataCache[year].length > 0) {
+                    console.log(`Using localStorage cache for ${year}`);
+                    return {
+                        source: 'local_storage_cache',
+                        data: dashboardDataCache[year],
+                        cacheAgeHours: null
+                    };
+                }
+            }
+            
+            // No fresh cache available - fetch from source
+            console.log(`Fetching fresh data for ${year} from source...`);
+            
+            const result = await jsonpFetch({
+                action: 'getDashboardData',
+                year: year.toString(),
+                includeLastYear: 'true'
+            });
+            
+            if (result.success) {
+                dashboardDataCache[year] = result.data || [];
+                
+                // Save to localStorage
+                saveCacheToStorage();
+                
+                // Update Google Sheets cache in background (don't await)
+                // Server fetches fresh data itself to avoid URL length limits
+                updateGoogleSheetsCache(year).catch(e => 
+                    console.warn('Background cache update failed:', e)
+                );
+                
+                return {
+                    source: 'fresh',
+                    data: result.data
+                };
+            }
+            
+            throw new Error(result.error || 'Failed to fetch data');
+        }
+        
         function initializeCacheFromStorage() {
             try {
                 const storedVersion = localStorage.getItem(CACHE_VERSION_KEY);
@@ -3747,9 +3891,9 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
          */
         async function refreshAllData() {
             // Show loading toast
-            showToast('Refreshing all data...', 'info');
+            showToast('Refreshing all data from source...', 'info');
             
-            // Clear all caches
+            // Clear all in-memory caches
             dashboardDataCache = {};
             oncallDataCache = null;
             providerInsightsData = null;
@@ -3768,10 +3912,10 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
             // Reload available years
             await loadAvailableYears();
             
-            // Reload the current tab
+            // Reload the current tab with forceRefresh=true to bypass and update cache
             if (currentTab === 'dashboard') {
                 tabsRendered.dashboard = true;
-                await loadDashboardData();
+                await loadDashboardData(true); // Force refresh and update Google Sheets cache
             } else if (currentTab === 'clientInsights') {
                 tabsRendered.clientInsights = true;
                 await loadClientInsights();
@@ -3780,7 +3924,7 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                 await loadProviderInsights(true); // force refresh
             }
             
-            showToast('Data refreshed successfully!', 'success');
+            showToast('Data refreshed and cache updated!', 'success');
         }
         
         // ============================================
@@ -4859,53 +5003,37 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
             }
         }
         
-        async function loadDashboardData() {
+        async function loadDashboardData(forceRefresh = false) {
             const selectedYear = parseInt(document.getElementById('dashboardYear')?.value || new Date().getFullYear());
             document.getElementById('dashboardYearLabel').textContent = selectedYear;
             
-            // Check if we have cached data for this year (memory or localStorage)
-            const hasCachedData = dashboardDataCache[selectedYear] && dashboardDataCache[selectedYear].length > 0;
+            // Check if we have cached data for this year (memory)
+            const hasCachedData = !forceRefresh && dashboardDataCache[selectedYear] && dashboardDataCache[selectedYear].length > 0;
             
             if (hasCachedData) {
-                console.log(`Using cached data for ${selectedYear} (${dashboardDataCache[selectedYear].length} records)`);
+                console.log(`Using memory cache for ${selectedYear} (${dashboardDataCache[selectedYear].length} records)`);
                 // Don't show loading for cached data - render immediately
             } else {
-                showLoading('Loading Dashboard', `Fetching ${selectedYear} data...`);
+                showLoading('Loading Dashboard', forceRefresh ? 'Refreshing data...' : `Loading ${selectedYear} data...`);
             }
             
             try {
-                // Check if we have cached data for this year
-                if (!dashboardDataCache[selectedYear]) {
-                    console.log(`Fetching data for year ${selectedYear}...`);
+                // Use smart loading - tries Google Sheets cache first, then source
+                if (!hasCachedData) {
+                    const loadResult = await loadDashboardDataSmart(selectedYear, forceRefresh);
+                    console.log(`Data loaded from: ${loadResult.source}`, loadResult.cacheAgeHours ? `(${loadResult.cacheAgeHours.toFixed(1)}h old)` : '');
                     
-                    // Fetch data for selected year + last year (for YoY comparison)
-                    const result = await jsonpFetch({ 
-                        action: 'getDashboardData', 
-                        year: selectedYear.toString(),
-                        includeLastYear: 'true'
-                    });
-                    
-                    console.log('Dashboard data result:', result);
-                    
-                    if (result.success) {
-                        // Cache the data in memory
-                        dashboardDataCache[selectedYear] = result.data || [];
-                        console.log(`Cached ${dashboardDataCache[selectedYear].length} records for ${selectedYear}`);
-                        
-                        // Persist to localStorage for cross-session caching
-                        saveCacheToStorage();
-                    } else {
-                        hideLoading();
-                        console.error('Failed to fetch dashboard data:', result.error);
-                        showToast('Error loading dashboard: ' + result.error, 'error');
-                        return;
+                    if (loadResult.source === 'google_sheets_cache') {
+                        showToast(`Using cached data (${loadResult.cacheAgeHours.toFixed(1)} hours old)`, 'info');
+                    } else if (loadResult.source === 'fresh' && forceRefresh) {
+                        showToast('Data refreshed and cache updated!', 'success');
                     }
                 }
                 
                 // Use cached data
                 const yearData = dashboardDataCache[selectedYear];
                 
-                if (yearData.length === 0) {
+                if (!yearData || yearData.length === 0) {
                     hideLoading();
                     console.log('No data available for ' + selectedYear);
                     showToast(`No data found for ${selectedYear}`, 'warning');
@@ -7343,12 +7471,34 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
         
         async function loadDashboardDataForYear(year) {
             try {
-                console.log(`Fetching data for year ${year}...`);
-                const params = { action: 'getDashboardData', year: year, includeLastYear: false };
-                const result = await jsonpFetch(params);
+                // Check if already in memory cache
+                if (dashboardDataCache[year] && dashboardDataCache[year].length > 0) {
+                    console.log(`Year ${year} already in memory cache (${dashboardDataCache[year].length} records)`);
+                    return;
+                }
+                
+                console.log(`Loading data for year ${year}...`);
+                
+                // Try Google Sheets cache first
+                const cacheResult = await loadFromGoogleSheetsCache(year);
+                
+                if (cacheResult.success && cacheResult.data && cacheResult.data.length > 0) {
+                    dashboardDataCache[year] = cacheResult.data;
+                    console.log(`Loaded ${cacheResult.data.length} records for ${year} from Google Sheets cache (${cacheResult.cacheAgeHours?.toFixed(1) || '?'}h old)`);
+                    return;
+                }
+                
+                // Fall back to fetching from source
+                console.log(`Fetching data for year ${year} from source...`);
+                const result = await jsonpFetch({ action: 'getDashboardData', year: year, includeLastYear: false });
                 if (result.success) {
                     dashboardDataCache[year] = result.data;
                     console.log(`Cached ${result.data.length} records for ${year}`);
+                    
+                    // Update Google Sheets cache in background
+                    updateGoogleSheetsCache(year).catch(e => 
+                        console.warn(`Background cache update failed for ${year}:`, e)
+                    );
                 }
             } catch (e) {
                 console.error('Error loading data for year', year, e);
@@ -8354,7 +8504,7 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
         // ============================================
         // INITIALIZATION
         // ============================================
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             if (WEBAPP_URL === 'YOUR_WEBAPP_URL_HERE') {
                 document.getElementById('reportTableContainer').innerHTML = `
                     <div class="notice-box">
@@ -8373,33 +8523,61 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                 });
             });
             
-            // Try to load cache from localStorage first
-            const cacheStatus = initializeCacheFromStorage();
+            // Try loading data in this order:
+            // 1. Google Sheets cache (shared across all users) - fastest for everyone
+            // 2. LocalStorage cache (individual user) - fast offline fallback
+            // 3. Fresh fetch from source - slowest but always up-to-date
             
-            if (cacheStatus.loaded && cacheStatus.isFresh) {
-                // Cache is fresh - use it without fetching
-                console.log('Using fresh cache from localStorage');
-                initialDataLoaded = true;
+            const currentYear = new Date().getFullYear();
+            let cacheSource = null;
+            let cacheAge = null;
+            
+            // First try Google Sheets cache (shared)
+            try {
+                showLoading('Loading Dashboard', 'Checking shared cache...');
+                const gsCache = await loadFromGoogleSheetsCache(currentYear);
                 
-                // Pre-populate available years from cache
-                availableYears = cacheStatus.years.sort((a, b) => b - a);
-                if (availableYears.length === 0) {
-                    availableYears = [new Date().getFullYear()];
+                if (gsCache.success && gsCache.isFresh) {
+                    dashboardDataCache[currentYear] = gsCache.data;
+                    cacheSource = 'shared';
+                    cacheAge = gsCache.cacheAgeHours;
+                    console.log('Loaded from Google Sheets cache');
                 }
-                
-                // Update year selectors
-                updateYearSelectors();
-                
-                // Load dashboard with cached data (no fetch)
+            } catch (e) {
+                console.warn('Google Sheets cache check failed:', e);
+            }
+            
+            // If no shared cache, try localStorage
+            if (!cacheSource) {
+                const localCache = initializeCacheFromStorage();
+                if (localCache.loaded && localCache.isFresh) {
+                    cacheSource = 'local';
+                    cacheAge = localCache.ageHours;
+                    availableYears = localCache.years.sort((a, b) => b - a);
+                    console.log('Loaded from localStorage cache');
+                }
+            }
+            
+            // Set up year selectors
+            if (availableYears.length === 0) {
+                availableYears = [currentYear];
+            }
+            updateYearSelectors();
+            
+            hideLoading();
+            
+            // Switch to dashboard (will use cached data if available)
+            if (cacheSource) {
+                initialDataLoaded = true;
                 switchTab('dashboard');
                 
-                // Show toast indicating cached data
                 setTimeout(() => {
-                    showToast(`Using cached data (${cacheStatus.ageHours.toFixed(1)} hours old). Click Refresh to update.`, 'info');
+                    const sourceLabel = cacheSource === 'shared' ? 'shared cache' : 'local cache';
+                    showToast(`Using ${sourceLabel} (${cacheAge.toFixed(1)} hours old). Click Refresh to update.`, 'info');
                 }, 500);
             } else {
-                // Cache is stale or doesn't exist - fetch fresh data
-                console.log('Cache stale or missing, fetching fresh data');
+                // No cache - fetch fresh data
+                console.log('No cache available, fetching fresh data');
                 switchTab('dashboard');
             }
             
@@ -8753,21 +8931,18 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
             }
             
             try {
-                // Load data for the selected year if not cached or force refresh
-                if (!dashboardDataCache[selectedYear] || forceRefresh) {
-                    const result = await jsonpFetch({ action: 'getDashboardData', year: selectedYear });
-                    if (result.success) {
-                        dashboardDataCache[selectedYear] = result.data;
-                    }
+                // Use smart loading with Google Sheets cache
+                if (forceRefresh) {
+                    // Clear memory cache for these years
+                    delete dashboardDataCache[selectedYear];
+                    delete dashboardDataCache[prevYear];
                 }
                 
+                // Load data for the selected year (uses Google Sheets cache)
+                await loadDashboardDataForYear(selectedYear);
+                
                 // Also load previous year for comparison
-                if (!dashboardDataCache[prevYear] || forceRefresh) {
-                    const result = await jsonpFetch({ action: 'getDashboardData', year: prevYear });
-                    if (result.success) {
-                        dashboardDataCache[prevYear] = result.data;
-                    }
-                }
+                await loadDashboardDataForYear(prevYear);
                 
                 // Calculate provider insights
                 calculateProviderInsights(selectedYear);
