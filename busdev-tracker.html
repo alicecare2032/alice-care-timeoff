@@ -6103,80 +6103,89 @@
         
         async function addStock() {
             const itemId = document.getElementById('addStockAsset').value;
-            const qty = parseInt(document.getElementById('addStockQty').value) || 0;
+            const newQuantity = parseInt(document.getElementById('addStockQty').value) || 0;
             const notes = document.getElementById('addStockNotes').value;
             
-            if (!itemId || qty <= 0) { showToast('Select item and enter quantity', 'error'); return; }
+            if (!itemId || newQuantity < 0) { showToast('Select item and enter valid quantity', 'error'); return; }
             
             showLoading(true);
             try {
                 const item = state.assetItems.find(a => a.ID === itemId);
                 if (item) {
-                    item.Quantity = (item.Quantity || 0) + qty;
+                    const oldQuantity = item.Quantity || 0;
+                    // ✅ SET quantity to exact value (NOT add)
+                    item.Quantity = newQuantity;
                     
                     state.stockHistory.unshift({
                         ID: 'sh_' + Date.now(),
                         Asset_ID: itemId,
-                        Type: 'add',
-                        Quantity: qty,
+                        Type: newQuantity > oldQuantity ? 'adjustment_increase' : 'adjustment_decrease',
+                        Quantity: newQuantity,
                         Date: new Date().toISOString(),
                         By: state.user?.name || '',
-                        Notes: notes
+                        Notes: `Set to ${newQuantity} (was ${oldQuantity})${notes ? ': ' + notes : ''}`
                     });
                     
-                    await apiPost('updateAssetStock', { assetId: itemId, quantity: item.Quantity, history: state.stockHistory[0] });
+                    // ✅ Send exact quantity to database
+                    await apiPost('updateAssetStock', { assetId: itemId, quantity: newQuantity, history: state.stockHistory[0] });
                     
                     renderAssets();
                     checkLowStock();
                     closeModal('addStockModal');
-                    showToast(`Added ${qty} ${item.Name}`, 'success');
+                    showToast(`Set ${item.Name} to ${newQuantity} units`, 'success');
                 }
-            } catch (err) { showToast('Failed to add stock', 'error'); }
+            } catch (err) { showToast('Failed to update stock', 'error'); }
             showLoading(false);
         }
         
         function quickAddStock(itemId) {
-            const qty = prompt('Enter quantity to add:');
-            if (qty && parseInt(qty) > 0) {
+            const newQty = prompt('Enter new quantity (this SETS the value, not adds to it):');
+            if (newQty !== null && !isNaN(newQty) && parseInt(newQty) >= 0) {
                 const item = state.assetItems.find(a => a.ID === itemId);
                 if (item) {
-                    item.Quantity = (item.Quantity || 0) + parseInt(qty);
+                    const oldQty = item.Quantity || 0;
+                    const newQuantity = parseInt(newQty);
+                    // ✅ SET the quantity
+                    item.Quantity = newQuantity;
                     state.stockHistory.unshift({
                         ID: 'sh_' + Date.now(),
                         Asset_ID: itemId,
-                        Type: 'add',
-                        Quantity: parseInt(qty),
+                        Type: newQuantity > oldQty ? 'adjustment_increase' : 'adjustment_decrease',
+                        Quantity: newQuantity,
                         Date: new Date().toISOString(),
                         By: state.user?.name || '',
-                        Notes: 'Quick add'
+                        Notes: `Adjusted from ${oldQty} to ${newQuantity}`
                     });
-                    apiPost('updateAssetStock', { assetId: itemId, quantity: item.Quantity, history: state.stockHistory[0] });
+                    apiPost('updateAssetStock', { assetId: itemId, quantity: newQuantity, history: state.stockHistory[0] });
                     renderAssets();
                     checkLowStock();
-                    showToast(`Added ${qty} ${item.Name}`, 'success');
+                    showToast(`${item.Name} set to ${newQuantity}`, 'success');
                 }
             }
         }
         
         function quickRemoveStock(itemId) {
-            const qty = prompt('Enter quantity to remove:');
-            if (qty && parseInt(qty) > 0) {
+            const newQty = prompt('Enter new quantity (this SETS the value, not subtracts from it):');
+            if (newQty !== null && !isNaN(newQty) && parseInt(newQty) >= 0) {
                 const item = state.assetItems.find(a => a.ID === itemId);
                 if (item) {
-                    item.Quantity = Math.max(0, (item.Quantity || 0) - parseInt(qty));
+                    const oldQty = item.Quantity || 0;
+                    const newQuantity = parseInt(newQty);
+                    // ✅ SET the quantity
+                    item.Quantity = newQuantity;
                     state.stockHistory.unshift({
                         ID: 'sh_' + Date.now(),
                         Asset_ID: itemId,
-                        Type: 'remove',
-                        Quantity: parseInt(qty),
+                        Type: newQuantity < oldQty ? 'adjustment_decrease' : 'adjustment_increase',
+                        Quantity: newQuantity,
                         Date: new Date().toISOString(),
                         By: state.user?.name || '',
-                        Notes: 'Quick remove'
+                        Notes: `Adjusted from ${oldQty} to ${newQuantity}`
                     });
-                    apiPost('updateAssetStock', { assetId: itemId, quantity: item.Quantity, history: state.stockHistory[0] });
+                    apiPost('updateAssetStock', { assetId: itemId, quantity: newQuantity, history: state.stockHistory[0] });
                     renderAssets();
                     checkLowStock();
-                    showToast(`Removed ${qty} ${item.Name}`, 'success');
+                    showToast(`${item.Name} set to ${newQuantity}`, 'success');
                 }
             }
         }
