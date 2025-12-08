@@ -1599,6 +1599,329 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(255, 140, 0, 0.3);
         }
+
+        /* ============================================
+           ROUTE PLANNER STYLES
+           ============================================ */
+
+        .route-planner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 0;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .route-planner-header {
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .route-planner-header:hover {
+            background: rgba(0,0,0,0.1);
+        }
+
+        .route-planner-toggle {
+            display: inline-block;
+            transition: transform 0.3s;
+            font-size: 16px;
+        }
+
+        .route-planner-toggle.open {
+            transform: rotate(90deg);
+        }
+
+        .route-planner-content {
+            padding: 0 20px 20px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .route-planner h3 {
+            margin: 0;
+            font-size: 18px;
+            display: inline;
+        }
+
+        .route-planner-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: flex-end;
+        }
+
+        .route-planner-controls > div {
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .route-planner-controls select,
+        .route-planner-controls input {
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            color: #333;
+            font-family: inherit;
+        }
+
+        .route-planner-controls label {
+            color: white;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        
+        .route-planner-controls button {
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .route-planner-controls button:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .route-planner-controls button {
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .route-planner-controls button:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .route-city-checkboxes {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .route-city-checkbox {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 4px;
+        }
+
+        .route-city-checkbox:hover {
+            background: #efefef;
+            border-color: #667eea;
+        }
+
+        .route-city-checkbox input[type="checkbox"] {
+            margin-right: 10px;
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+            accent-color: #667eea;
+        }
+
+        .route-city-checkbox input[type="checkbox"]:checked {
+            accent-color: #28a745;
+        }
+
+        .route-city-checkbox label {
+            cursor: pointer;
+            margin: 0;
+            font-size: 14px;
+            flex: 1;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .route-city-checkbox input[type="checkbox"]:checked + label {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .route-results {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            color: #333;
+            margin-top: 15px;
+        }
+
+        .route-results h4 {
+            margin-top: 0;
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .route-stats {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .stat-badge {
+            background: #e7f3ff;
+            color: #0066cc;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .route-stops-list {
+            max-height: 600px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .route-stop {
+            display: flex;
+            align-items: flex-start;
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            gap: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .route-stop:hover {
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .route-stop:last-child {
+            border-bottom: none;
+        }
+
+        .route-stop-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .route-stop-content {
+            flex: 1;
+        }
+
+        .route-stop-name {
+            font-weight: bold;
+            font-size: 15px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .route-stop-details {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr;
+            gap: 10px;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .detail-address,
+        .detail-time,
+        .detail-overdue {
+            color: #666;
+        }
+
+        .route-stop-footer {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .phone-link {
+            color: #0066cc;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .phone-link:hover {
+            text-decoration: underline;
+        }
+
+        .route-stop-include {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            margin-top: 10px;
+            flex-shrink: 0;
+        }
+
+        .route-results button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .route-results button:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .route-planner-controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .route-stop-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .route-stop {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .route-stop-number {
+                align-self: flex-start;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -1647,13 +1970,13 @@
 
     <!-- Navigation -->
     <nav class="nav-tabs">
-        <button class="nav-tab active" data-tab="dashboard">
-            <span class="material-icons-outlined">dashboard</span>
-            <span>Dashboard</span>
-        </button>
-        <button class="nav-tab" data-tab="checkin">
+        <button class="nav-tab active" data-tab="checkin">
             <span class="material-icons-outlined">login</span>
             <span>Check-In</span>
+        </button>
+        <button class="nav-tab" data-tab="dashboard">
+            <span class="material-icons-outlined">dashboard</span>
+            <span>Dashboard</span>
         </button>
         <button class="nav-tab" data-tab="directory">
             <span class="material-icons-outlined">folder_shared</span>
@@ -1667,14 +1990,6 @@
             <span class="material-icons-outlined">email</span>
             <span>Emails</span>
             <span class="badge" id="unreadBadge" style="display:none;">0</span>
-        </button>
-        <button class="nav-tab" data-tab="templates">
-            <span class="material-icons-outlined">description</span>
-            <span>Templates</span>
-        </button>
-        <button class="nav-tab" data-tab="team">
-            <span class="material-icons-outlined">groups</span>
-            <span>Team</span>
         </button>
         <button class="nav-tab" data-tab="assets">
             <span class="material-icons-outlined">inventory_2</span>
@@ -1690,7 +2005,7 @@
     <!-- Main Content -->
     <main class="main-content">
         <!-- Dashboard Tab -->
-        <div class="tab-content active" id="tab-dashboard">
+        <div class="tab-content" id="tab-dashboard">
             <!-- Key Metrics -->
             <div class="stats-grid">
                 <div class="stat-card">
@@ -1847,7 +2162,7 @@
         </div>
 
         <!-- Check-In Tab (Mobile Friendly) -->
-        <div class="tab-content" id="tab-checkin">
+        <div class="tab-content active" id="tab-checkin">
             <div class="checkin-card">
                 <div class="checkin-header">
                     <div class="checkin-title">Visit Check-In</div>
@@ -1968,6 +2283,82 @@
 
         <!-- Visits Tab -->
         <div class="tab-content" id="tab-visits">
+
+            <!-- ROUTE PLANNER PANEL - COLLAPSIBLE -->
+            <div id="routePlannerPanel" class="route-planner">
+                <div class="route-planner-header" onclick="toggleRoutePlanner()">
+                    <span class="route-planner-toggle">▶</span>
+                    <h3 style="margin: 0; display: inline; cursor: pointer;">🗺️ Smart Route Planner</h3>
+                </div>
+                
+                <div id="routePlannerContent" class="route-planner-content" style="display: none;">
+                    <div class="route-planner-controls">
+                    <div style="min-width: 180px;">
+                        <label for="routeZone" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">Select Zone</label>
+                        <select id="routeZone" class="form-select" onchange="updateRouteCitiesForZone()">
+                            <option value="">All Zones</option>
+                        </select>
+                    </div>
+                    
+                    <div style="min-width: 280px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">Select Cities (Multiple)</label>
+                        <div id="routeCityCheckboxes" class="route-city-checkboxes" style="background: white; border-radius: 6px; padding: 8px; max-height: 150px; overflow-y: auto; border: 1px solid #ddd;">
+                            <!-- Checkboxes will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <div style="min-width: 140px;">
+                        <label for="routePlanDate" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">Plan Date</label>
+                        <input type="date" id="routePlanDate" class="form-input">
+                    </div>
+                    
+                    <div style="min-width: 130px;">
+                        <label for="routeStartTime" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">Start Time</label>
+                        <input type="time" id="routeStartTime" class="form-input" value="09:00">
+                    </div>
+                    
+                    <div style="min-width: 140px;">
+                        <label for="routeVisitDuration" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">Visit (min)</label>
+                        <input type="number" id="routeVisitDuration" class="form-input" 
+                               min="15" max="120" step="5" value="30">
+                    </div>
+                    
+                    <div style="min-width: 140px;">
+                        <label for="routeTravelBuffer" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">Travel (min)</label>
+                        <input type="number" id="routeTravelBuffer" class="form-input" 
+                               min="0" max="60" step="5" value="15">
+                    </div>
+                    
+                    <div style="display: flex; align-items: flex-end; gap: 10px; min-width: 280px;">
+                        <button onclick="generateRoutePlan()" class="btn btn-primary" style="flex: 1; height: 40px; margin: 0; font-weight: bold;">
+                            Generate
+                        </button>
+                        <button onclick="clearRoutePlanner()" class="btn btn-secondary" style="flex: 1; height: 40px; margin: 0; font-weight: bold;">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="routeResults" class="route-results" style="display: none;">
+                    <h4>📍 Route Plan for <span id="routeResultsCity"></span> on <span id="routeResultsDate"></span></h4>
+                    <div id="routeStops" class="route-stops">
+                        <!-- Generated list of stops will appear here -->
+                    </div>
+                    
+                    <button onclick="exportRouteToCalendar()" class="btn btn-success" style="width: 100%;">
+                        📅 Export to Google Calendar (ICS)
+                    </button>
+                    
+                    <button onclick="saveRoutePlan()" class="btn btn-info" style="width: 100%; margin-top: 10px;">
+                        💾 Save Route Plan
+                    </button>
+                    
+                    <button onclick="clearRoutePlanner()" class="btn btn-secondary" style="width: 100%; margin-top: 10px;">
+                        🔄 Start Over
+                    </button>
+                </div>
+                    </div>
+                </div>
             <div class="card">
                 <div class="card-header" style="flex-wrap: wrap; gap: 12px;">
                     <h2 class="card-title"><span class="material-icons-outlined">history</span> Visit History</h2>
@@ -2030,68 +2421,6 @@
                     <div class="email-empty">
                         <span class="material-icons-outlined">mail</span>
                         <div>Select an email to view</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Templates Tab -->
-        <div class="tab-content" id="tab-templates">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title"><span class="material-icons-outlined">description</span> Email Templates</h2>
-                    <div class="search-filters">
-                        <select class="form-select filter-select" id="templateCategoryFilter" onchange="renderTemplates()">
-                            <option value="">All Categories</option>
-                            <option value="intro">Introduction</option>
-                            <option value="followup">Follow-up</option>
-                            <option value="meeting">Meeting Request</option>
-                            <option value="thankyou">Thank You</option>
-                            <option value="checkin">Check-in</option>
-                            <option value="general">General</option>
-                        </select>
-                        <button class="btn btn-primary" onclick="openTemplateModal()">
-                            <span class="material-icons-outlined">add</span> New Template
-                        </button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div style="background: var(--info-light); color: var(--info); padding: 12px 16px; border-radius: var(--radius); margin-bottom: 16px; font-size: 13px;">
-                        <strong>Template Variables:</strong> {{contact_name}}, {{organization}}, {{zone}}, {{rep_name}}, {{rep_email}}, {{rep_phone}}, {{visit_date}}
-                    </div>
-                    <div class="template-grid" id="templateGrid"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Team Tab -->
-        <div class="tab-content" id="tab-team">
-            <div class="card">
-                <div class="card-header" style="flex-wrap: wrap; gap: 12px;">
-                    <h2 class="card-title"><span class="material-icons-outlined">groups</span> Team Members</h2>
-                    <div class="directory-toolbar">
-                        <div class="search-box" style="min-width: 180px;">
-                            <span class="material-icons-outlined">search</span>
-                            <input type="text" class="form-input" id="teamSearch" placeholder="Search..." oninput="renderTeam()">
-                        </div>
-                        <button class="btn btn-primary btn-sm" onclick="openTeamModal()">
-                            <span class="material-icons-outlined">add</span> Add Member
-                        </button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="table-container">
-                        <table id="teamTable" class="sortable-table">
-                            <thead><tr>
-                                <th class="sortable-header" data-sort="name" onclick="sortTeam('name')">Name <span class="sort-icon"></span></th>
-                                <th>Email</th>
-                                <th>Zones</th>
-                                <th class="sortable-header" data-sort="role" onclick="sortTeam('role')">Role <span class="sort-icon"></span></th>
-                                <th class="sortable-header" data-sort="status" onclick="sortTeam('status')">Status <span class="sort-icon"></span></th>
-                                <th>Actions</th>
-                            </tr></thead>
-                            <tbody></tbody>
-                        </table>
                     </div>
                 </div>
             </div>
@@ -2269,6 +2598,64 @@
                             Manage geographic zones for organizations.
                         </p>
                         <div id="zonesList"></div>
+                    </div>
+                </div>
+
+                <!-- Email Templates Settings -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title"><span class="material-icons-outlined">description</span> Email Templates</h2>
+                        <div class="search-filters">
+                            <select class="form-select filter-select" id="templateCategoryFilter" onchange="renderTemplates()">
+                                <option value="">All Categories</option>
+                                <option value="intro">Introduction</option>
+                                <option value="followup">Follow-up</option>
+                                <option value="meeting">Meeting Request</option>
+                                <option value="thankyou">Thank You</option>
+                                <option value="checkin">Check-in</option>
+                                <option value="general">General</option>
+                            </select>
+                            <button class="btn btn-primary btn-sm" onclick="openTemplateModal()">
+                                <span class="material-icons-outlined">add</span> New Template
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div style="background: var(--info-light); color: var(--info); padding: 12px 16px; border-radius: var(--radius); margin-bottom: 16px; font-size: 13px;">
+                            <strong>Template Variables:</strong> {{contact_name}}, {{organization}}, {{zone}}, {{rep_name}}, {{rep_email}}, {{rep_phone}}, {{visit_date}}
+                        </div>
+                        <div class="template-grid" id="templateGrid"></div>
+                    </div>
+                </div>
+
+                <!-- Team Members Settings -->
+                <div class="card">
+                    <div class="card-header" style="flex-wrap: wrap; gap: 12px;">
+                        <h2 class="card-title"><span class="material-icons-outlined">groups</span> Team Members</h2>
+                        <div class="directory-toolbar">
+                            <div class="search-box" style="min-width: 180px;">
+                                <span class="material-icons-outlined">search</span>
+                                <input type="text" class="form-input" id="teamSearch" placeholder="Search..." oninput="renderTeam()">
+                            </div>
+                            <button class="btn btn-primary btn-sm" onclick="openTeamModal()">
+                                <span class="material-icons-outlined">add</span> Add Member
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table id="teamTable" class="sortable-table">
+                                <thead><tr>
+                                    <th class="sortable-header" data-sort="name" onclick="sortTeam('name')">Name <span class="sort-icon"></span></th>
+                                    <th>Email</th>
+                                    <th>Zones</th>
+                                    <th class="sortable-header" data-sort="role" onclick="sortTeam('role')">Role <span class="sort-icon"></span></th>
+                                    <th class="sortable-header" data-sort="status" onclick="sortTeam('status')">Status <span class="sort-icon"></span></th>
+                                    <th>Actions</th>
+                                </tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -3175,7 +3562,690 @@
             ['clean']
         ];
 
+
+
         // ============================================
+        // 🗺️ SMART ROUTE PLANNER - COMPLETE CODE
+        // ============================================
+
+        function getRoutePlannerCities() {
+            const citiesSet = new Set();
+            
+            console.log('🔍 Getting all cities from database...');
+            console.log('Total organizations:', state.organizations.length);
+            
+            // Get ALL unique cities from Active organizations
+            state.organizations.forEach((org) => {
+                if (org.City && org.Status === 'Active') {
+                    citiesSet.add(org.City);
+                }
+            });
+            
+            const cities = Array.from(citiesSet).sort();
+            console.log('✅ All cities found:', cities);
+            return cities;
+        }
+
+        function getOverdueOrganizations(city) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            console.log(`🏙️ Getting organizations for city: ${city}`);
+            
+            const orgs = state.organizations.filter(org => 
+                org.City === city && org.Status === 'Active'
+            );
+            
+            console.log(`  Found ${orgs.length} active organizations in ${city}`);
+            
+            return orgs.map(org => {
+                let nextVisitDue = null;
+                
+                if (org.Next_Visit_Due) {
+                    nextVisitDue = new Date(org.Next_Visit_Due);
+                    // Handle date parsing issues
+                    if (isNaN(nextVisitDue.getTime())) {
+                        nextVisitDue = new Date(org.Next_Visit_Due.replace(/-/g, '/'));
+                    }
+                }
+                
+                let daysOverdue = 0;
+                if (nextVisitDue && !isNaN(nextVisitDue.getTime())) {
+                    daysOverdue = Math.floor((today - nextVisitDue) / (1000*60*60*24));
+                }
+                
+                return {
+                    ...org,
+                    DaysOverdue: daysOverdue,
+                    IsOverdue: daysOverdue > 0
+                };
+            }).sort((a, b) => b.DaysOverdue - a.DaysOverdue); // CHANGED: Show ALL organizations, not just overdue
+        }
+
+        function sortByDistance(organizations) {
+            return organizations.sort((a, b) => {
+                if (a.Zip !== b.Zip) return a.Zip.localeCompare(b.Zip);
+                return a.Address.localeCompare(b.Address);
+            });
+        }
+
+        function generateRoute(city, startTime, durationMinutes, travelBuffer = 0, planDate = null) {
+            let overdue = getOverdueOrganizations(city);
+            let sorted = sortByDistance(overdue);
+            
+            if (sorted.length === 0) {
+                showToast('No organizations in ' + city, 'warning');
+                return [];
+            }
+            
+            let [hours, minutes] = startTime.split(':').map(Number);
+            
+            // Use the selected plan date if provided
+            let currentTime;
+            if (planDate) {
+                // Parse date string in local timezone (NOT UTC)
+                const [year, month, day] = planDate.split('-').map(Number);
+                currentTime = new Date(year, month - 1, day, hours, minutes, 0, 0);
+                console.log(`📅 Created time for date: ${planDate} at ${startTime} => ${currentTime}`);
+            } else {
+                currentTime = new Date();
+                currentTime.setHours(hours, minutes, 0, 0);
+            }
+            
+            return sorted.map((org, index) => {
+                const arrivalTime = new Date(currentTime);
+                const departureTime = new Date(currentTime.getTime() + durationMinutes * 60000);
+                
+                const result = {
+                    ...org,
+                    Order: index + 1,
+                    EstimatedArrivalTime: arrivalTime.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit', hour12: true}),
+                    EstimatedDepartureTime: departureTime.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit', hour12: true}),
+                    _arrivalDate: arrivalTime,
+                    _departureDate: departureTime,
+                    Include: true
+                };
+                
+                currentTime = new Date(departureTime.getTime() + travelBuffer * 60000);
+                return result;
+            });
+        }
+
+        function generateICSFile(route, city, planDate = null) {
+            // Use the selected plan date, not today's date
+            const dateStr = planDate || new Date().toISOString().split('T')[0];
+            
+            console.log(`📅 ICS Generation started for ${city} on ${dateStr}`);
+            console.log(`   Total stops in route: ${route.length}`);
+            
+            let icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Alice Care Business Development//Route Plan//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:${city} Route - ${dateStr}
+X-WR-TIMEZONE:America/Los_Angeles
+X-WR-CALDESC:Route plan for visiting organizations in ${city} on ${dateStr}
+BEGIN:VTIMEZONE
+TZID:America/Los_Angeles
+BEGIN:DAYLIGHT
+TZOFFSETFROM:-0800
+TZOFFSETTO:-0700
+TZNAME:PDT
+DTSTART:20250309T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:-0700
+TZOFFSETTO:-0800
+TZNAME:PST
+DTSTART:20251102T020000
+RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU
+END:STANDARD
+END:VTIMEZONE
+`;
+
+            let eventCount = 0;
+            route.forEach((stop, index) => {
+                if (!stop.Include) {
+                    console.log(`   Skip ${index}: Include=false (${stop.Name})`);
+                    return;
+                }
+                
+                eventCount++;
+                const startDateTime = formatDateTimeForICS(stop._arrivalDate);
+                const endDateTime = formatDateTimeForICS(stop._departureDate);
+                const uid = `route-${city}-stop${stop.Order}-${Date.now()}-${eventCount}@alicecare.com`;
+                
+                console.log(`   Add event ${eventCount}: Stop ${stop.Order} - ${stop.Name} @ ${startDateTime}-${endDateTime}`);
+                
+                const description = `Organization: ${stop.Name}
+Address: ${stop.Address}, ${stop.City}, ${stop.State} ${stop.Zip}
+Phone: ${stop.Phone || 'N/A'}
+Last Visited: ${stop.Last_Visit ? new Date(stop.Last_Visit).toLocaleDateString() : 'Never'}
+Days Overdue: ${stop.DaysOverdue}
+Status: ${stop.Status}`;
+
+                icsContent += `BEGIN:VEVENT
+UID:${uid}
+DTSTAMP:${formatDateTimeForICS(new Date())}
+DTSTART;TZID=America/Los_Angeles:${startDateTime}
+DTEND;TZID=America/Los_Angeles:${endDateTime}
+SUMMARY:Stop ${stop.Order}: ${stop.Name}
+DESCRIPTION:${escapeICSString(description)}
+LOCATION:${stop.Address}, ${stop.City}, ${stop.State} ${stop.Zip}
+CATEGORIES:Route Planning,Alice Care,Business Development
+PRIORITY:5
+TRANSP:OPAQUE
+STATUS:CONFIRMED
+SEQUENCE:0
+END:VEVENT
+`;
+            });
+
+            icsContent += `END:VCALENDAR`;
+            console.log(`✅ ICS file generated with ${eventCount} events`);
+            return icsContent;
+        }
+
+        function formatDateTimeForICS(date) {
+            // Format date in LOCAL timezone, not UTC
+            // This prevents the timezone conversion issue
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            
+            return `${year}${month}${day}T${hours}${minutes}${seconds}`;
+        }
+
+        function escapeICSString(str) {
+            if (!str) return '';
+            return str
+                .replace(/\\/g, '\\\\')
+                .replace(/,/g, '\\,')
+                .replace(/;/g, '\\;')
+                .replace(/\n/g, '\\n')
+                .replace(/\r/g, '\\r');
+        }
+
+        function downloadICS(icsContent, filename) {
+            try {
+                const element = document.createElement('a');
+                const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                
+                element.setAttribute('href', url);
+                element.setAttribute('download', filename);
+                element.style.display = 'none';
+                
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+                
+                URL.revokeObjectURL(url);
+                showToast(`✅ Downloaded: ${filename}`, 'success');
+            } catch (err) {
+                console.error('Download error:', err);
+                showToast('Failed to download ICS file', 'error');
+            }
+        }
+
+        // Alias for backward compatibility
+        function populateRoutePlannerCities() {
+            populateRouteCities();
+        }
+
+        function generateRoutePlan() {
+            console.log('🚀 GENERATE ROUTE PLAN STARTED');
+            
+            // Get selected cities from checkboxes
+            const checkedBoxes = document.querySelectorAll('.route-city-checkbox input[type="checkbox"]:checked');
+            const selectedOptions = Array.from(checkedBoxes).map(box => box.value);
+            
+            const zone = document.getElementById('routeZone').value;
+            const planDate = document.getElementById('routePlanDate').value;
+            const startTime = document.getElementById('routeStartTime').value;
+            const duration = parseInt(document.getElementById('routeVisitDuration').value);
+            const travelBuffer = parseInt(document.getElementById('routeTravelBuffer').value) || 0;
+            
+            console.log('  Cities selected:', selectedOptions);
+            console.log('  Zone:', zone);
+            console.log('  Plan Date:', planDate);
+            console.log('  Start Time:', startTime);
+            console.log('  Visit Duration:', duration);
+            console.log('  Travel Buffer:', travelBuffer);
+            
+            if (!selectedOptions || selectedOptions.length === 0) {
+                showToast('Please select at least one city', 'warning');
+                return;
+            }
+            
+            if (!startTime) {
+                showToast('Please select a start time', 'warning');
+                return;
+            }
+            
+            if (!duration || duration < 15) {
+                showToast('Visit duration must be at least 15 minutes', 'warning');
+                return;
+            }
+            
+            console.log('✅ All validations passed');
+            
+            // Combine routes from all selected cities
+            let combinedRoute = [];
+            selectedOptions.forEach(city => {
+                console.log('📞 Generating route for city:', city);
+                const route = generateRoute(city, startTime, duration, travelBuffer, planDate);
+                combinedRoute = combinedRoute.concat(route);
+            });
+            
+            // Re-sequence the combined route with travel buffer
+            combinedRoute.forEach((stop, index) => {
+                stop.Order = index + 1;
+                
+                // Create date using selected planDate in LOCAL timezone (not UTC)
+                let arrivalTime;
+                if (planDate) {
+                    const [year, month, day] = planDate.split('-').map(Number);
+                    arrivalTime = new Date(year, month - 1, day, parseInt(startTime.split(':')[0]), parseInt(startTime.split(':')[1]), 0);
+                } else {
+                    arrivalTime = new Date();
+                    arrivalTime.setHours(parseInt(startTime.split(':')[0]), parseInt(startTime.split(':')[1]), 0);
+                }
+                
+                // Add cumulative time: (index * (duration + travel))
+                const cumulativeMinutes = index * (duration + travelBuffer);
+                arrivalTime.setTime(arrivalTime.getTime() + cumulativeMinutes * 60000);
+                
+                const departureTime = new Date(arrivalTime);
+                departureTime.setTime(departureTime.getTime() + duration * 60000);
+                
+                stop.EstimatedArrivalTime = arrivalTime.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit', hour12: true});
+                stop.EstimatedDepartureTime = departureTime.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit', hour12: true});
+                stop._arrivalDate = arrivalTime;
+                stop._departureDate = departureTime;
+            });
+            
+            console.log('Route generated:', combinedRoute.length, 'total stops');
+            
+            if (combinedRoute.length === 0) {
+                console.warn('⚠️ No organizations found for selected cities');
+                showToast('No organizations found. Check that organizations have Status=Active.', 'warning');
+                return;
+            }
+            
+            state.currentRoute = combinedRoute;
+            state.currentRouteCity = selectedOptions.join(', ');
+            state.currentRouteZone = zone;
+            state.currentRoutePlanDate = planDate;
+            state.currentTravelBuffer = travelBuffer;
+            
+            console.log('✅ Route plan ready for display');
+            displayRoute(combinedRoute, selectedOptions.join(', '), duration, planDate, travelBuffer);
+        }
+
+        function displayRoute(route, city, durationMinutes, planDate = '', travelBuffer = 0) {
+            const resultsDiv = document.getElementById('routeResults');
+            const stopsDiv = document.getElementById('routeStops');
+            
+            if (!resultsDiv || !stopsDiv) return;
+            
+            document.getElementById('routeResultsCity').textContent = city;
+            
+            // Format date for display
+            let dateDisplay = planDate ? new Date(planDate).toLocaleDateString('en-US', {weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'}) : 'Unscheduled';
+            document.getElementById('routeResultsDate').textContent = dateDisplay;
+            
+            let stopsHTML = `<div class="route-stats">
+                <span class="stat-badge">📍 ${route.length} stops</span>
+                <span class="stat-badge">⏱️ ${route[route.length - 1].EstimatedDepartureTime}</span>
+                <span class="stat-badge">⏰ ${durationMinutes} min each</span>
+            </div>`;
+            
+            stopsHTML += '<div class="route-stops-list">';
+            
+            route.forEach((stop, index) => {
+                const daysOverdueColor = stop.DaysOverdue > 60 ? '#dc3545' : stop.DaysOverdue > 30 ? '#fd7e14' : '#28a745';
+                
+                stopsHTML += `
+                <div class="route-stop">
+                    <div class="route-stop-number">${stop.Order}</div>
+                    <div class="route-stop-content">
+                        <div class="route-stop-name">${stop.Name}</div>
+                        <div class="route-stop-details">
+                            <div class="detail-address">📍 ${stop.Address}, ${stop.City}</div>
+                            <div class="detail-time">🕐 ${stop.EstimatedArrivalTime} - ${stop.EstimatedDepartureTime}</div>
+                            <div class="detail-overdue" style="color: ${daysOverdueColor};">
+                                📅 ${stop.DaysOverdue} days overdue
+                            </div>
+                        </div>
+                        <div class="route-stop-footer">
+                            <span class="phone-link">☎️ ${stop.Phone || 'No phone'}</span>
+                        </div>
+                    </div>
+                    <input type="checkbox" class="route-stop-include" data-index="${index}" 
+                           ${stop.Include ? 'checked' : ''} onchange="updateRouteSelection(${index})">
+                </div>
+                `;
+            });
+            
+            stopsHTML += '</div>';
+            stopsDiv.innerHTML = stopsHTML;
+            resultsDiv.style.display = 'block';
+            
+            resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function updateRouteSelection(index) {
+            if (!state.currentRoute) return;
+            const checkbox = document.querySelector(`[data-index="${index}"]`);
+            state.currentRoute[index].Include = checkbox.checked;
+        }
+
+        function exportRouteToCalendar() {
+            if (!state.currentRoute || state.currentRoute.length === 0) {
+                showToast('No route to export', 'warning');
+                return;
+            }
+            
+            const includedStops = state.currentRoute.filter(stop => stop.Include);
+            
+            if (includedStops.length === 0) {
+                showToast('Please select at least one stop', 'warning');
+                return;
+            }
+            
+            try {
+                const planDate = state.currentRoutePlanDate || new Date().toISOString().split('T')[0];
+                const icsContent = generateICSFile(state.currentRoute, state.currentRouteCity, planDate);
+                const filename = `${state.currentRouteCity}_Route_${planDate}.ics`;
+                downloadICS(icsContent, filename);
+                console.log('✅ Exported route with', includedStops.length, 'stops for date:', planDate);
+            } catch (err) {
+                console.error('Export error:', err);
+                showToast('Failed to export route', 'error');
+            }
+        }
+
+        // ============================================
+        // ZONE & CITY FILTERING FUNCTIONS
+        // ============================================
+
+        function getRoutePlannerZones() {
+            const zonesArray = []; // Array of {code, name} objects
+            if (state.settings && state.settings.zones) {
+                state.settings.zones.forEach(z => {
+                    if (typeof z === 'object' && z.code && z.name) {
+                        zonesArray.push({ code: z.code, name: z.name });
+                    } else if (typeof z === 'string') {
+                        zonesArray.push({ code: z, name: z });
+                    }
+                });
+            }
+            return zonesArray.sort((a, b) => a.name.localeCompare(b.name));
+        }
+
+        function populateRouteZones() {
+            const select = document.getElementById('routeZone');
+            if (!select) return;
+            
+            const zones = getRoutePlannerZones();
+            console.log('📍 Loading zones:', zones.map(z => `${z.code}-${z.name}`));
+            
+            // Clear except "All Zones"
+            while (select.options.length > 1) {
+                select.remove(1);
+            }
+            
+            zones.forEach(zone => {
+                const option = document.createElement('option');
+                option.value = zone.code; // Use CODE as value
+                option.textContent = zone.name; // Show NAME to user
+                select.appendChild(option);
+            });
+            
+            console.log('✅ Route zones populated');
+        }
+
+        function getCitiesForZone(zone) {
+            if (!zone) {
+                // Return all cities
+                return getRoutePlannerCities();
+            }
+            
+            console.log(`🔍 Filtering cities for zone CODE: "${zone}"`);
+            console.log(`📊 Total organizations: ${state.organizations.length}`);
+            
+            // Show what zones exist in the database
+            const zonesInDB = new Set();
+            state.organizations.forEach(org => {
+                if (org.Zone) {
+                    zonesInDB.add(org.Zone);
+                }
+            });
+            if (zonesInDB.size > 0) {
+                console.log('   Zone codes in database:', Array.from(zonesInDB).sort());
+            }
+            
+            // Filter cities by zone CODE (not name)
+            // The zone parameter is the CODE (e.g., "SMF", "SDG")
+            const citiesSet = new Set();
+            let matchCount = 0;
+            
+            state.organizations.forEach(org => {
+                if (org.Status === 'Active' && org.City && org.Zone) {
+                    // Match organization ZONE field against the zone CODE parameter
+                    if (org.Zone.trim() === zone.trim()) {
+                        citiesSet.add(org.City);
+                        matchCount++;
+                    }
+                }
+            });
+            
+            const cities = Array.from(citiesSet).sort();
+            console.log(`✅ Found ${cities.length} cities for zone code "${zone}" (${matchCount} active organizations)`);
+            if (cities.length > 0) {
+                console.log('   Cities:', cities);
+            } else {
+                console.warn(`⚠️ No cities found for zone code "${zone}". Check that organization ZONE field matches exactly.`);
+            }
+            
+            return cities;
+        }
+
+        function updateRouteCitiesForZone() {
+            const zoneSelect = document.getElementById('routeZone');
+            const citiesContainer = document.getElementById('routeCityCheckboxes');
+            
+            if (!zoneSelect || !citiesContainer) return;
+            
+            const selectedZone = zoneSelect.value;
+            const cities = getCitiesForZone(selectedZone);
+            
+            // Clear existing checkboxes
+            citiesContainer.innerHTML = '';
+            
+            console.log(`📍 Cities for zone "${selectedZone}":`, cities);
+            
+            if (cities.length === 0) {
+                citiesContainer.innerHTML = '<div style="padding: 8px; color: #999;">No cities in this zone</div>';
+                return;
+            }
+            
+            // Add checkboxes for each city
+            cities.forEach(city => {
+                const checkboxDiv = document.createElement('div');
+                checkboxDiv.className = 'route-city-checkbox';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = city;
+                checkbox.id = `city_${city.replace(/\s+/g, '_')}`;
+                
+                const label = document.createElement('label');
+                label.htmlFor = checkbox.id;
+                label.textContent = city;
+                
+                checkboxDiv.appendChild(checkbox);
+                checkboxDiv.appendChild(label);
+                citiesContainer.appendChild(checkboxDiv);
+            });
+            
+            console.log('✅ City checkboxes populated:', cities);
+        }
+
+        function updateRouteCitiesDisplay() {
+            // This function is no longer needed but kept for compatibility
+        }
+
+        // Initial population of city checkboxes
+        function populateRouteCities() {
+            const citiesContainer = document.getElementById('routeCityCheckboxes');
+            if (!citiesContainer) return;
+            
+            const cities = getRoutePlannerCities();
+            console.log('📍 Initial cities available:', cities);
+            
+            citiesContainer.innerHTML = '';
+            
+            cities.forEach(city => {
+                const checkboxDiv = document.createElement('div');
+                checkboxDiv.className = 'route-city-checkbox';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = city;
+                checkbox.id = `city_${city.replace(/\s+/g, '_')}`;
+                
+                const label = document.createElement('label');
+                label.htmlFor = checkbox.id;
+                label.textContent = city;
+                
+                checkboxDiv.appendChild(checkbox);
+                checkboxDiv.appendChild(label);
+                citiesContainer.appendChild(checkboxDiv);
+            });
+        }
+
+        function saveRoutePlan() {
+            if (!state.currentRoute || state.currentRoute.length === 0) {
+                showToast('No route to save', 'warning');
+                return;
+            }
+            
+            const planDate = state.currentRoutePlanDate;
+            const zone = state.currentRouteZone;
+            const city = state.currentRouteCity;
+            const stops = state.currentRoute;
+            
+            if (!state.routePlans) {
+                state.routePlans = [];
+            }
+            
+            const routePlan = {
+                id: 'plan_' + Date.now(),
+                date: planDate,
+                zone: zone,
+                city: city,
+                stops: stops.filter(s => s.Include).map(s => ({
+                    orgId: s.ID,
+                    orgName: s.Name,
+                    address: s.Address,
+                    arrivalTime: s.EstimatedArrivalTime,
+                    departureTime: s.EstimatedDepartureTime,
+                    completed: false
+                })),
+                createdAt: new Date().toISOString(),
+                status: 'active'
+            };
+            
+            state.routePlans.push(routePlan);
+            
+            console.log('💾 Route plan saved:', routePlan);
+            showToast(`✅ Route plan saved for ${new Date(planDate).toLocaleDateString()}`, 'success');
+            
+            // You can sync this to your backend later
+            // apiCall('saveRoutePlan', routePlan);
+        }
+
+        // ============================================
+        // ROUTE PLANNER TOGGLE
+        // ============================================
+
+        function toggleRoutePlanner() {
+            const content = document.getElementById('routePlannerContent');
+            const toggle = document.querySelector('.route-planner-toggle');
+            
+            if (!content || !toggle) return;
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                toggle.classList.add('open');
+                console.log('✅ Route Planner expanded');
+            } else {
+                content.style.display = 'none';
+                toggle.classList.remove('open');
+                console.log('✅ Route Planner collapsed');
+            }
+        }
+
+        function clearRoutePlanner() {
+            console.log('🔄 Clearing route planner...');
+            
+            // Reset form inputs
+            document.getElementById('routeZone').value = '';
+            document.getElementById('routePlanDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('routeStartTime').value = '09:00';
+            document.getElementById('routeVisitDuration').value = '30';
+            document.getElementById('routeTravelBuffer').value = '15';
+            
+            // Uncheck all city checkboxes
+            document.querySelectorAll('.route-city-checkbox input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            // Hide results
+            const routeResults = document.getElementById('routeResults');
+            const routeControls = document.getElementById('routePlannerContent');
+            if (routeResults) routeResults.style.display = 'none';
+            if (routeControls) routeControls.style.display = 'block';
+            
+            // Reset state
+            state.currentRoute = [];
+            state.currentRouteCity = '';
+            state.currentRouteZone = '';
+            state.currentRoutePlanDate = new Date().toISOString().split('T')[0];
+            state.currentTravelBuffer = 0;
+            
+            console.log('✅ Route planner cleared - ready for new route');
+            showToast('Route planner cleared. Ready to plan a new route!', 'success');
+        }
+
+        function initializeRoutePlanner() {
+            populateRouteZones();
+            populateRouteCities();  // Use the new checkbox population function
+            
+            // Set today as default date
+            const today = new Date().toISOString().split('T')[0];
+            const dateInput = document.getElementById('routePlanDate');
+            if (dateInput) dateInput.value = today;
+            
+            state.currentRoute = [];
+            state.currentRouteCity = '';
+            state.currentRouteZone = '';
+            state.currentRoutePlanDate = today;
+            state.currentTravelBuffer = 0;
+            state.routePlans = state.routePlans || [];
+            
+            console.log('✅ Route Planner initialized');
+        }
+
+
+                // ============================================
         // INITIALIZATION
         // ============================================
         document.addEventListener('DOMContentLoaded', () => {
@@ -3343,7 +4413,7 @@
                     
                     console.log('✅ State updated - Orgs:', state.organizations.length, 'Visits:', state.visits.length);
                     
-                    // Ensure all settings have proper defaults
+                                        initializeRoutePlanner();                    // Ensure all settings have proper defaults
                     ensureSettingsDefaults();
                     
                     if (userResponse?.success) {
@@ -4750,6 +5820,9 @@
         }
 
         function renderVisits() {
+            // Update route planner cities when visiting the Visits tab
+            try { populateRouteCities(); } catch (e) { console.warn('Error populating route cities:', e); }
+            
             // Populate zone filter dynamically
             const zoneSelect = document.getElementById('visitZoneFilter');
             if (zoneSelect && zoneSelect.options.length <= 1 && state.settings?.zones) {
