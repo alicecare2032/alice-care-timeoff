@@ -1075,11 +1075,9 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>HCA Expiration Date</label>
-                        <div id="empHCAExpiration" class="readonly-field" style="padding: 10px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 6px; color: #555; min-height: 20px; font-size: 14px;">
-                            <span class="hca-exp-value">—</span>
-                        </div>
-                        <span class="field-hint">Read-only from HCA Tracker (sync to update)</span>
+                        <label>HCA Certification Date</label>
+                        <input type="date" id="empHCADate">
+                        <span class="field-hint">HCA certification date</span>
                     </div>
                     <div class="form-group"></div>
                 </div>
@@ -1140,8 +1138,8 @@
                         </div>
                         <div class="variable-chip-group">
                             <span class="chip-group-label">Compliance (Auto-filled)</span>
-                            <button type="button" class="variable-chip auto-var" onclick="insertVariable('hca_expiration_date')" title="Read-only from HCA Tracker (sync required)">{{hca_expiration_date}}</button>
-                            <button type="button" class="variable-chip auto-var" onclick="insertVariable('days_until_hca_expiration')" title="Days until HCA expiration (from HCA Tracker)">{{days_until_hca_expiration}}</button>
+                            <button type="button" class="variable-chip auto-var" onclick="insertVariable('hca_expiration_date')" title="Auto-filled from HCA Tracker or employee record">{{hca_expiration_date}}</button>
+                            <button type="button" class="variable-chip auto-var" onclick="insertVariable('days_until_hca_expiration')" title="Auto-calculated days remaining">{{days_until_hca_expiration}}</button>
                             <button type="button" class="variable-chip auto-var" onclick="insertVariable('tb_due_date')" title="Auto-calculated: TB date + 2 years">{{tb_due_date}}</button>
                             <button type="button" class="variable-chip auto-var" onclick="insertVariable('days_until_tb_due')" title="Auto-calculated days remaining">{{days_until_tb_due}}</button>
                             <button type="button" class="variable-chip auto-var" onclick="insertVariable('training_due_date')" title="Auto-calculated: Training date + 1 year">{{training_due_date}}</button>
@@ -1661,14 +1659,18 @@ Write your email content here..."></div>
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
-            // HCA Expiration - ONLY from HCA Tracker (read-only, no calculation)
+            // HCA Expiration - from HCA Tracker or calculated
             const hcaMatch = findHCATrackerMatch(emp.firstName, emp.lastName);
             let hcaExpDate = null;
             if (hcaMatch && hcaMatch.expirationDate) {
                 hcaExpDate = new Date(hcaMatch.expirationDate);
                 variableValues['hca_expiration_date'] = formatDateForDisplay(hcaExpDate);
+            } else if (emp.hcaDate) {
+                hcaExpDate = new Date(emp.hcaDate);
+                hcaExpDate.setFullYear(hcaExpDate.getFullYear() + 2);
+                variableValues['hca_expiration_date'] = formatDateForDisplay(hcaExpDate);
             } else {
-                variableValues['hca_expiration_date'] = 'N/A (not in HCA Tracker)';
+                variableValues['hca_expiration_date'] = 'N/A';
             }
             
             if (hcaExpDate && !isNaN(hcaExpDate.getTime())) {
@@ -1853,14 +1855,18 @@ Write your email content here..."></div>
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
                 
-                // HCA Expiration - ONLY from HCA Tracker (read-only, no calculation)
+                // HCA Expiration
                 const hcaMatch = findHCATrackerMatch(empOverride.firstName, empOverride.lastName);
                 let hcaExpDate = null;
                 if (hcaMatch && hcaMatch.expirationDate) {
                     hcaExpDate = new Date(hcaMatch.expirationDate);
                     vars['hca_expiration_date'] = formatDateForDisplay(hcaExpDate);
+                } else if (empOverride.hcaDate) {
+                    hcaExpDate = new Date(empOverride.hcaDate);
+                    hcaExpDate.setFullYear(hcaExpDate.getFullYear() + 2);
+                    vars['hca_expiration_date'] = formatDateForDisplay(hcaExpDate);
                 } else {
-                    vars['hca_expiration_date'] = 'N/A (not in HCA Tracker)';
+                    vars['hca_expiration_date'] = 'N/A';
                 }
                 
                 if (hcaExpDate && !isNaN(hcaExpDate.getTime())) {
@@ -2512,11 +2518,13 @@ Write your email content here..."></div>
             const tbDays = autoSettings.tbReminder?.daysBefore || 30;
             const trainingDays = autoSettings.trainingReminder?.daysBefore || 30;
             
-            // Helper to get HCA status for an employee - ONLY from HCA Tracker
+            // Helper to get HCA status for an employee
             function getEmployeeHCAStatus(emp) {
                 const hcaMatch = findHCATrackerMatch(emp.firstName, emp.lastName);
                 if (hcaMatch && hcaMatch.expirationDate) {
                     return getHCADateStatus(hcaMatch.expirationDate, hcaDays);
+                } else if (emp.hcaDate) {
+                    return getDateStatus(emp.hcaDate, 2, hcaDays);
                 }
                 return { status: 'na' };
             }
@@ -2646,13 +2654,17 @@ Write your email content here..."></div>
                 const hasHCASync = hcaTrackerData.length > 0;
                 const hcaMismatch = hasHCASync && !hcaMatch;
                 
-                // HCA Expiration - ONLY from HCA Tracker (read-only, no fallback calculation)
+                // Use HCA Tracker expiration if available, otherwise use local hcaDate
+                // Note: HCA Tracker stores expiration directly, local hcaDate needs +2 years
                 let hcaCell;
                 if (hcaMatch && hcaMatch.expirationDate) {
                     // HCA Tracker provides expiration date directly
                     hcaCell = renderHCADateCell(hcaMatch.expirationDate, hcaDays);
+                } else if (emp.hcaDate) {
+                    // Fallback to local date (add 2 years for expiration)
+                    hcaCell = renderDateCell(emp.hcaDate, 2, hcaDays, true);
                 } else {
-                    hcaCell = hasHCASync ? '<span class="date-status na" title="Not found in HCA Tracker">N/A</span>' : '<span class="date-status na" title="Sync HCA Tracker to see expiration">Sync HCA</span>';
+                    hcaCell = '<span class="date-status na">N/A</span>';
                 }
                 
                 // TB: Shows date taken, warns when approaching 2-year renewal (unless X-Ray)
@@ -2698,28 +2710,16 @@ Write your email content here..."></div>
             updateHCAOnlyAlert();
         }
         
-        // Helper: Normalize string for matching (removes accents, special chars, extra spaces)
-        function normalizeForMatch(str) {
-            if (!str) return '';
-            return str
-                .normalize('NFD')                          // Decompose accents (é -> e + ´)
-                .replace(/[\u0300-\u036f]/g, '')          // Remove accent marks
-                .replace(/[^\w\s]/g, '')                   // Remove non-word chars except spaces
-                .replace(/\s+/g, ' ')                      // Collapse multiple spaces
-                .toLowerCase()
-                .trim();
-        }
-        
-        // Helper: Find matching HCA Tracker entry by name (with fuzzy matching)
+        // Helper: Find matching HCA Tracker entry by name
         function findHCATrackerMatch(firstName, lastName) {
             if (!hcaTrackerData.length) return null;
             
-            const empFirst = normalizeForMatch(firstName);
-            const empLast = normalizeForMatch(lastName);
+            const empFirst = (firstName || '').toLowerCase().trim();
+            const empLast = (lastName || '').toLowerCase().trim();
             
             return hcaTrackerData.find(hca => {
-                const hcaFirst = normalizeForMatch(hca.firstName);
-                const hcaLast = normalizeForMatch(hca.lastName);
+                const hcaFirst = (hca.firstName || '').toLowerCase().trim();
+                const hcaLast = (hca.lastName || '').toLowerCase().trim();
                 return hcaFirst === empFirst && hcaLast === empLast;
             });
         }
@@ -2807,11 +2807,11 @@ Write your email content here..."></div>
         function getHCAOnlyEmployees() {
             if (!hcaTrackerData.length) return [];
             return hcaTrackerData.filter(hca => {
-                const hcaFirst = normalizeForMatch(hca.firstName);
-                const hcaLast = normalizeForMatch(hca.lastName);
+                const hcaFirst = (hca.firstName || '').toLowerCase().trim();
+                const hcaLast = (hca.lastName || '').toLowerCase().trim();
                 return !employees.find(emp => {
-                    const empFirst = normalizeForMatch(emp.firstName);
-                    const empLast = normalizeForMatch(emp.lastName);
+                    const empFirst = (emp.firstName || '').toLowerCase().trim();
+                    const empLast = (emp.lastName || '').toLowerCase().trim();
                     return empFirst === hcaFirst && empLast === hcaLast;
                 });
             });
@@ -2934,7 +2934,7 @@ Write your email content here..."></div>
             document.getElementById('empTBDate').value = '';
             document.getElementById('empTBXray').checked = false;
             document.getElementById('empTrainingDate').value = '';
-            document.getElementById('empHCAExpiration').innerHTML = '<span class="hca-exp-value">—</span>';
+            document.getElementById('empHCADate').value = '';
             
             if (empId) {
                 // Convert to string for comparison (handles both number and string IDs)
@@ -2969,32 +2969,7 @@ Write your email content here..."></div>
                     document.getElementById('empTBDate').value = formatDateForInput(emp.tbDate);
                     document.getElementById('empTBXray').checked = emp.tbXray === true || emp.tbXray === 'true';
                     document.getElementById('empTrainingDate').value = formatDateForInput(emp.trainingDate);
-                    
-                    // HCA Expiration - read-only from HCA Tracker
-                    const hcaMatch = findHCATrackerMatch(firstName, lastName);
-                    if (hcaMatch && hcaMatch.expirationDate) {
-                        const expDate = new Date(hcaMatch.expirationDate);
-                        const displayDate = formatDateForDisplay(expDate);
-                        const today = new Date();
-                        today.setHours(0, 0, 0, 0);
-                        expDate.setHours(0, 0, 0, 0);
-                        const daysLeft = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
-                        let statusClass = 'ok';
-                        let statusText = '';
-                        if (daysLeft < 0) {
-                            statusClass = 'overdue';
-                            statusText = ` (${Math.abs(daysLeft)} days overdue)`;
-                        } else if (daysLeft <= 30) {
-                            statusClass = 'urgent';
-                            statusText = ` (${daysLeft} days left)`;
-                        } else if (daysLeft <= 60) {
-                            statusClass = 'warning';
-                            statusText = ` (${daysLeft} days left)`;
-                        }
-                        document.getElementById('empHCAExpiration').innerHTML = `<span class="hca-exp-value" style="color: ${statusClass === 'overdue' ? '#dc3545' : statusClass === 'urgent' ? '#fd7e14' : statusClass === 'warning' ? '#ffc107' : '#28a745'}; font-weight: 600;">${displayDate}${statusText}</span>`;
-                    } else {
-                        document.getElementById('empHCAExpiration').innerHTML = '<span class="hca-exp-value" style="color: #999;">Not found in HCA Tracker</span>';
-                    }
+                    document.getElementById('empHCADate').value = formatDateForInput(emp.hcaDate);
                     
                     console.log('Populated fields:', { firstName, lastName, email: emp.email, status: emp.status });
                 } else {
@@ -3036,7 +3011,7 @@ Write your email content here..."></div>
             const tbDate = document.getElementById('empTBDate').value || null;
             const tbXray = document.getElementById('empTBXray').checked;
             const trainingDate = document.getElementById('empTrainingDate').value || null;
-            // Note: HCA expiration is read-only from HCA Tracker, not editable here
+            const hcaDate = document.getElementById('empHCADate').value || null;
             
             if (!firstName || !lastName || !email) { showToast('First name, last name, and email required', 'error'); return; }
             if (!isValidEmail(email)) { showToast('Invalid email', 'error'); return; }
@@ -3051,12 +3026,12 @@ Write your email content here..."></div>
                     action: id ? 'updateEmployee' : 'addEmployee', 
                     id: id || undefined, 
                     firstName, lastName, email, status, department, position, supervisor,
-                    hireDate, birthDate, tbDate, tbXray, trainingDate
+                    hireDate, birthDate, tbDate, tbXray, trainingDate, hcaDate
                 };
                 const result = await apiCall(data, 'POST');
                 if (!result.success) throw new Error(result.error);
                 
-                const empData = { firstName, lastName, email, status, department, position, supervisor, hireDate, birthDate, tbDate, tbXray, trainingDate };
+                const empData = { firstName, lastName, email, status, department, position, supervisor, hireDate, birthDate, tbDate, tbXray, trainingDate, hcaDate };
                 if (id) {
                     const idx = employees.findIndex(e => String(e.id) === String(id));
                     if (idx !== -1) employees[idx] = { ...employees[idx], ...empData };
