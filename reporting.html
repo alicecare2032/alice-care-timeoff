@@ -1784,14 +1784,14 @@
                             <div class="subtitle">With services</div>
                         </div>
                         <div class="stat-card" style="border-left-color: #2196F3;">
-                            <h3>Total Services</h3>
+                            <h3>Services</h3>
                             <div class="number" id="expectedServiceCount">--</div>
-                            <div class="subtitle">In period</div>
+                            <div class="subtitle">Completed / Total</div>
                         </div>
                         <div class="stat-card" style="border-left-color: #62B790;">
-                            <h3>Total Revenue</h3>
+                            <h3>Completed Revenue</h3>
                             <div class="number" id="expectedTotalRevenue">--</div>
-                            <div class="subtitle">Expected billing</div>
+                            <div class="subtitle">Billable amount</div>
                         </div>
                         <div class="stat-card" style="border-left-color: #4CAF50;">
                             <h3>Reports Sent</h3>
@@ -4379,31 +4379,140 @@
             sendBulkReports(type);
         }
         
-        async function sendBulkReports(reportType) {
-            showLoading('Sending Reports', `Preparing ${reportType} reports for all clients...`);
+        async function sendBulkReports(reportType, forceSend = false) {
+            const actionText = forceSend ? 'Force Sending' : 'Sending';
+            showLoading(actionText + ' Reports', `Preparing ${reportType} reports for all clients...`);
             
             const config = JSON.parse(localStorage.getItem('aliceCareAutomationConfig') || '{}');
             
             try {
-                updateLoadingText('Sending Reports', 'This may take a few minutes...');
+                updateLoadingText(actionText + ' Reports', 'This may take a few minutes...');
                 
                 const result = await jsonpFetch({ 
                     action: 'sendBulkReports', 
                     reportType: reportType,
                     testMode: config.testMode ? 'true' : 'false',
-                    testEmail: config.testEmail || ''
+                    testEmail: config.testEmail || '',
+                    forceSend: forceSend ? 'true' : 'false'
                 });
                 
                 hideLoading();
                 
                 if (result.success) {
-                    showToast(`${reportType} reports sent! ${result.sentCount} emails sent.`, 'success');
+                    // Build detailed result message
+                    let message = `${result.sentCount} report(s) sent`;
+                    
+                    if (result.skippedCount > 0) {
+                        message += `, ${result.skippedCount} skipped (already sent)`;
+                    }
+                    
+                    if (result.errors && result.errors.length > 0) {
+                        message += `, ${result.errors.length} error(s)`;
+                    }
+                    
+                    showToast(message, result.sentCount > 0 ? 'success' : 'warning');
+                    
+                    // If there were skipped reports and not forcing, offer to force resend
+                    if (result.skippedCount > 0 && !forceSend) {
+                        showSkippedReportsModal(result, reportType);
+                    }
                 } else {
                     showToast('Failed to send reports: ' + (result.error || 'Unknown error'), 'error');
                 }
             } catch (error) {
                 hideLoading();
                 showToast('Error sending reports: ' + error.message, 'error');
+            }
+        }
+        
+        function showSkippedReportsModal(result, reportType) {
+            // Remove existing modal if any
+            const existingModal = document.getElementById('skippedReportsModal');
+            if (existingModal) existingModal.remove();
+            
+            const skippedList = result.skipped || [];
+            const periodInfo = result.period || {};
+            
+            let skippedHtml = '';
+            skippedList.forEach(item => {
+                const sentDate = item.sentOn ? new Date(item.sentOn).toLocaleString() : 'Unknown date';
+                skippedHtml += `
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #E5ECF3;">${escapeHtml(item.customerName)}</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #E5ECF3;">${item.reason}</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #E5ECF3; font-size: 12px; color: #666;">${sentDate}</td>
+                    </tr>
+                `;
+            });
+            
+            const modalHtml = `
+                <div id="skippedReportsModal" class="modal-overlay active" onclick="closeSkippedModal(event)">
+                    <div class="modal" style="max-width: 600px; max-height: 80vh; overflow-y: auto;" onclick="event.stopPropagation()">
+                        <div class="modal-header">
+                            <h2 style="display: flex; align-items: center; gap: 10px;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#F57600" stroke-width="2" style="width: 24px; height: 24px;">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="12" y1="8" x2="12" y2="12"/>
+                                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                                </svg>
+                                Reports Skipped
+                            </h2>
+                            <button class="modal-close" onclick="closeSkippedModal()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <p style="margin-bottom: 15px; color: #666;">
+                                The following ${skippedList.length} report(s) were skipped because they were already sent for 
+                                <strong>${periodInfo.type || reportType} ${periodInfo.value || ''} ${periodInfo.year || ''}</strong>:
+                            </p>
+                            
+                            <div class="table-container" style="max-height: 300px; overflow-y: auto;">
+                                <table class="data-table" style="font-size: 13px;">
+                                    <thead>
+                                        <tr>
+                                            <th>Customer</th>
+                                            <th>Reason</th>
+                                            <th>Originally Sent</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${skippedHtml}
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div style="margin-top: 20px; padding: 15px; background: #FFF3E0; border-radius: 8px; border-left: 4px solid #F57600;">
+                                <p style="margin: 0; font-size: 13px;">
+                                    <strong>Need to resend anyway?</strong><br>
+                                    Click "Force Resend All" to send reports to ALL clients, including those already sent.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="modal-footer" style="display: flex; gap: 10px; justify-content: flex-end;">
+                            <button class="btn btn-secondary" onclick="closeSkippedModal()">Close</button>
+                            <button class="btn btn-primary" onclick="forceResendAll('${reportType}')" style="background: #F57600;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+                                    <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+                                </svg>
+                                Force Resend All
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+        
+        function closeSkippedModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            const modal = document.getElementById('skippedReportsModal');
+            if (modal) modal.remove();
+        }
+        
+        function forceResendAll(reportType) {
+            closeSkippedModal();
+            if (confirm('Are you sure you want to FORCE RESEND to ALL clients, including those who already received this report?\n\nThis will send duplicate reports.')) {
+                sendBulkReports(reportType, true);
             }
         }
         
@@ -5489,6 +5598,8 @@
                 const duration = parseFloat(row['Service Duration']) || 0;
                 const durationHrs = duration / 60;
                 const cost = parseFloat(row['Cost To Customer']) || 0;
+                const status = (row['Status'] || '').toUpperCase().trim();
+                const isCompleted = status === 'COMPLETED';
                 
                 if (!clientMap.has(customerName)) {
                     const clientInfo = getClientInfo(customerName);
@@ -5500,7 +5611,13 @@
                         services: [],
                         totalHours: 0,
                         totalCost: 0,
-                        serviceCount: 0
+                        serviceCount: 0,
+                        // Completed-only totals
+                        completedHours: 0,
+                        completedCost: 0,
+                        completedCount: 0,
+                        // Status counts
+                        statusCounts: {}
                     });
                 }
                 
@@ -5511,21 +5628,35 @@
                     endTime: row['ETxTime'],
                     provider: row['Provider Name'] || 'Unassigned',
                     duration: durationHrs,
-                    cost: cost
+                    cost: cost,
+                    status: status || 'UNKNOWN'
                 });
+                
+                // All services totals
                 client.totalHours += durationHrs;
                 client.totalCost += cost;
                 client.serviceCount++;
+                
+                // Completed-only totals
+                if (isCompleted) {
+                    client.completedHours += durationHrs;
+                    client.completedCost += cost;
+                    client.completedCount++;
+                }
+                
+                // Track status counts
+                const statusKey = status || 'UNKNOWN';
+                client.statusCounts[statusKey] = (client.statusCounts[statusKey] || 0) + 1;
             });
             
-            // Calculate average rate for each client
+            // Calculate average rate for each client (based on completed only)
             const aggregated = Array.from(clientMap.values()).map(client => ({
                 ...client,
-                avgRate: client.totalHours > 0 ? (client.totalCost / client.totalHours) : 0
+                avgRate: client.completedHours > 0 ? (client.completedCost / client.completedHours) : 0
             }));
             
-            // Sort by total cost descending by default
-            return aggregated.sort((a, b) => b.totalCost - a.totalCost);
+            // Sort by completed cost descending by default
+            return aggregated.sort((a, b) => b.completedCost - a.completedCost);
         }
         
         function getClientsWithMatchingSubscription() {
@@ -5770,13 +5901,14 @@
                 return;
             }
             
-            // Update stats
+            // Update stats (using completed-only totals)
             document.getElementById('expectedStats').style.display = 'flex';
             document.getElementById('expectedClientCount').textContent = aggregatedData.length;
-            const totalServicesFiltered = aggregatedData.reduce((sum, c) => sum + c.serviceCount, 0);
-            document.getElementById('expectedServiceCount').textContent = totalServicesFiltered;
-            const totalRevenue = aggregatedData.reduce((sum, c) => sum + c.totalCost, 0);
-            document.getElementById('expectedTotalRevenue').textContent = '$' + totalRevenue.toFixed(2);
+            const totalCompletedServices = aggregatedData.reduce((sum, c) => sum + c.completedCount, 0);
+            const totalAllServices = aggregatedData.reduce((sum, c) => sum + c.serviceCount, 0);
+            document.getElementById('expectedServiceCount').textContent = totalCompletedServices + ' / ' + totalAllServices;
+            const totalCompletedRevenue = aggregatedData.reduce((sum, c) => sum + c.completedCost, 0);
+            document.getElementById('expectedTotalRevenue').textContent = '$' + totalCompletedRevenue.toFixed(2);
             
             // Calculate sent/pending counts (including no-service clients)
             const allClients = [...aggregatedData, ...noServiceClients];
@@ -5801,10 +5933,11 @@
                                 <th>Insurance</th>
                                 <th>Frequency</th>
                                 <th>Assignment</th>
+                                <th>Status</th>
                                 <th>$/Hr (Avg)</th>
-                                <th>Total Hours</th>
+                                <th>Completed Hrs</th>
                                 <th>Services</th>
-                                <th>Total $</th>
+                                <th>Completed $</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -5841,6 +5974,28 @@
                     ? '<span class="badge" style="background: #F3E5F5; color: #9C27B0;">Yes</span>'
                     : '<span class="badge" style="background: #E3F2FD; color: #2196F3;">No</span>';
                 
+                // Format status badges
+                let statusBadges = [];
+                const statusColors = {
+                    'COMPLETED': { bg: '#E8F5E9', color: '#4CAF50' },
+                    'CANCELLED': { bg: '#FFEBEE', color: '#F44336' },
+                    'PENDING': { bg: '#FFF3E0', color: '#F57600' },
+                    'SCHEDULED': { bg: '#E3F2FD', color: '#2196F3' },
+                    'IN PROGRESS': { bg: '#E1F5FE', color: '#03A9F4' },
+                    'UNKNOWN': { bg: '#F5F5F5', color: '#999' }
+                };
+                Object.entries(client.statusCounts).forEach(([status, count]) => {
+                    const colors = statusColors[status] || statusColors['UNKNOWN'];
+                    const shortStatus = status.substring(0, 3).toUpperCase();
+                    statusBadges.push(`<span class="badge" style="background: ${colors.bg}; color: ${colors.color};" title="${status}: ${count}">${shortStatus}:${count}</span>`);
+                });
+                const statusBadge = statusBadges.join(' ');
+                
+                // Service count display (completed / total)
+                const serviceCountDisplay = client.completedCount === client.serviceCount 
+                    ? client.serviceCount 
+                    : `${client.completedCount}/${client.serviceCount}`;
+                
                 html += `
                     <tr class="expandable-row" onclick="toggleClientExpand('${escapeHtml(client.customerName)}')">
                         <td>
@@ -5851,13 +6006,14 @@
                         <td>${escapeHtml(client.insurance)}</td>
                         <td>${frequencyBadge}</td>
                         <td>${assignmentBadge}</td>
+                        <td style="font-size: 11px;">${statusBadge}</td>
                         <td>$${client.avgRate.toFixed(2)}</td>
-                        <td>${client.totalHours.toFixed(2)}</td>
-                        <td>${client.serviceCount}</td>
-                        <td><strong>$${client.totalCost.toFixed(2)}</strong></td>
+                        <td>${client.completedHours.toFixed(2)}</td>
+                        <td>${serviceCountDisplay}</td>
+                        <td><strong>$${client.completedCost.toFixed(2)}</strong></td>
                     </tr>
                     <tr class="service-details-row ${isExpanded ? 'expanded' : ''}" id="details_${clientId}">
-                        <td colspan="10" class="service-details-cell">
+                        <td colspan="11" class="service-details-cell">
                             <div class="service-details-wrapper">
                                 <table class="service-details-table">
                                     <thead>
@@ -5866,26 +6022,38 @@
                                             <th>Start Time</th>
                                             <th>End Time</th>
                                             <th>Provider</th>
+                                            <th>Status</th>
                                             <th>Hours</th>
                                             <th>Cost</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        ${client.services.map(s => `
-                                            <tr>
+                                        ${client.services.map(s => {
+                                            const sColors = statusColors[s.status] || statusColors['UNKNOWN'];
+                                            const rowStyle = s.status === 'COMPLETED' ? '' : 'opacity: 0.6;';
+                                            return `
+                                            <tr style="${rowStyle}">
                                                 <td>${formatDate(s.date)}</td>
                                                 <td>${formatTime(s.startTime)}</td>
                                                 <td>${formatTime(s.endTime)}</td>
                                                 <td>${escapeHtml(s.provider)}</td>
+                                                <td><span class="badge" style="background: ${sColors.bg}; color: ${sColors.color}; font-size: 10px;">${s.status}</span></td>
                                                 <td>${s.duration.toFixed(2)}</td>
                                                 <td>$${s.cost.toFixed(2)}</td>
                                             </tr>
-                                        `).join('')}
+                                        `}).join('')}
                                         <tr class="summary-row">
-                                            <td colspan="4" style="text-align: right;"><strong>Totals:</strong></td>
-                                            <td><strong>${client.totalHours.toFixed(2)}</strong></td>
-                                            <td><strong>$${client.totalCost.toFixed(2)}</strong></td>
+                                            <td colspan="5" style="text-align: right;"><strong>Completed Totals:</strong></td>
+                                            <td><strong>${client.completedHours.toFixed(2)}</strong></td>
+                                            <td><strong>$${client.completedCost.toFixed(2)}</strong></td>
                                         </tr>
+                                        ${client.completedCount !== client.serviceCount ? `
+                                        <tr class="summary-row" style="opacity: 0.6;">
+                                            <td colspan="5" style="text-align: right; font-size: 11px;">All Services:</td>
+                                            <td style="font-size: 11px;">${client.totalHours.toFixed(2)}</td>
+                                            <td style="font-size: 11px;">$${client.totalCost.toFixed(2)}</td>
+                                        </tr>
+                                        ` : ''}
                                     </tbody>
                                 </table>
                             </div>
@@ -5925,15 +6093,17 @@
                 return;
             }
             
-            // Create CSV content with new columns including Sent status
-            let csv = 'Customer Name,Insurance,Report Frequency,Assignment of Benefits,Avg $/Hr,Total Hours,Service Count,Total $,Services Status,Report Sent\n';
+            // Create CSV content with status and completed totals
+            let csv = 'Customer Name,Insurance,Report Frequency,Assignment of Benefits,Status Summary,Avg $/Hr,Completed Hours,Total Hours,Completed Services,Total Services,Completed $,Total $,Report Sent\n';
             
             // Add clients with services
             aggregatedData.forEach(client => {
                 const assignmentText = client.assignment ? 'Yes' : 'No';
                 const sentStatus = getSentStatus(client.customerName);
                 const sentText = sentStatus.sent ? 'Yes' : 'No';
-                csv += `"${client.customerName}","${client.insurance}","${client.subscription}","${assignmentText}",${client.avgRate.toFixed(2)},${client.totalHours.toFixed(2)},${client.serviceCount},${client.totalCost.toFixed(2)},"Has Services","${sentText}"\n`;
+                // Build status summary string
+                const statusSummary = Object.entries(client.statusCounts).map(([s, c]) => `${s}:${c}`).join(' | ');
+                csv += `"${client.customerName}","${client.insurance}","${client.subscription}","${assignmentText}","${statusSummary}",${client.avgRate.toFixed(2)},${client.completedHours.toFixed(2)},${client.totalHours.toFixed(2)},${client.completedCount},${client.serviceCount},${client.completedCost.toFixed(2)},${client.totalCost.toFixed(2)},"${sentText}"\n`;
             });
             
             // Add clients without services
@@ -5941,15 +6111,18 @@
                 const assignmentText = client.assignment ? 'Yes' : 'No';
                 const sentStatus = getSentStatus(client.customerName);
                 const sentText = sentStatus.sent ? 'Yes' : 'No';
-                csv += `"${client.customerName}","${client.insurance}","${client.subscription}","${assignmentText}",0,0,0,0,"No Services","${sentText}"\n`;
+                csv += `"${client.customerName}","${client.insurance}","${client.subscription}","${assignmentText}","No Services",0,0,0,0,0,0,"${sentText}"\n`;
             });
             
-            // Add totals row (only for clients with services)
+            // Add totals row (completed only)
             if (aggregatedData.length > 0) {
+                const completedHours = aggregatedData.reduce((sum, c) => sum + c.completedHours, 0);
+                const completedCost = aggregatedData.reduce((sum, c) => sum + c.completedCost, 0);
+                const completedServices = aggregatedData.reduce((sum, c) => sum + c.completedCount, 0);
                 const totalHours = aggregatedData.reduce((sum, c) => sum + c.totalHours, 0);
                 const totalCost = aggregatedData.reduce((sum, c) => sum + c.totalCost, 0);
                 const totalServices = aggregatedData.reduce((sum, c) => sum + c.serviceCount, 0);
-                csv += `\n"TOTAL (With Services)","","","",${(totalCost/totalHours || 0).toFixed(2)},${totalHours.toFixed(2)},${totalServices},${totalCost.toFixed(2)},"",""\n`;
+                csv += `\n"TOTALS","","","","",${(completedCost/completedHours || 0).toFixed(2)},${completedHours.toFixed(2)},${totalHours.toFixed(2)},${completedServices},${totalServices},${completedCost.toFixed(2)},${totalCost.toFixed(2)},""\n`;
             }
             
             // Calculate sent/pending summary
@@ -5957,11 +6130,11 @@
             const sentCount = allClients.filter(c => getSentStatus(c.customerName).sent).length;
             const pendingCount = allClients.length - sentCount;
             
-            csv += `\n"SUMMARY","","","","","","","","",""\n`;
-            csv += `"Clients with Services","","","","","","","",${aggregatedData.length},""\n`;
-            csv += `"Clients without Services","","","","","","","",${noServiceClients.length},""\n`;
-            csv += `"Reports Sent","","","","","","","","",${sentCount}\n`;
-            csv += `"Reports Pending","","","","","","","","",${pendingCount}\n`;
+            csv += `\n"SUMMARY","","","","","","","","","","","",""\n`;
+            csv += `"Clients with Services","","","","","","","","","",${aggregatedData.length},"",""\n`;
+            csv += `"Clients without Services","","","","","","","","","",${noServiceClients.length},"",""\n`;
+            csv += `"Reports Sent","","","","","","","","","","","",${sentCount}\n`;
+            csv += `"Reports Pending","","","","","","","","","","","",${pendingCount}\n`;
             
             // Download
             const blob = new Blob([csv], { type: 'text/csv' });
