@@ -1764,6 +1764,14 @@
                                 <option value="0">No (CC Pay)</option>
                             </select>
                         </div>
+                        <div class="filter-group">
+                            <label>Sent Status</label>
+                            <select id="expectedSentStatus" onchange="applyExpectedFilters()">
+                                <option value="">All</option>
+                                <option value="sent">Sent ✓</option>
+                                <option value="pending">Pending —</option>
+                            </select>
+                        </div>
                         <div class="filter-buttons">
                             <button class="btn btn-secondary" onclick="clearExpectedFilters()">Clear Filters</button>
                         </div>
@@ -1784,6 +1792,16 @@
                             <h3>Total Revenue</h3>
                             <div class="number" id="expectedTotalRevenue">--</div>
                             <div class="subtitle">Expected billing</div>
+                        </div>
+                        <div class="stat-card" style="border-left-color: #4CAF50;">
+                            <h3>Reports Sent</h3>
+                            <div class="number" id="expectedSentCount">--</div>
+                            <div class="subtitle">Completed</div>
+                        </div>
+                        <div class="stat-card" style="border-left-color: #F57600;">
+                            <h3>Reports Pending</h3>
+                            <div class="number" id="expectedPendingCount">--</div>
+                            <div class="subtitle">Not yet sent</div>
                         </div>
                     </div>
                     
@@ -2687,6 +2705,7 @@
         let expectedCurrentPage = 1;
         let expectedPeriodType = 'week';
         let expandedClients = new Set();
+        let sentStatusMap = new Map(); // Tracks which clients have reports already sent
         
         
         // ============================================
@@ -5303,6 +5322,7 @@
             
             // Hide stats while loading
             document.getElementById('expectedStats').style.display = 'none';
+            document.getElementById('noServicesSection').style.display = 'none';
             
             try {
                 // Load client data if not already loaded (needed for filtering)
@@ -5331,7 +5351,12 @@
                 if (result.success) {
                     expectedReportData = result.data || [];
                     expandedClients.clear();
+                    sentStatusMap.clear();
                     expectedCurrentPage = 1;
+                    
+                    // Check sent status for all clients with matching subscription
+                    await checkAllSentStatus();
+                    
                     renderExpectedReportsTable();
                 } else {
                     throw new Error(result.error || 'Failed to load data');
@@ -5350,6 +5375,75 @@
                     </div>
                 `;
             }
+        }
+        
+        /**
+         * Check sent status for all clients with matching subscription
+         */
+        async function checkAllSentStatus() {
+            // Get report type label based on period type
+            const reportTypeMap = {
+                'week': 'Weekly',
+                'month': 'Monthly',
+                'year': 'Yearly'
+            };
+            const reportType = reportTypeMap[expectedPeriodType] || 'Weekly';
+            
+            // Get period value
+            let periodValue;
+            if (expectedPeriodType === 'week') {
+                periodValue = document.getElementById('expectedWeek').value;
+            } else if (expectedPeriodType === 'month') {
+                periodValue = document.getElementById('expectedMonth').value;
+            } else {
+                periodValue = document.getElementById('expectedYear').value;
+            }
+            const year = document.getElementById('expectedYear').value;
+            
+            // Get all unique customer names from service data
+            const customersWithServices = [...new Set(expectedReportData.map(row => row['Customer Name']).filter(Boolean))];
+            
+            // Get all clients with matching subscription (for no services section)
+            const subscribedClients = getClientsWithMatchingSubscription();
+            const allCustomerNames = [...new Set([
+                ...customersWithServices,
+                ...subscribedClients.map(c => c.customerName)
+            ])];
+            
+            // Check sent status for each client (in batches to avoid overwhelming the server)
+            const batchSize = 10;
+            for (let i = 0; i < allCustomerNames.length; i += batchSize) {
+                const batch = allCustomerNames.slice(i, i + batchSize);
+                
+                await Promise.all(batch.map(async (customerName) => {
+                    try {
+                        const result = await jsonpFetch({
+                            action: 'checkReportSent',
+                            customerName: customerName,
+                            reportType: reportType,
+                            periodValue: periodValue,
+                            year: year
+                        });
+                        
+                        if (result.success) {
+                            sentStatusMap.set(customerName.toLowerCase().trim(), {
+                                sent: result.alreadySent,
+                                sentDate: result.logEntry?.timestamp || null
+                            });
+                        }
+                    } catch (e) {
+                        console.error('Error checking sent status for', customerName, e);
+                    }
+                }));
+            }
+        }
+        
+        /**
+         * Get sent status for a customer
+         */
+        function getSentStatus(customerName) {
+            const key = (customerName || '').toLowerCase().trim();
+            return sentStatusMap.get(key) || { sent: false, sentDate: null };
         }
         
         function getClientInfo(customerName) {
@@ -5382,6 +5476,7 @@
             document.getElementById('expectedInsurance').value = '';
             document.getElementById('expectedFrequency').value = '';
             document.getElementById('expectedAssignment').value = '';
+            document.getElementById('expectedSentStatus').value = '';
             expectedCurrentPage = 1;
             renderExpectedReportsTable();
         }
@@ -5463,6 +5558,7 @@
             const insuranceFilter = document.getElementById('expectedInsurance')?.value || '';
             const frequencyFilter = document.getElementById('expectedFrequency')?.value || '';
             const assignmentFilter = document.getElementById('expectedAssignment')?.value || '';
+            const sentStatusFilter = document.getElementById('expectedSentStatus')?.value || '';
             
             if (insuranceFilter) {
                 aggregated = aggregated.filter(c => c.insurance === insuranceFilter);
@@ -5478,6 +5574,18 @@
             if (assignmentFilter !== '') {
                 const isAssigned = assignmentFilter === '1';
                 aggregated = aggregated.filter(c => c.assignment === isAssigned);
+            }
+            
+            if (sentStatusFilter) {
+                aggregated = aggregated.filter(c => {
+                    const status = getSentStatus(c.customerName);
+                    if (sentStatusFilter === 'sent') {
+                        return status.sent === true;
+                    } else if (sentStatusFilter === 'pending') {
+                        return status.sent === false;
+                    }
+                    return true;
+                });
             }
             
             return aggregated;
@@ -5501,6 +5609,7 @@
             const insuranceFilter = document.getElementById('expectedInsurance')?.value || '';
             const frequencyFilter = document.getElementById('expectedFrequency')?.value || '';
             const assignmentFilter = document.getElementById('expectedAssignment')?.value || '';
+            const sentStatusFilter = document.getElementById('expectedSentStatus')?.value || '';
             
             if (insuranceFilter) {
                 noServiceClients = noServiceClients.filter(c => c.insurance === insuranceFilter);
@@ -5516,6 +5625,18 @@
             if (assignmentFilter !== '') {
                 const isAssigned = assignmentFilter === '1';
                 noServiceClients = noServiceClients.filter(c => c.assignment === isAssigned);
+            }
+            
+            if (sentStatusFilter) {
+                noServiceClients = noServiceClients.filter(c => {
+                    const status = getSentStatus(c.customerName);
+                    if (sentStatusFilter === 'sent') {
+                        return status.sent === true;
+                    } else if (sentStatusFilter === 'pending') {
+                        return status.sent === false;
+                    }
+                    return true;
+                });
             }
             
             return noServiceClients.sort((a, b) => a.customerName.localeCompare(b.customerName));
@@ -5560,6 +5681,7 @@
                         <table class="data-table">
                             <thead>
                                 <tr>
+                                    <th style="width: 60px;">Sent</th>
                                     <th>Customer Name</th>
                                     <th>Insurance</th>
                                     <th>Frequency</th>
@@ -5572,6 +5694,12 @@
                 `;
                 
                 noServiceClients.forEach(client => {
+                    // Get sent status
+                    const sentStatus = getSentStatus(client.customerName);
+                    const sentBadge = sentStatus.sent 
+                        ? `<span class="badge" style="background: #E8F5E9; color: #4CAF50;" title="Sent: ${sentStatus.sentDate || 'Unknown date'}">✓</span>`
+                        : '<span class="badge" style="background: #FFF3E0; color: #F57600;">—</span>';
+                    
                     // Format subscription badges
                     const subscription = (client.subscription || '').toLowerCase();
                     let frequencyBadges = [];
@@ -5593,6 +5721,7 @@
                     
                     noServicesHtml += `
                         <tr style="background: #FFF8F8;">
+                            <td style="text-align: center;">${sentBadge}</td>
                             <td><strong>${escapeHtml(client.customerName)}</strong></td>
                             <td>${escapeHtml(client.insurance)}</td>
                             <td>${frequencyBadge}</td>
@@ -5649,6 +5778,13 @@
             const totalRevenue = aggregatedData.reduce((sum, c) => sum + c.totalCost, 0);
             document.getElementById('expectedTotalRevenue').textContent = '$' + totalRevenue.toFixed(2);
             
+            // Calculate sent/pending counts (including no-service clients)
+            const allClients = [...aggregatedData, ...noServiceClients];
+            const sentCount = allClients.filter(c => getSentStatus(c.customerName).sent).length;
+            const pendingCount = allClients.length - sentCount;
+            document.getElementById('expectedSentCount').textContent = sentCount;
+            document.getElementById('expectedPendingCount').textContent = pendingCount;
+            
             // Pagination
             const totalPages = Math.ceil(aggregatedData.length / PAGE_SIZE);
             const start = (expectedCurrentPage - 1) * PAGE_SIZE;
@@ -5660,6 +5796,7 @@
                         <thead>
                             <tr>
                                 <th style="width: 40px;"></th>
+                                <th style="width: 60px;">Sent</th>
                                 <th>Customer Name</th>
                                 <th>Insurance</th>
                                 <th>Frequency</th>
@@ -5676,6 +5813,12 @@
             pageData.forEach((client, index) => {
                 const clientId = `client_${start + index}`;
                 const isExpanded = expandedClients.has(client.customerName);
+                
+                // Get sent status
+                const sentStatus = getSentStatus(client.customerName);
+                const sentBadge = sentStatus.sent 
+                    ? `<span class="badge" style="background: #E8F5E9; color: #4CAF50;" title="Sent: ${sentStatus.sentDate || 'Unknown date'}">✓</span>`
+                    : '<span class="badge" style="background: #FFF3E0; color: #F57600;">—</span>';
                 
                 // Format subscription badges
                 const subscription = (client.subscription || '').toLowerCase();
@@ -5703,6 +5846,7 @@
                         <td>
                             <span class="expand-btn ${isExpanded ? 'expanded' : ''}" id="btn_${clientId}">+</span>
                         </td>
+                        <td style="text-align: center;">${sentBadge}</td>
                         <td><strong>${escapeHtml(client.customerName)}</strong></td>
                         <td>${escapeHtml(client.insurance)}</td>
                         <td>${frequencyBadge}</td>
@@ -5713,7 +5857,7 @@
                         <td><strong>$${client.totalCost.toFixed(2)}</strong></td>
                     </tr>
                     <tr class="service-details-row ${isExpanded ? 'expanded' : ''}" id="details_${clientId}">
-                        <td colspan="9" class="service-details-cell">
+                        <td colspan="10" class="service-details-cell">
                             <div class="service-details-wrapper">
                                 <table class="service-details-table">
                                     <thead>
@@ -5781,19 +5925,23 @@
                 return;
             }
             
-            // Create CSV content with new columns
-            let csv = 'Customer Name,Insurance,Report Frequency,Assignment of Benefits,Avg $/Hr,Total Hours,Service Count,Total $,Status\n';
+            // Create CSV content with new columns including Sent status
+            let csv = 'Customer Name,Insurance,Report Frequency,Assignment of Benefits,Avg $/Hr,Total Hours,Service Count,Total $,Services Status,Report Sent\n';
             
             // Add clients with services
             aggregatedData.forEach(client => {
                 const assignmentText = client.assignment ? 'Yes' : 'No';
-                csv += `"${client.customerName}","${client.insurance}","${client.subscription}","${assignmentText}",${client.avgRate.toFixed(2)},${client.totalHours.toFixed(2)},${client.serviceCount},${client.totalCost.toFixed(2)},"Has Services"\n`;
+                const sentStatus = getSentStatus(client.customerName);
+                const sentText = sentStatus.sent ? 'Yes' : 'No';
+                csv += `"${client.customerName}","${client.insurance}","${client.subscription}","${assignmentText}",${client.avgRate.toFixed(2)},${client.totalHours.toFixed(2)},${client.serviceCount},${client.totalCost.toFixed(2)},"Has Services","${sentText}"\n`;
             });
             
             // Add clients without services
             noServiceClients.forEach(client => {
                 const assignmentText = client.assignment ? 'Yes' : 'No';
-                csv += `"${client.customerName}","${client.insurance}","${client.subscription}","${assignmentText}",0,0,0,0,"No Services"\n`;
+                const sentStatus = getSentStatus(client.customerName);
+                const sentText = sentStatus.sent ? 'Yes' : 'No';
+                csv += `"${client.customerName}","${client.insurance}","${client.subscription}","${assignmentText}",0,0,0,0,"No Services","${sentText}"\n`;
             });
             
             // Add totals row (only for clients with services)
@@ -5801,12 +5949,19 @@
                 const totalHours = aggregatedData.reduce((sum, c) => sum + c.totalHours, 0);
                 const totalCost = aggregatedData.reduce((sum, c) => sum + c.totalCost, 0);
                 const totalServices = aggregatedData.reduce((sum, c) => sum + c.serviceCount, 0);
-                csv += `\n"TOTAL (With Services)","","","",${(totalCost/totalHours || 0).toFixed(2)},${totalHours.toFixed(2)},${totalServices},${totalCost.toFixed(2)},""\n`;
+                csv += `\n"TOTAL (With Services)","","","",${(totalCost/totalHours || 0).toFixed(2)},${totalHours.toFixed(2)},${totalServices},${totalCost.toFixed(2)},"",""\n`;
             }
             
-            csv += `\n"SUMMARY","","","","","","","",""\n`;
-            csv += `"Clients with Services","","","","","","","",${aggregatedData.length}\n`;
-            csv += `"Clients without Services","","","","","","","",${noServiceClients.length}\n`;
+            // Calculate sent/pending summary
+            const allClients = [...aggregatedData, ...noServiceClients];
+            const sentCount = allClients.filter(c => getSentStatus(c.customerName).sent).length;
+            const pendingCount = allClients.length - sentCount;
+            
+            csv += `\n"SUMMARY","","","","","","","","",""\n`;
+            csv += `"Clients with Services","","","","","","","",${aggregatedData.length},""\n`;
+            csv += `"Clients without Services","","","","","","","",${noServiceClients.length},""\n`;
+            csv += `"Reports Sent","","","","","","","","",${sentCount}\n`;
+            csv += `"Reports Pending","","","","","","","","",${pendingCount}\n`;
             
             // Download
             const blob = new Blob([csv], { type: 'text/csv' });

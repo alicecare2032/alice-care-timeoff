@@ -1801,6 +1801,23 @@
                     </div>
                     
                     <div class="pagination" id="expectedPagination"></div>
+                    
+                    <!-- No Services Section -->
+                    <div id="noServicesSection" style="display: none; margin-top: 30px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <h3 style="color: #C62828; margin: 0; display: flex; align-items: center; gap: 8px;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px;">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="12" y1="8" x2="12" y2="12"/>
+                                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                                </svg>
+                                Clients with No Services
+                            </h3>
+                            <span id="noServicesCount" class="badge" style="background: #FFEBEE; color: #C62828; padding: 6px 12px; font-size: 13px;">0 clients</span>
+                        </div>
+                        <p style="color: #666; font-size: 13px; margin-bottom: 15px;">These clients have a report subscription for this frequency but no services recorded in the selected period.</p>
+                        <div id="noServicesTableContainer"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -5416,6 +5433,29 @@
             return aggregated.sort((a, b) => b.totalCost - a.totalCost);
         }
         
+        function getClientsWithMatchingSubscription() {
+            // Get the frequency that matches the selected period type
+            const frequencyMap = {
+                'week': 'weekly',
+                'month': 'monthly',
+                'year': 'yearly'
+            };
+            const targetFrequency = frequencyMap[expectedPeriodType] || '';
+            
+            // Find all clients who have this subscription frequency
+            return clientData.filter(client => {
+                const subscription = (client['Subscription'] || '').toLowerCase();
+                return subscription.includes(targetFrequency);
+            }).map(client => ({
+                customerName: client['Customer Name'] || '',
+                insurance: client['Insurance_Name'] || '--',
+                subscription: client['Subscription'] || 'None',
+                assignment: String(client['Assigment_Y1_N0']) === '1',
+                email: client['email'] || '--',
+                phone: client['Phone'] || '--'
+            }));
+        }
+        
         function getFilteredExpectedData() {
             let aggregated = aggregateExpectedReports(expectedReportData);
             
@@ -5443,11 +5483,56 @@
             return aggregated;
         }
         
+        function getClientsWithNoServices() {
+            // Get all clients with matching subscription
+            const subscribedClients = getClientsWithMatchingSubscription();
+            
+            // Get customer names who had services
+            const clientsWithServices = new Set(
+                expectedReportData.map(row => (row['Customer Name'] || '').toLowerCase().trim())
+            );
+            
+            // Filter to only those without services
+            let noServiceClients = subscribedClients.filter(client => 
+                !clientsWithServices.has(client.customerName.toLowerCase().trim())
+            );
+            
+            // Apply same filters
+            const insuranceFilter = document.getElementById('expectedInsurance')?.value || '';
+            const frequencyFilter = document.getElementById('expectedFrequency')?.value || '';
+            const assignmentFilter = document.getElementById('expectedAssignment')?.value || '';
+            
+            if (insuranceFilter) {
+                noServiceClients = noServiceClients.filter(c => c.insurance === insuranceFilter);
+            }
+            
+            if (frequencyFilter) {
+                noServiceClients = noServiceClients.filter(c => {
+                    const sub = (c.subscription || '').toLowerCase();
+                    return sub.includes(frequencyFilter.toLowerCase());
+                });
+            }
+            
+            if (assignmentFilter !== '') {
+                const isAssigned = assignmentFilter === '1';
+                noServiceClients = noServiceClients.filter(c => c.assignment === isAssigned);
+            }
+            
+            return noServiceClients.sort((a, b) => a.customerName.localeCompare(b.customerName));
+        }
+        
         function renderExpectedReportsTable() {
             const container = document.getElementById('expectedTableContainer');
+            const noServicesSection = document.getElementById('noServicesSection');
+            const noServicesContainer = document.getElementById('noServicesTableContainer');
             
-            if (expectedReportData.length === 0) {
+            // Get clients with no services
+            const noServiceClients = getClientsWithNoServices();
+            
+            // Check if we have any data loaded
+            if (expectedReportData.length === 0 && noServiceClients.length === 0) {
                 document.getElementById('expectedStats').style.display = 'none';
+                noServicesSection.style.display = 'none';
                 container.innerHTML = `
                     <div class="empty-state">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -5465,17 +5550,94 @@
             
             const aggregatedData = getFilteredExpectedData();
             
-            if (aggregatedData.length === 0) {
-                document.getElementById('expectedStats').style.display = 'none';
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
-                        </svg>
-                        <h3>No matching clients</h3>
-                        <p>No clients match the selected filters. Try adjusting your filter criteria.</p>
+            // Render No Services section
+            if (noServiceClients.length > 0) {
+                noServicesSection.style.display = 'block';
+                document.getElementById('noServicesCount').textContent = `${noServiceClients.length} client${noServiceClients.length !== 1 ? 's' : ''}`;
+                
+                let noServicesHtml = `
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Customer Name</th>
+                                    <th>Insurance</th>
+                                    <th>Frequency</th>
+                                    <th>Assignment</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                noServiceClients.forEach(client => {
+                    // Format subscription badges
+                    const subscription = (client.subscription || '').toLowerCase();
+                    let frequencyBadges = [];
+                    if (subscription.includes('weekly')) {
+                        frequencyBadges.push('<span class="badge" style="background: #E3F2FD; color: #2196F3;">W</span>');
+                    }
+                    if (subscription.includes('monthly')) {
+                        frequencyBadges.push('<span class="badge" style="background: #E0F1E9; color: #62B790;">M</span>');
+                    }
+                    if (subscription.includes('yearly')) {
+                        frequencyBadges.push('<span class="badge" style="background: #FFF3E0; color: #F57600;">Y</span>');
+                    }
+                    const frequencyBadge = frequencyBadges.join(' ');
+                    
+                    // Format assignment badge
+                    const assignmentBadge = client.assignment 
+                        ? '<span class="badge" style="background: #F3E5F5; color: #9C27B0;">Yes</span>'
+                        : '<span class="badge" style="background: #E3F2FD; color: #2196F3;">No</span>';
+                    
+                    noServicesHtml += `
+                        <tr style="background: #FFF8F8;">
+                            <td><strong>${escapeHtml(client.customerName)}</strong></td>
+                            <td>${escapeHtml(client.insurance)}</td>
+                            <td>${frequencyBadge}</td>
+                            <td>${assignmentBadge}</td>
+                            <td>${escapeHtml(client.email)}</td>
+                            <td>${escapeHtml(client.phone)}</td>
+                        </tr>
+                    `;
+                });
+                
+                noServicesHtml += `
+                            </tbody>
+                        </table>
                     </div>
                 `;
+                
+                noServicesContainer.innerHTML = noServicesHtml;
+            } else {
+                noServicesSection.style.display = 'none';
+            }
+            
+            // Handle case where no clients with services match filters
+            if (aggregatedData.length === 0) {
+                document.getElementById('expectedStats').style.display = 'none';
+                if (noServiceClients.length > 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                            </svg>
+                            <h3>No clients with services</h3>
+                            <p>No clients with services match the current filters. See "No Services" section below for clients expecting reports.</p>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                            </svg>
+                            <h3>No matching clients</h3>
+                            <p>No clients match the selected filters. Try adjusting your filter criteria.</p>
+                        </div>
+                    `;
+                }
                 return;
             }
             
@@ -5611,30 +5773,40 @@
         }
         
         function exportExpectedReport() {
-            if (expectedReportData.length === 0) {
+            const aggregatedData = getFilteredExpectedData();
+            const noServiceClients = getClientsWithNoServices();
+            
+            if (aggregatedData.length === 0 && noServiceClients.length === 0) {
                 showToast('No data to export. Please load a report first.', 'error');
                 return;
             }
             
-            const aggregatedData = getFilteredExpectedData();
-            
-            if (aggregatedData.length === 0) {
-                showToast('No data matches current filters.', 'error');
-                return;
-            }
-            
             // Create CSV content with new columns
-            let csv = 'Customer Name,Insurance,Report Frequency,Assignment of Benefits,Avg $/Hr,Total Hours,Service Count,Total $\n';
+            let csv = 'Customer Name,Insurance,Report Frequency,Assignment of Benefits,Avg $/Hr,Total Hours,Service Count,Total $,Status\n';
+            
+            // Add clients with services
             aggregatedData.forEach(client => {
                 const assignmentText = client.assignment ? 'Yes' : 'No';
-                csv += `"${client.customerName}","${client.insurance}","${client.subscription}","${assignmentText}",${client.avgRate.toFixed(2)},${client.totalHours.toFixed(2)},${client.serviceCount},${client.totalCost.toFixed(2)}\n`;
+                csv += `"${client.customerName}","${client.insurance}","${client.subscription}","${assignmentText}",${client.avgRate.toFixed(2)},${client.totalHours.toFixed(2)},${client.serviceCount},${client.totalCost.toFixed(2)},"Has Services"\n`;
             });
             
-            // Add totals row
-            const totalHours = aggregatedData.reduce((sum, c) => sum + c.totalHours, 0);
-            const totalCost = aggregatedData.reduce((sum, c) => sum + c.totalCost, 0);
-            const totalServices = aggregatedData.reduce((sum, c) => sum + c.serviceCount, 0);
-            csv += `\n"TOTAL","","","",${(totalCost/totalHours || 0).toFixed(2)},${totalHours.toFixed(2)},${totalServices},${totalCost.toFixed(2)}\n`;
+            // Add clients without services
+            noServiceClients.forEach(client => {
+                const assignmentText = client.assignment ? 'Yes' : 'No';
+                csv += `"${client.customerName}","${client.insurance}","${client.subscription}","${assignmentText}",0,0,0,0,"No Services"\n`;
+            });
+            
+            // Add totals row (only for clients with services)
+            if (aggregatedData.length > 0) {
+                const totalHours = aggregatedData.reduce((sum, c) => sum + c.totalHours, 0);
+                const totalCost = aggregatedData.reduce((sum, c) => sum + c.totalCost, 0);
+                const totalServices = aggregatedData.reduce((sum, c) => sum + c.serviceCount, 0);
+                csv += `\n"TOTAL (With Services)","","","",${(totalCost/totalHours || 0).toFixed(2)},${totalHours.toFixed(2)},${totalServices},${totalCost.toFixed(2)},""\n`;
+            }
+            
+            csv += `\n"SUMMARY","","","","","","","",""\n`;
+            csv += `"Clients with Services","","","","","","","",${aggregatedData.length}\n`;
+            csv += `"Clients without Services","","","","","","","",${noServiceClients.length}\n`;
             
             // Download
             const blob = new Blob([csv], { type: 'text/csv' });
