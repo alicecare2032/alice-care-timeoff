@@ -119,180 +119,6 @@
             height: 18px;
         }
         
-        /* Sortable Table Headers */
-        .sortable-header {
-            cursor: pointer;
-            user-select: none;
-            white-space: nowrap;
-            transition: background 0.2s;
-        }
-        
-        .sortable-header:hover {
-            background: rgba(245, 118, 0, 0.1);
-        }
-        
-        .sortable-header .sort-icon {
-            display: inline-block;
-            margin-left: 5px;
-            opacity: 0.4;
-            font-size: 10px;
-            transition: opacity 0.2s;
-        }
-        
-        .sortable-header:hover .sort-icon {
-            opacity: 0.7;
-        }
-        
-        .sortable-header.sort-asc .sort-icon,
-        .sortable-header.sort-desc .sort-icon {
-            opacity: 1;
-            color: #F57600;
-        }
-        
-        .sortable-header.sort-asc .sort-icon::after {
-            content: '▲';
-        }
-        
-        .sortable-header.sort-desc .sort-icon::after {
-            content: '▼';
-        }
-        
-        .sortable-header:not(.sort-asc):not(.sort-desc) .sort-icon::after {
-            content: '⇅';
-        }
-        
-        /* Expected Reports Styles */
-        .expected-reports-section {
-            margin-top: 20px;
-        }
-        
-        .period-selector {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            align-items: flex-end;
-        }
-        
-        .period-type-buttons {
-            display: flex;
-            gap: 5px;
-        }
-        
-        .period-type-btn {
-            padding: 10px 20px;
-            border: 2px solid #E5ECF3;
-            background: white;
-            border-radius: 8px;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-            font-size: 13px;
-            color: #1A365C;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .period-type-btn:hover {
-            border-color: #F57600;
-        }
-        
-        .period-type-btn.active {
-            background: #F57600;
-            border-color: #F57600;
-            color: white;
-        }
-        
-        .period-inputs {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .expandable-row {
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        
-        .expandable-row:hover {
-            background: rgba(245, 118, 0, 0.05);
-        }
-        
-        .expand-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 24px;
-            height: 24px;
-            border: 2px solid #E5ECF3;
-            border-radius: 50%;
-            background: white;
-            color: #1A365C;
-            font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-right: 8px;
-        }
-        
-        .expand-btn:hover {
-            border-color: #F57600;
-            color: #F57600;
-        }
-        
-        .expand-btn.expanded {
-            background: #F57600;
-            border-color: #F57600;
-            color: white;
-            transform: rotate(45deg);
-        }
-        
-        .service-details-row {
-            display: none;
-            background: #F9FAFB;
-        }
-        
-        .service-details-row.expanded {
-            display: table-row;
-        }
-        
-        .service-details-cell {
-            padding: 0 !important;
-        }
-        
-        .service-details-wrapper {
-            padding: 15px 20px;
-            border-left: 3px solid #F57600;
-            margin: 0 15px 15px 15px;
-            background: white;
-            border-radius: 0 8px 8px 0;
-        }
-        
-        .service-details-table {
-            width: 100%;
-            font-size: 12px;
-        }
-        
-        .service-details-table th {
-            background: #E5ECF3;
-            padding: 8px 12px;
-            text-align: left;
-            font-weight: 600;
-            color: #1A365C;
-        }
-        
-        .service-details-table td {
-            padding: 8px 12px;
-            border-bottom: 1px solid #E5ECF3;
-        }
-        
-        .summary-row {
-            font-weight: 600;
-            background: #FFF8F0;
-        }
-        
-        .summary-row td {
-            border-top: 2px solid #F57600;
-        }
-        
         /* Container */
         .container {
             max-width: 1200px;
@@ -1435,16 +1261,6 @@
             </svg>
             Clients
         </button>
-        <button class="tab-btn" data-tab="expected">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                <line x1="16" y1="2" x2="16" y2="6"/>
-                <line x1="8" y1="2" x2="8" y2="6"/>
-                <line x1="3" y1="10" x2="21" y2="10"/>
-                <path d="M9 16l2 2 4-4"/>
-            </svg>
-            Expected Reports
-        </button>
     </nav>
     
     <!-- Main Container -->
@@ -1663,144 +1479,6 @@
                     <div id="automationStatusContent" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
                         <!-- Populated by JS -->
                     </div>
-                </div>
-            </div>
-            
-            <!-- Expected Reports Tab -->
-            <div class="tab-panel" id="expected-panel">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2 class="section-title" style="margin-bottom: 0;">Expected Reports</h2>
-                    <button class="btn btn-green" onclick="exportExpectedReport()">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="7 10 12 15 17 10"/>
-                            <line x1="12" y1="15" x2="12" y2="3"/>
-                        </svg>
-                        Export CSV
-                    </button>
-                </div>
-                
-                <div class="notice-box" style="background: #E3F2FD; border-color: #2196F3;">
-                    <h3>📊 Report Preview</h3>
-                    <p>Select a period to view expected billing reports. Click <strong>+</strong> on any client to expand and view individual service details.</p>
-                </div>
-                
-                <div class="expected-reports-section">
-                    <div class="period-selector">
-                        <div class="filter-group">
-                            <label>Period Type</label>
-                            <div class="period-type-buttons">
-                                <button class="period-type-btn active" data-period="week" onclick="selectPeriodType('week')">Week</button>
-                                <button class="period-type-btn" data-period="month" onclick="selectPeriodType('month')">Month</button>
-                                <button class="period-type-btn" data-period="year" onclick="selectPeriodType('year')">Year</button>
-                            </div>
-                        </div>
-                        
-                        <div class="filter-group" id="weekSelector">
-                            <label>Week Number <a href="week_number_reference.html" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; background: #F57600; color: white; text-decoration: none; border-radius: 50%; font-weight: bold; font-size: 12px;" title="Find Week Number">?</a></label>
-                            <input type="number" id="expectedWeek" placeholder="Week #" min="1" max="53" style="width: 100px;">
-                        </div>
-                        
-                        <div class="filter-group" id="monthSelector" style="display: none;">
-                            <label>Month</label>
-                            <select id="expectedMonth">
-                                <option value="1">January</option>
-                                <option value="2">February</option>
-                                <option value="3">March</option>
-                                <option value="4">April</option>
-                                <option value="5">May</option>
-                                <option value="6">June</option>
-                                <option value="7">July</option>
-                                <option value="8">August</option>
-                                <option value="9">September</option>
-                                <option value="10">October</option>
-                                <option value="11">November</option>
-                                <option value="12">December</option>
-                            </select>
-                        </div>
-                        
-                        <div class="filter-group">
-                            <label>Year</label>
-                            <select id="expectedYear">
-                                <option value="2024">2024</option>
-                                <option value="2025" selected>2025</option>
-                                <option value="2026">2026</option>
-                            </select>
-                        </div>
-                        
-                        <div class="filter-buttons">
-                            <button class="btn btn-primary" onclick="loadExpectedReports()">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
-                                    <circle cx="11" cy="11" r="8"/>
-                                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                                </svg>
-                                Load Report
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Additional Filters Row -->
-                    <div class="filters" style="margin-top: -10px; padding-top: 15px; border-top: 1px solid #E5ECF3;">
-                        <div class="filter-group">
-                            <label>Insurance</label>
-                            <select id="expectedInsurance" onchange="applyExpectedFilters()">
-                                <option value="">All Insurance</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label>Report Frequency</label>
-                            <select id="expectedFrequency" onchange="applyExpectedFilters()">
-                                <option value="">All Frequencies</option>
-                                <option value="weekly">Weekly</option>
-                                <option value="monthly">Monthly</option>
-                                <option value="yearly">Yearly</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label>Assignment of Benefits</label>
-                            <select id="expectedAssignment" onchange="applyExpectedFilters()">
-                                <option value="">All</option>
-                                <option value="1">Yes (Assignment Benefits)</option>
-                                <option value="0">No (CC Pay)</option>
-                            </select>
-                        </div>
-                        <div class="filter-buttons">
-                            <button class="btn btn-secondary" onclick="clearExpectedFilters()">Clear Filters</button>
-                        </div>
-                    </div>
-                    
-                    <div class="stats-row" id="expectedStats" style="display: none;">
-                        <div class="stat-card">
-                            <h3>Total Clients</h3>
-                            <div class="number" id="expectedClientCount">--</div>
-                            <div class="subtitle">With services</div>
-                        </div>
-                        <div class="stat-card" style="border-left-color: #2196F3;">
-                            <h3>Total Services</h3>
-                            <div class="number" id="expectedServiceCount">--</div>
-                            <div class="subtitle">In period</div>
-                        </div>
-                        <div class="stat-card" style="border-left-color: #62B790;">
-                            <h3>Total Revenue</h3>
-                            <div class="number" id="expectedTotalRevenue">--</div>
-                            <div class="subtitle">Expected billing</div>
-                        </div>
-                    </div>
-                    
-                    <div id="expectedTableContainer">
-                        <div class="empty-state">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                                <line x1="16" y1="2" x2="16" y2="6"/>
-                                <line x1="8" y1="2" x2="8" y2="6"/>
-                                <line x1="3" y1="10" x2="21" y2="10"/>
-                            </svg>
-                            <h3>Select a Period</h3>
-                            <p>Choose a week, month, or year and click "Load Report" to view expected billing</p>
-                        </div>
-                    </div>
-                    
-                    <div class="pagination" id="expectedPagination"></div>
                 </div>
             </div>
         </div>
@@ -2659,18 +2337,6 @@
         let currentPage = 1;
         let selectedClient = null;
         
-        // Sorting state
-        let reportSortColumn = null;
-        let reportSortDirection = 'asc';
-        let clientSortColumn = null;
-        let clientSortDirection = 'asc';
-        
-        // Expected reports state
-        let expectedReportData = [];
-        let expectedCurrentPage = 1;
-        let expectedPeriodType = 'week';
-        let expandedClients = new Set();
-        
         
         // ============================================
         // JSONP FETCH (No-CORS compatible)
@@ -2728,81 +2394,7 @@
                 showReportFilterPrompt();  // Show filter prompt instead of loading all data
             } else if (tab === 'client' && clientData.length === 0) {
                 loadClientData();
-            } else if (tab === 'expected') {
-                // Set default week/month to current
-                initializeExpectedReportPeriod();
-                // Load client data if needed for insurance filter
-                if (clientData.length === 0) {
-                    loadClientDataForExpected();
-                } else {
-                    populateExpectedInsuranceFilter();
-                }
             }
-        }
-        
-        async function loadClientDataForExpected() {
-            try {
-                const result = await jsonpFetch({ action: 'getClientList' });
-                if (result.success) {
-                    clientData = result.data;
-                    if (result.config) appConfig = result.config;
-                    populateExpectedInsuranceFilter();
-                }
-            } catch (error) {
-                console.error('Failed to load client data for filters:', error);
-            }
-        }
-        
-        // ============================================
-        // SORTING FUNCTIONS
-        // ============================================
-        
-        function sortData(data, column, direction, columnMappings) {
-            return [...data].sort((a, b) => {
-                let aVal = a[columnMappings[column]] || '';
-                let bVal = b[columnMappings[column]] || '';
-                
-                // Handle numeric columns
-                if (column === 'duration' || column === 'rate' || column === 'total' || column === 'costToCustomer') {
-                    aVal = parseFloat(aVal) || 0;
-                    bVal = parseFloat(bVal) || 0;
-                } else if (column === 'date') {
-                    aVal = new Date(aVal) || new Date(0);
-                    bVal = new Date(bVal) || new Date(0);
-                } else {
-                    aVal = String(aVal).toLowerCase();
-                    bVal = String(bVal).toLowerCase();
-                }
-                
-                if (aVal < bVal) return direction === 'asc' ? -1 : 1;
-                if (aVal > bVal) return direction === 'asc' ? 1 : -1;
-                return 0;
-            });
-        }
-        
-        function handleReportSort(column) {
-            if (reportSortColumn === column) {
-                reportSortDirection = reportSortDirection === 'asc' ? 'desc' : 'asc';
-            } else {
-                reportSortColumn = column;
-                reportSortDirection = 'asc';
-            }
-            renderReportTable();
-        }
-        
-        function handleClientSort(column) {
-            if (clientSortColumn === column) {
-                clientSortDirection = clientSortDirection === 'asc' ? 'desc' : 'asc';
-            } else {
-                clientSortColumn = column;
-                clientSortDirection = 'asc';
-            }
-            renderClientTable();
-        }
-        
-        function getSortHeaderClass(currentColumn, sortColumn, sortDirection) {
-            if (currentColumn !== sortColumn) return 'sortable-header';
-            return `sortable-header sort-${sortDirection}`;
         }
         
         // ============================================
@@ -2875,45 +2467,23 @@
                 return;
             }
             
-            // Apply sorting if set
-            const reportColumnMappings = {
-                'customerName': 'Customer Name',
-                'date': 'Scheduled Date',
-                'startTime': 'STxTime',
-                'endTime': 'ETxTime',
-                'provider': 'Provider Name',
-                'duration': 'Service Duration',
-                'rate': '_rate',
-                'total': 'Cost To Customer'
-            };
-            
-            let sortedData = [...reportData];
-            if (reportSortColumn) {
-                // Add calculated rate for sorting
-                sortedData = sortedData.map(row => ({
-                    ...row,
-                    '_rate': ((parseFloat(row['Cost To Customer']) || 0) / ((parseFloat(row['Service Duration']) || 1) / 60))
-                }));
-                sortedData = sortData(sortedData, reportSortColumn, reportSortDirection, reportColumnMappings);
-            }
-            
-            const totalPages = Math.ceil(sortedData.length / ROWS_PER_PAGE);
+            const totalPages = Math.ceil(reportData.length / ROWS_PER_PAGE);
             const start = (currentPage - 1) * ROWS_PER_PAGE;
-            const pageData = sortedData.slice(start, start + ROWS_PER_PAGE);
+            const pageData = reportData.slice(start, start + ROWS_PER_PAGE);
             
             let html = `
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th class="${getSortHeaderClass('customerName', reportSortColumn, reportSortDirection)}" onclick="handleReportSort('customerName')">Customer Name <span class="sort-icon"></span></th>
-                                <th class="${getSortHeaderClass('date', reportSortColumn, reportSortDirection)}" onclick="handleReportSort('date')">Date <span class="sort-icon"></span></th>
-                                <th class="${getSortHeaderClass('startTime', reportSortColumn, reportSortDirection)}" onclick="handleReportSort('startTime')">Start Time <span class="sort-icon"></span></th>
-                                <th class="${getSortHeaderClass('endTime', reportSortColumn, reportSortDirection)}" onclick="handleReportSort('endTime')">End Time <span class="sort-icon"></span></th>
-                                <th class="${getSortHeaderClass('provider', reportSortColumn, reportSortDirection)}" onclick="handleReportSort('provider')">Provider <span class="sort-icon"></span></th>
-                                <th class="${getSortHeaderClass('duration', reportSortColumn, reportSortDirection)}" onclick="handleReportSort('duration')">Duration HRS <span class="sort-icon"></span></th>
-                                <th class="${getSortHeaderClass('rate', reportSortColumn, reportSortDirection)}" onclick="handleReportSort('rate')">$/Hr <span class="sort-icon"></span></th>
-                                <th class="${getSortHeaderClass('total', reportSortColumn, reportSortDirection)}" onclick="handleReportSort('total')">Total $ <span class="sort-icon"></span></th>
+                                <th>Customer Name</th>
+                                <th>Date</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Provider</th>
+                                <th>Duration HRS</th>
+                                <th>$/Hr</th>
+                                <th>Total $</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -3188,7 +2758,7 @@
         
         function renderClientTable() {
             const container = document.getElementById('clientTableContainer');
-            let filteredData = getFilteredClientData();
+            const filteredData = getFilteredClientData();
             
             if (filteredData.length === 0) {
                 container.innerHTML = `
@@ -3204,20 +2774,6 @@
                 return;
             }
             
-            // Apply sorting if set
-            const clientColumnMappings = {
-                'customerName': 'Customer Name',
-                'email': 'email',
-                'phone': 'Phone',
-                'insurance': 'Insurance_Name',
-                'assignment': 'Assigment_Y1_N0',
-                'subscription': 'Subscription'
-            };
-            
-            if (clientSortColumn) {
-                filteredData = sortData(filteredData, clientSortColumn, clientSortDirection, clientColumnMappings);
-            }
-            
             const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
             const start = (clientCurrentPage - 1) * PAGE_SIZE;
             const pageData = filteredData.slice(start, start + PAGE_SIZE);
@@ -3227,12 +2783,12 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th class="${getSortHeaderClass('customerName', clientSortColumn, clientSortDirection)}" onclick="handleClientSort('customerName')">Customer Name <span class="sort-icon"></span></th>
-                                <th class="${getSortHeaderClass('email', clientSortColumn, clientSortDirection)}" onclick="handleClientSort('email')">Email <span class="sort-icon"></span></th>
-                                <th class="${getSortHeaderClass('phone', clientSortColumn, clientSortDirection)}" onclick="handleClientSort('phone')">Phone <span class="sort-icon"></span></th>
-                                <th class="${getSortHeaderClass('insurance', clientSortColumn, clientSortDirection)}" onclick="handleClientSort('insurance')">Insurance <span class="sort-icon"></span></th>
-                                <th class="${getSortHeaderClass('assignment', clientSortColumn, clientSortDirection)}" onclick="handleClientSort('assignment')">Assignment <span class="sort-icon"></span></th>
-                                <th class="${getSortHeaderClass('subscription', clientSortColumn, clientSortDirection)}" onclick="handleClientSort('subscription')">Subscription <span class="sort-icon"></span></th>
+                                <th>Customer Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Insurance</th>
+                                <th>Assignment</th>
+                                <th>Subscription</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -3280,7 +2836,7 @@
             
             html += `
                         </tbody>
-                    </table>>
+                    </table>
                 </div>
             `;
             
@@ -5216,443 +4772,6 @@
             
             btn.disabled = false;
             btn.textContent = 'Import Anyway';
-        }
-        
-        // ============================================
-        // EXPECTED REPORTS FUNCTIONS
-        // ============================================
-        
-        function initializeExpectedReportPeriod() {
-            const today = new Date();
-            const currentYear = today.getFullYear();
-            const currentMonth = today.getMonth() + 1;
-            
-            // Calculate current week number
-            const startOfYear = new Date(today.getFullYear(), 0, 1);
-            const days = Math.floor((today - startOfYear) / (24 * 60 * 60 * 1000));
-            const currentWeek = Math.ceil((days + startOfYear.getDay() + 1) / 7);
-            
-            // Set default values
-            document.getElementById('expectedWeek').value = currentWeek;
-            document.getElementById('expectedMonth').value = currentMonth;
-            document.getElementById('expectedYear').value = currentYear;
-            
-            // Populate insurance dropdown if client data is loaded
-            populateExpectedInsuranceFilter();
-        }
-        
-        function populateExpectedInsuranceFilter() {
-            const select = document.getElementById('expectedInsurance');
-            if (!select) return;
-            
-            // Save current selection
-            const currentValue = select.value;
-            
-            // Get unique insurance names from client data
-            const insuranceNames = [...new Set(clientData.map(c => c['Insurance_Name']).filter(Boolean))];
-            
-            select.innerHTML = '<option value="">All Insurance</option>';
-            insuranceNames.sort().forEach(name => {
-                select.innerHTML += `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`;
-            });
-            
-            // Restore selection if it still exists
-            if (currentValue && insuranceNames.includes(currentValue)) {
-                select.value = currentValue;
-            }
-        }
-        
-        function selectPeriodType(type) {
-            expectedPeriodType = type;
-            
-            // Update button states
-            document.querySelectorAll('.period-type-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.period === type);
-            });
-            
-            // Show/hide relevant selectors
-            document.getElementById('weekSelector').style.display = type === 'week' ? 'block' : 'none';
-            document.getElementById('monthSelector').style.display = type === 'month' ? 'block' : 'none';
-        }
-        
-        async function loadExpectedReports() {
-            const container = document.getElementById('expectedTableContainer');
-            container.innerHTML = `
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>Loading expected reports...</p>
-                </div>
-            `;
-            
-            // Hide stats while loading
-            document.getElementById('expectedStats').style.display = 'none';
-            
-            try {
-                // Load client data if not already loaded (needed for filtering)
-                if (clientData.length === 0) {
-                    const clientResult = await jsonpFetch({ action: 'getClientList' });
-                    if (clientResult.success) {
-                        clientData = clientResult.data;
-                        populateExpectedInsuranceFilter();
-                    }
-                }
-                
-                const filters = {
-                    action: 'getServiceReport',
-                    year: document.getElementById('expectedYear').value
-                };
-                
-                if (expectedPeriodType === 'week') {
-                    filters.week = document.getElementById('expectedWeek').value;
-                } else if (expectedPeriodType === 'month') {
-                    filters.month = document.getElementById('expectedMonth').value;
-                }
-                // For 'year', we only need the year filter which is already set
-                
-                const result = await jsonpFetch(filters);
-                
-                if (result.success) {
-                    expectedReportData = result.data || [];
-                    expandedClients.clear();
-                    expectedCurrentPage = 1;
-                    renderExpectedReportsTable();
-                } else {
-                    throw new Error(result.error || 'Failed to load data');
-                }
-            } catch (error) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <line x1="12" y1="8" x2="12" y2="12"/>
-                            <line x1="12" y1="16" x2="12.01" y2="16"/>
-                        </svg>
-                        <h3>Failed to load expected reports</h3>
-                        <p>${error.message}</p>
-                        <button class="btn btn-secondary" style="margin-top: 15px;" onclick="loadExpectedReports()">Try Again</button>
-                    </div>
-                `;
-            }
-        }
-        
-        function getClientInfo(customerName) {
-            // Find client in clientData by Customer Name
-            const client = clientData.find(c => 
-                (c['Customer Name'] || '').toLowerCase().trim() === customerName.toLowerCase().trim()
-            );
-            
-            if (client) {
-                return {
-                    insurance: client['Insurance_Name'] || '--',
-                    subscription: client['Subscription'] || 'None',
-                    assignment: String(client['Assigment_Y1_N0']) === '1'
-                };
-            }
-            
-            return {
-                insurance: '--',
-                subscription: 'None',
-                assignment: false
-            };
-        }
-        
-        function applyExpectedFilters() {
-            expectedCurrentPage = 1;
-            renderExpectedReportsTable();
-        }
-        
-        function clearExpectedFilters() {
-            document.getElementById('expectedInsurance').value = '';
-            document.getElementById('expectedFrequency').value = '';
-            document.getElementById('expectedAssignment').value = '';
-            expectedCurrentPage = 1;
-            renderExpectedReportsTable();
-        }
-        
-        function aggregateExpectedReports(data) {
-            const clientMap = new Map();
-            
-            data.forEach(row => {
-                const customerName = row['Customer Name'] || 'Unknown';
-                const duration = parseFloat(row['Service Duration']) || 0;
-                const durationHrs = duration / 60;
-                const cost = parseFloat(row['Cost To Customer']) || 0;
-                
-                if (!clientMap.has(customerName)) {
-                    const clientInfo = getClientInfo(customerName);
-                    clientMap.set(customerName, {
-                        customerName: customerName,
-                        insurance: clientInfo.insurance,
-                        subscription: clientInfo.subscription,
-                        assignment: clientInfo.assignment,
-                        services: [],
-                        totalHours: 0,
-                        totalCost: 0,
-                        serviceCount: 0
-                    });
-                }
-                
-                const client = clientMap.get(customerName);
-                client.services.push({
-                    date: row['Scheduled Date'],
-                    startTime: row['STxTime'],
-                    endTime: row['ETxTime'],
-                    provider: row['Provider Name'] || 'Unassigned',
-                    duration: durationHrs,
-                    cost: cost
-                });
-                client.totalHours += durationHrs;
-                client.totalCost += cost;
-                client.serviceCount++;
-            });
-            
-            // Calculate average rate for each client
-            const aggregated = Array.from(clientMap.values()).map(client => ({
-                ...client,
-                avgRate: client.totalHours > 0 ? (client.totalCost / client.totalHours) : 0
-            }));
-            
-            // Sort by total cost descending by default
-            return aggregated.sort((a, b) => b.totalCost - a.totalCost);
-        }
-        
-        function getFilteredExpectedData() {
-            let aggregated = aggregateExpectedReports(expectedReportData);
-            
-            // Apply filters
-            const insuranceFilter = document.getElementById('expectedInsurance')?.value || '';
-            const frequencyFilter = document.getElementById('expectedFrequency')?.value || '';
-            const assignmentFilter = document.getElementById('expectedAssignment')?.value || '';
-            
-            if (insuranceFilter) {
-                aggregated = aggregated.filter(c => c.insurance === insuranceFilter);
-            }
-            
-            if (frequencyFilter) {
-                aggregated = aggregated.filter(c => {
-                    const sub = (c.subscription || '').toLowerCase();
-                    return sub.includes(frequencyFilter.toLowerCase());
-                });
-            }
-            
-            if (assignmentFilter !== '') {
-                const isAssigned = assignmentFilter === '1';
-                aggregated = aggregated.filter(c => c.assignment === isAssigned);
-            }
-            
-            return aggregated;
-        }
-        
-        function renderExpectedReportsTable() {
-            const container = document.getElementById('expectedTableContainer');
-            
-            if (expectedReportData.length === 0) {
-                document.getElementById('expectedStats').style.display = 'none';
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                            <line x1="16" y1="2" x2="16" y2="6"/>
-                            <line x1="8" y1="2" x2="8" y2="6"/>
-                            <line x1="3" y1="10" x2="21" y2="10"/>
-                        </svg>
-                        <h3>No services found</h3>
-                        <p>No service records found for the selected period</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            const aggregatedData = getFilteredExpectedData();
-            
-            if (aggregatedData.length === 0) {
-                document.getElementById('expectedStats').style.display = 'none';
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
-                        </svg>
-                        <h3>No matching clients</h3>
-                        <p>No clients match the selected filters. Try adjusting your filter criteria.</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Update stats
-            document.getElementById('expectedStats').style.display = 'flex';
-            document.getElementById('expectedClientCount').textContent = aggregatedData.length;
-            const totalServicesFiltered = aggregatedData.reduce((sum, c) => sum + c.serviceCount, 0);
-            document.getElementById('expectedServiceCount').textContent = totalServicesFiltered;
-            const totalRevenue = aggregatedData.reduce((sum, c) => sum + c.totalCost, 0);
-            document.getElementById('expectedTotalRevenue').textContent = '$' + totalRevenue.toFixed(2);
-            
-            // Pagination
-            const totalPages = Math.ceil(aggregatedData.length / PAGE_SIZE);
-            const start = (expectedCurrentPage - 1) * PAGE_SIZE;
-            const pageData = aggregatedData.slice(start, start + PAGE_SIZE);
-            
-            let html = `
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 40px;"></th>
-                                <th>Customer Name</th>
-                                <th>Insurance</th>
-                                <th>Frequency</th>
-                                <th>Assignment</th>
-                                <th>$/Hr (Avg)</th>
-                                <th>Total Hours</th>
-                                <th>Services</th>
-                                <th>Total $</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-            
-            pageData.forEach((client, index) => {
-                const clientId = `client_${start + index}`;
-                const isExpanded = expandedClients.has(client.customerName);
-                
-                // Format subscription badges
-                const subscription = (client.subscription || '').toLowerCase();
-                let frequencyBadges = [];
-                if (subscription.includes('weekly')) {
-                    frequencyBadges.push('<span class="badge" style="background: #E3F2FD; color: #2196F3;">W</span>');
-                }
-                if (subscription.includes('monthly')) {
-                    frequencyBadges.push('<span class="badge" style="background: #E0F1E9; color: #62B790;">M</span>');
-                }
-                if (subscription.includes('yearly')) {
-                    frequencyBadges.push('<span class="badge" style="background: #FFF3E0; color: #F57600;">Y</span>');
-                }
-                const frequencyBadge = frequencyBadges.length > 0 
-                    ? frequencyBadges.join(' ') 
-                    : '<span class="badge" style="background: #F5F5F5; color: #999;">None</span>';
-                
-                // Format assignment badge
-                const assignmentBadge = client.assignment 
-                    ? '<span class="badge" style="background: #F3E5F5; color: #9C27B0;">Yes</span>'
-                    : '<span class="badge" style="background: #E3F2FD; color: #2196F3;">No</span>';
-                
-                html += `
-                    <tr class="expandable-row" onclick="toggleClientExpand('${escapeHtml(client.customerName)}')">
-                        <td>
-                            <span class="expand-btn ${isExpanded ? 'expanded' : ''}" id="btn_${clientId}">+</span>
-                        </td>
-                        <td><strong>${escapeHtml(client.customerName)}</strong></td>
-                        <td>${escapeHtml(client.insurance)}</td>
-                        <td>${frequencyBadge}</td>
-                        <td>${assignmentBadge}</td>
-                        <td>$${client.avgRate.toFixed(2)}</td>
-                        <td>${client.totalHours.toFixed(2)}</td>
-                        <td>${client.serviceCount}</td>
-                        <td><strong>$${client.totalCost.toFixed(2)}</strong></td>
-                    </tr>
-                    <tr class="service-details-row ${isExpanded ? 'expanded' : ''}" id="details_${clientId}">
-                        <td colspan="9" class="service-details-cell">
-                            <div class="service-details-wrapper">
-                                <table class="service-details-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Date</th>
-                                            <th>Start Time</th>
-                                            <th>End Time</th>
-                                            <th>Provider</th>
-                                            <th>Hours</th>
-                                            <th>Cost</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${client.services.map(s => `
-                                            <tr>
-                                                <td>${formatDate(s.date)}</td>
-                                                <td>${formatTime(s.startTime)}</td>
-                                                <td>${formatTime(s.endTime)}</td>
-                                                <td>${escapeHtml(s.provider)}</td>
-                                                <td>${s.duration.toFixed(2)}</td>
-                                                <td>$${s.cost.toFixed(2)}</td>
-                                            </tr>
-                                        `).join('')}
-                                        <tr class="summary-row">
-                                            <td colspan="4" style="text-align: right;"><strong>Totals:</strong></td>
-                                            <td><strong>${client.totalHours.toFixed(2)}</strong></td>
-                                            <td><strong>$${client.totalCost.toFixed(2)}</strong></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            html += `
-                        </tbody>
-                    </table>
-                </div>
-            `;
-            
-            container.innerHTML = html;
-            renderPagination('expectedPagination', totalPages, expectedCurrentPage, (page) => {
-                expectedCurrentPage = page;
-                renderExpectedReportsTable();
-            });
-        }
-        
-        function toggleClientExpand(customerName) {
-            if (expandedClients.has(customerName)) {
-                expandedClients.delete(customerName);
-            } else {
-                expandedClients.add(customerName);
-            }
-            renderExpectedReportsTable();
-        }
-        
-        function exportExpectedReport() {
-            if (expectedReportData.length === 0) {
-                showToast('No data to export. Please load a report first.', 'error');
-                return;
-            }
-            
-            const aggregatedData = getFilteredExpectedData();
-            
-            if (aggregatedData.length === 0) {
-                showToast('No data matches current filters.', 'error');
-                return;
-            }
-            
-            // Create CSV content with new columns
-            let csv = 'Customer Name,Insurance,Report Frequency,Assignment of Benefits,Avg $/Hr,Total Hours,Service Count,Total $\n';
-            aggregatedData.forEach(client => {
-                const assignmentText = client.assignment ? 'Yes' : 'No';
-                csv += `"${client.customerName}","${client.insurance}","${client.subscription}","${assignmentText}",${client.avgRate.toFixed(2)},${client.totalHours.toFixed(2)},${client.serviceCount},${client.totalCost.toFixed(2)}\n`;
-            });
-            
-            // Add totals row
-            const totalHours = aggregatedData.reduce((sum, c) => sum + c.totalHours, 0);
-            const totalCost = aggregatedData.reduce((sum, c) => sum + c.totalCost, 0);
-            const totalServices = aggregatedData.reduce((sum, c) => sum + c.serviceCount, 0);
-            csv += `\n"TOTAL","","","",${(totalCost/totalHours || 0).toFixed(2)},${totalHours.toFixed(2)},${totalServices},${totalCost.toFixed(2)}\n`;
-            
-            // Download
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            
-            const periodLabel = expectedPeriodType === 'week' 
-                ? `Week${document.getElementById('expectedWeek').value}`
-                : expectedPeriodType === 'month'
-                ? `Month${document.getElementById('expectedMonth').value}`
-                : 'Year';
-            const year = document.getElementById('expectedYear').value;
-            a.download = `expected_reports_${periodLabel}_${year}.csv`;
-            a.click();
-            window.URL.revokeObjectURL(url);
-            
-            showToast('Expected report exported successfully!', 'success');
         }
         
     </script>
