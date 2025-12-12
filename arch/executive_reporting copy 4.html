@@ -1905,40 +1905,27 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                             </div>
                         </div>
                         
-                        <!-- Row 2.5: New Clients Per Week/Quarter Chart -->
+                        <!-- Row 2.5: New Clients Per Week Chart -->
                         <div style="background: white; border: 1px solid #E5ECF3; border-radius: 12px; padding: 20px; margin-bottom: 30px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                                <div style="display: flex; align-items: center; gap: 15px;">
-                                    <h3 id="newClientsChartTitle" style="color: #1A365C; margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-                                        🆕 New Clients Per Week
-                                        <span class="info-tooltip" style="cursor: help; opacity: 0.7; font-size: 14px;" 
-                                              title="New Client = A client receiving their first-ever service in that period.
+                                <h3 style="color: #1A365C; margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                                    🆕 New Clients Per Week
+                                    <span class="info-tooltip" style="cursor: help; opacity: 0.7; font-size: 14px;" 
+                                          title="New Client = A client receiving their first-ever service in that week.
 
 Left axis (bars): Count of new clients acquired
-Right axis (line): Total hours scheduled for those new clients in their first week/quarter
+Right axis (line): Total hours scheduled for those new clients in their first week
 
-Note: Clients starting later in the period will naturally show fewer initial hours.">ⓘ</span>
-                                    </h3>
-                                    <!-- View Toggle -->
-                                    <div style="display: flex; background: #E5ECF3; border-radius: 6px; padding: 3px;">
-                                        <button id="newClientsViewWeek" onclick="switchNewClientsView('week')" 
-                                                style="padding: 6px 12px; border: none; border-radius: 4px; font-size: 12px; font-weight: 500; cursor: pointer; background: #1A365C; color: white; transition: all 0.2s;">
-                                            Weekly
-                                        </button>
-                                        <button id="newClientsViewQuarter" onclick="switchNewClientsView('quarter')" 
-                                                style="padding: 6px 12px; border: none; border-radius: 4px; font-size: 12px; font-weight: 500; cursor: pointer; background: transparent; color: #666; transition: all 0.2s;">
-                                            Quarterly
-                                        </button>
-                                    </div>
-                                </div>
+Note: Clients starting later in the week will naturally show fewer first-week hours.">ⓘ</span>
+                                </h3>
                                 <div style="display: flex; gap: 20px; align-items: center;">
                                     <div style="text-align: center;">
                                         <div id="newClientsTotal" style="font-size: 22px; font-weight: 700; color: #1A365C;">--</div>
-                                        <div id="newClientsTotalLabel" style="font-size: 10px; color: #666;">Total (12 wks)</div>
+                                        <div style="font-size: 10px; color: #666;">Total (12 wks)</div>
                                     </div>
                                     <div style="text-align: center;">
                                         <div id="newClientsAvgCount" style="font-size: 22px; font-weight: 700; color: #62B790;">--</div>
-                                        <div id="newClientsAvgLabel" style="font-size: 10px; color: #666;">Avg/Week</div>
+                                        <div style="font-size: 10px; color: #666;">Avg/Week</div>
                                     </div>
                                     <div style="text-align: center;">
                                         <div id="newClientsAvgHours" style="font-size: 22px; font-weight: 700; color: #F57600;">--</div>
@@ -5055,51 +5042,33 @@ Note: Clients starting later in the period will naturally show fewer initial hou
         
         async function loadDashboardData(forceRefresh = false) {
             const selectedYear = parseInt(document.getElementById('dashboardYear')?.value || new Date().getFullYear());
-            const lastYear = selectedYear - 1;
             document.getElementById('dashboardYearLabel').textContent = selectedYear;
             
-            // Check if we have cached data for both years (memory)
-            const hasCachedCurrentYear = !forceRefresh && dashboardDataCache[selectedYear] && dashboardDataCache[selectedYear].length > 0;
-            const hasCachedLastYear = !forceRefresh && dashboardDataCache[lastYear] && dashboardDataCache[lastYear].length > 0;
+            // Check if we have cached data for this year (memory)
+            const hasCachedData = !forceRefresh && dashboardDataCache[selectedYear] && dashboardDataCache[selectedYear].length > 0;
             
-            // Show loading if we need to fetch any data
-            const needsLoading = !hasCachedCurrentYear || !hasCachedLastYear || forceRefresh;
-            
-            if (!needsLoading) {
-                console.log(`Using memory cache for ${selectedYear} (${dashboardDataCache[selectedYear].length} records) and ${lastYear} (${dashboardDataCache[lastYear].length} records)`);
+            if (hasCachedData) {
+                console.log(`Using memory cache for ${selectedYear} (${dashboardDataCache[selectedYear].length} records)`);
+                // Don't show loading for cached data - render immediately
             } else {
                 showLoading('Loading Dashboard', forceRefresh ? 'Refreshing data...' : `Loading ${selectedYear} data...`);
             }
             
             try {
-                // Load current year data if not cached or force refresh
-                if (!hasCachedCurrentYear || forceRefresh) {
+                // Use smart loading - tries Google Sheets cache first, then source
+                if (!hasCachedData) {
                     const loadResult = await loadDashboardDataSmart(selectedYear, forceRefresh);
-                    console.log(`${selectedYear} data loaded from: ${loadResult.source}`, loadResult.cacheAgeHours ? `(${loadResult.cacheAgeHours.toFixed(1)}h old)` : '');
+                    console.log(`Data loaded from: ${loadResult.source}`, loadResult.cacheAgeHours ? `(${loadResult.cacheAgeHours.toFixed(1)}h old)` : '');
                     
-                    if (loadResult.source === 'google_sheets_cache' && !forceRefresh) {
+                    if (loadResult.source === 'google_sheets_cache') {
                         showToast(`Using cached data (${loadResult.cacheAgeHours.toFixed(1)} hours old)`, 'info');
                     } else if (loadResult.source === 'fresh' && forceRefresh) {
                         showToast('Data refreshed and cache updated!', 'success');
                     }
                 }
                 
-                // Load last year data for YoY comparison (if not already cached)
-                if (!hasCachedLastYear || forceRefresh) {
-                    try {
-                        updateLoadingText('Loading Dashboard', `Loading ${lastYear} data for comparison...`);
-                        await loadDashboardDataSmart(lastYear, forceRefresh);
-                        console.log(`${lastYear} data loaded for YoY comparison (${dashboardDataCache[lastYear]?.length || 0} records)`);
-                    } catch (e) {
-                        console.warn(`Could not load ${lastYear} data for YoY comparison:`, e.message);
-                        // Continue without last year data - YoY will show 0%
-                    }
-                }
-                
-                // Use cached data - combine both years for YoY calculations
-                const yearData = dashboardDataCache[selectedYear] || [];
-                const lastYearData = dashboardDataCache[lastYear] || [];
-                const combinedData = [...yearData, ...lastYearData];
+                // Use cached data
+                const yearData = dashboardDataCache[selectedYear];
                 
                 if (!yearData || yearData.length === 0) {
                     hideLoading();
@@ -5108,12 +5077,10 @@ Note: Clients starting later in the period will naturally show fewer initial hou
                     return;
                 }
                 
-                console.log(`Calculating metrics with ${yearData.length} records from ${selectedYear} and ${lastYearData.length} records from ${lastYear}`);
-                
                 updateLoadingText('Loading Dashboard', 'Calculating metrics...');
                 
-                // Calculate dashboard metrics with combined data for YoY
-                const metrics = calculateDashboardMetrics(combinedData, selectedYear);
+                // Calculate dashboard metrics
+                const metrics = calculateDashboardMetrics(yearData, selectedYear);
                 console.log('Calculated metrics:', metrics);
                 
                 // Update YTD KPIs
@@ -7708,364 +7675,13 @@ Note: Clients starting later in the period will naturally show fewer initial hou
             });
         }
         
-        // Store data for toggle between views
-        let newClientsAllData = null;
-        let newClientsCurrentView = 'week';
-        
-        /**
-         * Calculate new clients per quarter
-         * Aggregates weekly data into quarters
-         */
-        function calculateNewClientsPerQuarter(allData, quartersToShow = 4) {
-            // Step 1: Find each client's first service date using normalized names
-            const clientFirstService = {};
-            
-            allData.forEach(record => {
-                const clientName = record['Customer Name'] || record['Client Name'] || record['Client_Name'] || '';
-                const scheduledDate = record['Scheduled Date'] || record['Scheduled_Date'] || '';
-                const hours = (parseFloat(record['Service Duration']) || 0) / 60;
-                
-                if (!clientName || clientName === 'Unknown' || !scheduledDate) return;
-                
-                const dateObj = new Date(scheduledDate);
-                if (isNaN(dateObj.getTime())) return;
-                
-                const normalizedClient = normalizeName(clientName);
-                if (!normalizedClient) return;
-                
-                // Calculate quarter and year
-                const year = dateObj.getFullYear();
-                const quarter = Math.ceil((dateObj.getMonth() + 1) / 3);
-                
-                if (!clientFirstService[normalizedClient]) {
-                    clientFirstService[normalizedClient] = {
-                        clientName: clientName,
-                        firstDate: dateObj,
-                        firstQuarter: quarter,
-                        firstYear: year,
-                        firstQuarterHours: hours
-                    };
-                } else {
-                    if (dateObj < clientFirstService[normalizedClient].firstDate) {
-                        clientFirstService[normalizedClient].firstDate = dateObj;
-                        clientFirstService[normalizedClient].firstQuarter = quarter;
-                        clientFirstService[normalizedClient].firstYear = year;
-                        clientFirstService[normalizedClient].firstQuarterHours = hours;
-                    }
-                }
-            });
-            
-            // Step 2: Aggregate all hours for clients in their first quarter
-            Object.keys(clientFirstService).forEach(normalizedClient => {
-                const client = clientFirstService[normalizedClient];
-                let totalFirstQuarterHours = 0;
-                
-                allData.forEach(record => {
-                    const recordClient = normalizeName(record['Customer Name'] || record['Client Name'] || record['Client_Name'] || '');
-                    const scheduledDate = record['Scheduled Date'] || record['Scheduled_Date'] || '';
-                    const hours = (parseFloat(record['Service Duration']) || 0) / 60;
-                    
-                    if (!scheduledDate) return;
-                    const dateObj = new Date(scheduledDate);
-                    if (isNaN(dateObj.getTime())) return;
-                    
-                    const year = dateObj.getFullYear();
-                    const quarter = Math.ceil((dateObj.getMonth() + 1) / 3);
-                    
-                    if (recordClient === normalizedClient &&
-                        quarter === client.firstQuarter &&
-                        year === client.firstYear) {
-                        totalFirstQuarterHours += hours;
-                    }
-                });
-                
-                client.firstQuarterHours = totalFirstQuarterHours;
-            });
-            
-            // Step 3: Build quarter-by-quarter aggregation
-            const quarterlyNewClients = {};
-            
-            Object.values(clientFirstService).forEach(client => {
-                const quarterKey = `${client.firstYear}-Q${client.firstQuarter}`;
-                
-                if (!quarterlyNewClients[quarterKey]) {
-                    quarterlyNewClients[quarterKey] = {
-                        quarter: client.firstQuarter,
-                        year: client.firstYear,
-                        count: 0,
-                        totalHours: 0,
-                        clients: []
-                    };
-                }
-                
-                quarterlyNewClients[quarterKey].count++;
-                quarterlyNewClients[quarterKey].totalHours += client.firstQuarterHours;
-                quarterlyNewClients[quarterKey].clients.push({
-                    name: client.clientName,
-                    hours: Math.round(client.firstQuarterHours * 10) / 10
-                });
-            });
-            
-            // Step 4: Get last N quarters (ending with last completed quarter or current)
-            const today = new Date();
-            const currentQuarter = Math.ceil((today.getMonth() + 1) / 3);
-            const currentYear = today.getFullYear();
-            
-            // Start from current quarter (include partial quarter data)
-            let targetQuarter = currentQuarter;
-            let targetYear = currentYear;
-            
-            const labels = [];
-            const newClientCounts = [];
-            const newClientHours = [];
-            const quarterDetails = [];
-            
-            // Build from oldest to newest
-            for (let i = 0; i < quartersToShow; i++) {
-                let q = targetQuarter - (quartersToShow - 1 - i);
-                let y = targetYear;
-                
-                while (q < 1) {
-                    q += 4;
-                    y--;
-                }
-                
-                const quarterKey = `${y}-Q${q}`;
-                const data = quarterlyNewClients[quarterKey] || { count: 0, totalHours: 0, clients: [] };
-                
-                labels.push(`Q${q} ${y}`);
-                newClientCounts.push(data.count);
-                newClientHours.push(Math.round(data.totalHours * 10) / 10);
-                quarterDetails.push({
-                    quarter: q,
-                    year: y,
-                    quarterKey: quarterKey,
-                    clients: data.clients
-                });
-            }
-            
-            const totalNewClients = newClientCounts.reduce((a, b) => a + b, 0);
-            const totalFirstQuarterHours = newClientHours.reduce((a, b) => a + b, 0);
-            
-            return {
-                labels,
-                newClientCounts,
-                newClientHours,
-                weekDetails: quarterDetails, // Reuse same property name for chart compatibility
-                summary: {
-                    totalNewClients: totalNewClients,
-                    totalFirstWeekHours: Math.round(totalFirstQuarterHours * 10) / 10,
-                    avgNewClientsPerWeek: Math.round((totalNewClients / quartersToShow) * 10) / 10,
-                    avgHoursPerNewClient: totalNewClients > 0 
-                        ? Math.round((totalFirstQuarterHours / totalNewClients) * 10) / 10
-                        : 0
-                },
-                viewType: 'quarter',
-                periodsShown: quartersToShow
-            };
-        }
-        
-        /**
-         * Switch between weekly and quarterly views
-         */
-        function switchNewClientsView(view) {
-            if (!newClientsAllData) return;
-            
-            newClientsCurrentView = view;
-            
-            // Update toggle button styles
-            const weekBtn = document.getElementById('newClientsViewWeek');
-            const quarterBtn = document.getElementById('newClientsViewQuarter');
-            
-            if (view === 'week') {
-                weekBtn.style.background = '#1A365C';
-                weekBtn.style.color = 'white';
-                quarterBtn.style.background = 'transparent';
-                quarterBtn.style.color = '#666';
-            } else {
-                quarterBtn.style.background = '#1A365C';
-                quarterBtn.style.color = 'white';
-                weekBtn.style.background = 'transparent';
-                weekBtn.style.color = '#666';
-            }
-            
-            // Recalculate and render
-            let data;
-            if (view === 'week') {
-                data = calculateNewClientsPerWeek(newClientsAllData, 12);
-                document.getElementById('newClientsChartTitle').innerHTML = `
-                    🆕 New Clients Per Week
-                    <span class="info-tooltip" style="cursor: help; opacity: 0.7; font-size: 14px;" 
-                          title="New Client = A client receiving their first-ever service in that week.
-
-Left axis (bars): Count of new clients acquired
-Right axis (line): Total hours scheduled for those new clients in their first week
-
-Note: Clients starting later in the week will naturally show fewer first-week hours.">ⓘ</span>
-                `;
-                document.getElementById('newClientsTotalLabel').textContent = 'Total (12 wks)';
-                document.getElementById('newClientsAvgLabel').textContent = 'Avg/Week';
-            } else {
-                data = calculateNewClientsPerQuarter(newClientsAllData, 4);
-                document.getElementById('newClientsChartTitle').innerHTML = `
-                    🆕 New Clients Per Quarter
-                    <span class="info-tooltip" style="cursor: help; opacity: 0.7; font-size: 14px;" 
-                          title="New Client = A client receiving their first-ever service in that quarter.
-
-Left axis (bars): Count of new clients acquired
-Right axis (line): Total hours scheduled for those new clients in their first quarter
-
-Shows last 4 quarters including current quarter.">ⓘ</span>
-                `;
-                document.getElementById('newClientsTotalLabel').textContent = 'Total (4 qtrs)';
-                document.getElementById('newClientsAvgLabel').textContent = 'Avg/Quarter';
-            }
-            
-            // Update stats
-            document.getElementById('newClientsTotal').textContent = data.summary.totalNewClients;
-            document.getElementById('newClientsAvgCount').textContent = data.summary.avgNewClientsPerWeek;
-            document.getElementById('newClientsAvgHours').textContent = data.summary.avgHoursPerNewClient + ' hrs';
-            
-            // Re-render chart with updated axis labels
-            renderNewClientsChartWithView(data, view);
-        }
-        
-        /**
-         * Render chart with view-specific labels
-         */
-        function renderNewClientsChartWithView(data, view) {
-            const ctx = document.getElementById('newClientsChart');
-            if (!ctx) return;
-            
-            if (newClientsChartInstance) {
-                newClientsChartInstance.destroy();
-            }
-            
-            const yAxisLabel = view === 'week' ? 'New Clients' : 'New Clients';
-            const y1AxisLabel = view === 'week' ? 'First Week Hours' : 'First Quarter Hours';
-            const periodLabel = view === 'week' ? 'week' : 'quarter';
-            
-            newClientsChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: data.labels,
-                    datasets: [
-                        {
-                            label: 'New Clients',
-                            data: data.newClientCounts,
-                            backgroundColor: 'rgba(26, 54, 92, 0.8)',
-                            borderColor: '#1A365C',
-                            borderWidth: 1,
-                            yAxisID: 'y',
-                            order: 2
-                        },
-                        {
-                            label: y1AxisLabel,
-                            data: data.newClientHours,
-                            type: 'line',
-                            borderColor: '#F57600',
-                            backgroundColor: 'rgba(245, 118, 0, 0.1)',
-                            borderWidth: 3,
-                            pointBackgroundColor: '#F57600',
-                            pointRadius: 4,
-                            pointHoverRadius: 6,
-                            fill: true,
-                            tension: 0.3,
-                            yAxisID: 'y1',
-                            order: 1
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                usePointStyle: true,
-                                padding: 15,
-                                font: { size: 11 }
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                afterBody: function(context) {
-                                    const idx = context[0].dataIndex;
-                                    const detail = data.weekDetails[idx];
-                                    if (detail && detail.clients.length > 0) {
-                                        let lines = ['', `New clients this ${periodLabel}:`];
-                                        detail.clients.slice(0, 5).forEach(c => {
-                                            lines.push(`  • ${c.name}: ${c.hours} hrs`);
-                                        });
-                                        if (detail.clients.length > 5) {
-                                            lines.push(`  ... and ${detail.clients.length - 5} more`);
-                                        }
-                                        return lines;
-                                    }
-                                    return '';
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            grid: { display: false },
-                            ticks: { color: '#666', font: { size: 11 } }
-                        },
-                        y: {
-                            type: 'linear',
-                            display: true,
-                            position: 'left',
-                            title: {
-                                display: true,
-                                text: yAxisLabel,
-                                color: '#1A365C',
-                                font: { weight: '500', size: 11 }
-                            },
-                            beginAtZero: true,
-                            ticks: { stepSize: 1, color: '#1A365C', font: { size: 10 } },
-                            grid: { color: 'rgba(0,0,0,0.05)' }
-                        },
-                        y1: {
-                            type: 'linear',
-                            display: true,
-                            position: 'right',
-                            title: {
-                                display: true,
-                                text: y1AxisLabel,
-                                color: '#F57600',
-                                font: { weight: '500', size: 11 }
-                            },
-                            beginAtZero: true,
-                            ticks: { color: '#F57600', font: { size: 10 } },
-                            grid: { drawOnChartArea: false }
-                        }
-                    }
-                }
-            });
-        }
-        
         /**
          * Load and render the new clients chart
          * Called from calculateClientInsights
          */
         function loadNewClientsChart(allData) {
             try {
-                // Store data for toggle functionality
-                newClientsAllData = allData;
-                
-                // Calculate based on current view
-                let newClientsData;
-                if (newClientsCurrentView === 'quarter') {
-                    newClientsData = calculateNewClientsPerQuarter(allData, 4);
-                } else {
-                    newClientsData = calculateNewClientsPerWeek(allData, 12);
-                }
+                const newClientsData = calculateNewClientsPerWeek(allData, 12);
                 
                 // Update summary stats
                 const totalEl = document.getElementById('newClientsTotal');
@@ -8076,8 +7692,8 @@ Shows last 4 quarters including current quarter.">ⓘ</span>
                 if (avgCountEl) avgCountEl.textContent = newClientsData.summary.avgNewClientsPerWeek;
                 if (avgHoursEl) avgHoursEl.textContent = newClientsData.summary.avgHoursPerNewClient + ' hrs';
                 
-                // Render chart with current view
-                renderNewClientsChartWithView(newClientsData, newClientsCurrentView);
+                // Render chart
+                renderNewClientsChart(newClientsData);
                 
                 console.log('New Clients Chart loaded:', newClientsData.summary);
             } catch (e) {
