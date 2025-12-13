@@ -1905,19 +1905,21 @@ Also known as Customer Lifespan. Based on real cohort retention data from histor
                             </div>
                         </div>
                         
-                        <!-- Row 2.5: New Clients Per Week/Quarter Chart -->
+                        <!-- Row 2.5: Client Acquisition & Drop-off Chart -->
                         <div style="background: white; border: 1px solid #E5ECF3; border-radius: 12px; padding: 20px; margin-bottom: 30px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
                                 <div style="display: flex; align-items: center; gap: 15px;">
                                     <h3 id="newClientsChartTitle" style="color: #1A365C; margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-                                        🆕 New Clients Per Week
+                                        📊 Client Acquisition & Drop-off
                                         <span class="info-tooltip" style="cursor: help; opacity: 0.7; font-size: 14px;" 
-                                              title="New Client = A client receiving their first-ever service in that period.
+                                              title="New Client = First-ever service in that period
+Drop-off Client = Last service was in that period and never returned
 
-Left axis (bars): Count of new clients acquired
-Right axis (line): Total hours scheduled for those new clients in their first week/quarter
+Navy bars: New clients acquired
+Red bars: Clients who dropped off
+Orange line: Hours scheduled for new clients in their first week/quarter
 
-Note: Clients starting later in the period will naturally show fewer initial hours.">ⓘ</span>
+Note: Drop-off is only confirmed retrospectively - clients may return.">ⓘ</span>
                                     </h3>
                                     <!-- View Toggle -->
                                     <div style="display: flex; background: #E5ECF3; border-radius: 6px; padding: 3px;">
@@ -1931,23 +1933,34 @@ Note: Clients starting later in the period will naturally show fewer initial hou
                                         </button>
                                     </div>
                                 </div>
-                                <div style="display: flex; gap: 20px; align-items: center;">
-                                    <div style="text-align: center;">
-                                        <div id="newClientsTotal" style="font-size: 22px; font-weight: 700; color: #1A365C;">--</div>
-                                        <div id="newClientsTotalLabel" style="font-size: 10px; color: #666;">Total (12 wks)</div>
+                                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                                    <!-- New Clients Stats -->
+                                    <div style="text-align: center; padding: 8px 12px; background: #F0F7FF; border-radius: 8px; border: 2px solid #1A365C;">
+                                        <div id="newClientsTotal" style="font-size: 20px; font-weight: 700; color: #1A365C;">--</div>
+                                        <div id="newClientsTotalLabel" style="font-size: 9px; color: #666;">New (12 wks)</div>
                                     </div>
-                                    <div style="text-align: center;">
-                                        <div id="newClientsAvgCount" style="font-size: 22px; font-weight: 700; color: #62B790;">--</div>
-                                        <div id="newClientsAvgLabel" style="font-size: 10px; color: #666;">Avg/Week</div>
+                                    <!-- Drop-off Stats -->
+                                    <div style="text-align: center; padding: 8px 12px; background: #FEF2F2; border-radius: 8px; border: 2px solid #DC2626;">
+                                        <div id="dropOffClientsTotal" style="font-size: 20px; font-weight: 700; color: #DC2626;">--</div>
+                                        <div id="dropOffClientsTotalLabel" style="font-size: 9px; color: #666;">Drop-off (12 wks)</div>
                                     </div>
-                                    <div style="text-align: center;">
-                                        <div id="newClientsAvgHours" style="font-size: 22px; font-weight: 700; color: #F57600;">--</div>
-                                        <div style="font-size: 10px; color: #666;">Avg Hrs/Client</div>
+                                    <!-- Divider -->
+                                    <div style="width: 1px; height: 40px; background: #E5ECF3;"></div>
+                                    <!-- New Client Hours -->
+                                    <div style="text-align: center; padding: 8px 12px; background: #FFF7ED; border-radius: 8px;">
+                                        <div id="newClientsAvgHours" style="font-size: 20px; font-weight: 700; color: #F57600;">--</div>
+                                        <div style="font-size: 9px; color: #666;">Avg Hrs/New Client</div>
                                     </div>
                                 </div>
                             </div>
-                            <div style="height: 280px;">
+                            <div style="height: 300px;">
                                 <canvas id="newClientsChart"></canvas>
+                            </div>
+                            <!-- Legend explanation -->
+                            <div style="display: flex; gap: 20px; justify-content: center; margin-top: 10px; font-size: 11px; color: #666;">
+                                <span><span style="display: inline-block; width: 12px; height: 12px; background: #1A365C; border-radius: 2px; margin-right: 4px;"></span>New Clients</span>
+                                <span><span style="display: inline-block; width: 12px; height: 12px; background: #DC2626; border-radius: 2px; margin-right: 4px;"></span>Drop-off Clients</span>
+                                <span><span style="display: inline-block; width: 12px; height: 12px; background: #F57600; border-radius: 50%; margin-right: 4px;"></span>New Client Hours</span>
                             </div>
                         </div>
                         
@@ -7806,14 +7819,23 @@ Note: Clients starting later in the period will naturally show fewer initial hou
                 });
             });
             
-            // Step 4: Get last N quarters (ending with last completed quarter or current)
+            // Step 4: Get last N quarters
+            // If we're in Q1, look at previous year's quarters (Q1 doesn't have enough data yet)
+            // Otherwise, use completed quarters only (exclude current quarter for fair comparison with drop-offs)
             const today = new Date();
             const currentQuarter = Math.ceil((today.getMonth() + 1) / 3);
             const currentYear = today.getFullYear();
             
-            // Start from current quarter (include partial quarter data)
-            let targetQuarter = currentQuarter;
-            let targetYear = currentYear;
+            let targetQuarter, targetYear;
+            if (currentQuarter === 1) {
+                // Q1: Show Q1-Q4 of previous year
+                targetQuarter = 4;
+                targetYear = currentYear - 1;
+            } else {
+                // Q2-Q4: Show last 4 completed quarters (exclude current)
+                targetQuarter = currentQuarter - 1;
+                targetYear = currentYear;
+            }
             
             const labels = [];
             const newClientCounts = [];
@@ -7866,6 +7888,253 @@ Note: Clients starting later in the period will naturally show fewer initial hou
         }
         
         /**
+         * Calculate drop-off clients per week
+         * Drop-off Client = Last service was in that week and never returned (through current data)
+         */
+        function calculateDropOffClientsPerWeek(allData, weeksToShow = 12) {
+            // Step 1: Find each client's last service date using normalized names
+            const clientLastService = {};
+            
+            allData.forEach(record => {
+                const clientName = record['Customer Name'] || record['Client Name'] || record['Client_Name'] || '';
+                const scheduledDate = record['Scheduled Date'] || record['Scheduled_Date'] || '';
+                const recordWeek = parseInt(record['Week']) || 0;
+                const recordYear = parseInt(record['Year']) || 0;
+                
+                if (!clientName || clientName === 'Unknown' || !scheduledDate) return;
+                
+                const dateObj = new Date(scheduledDate);
+                if (isNaN(dateObj.getTime())) return;
+                
+                const normalizedClient = normalizeName(clientName);
+                if (!normalizedClient) return;
+                
+                const week = recordWeek || getWeekNumber(dateObj);
+                const year = recordYear || dateObj.getFullYear();
+                
+                if (!clientLastService[normalizedClient]) {
+                    clientLastService[normalizedClient] = {
+                        clientName: clientName,
+                        lastDate: dateObj,
+                        lastWeek: week,
+                        lastYear: year
+                    };
+                } else {
+                    // Update if this service is later
+                    if (dateObj > clientLastService[normalizedClient].lastDate) {
+                        clientLastService[normalizedClient].lastDate = dateObj;
+                        clientLastService[normalizedClient].lastWeek = week;
+                        clientLastService[normalizedClient].lastYear = year;
+                    }
+                }
+            });
+            
+            // Step 2: Build week-by-week aggregation for drop-offs
+            const weeklyDropOffs = {};
+            
+            Object.values(clientLastService).forEach(client => {
+                const weekKey = `${client.lastYear}-W${String(client.lastWeek).padStart(2, '0')}`;
+                
+                if (!weeklyDropOffs[weekKey]) {
+                    weeklyDropOffs[weekKey] = {
+                        week: client.lastWeek,
+                        year: client.lastYear,
+                        count: 0,
+                        clients: []
+                    };
+                }
+                
+                weeklyDropOffs[weekKey].count++;
+                weeklyDropOffs[weekKey].clients.push({
+                    name: client.clientName,
+                    lastDate: client.lastDate
+                });
+            });
+            
+            // Step 3: Get last N weeks (ending with last week, not current week)
+            // IMPORTANT: Don't count the last 2 weeks as drop-offs (too early to tell)
+            const today = new Date();
+            const currentWeek = getWeekNumber(today);
+            const currentYear = today.getFullYear();
+            
+            // Go back 3 weeks to start counting drop-offs (grace period)
+            let targetWeek = currentWeek - 3;
+            let targetYear = currentYear;
+            while (targetWeek < 1) {
+                targetWeek += 52;
+                targetYear--;
+            }
+            
+            const dropOffCounts = [];
+            const dropOffDetails = [];
+            
+            // Build from oldest to newest
+            for (let i = 0; i < weeksToShow; i++) {
+                let w = targetWeek - (weeksToShow - 1 - i);
+                let y = targetYear;
+                
+                while (w < 1) {
+                    w += 52;
+                    y--;
+                }
+                
+                const weekKey = `${y}-W${String(w).padStart(2, '0')}`;
+                const data = weeklyDropOffs[weekKey] || { count: 0, clients: [] };
+                
+                dropOffCounts.push(data.count);
+                dropOffDetails.push({
+                    week: w,
+                    year: y,
+                    weekKey: weekKey,
+                    clients: data.clients
+                });
+            }
+            
+            return {
+                dropOffCounts,
+                dropOffDetails,
+                totalDropOffs: dropOffCounts.reduce((a, b) => a + b, 0)
+            };
+        }
+        
+        /**
+         * Calculate drop-off clients per quarter
+         */
+        function calculateDropOffClientsPerQuarter(allData, quartersToShow = 4) {
+            // Step 1: Find each client's last service date
+            const clientLastService = {};
+            
+            allData.forEach(record => {
+                const clientName = record['Customer Name'] || record['Client Name'] || record['Client_Name'] || '';
+                const scheduledDate = record['Scheduled Date'] || record['Scheduled_Date'] || '';
+                
+                if (!clientName || clientName === 'Unknown' || !scheduledDate) return;
+                
+                const dateObj = new Date(scheduledDate);
+                if (isNaN(dateObj.getTime())) return;
+                
+                const normalizedClient = normalizeName(clientName);
+                if (!normalizedClient) return;
+                
+                const year = dateObj.getFullYear();
+                const quarter = Math.ceil((dateObj.getMonth() + 1) / 3);
+                
+                if (!clientLastService[normalizedClient]) {
+                    clientLastService[normalizedClient] = {
+                        clientName: clientName,
+                        lastDate: dateObj,
+                        lastQuarter: quarter,
+                        lastYear: year
+                    };
+                } else {
+                    if (dateObj > clientLastService[normalizedClient].lastDate) {
+                        clientLastService[normalizedClient].lastDate = dateObj;
+                        clientLastService[normalizedClient].lastQuarter = quarter;
+                        clientLastService[normalizedClient].lastYear = year;
+                    }
+                }
+            });
+            
+            // Step 2: Build quarter-by-quarter aggregation
+            const quarterlyDropOffs = {};
+            
+            Object.values(clientLastService).forEach(client => {
+                const quarterKey = `${client.lastYear}-Q${client.lastQuarter}`;
+                
+                if (!quarterlyDropOffs[quarterKey]) {
+                    quarterlyDropOffs[quarterKey] = {
+                        quarter: client.lastQuarter,
+                        year: client.lastYear,
+                        count: 0,
+                        clients: []
+                    };
+                }
+                
+                quarterlyDropOffs[quarterKey].count++;
+                quarterlyDropOffs[quarterKey].clients.push({
+                    name: client.clientName,
+                    lastDate: client.lastDate
+                });
+            });
+            
+            // Step 3: Get last N quarters
+            // If we're in Q1, look at previous year's quarters (Q1 doesn't have enough data yet)
+            const today = new Date();
+            const currentQuarter = Math.ceil((today.getMonth() + 1) / 3);
+            const currentYear = today.getFullYear();
+            
+            // For Q1, use Q4 of previous year as the endpoint
+            // Otherwise go back 1 quarter (current quarter clients might still be active)
+            let targetQuarter, targetYear;
+            if (currentQuarter === 1) {
+                targetQuarter = 4;
+                targetYear = currentYear - 1;
+            } else {
+                targetQuarter = currentQuarter - 1;
+                targetYear = currentYear;
+                if (targetQuarter < 1) {
+                    targetQuarter = 4;
+                    targetYear--;
+                }
+            }
+            
+            const dropOffCounts = [];
+            const dropOffDetails = [];
+            
+            for (let i = 0; i < quartersToShow; i++) {
+                let q = targetQuarter - (quartersToShow - 1 - i);
+                let y = targetYear;
+                
+                while (q < 1) {
+                    q += 4;
+                    y--;
+                }
+                
+                const quarterKey = `${y}-Q${q}`;
+                const data = quarterlyDropOffs[quarterKey] || { count: 0, clients: [] };
+                
+                dropOffCounts.push(data.count);
+                dropOffDetails.push({
+                    quarter: q,
+                    year: y,
+                    quarterKey: quarterKey,
+                    clients: data.clients
+                });
+            }
+            
+            return {
+                dropOffCounts,
+                dropOffDetails,
+                totalDropOffs: dropOffCounts.reduce((a, b) => a + b, 0)
+            };
+        }
+        
+        /**
+         * Combine new clients and drop-off data for chart
+         */
+        function combineClientFlowData(newData, dropOffData, view) {
+            const totalNew = newData.summary.totalNewClients;
+            const totalDropOff = dropOffData.totalDropOffs;
+            const totalHours = newData.summary.totalFirstWeekHours || 0;
+            const avgHoursPerClient = newData.summary.avgHoursPerNewClient || 0;
+            
+            return {
+                labels: newData.labels,
+                newClientCounts: newData.newClientCounts,
+                dropOffCounts: dropOffData.dropOffCounts,
+                newClientHours: newData.newClientHours,
+                newClientDetails: newData.weekDetails,
+                dropOffDetails: dropOffData.dropOffDetails,
+                summary: {
+                    totalNew,
+                    totalDropOff,
+                    totalHours,
+                    avgHoursPerClient
+                }
+            };
+        }
+        
+        /**
          * Switch between weekly and quarterly views
          */
         function switchNewClientsView(view) {
@@ -7889,51 +8158,62 @@ Note: Clients starting later in the period will naturally show fewer initial hou
                 weekBtn.style.color = '#666';
             }
             
-            // Recalculate and render
-            let data;
+            // Calculate new clients and drop-offs
+            let newData, dropOffData, combinedData;
+            
             if (view === 'week') {
-                data = calculateNewClientsPerWeek(newClientsAllData, 12);
+                newData = calculateNewClientsPerWeek(newClientsAllData, 12);
+                dropOffData = calculateDropOffClientsPerWeek(newClientsAllData, 12);
+                combinedData = combineClientFlowData(newData, dropOffData, 'week');
+                
                 document.getElementById('newClientsChartTitle').innerHTML = `
-                    🆕 New Clients Per Week
+                    📊 Client Acquisition & Drop-off (Weekly)
                     <span class="info-tooltip" style="cursor: help; opacity: 0.7; font-size: 14px;" 
-                          title="New Client = A client receiving their first-ever service in that week.
+                          title="New Client = First-ever service in that week
+Drop-off Client = Last service was in that week and never returned
 
-Left axis (bars): Count of new clients acquired
-Right axis (line): Total hours scheduled for those new clients in their first week
+Navy bars: New clients acquired
+Red bars: Clients who dropped off
+Orange line: Hours scheduled for new clients in first week
 
-Note: Clients starting later in the week will naturally show fewer first-week hours.">ⓘ</span>
+Note: Recent weeks excluded from drop-off count (clients may return).">ⓘ</span>
                 `;
-                document.getElementById('newClientsTotalLabel').textContent = 'Total (12 wks)';
-                document.getElementById('newClientsAvgLabel').textContent = 'Avg/Week';
+                document.getElementById('newClientsTotalLabel').textContent = 'New (12 wks)';
+                document.getElementById('dropOffClientsTotalLabel').textContent = 'Drop-off (12 wks)';
             } else {
-                data = calculateNewClientsPerQuarter(newClientsAllData, 4);
+                newData = calculateNewClientsPerQuarter(newClientsAllData, 4);
+                dropOffData = calculateDropOffClientsPerQuarter(newClientsAllData, 4);
+                combinedData = combineClientFlowData(newData, dropOffData, 'quarter');
+                
                 document.getElementById('newClientsChartTitle').innerHTML = `
-                    🆕 New Clients Per Quarter
+                    📊 Client Acquisition & Drop-off (Quarterly)
                     <span class="info-tooltip" style="cursor: help; opacity: 0.7; font-size: 14px;" 
-                          title="New Client = A client receiving their first-ever service in that quarter.
+                          title="New Client = First-ever service in that quarter
+Drop-off Client = Last service was in that quarter and never returned
 
-Left axis (bars): Count of new clients acquired
-Right axis (line): Total hours scheduled for those new clients in their first quarter
+Navy bars: New clients acquired
+Red bars: Clients who dropped off
+Orange line: Hours scheduled for new clients in first quarter
 
-Shows last 4 quarters including current quarter.">ⓘ</span>
+Note: Current quarter excluded from drop-off count.">ⓘ</span>
                 `;
-                document.getElementById('newClientsTotalLabel').textContent = 'Total (4 qtrs)';
-                document.getElementById('newClientsAvgLabel').textContent = 'Avg/Quarter';
+                document.getElementById('newClientsTotalLabel').textContent = 'New (4 qtrs)';
+                document.getElementById('dropOffClientsTotalLabel').textContent = 'Drop-off (4 qtrs)';
             }
             
             // Update stats
-            document.getElementById('newClientsTotal').textContent = data.summary.totalNewClients;
-            document.getElementById('newClientsAvgCount').textContent = data.summary.avgNewClientsPerWeek;
-            document.getElementById('newClientsAvgHours').textContent = data.summary.avgHoursPerNewClient + ' hrs';
+            document.getElementById('newClientsTotal').textContent = combinedData.summary.totalNew;
+            document.getElementById('dropOffClientsTotal').textContent = combinedData.summary.totalDropOff;
+            document.getElementById('newClientsAvgHours').textContent = combinedData.summary.avgHoursPerClient + ' hrs';
             
-            // Re-render chart with updated axis labels
-            renderNewClientsChartWithView(data, view);
+            // Re-render chart
+            renderClientFlowChart(combinedData, view);
         }
         
         /**
-         * Render chart with view-specific labels
+         * Render the client flow chart (new clients, drop-offs, new client hours)
          */
-        function renderNewClientsChartWithView(data, view) {
+        function renderClientFlowChart(data, view) {
             const ctx = document.getElementById('newClientsChart');
             if (!ctx) return;
             
@@ -7941,9 +8221,8 @@ Shows last 4 quarters including current quarter.">ⓘ</span>
                 newClientsChartInstance.destroy();
             }
             
-            const yAxisLabel = view === 'week' ? 'New Clients' : 'New Clients';
-            const y1AxisLabel = view === 'week' ? 'First Week Hours' : 'First Quarter Hours';
             const periodLabel = view === 'week' ? 'week' : 'quarter';
+            const hoursLabel = view === 'week' ? 'First Week Hours' : 'First Quarter Hours';
             
             newClientsChartInstance = new Chart(ctx, {
                 type: 'bar',
@@ -7953,20 +8232,34 @@ Shows last 4 quarters including current quarter.">ⓘ</span>
                         {
                             label: 'New Clients',
                             data: data.newClientCounts,
-                            backgroundColor: 'rgba(26, 54, 92, 0.8)',
+                            backgroundColor: 'rgba(26, 54, 92, 0.85)',
                             borderColor: '#1A365C',
                             borderWidth: 1,
                             yAxisID: 'y',
-                            order: 2
+                            order: 3,
+                            barPercentage: 0.85,
+                            categoryPercentage: 0.7
                         },
                         {
-                            label: y1AxisLabel,
+                            label: 'Drop-off Clients',
+                            data: data.dropOffCounts,
+                            backgroundColor: 'rgba(220, 38, 38, 0.75)',
+                            borderColor: '#DC2626',
+                            borderWidth: 1,
+                            yAxisID: 'y',
+                            order: 2,
+                            barPercentage: 0.85,
+                            categoryPercentage: 0.7
+                        },
+                        {
+                            label: hoursLabel,
                             data: data.newClientHours,
                             type: 'line',
                             borderColor: '#F57600',
                             backgroundColor: 'rgba(245, 118, 0, 0.1)',
                             borderWidth: 3,
                             pointBackgroundColor: '#F57600',
+                            pointBorderColor: '#F57600',
                             pointRadius: 4,
                             pointHoverRadius: 6,
                             fill: true,
@@ -7985,29 +8278,40 @@ Shows last 4 quarters including current quarter.">ⓘ</span>
                     },
                     plugins: {
                         legend: {
-                            position: 'top',
-                            labels: {
-                                usePointStyle: true,
-                                padding: 15,
-                                font: { size: 11 }
-                            }
+                            display: false // Using custom legend below chart
                         },
                         tooltip: {
                             callbacks: {
                                 afterBody: function(context) {
                                     const idx = context[0].dataIndex;
-                                    const detail = data.weekDetails[idx];
-                                    if (detail && detail.clients.length > 0) {
-                                        let lines = ['', `New clients this ${periodLabel}:`];
-                                        detail.clients.slice(0, 5).forEach(c => {
-                                            lines.push(`  • ${c.name}: ${c.hours} hrs`);
+                                    let lines = [];
+                                    
+                                    // Show new clients with hours
+                                    const newDetail = data.newClientDetails[idx];
+                                    if (newDetail && newDetail.clients && newDetail.clients.length > 0) {
+                                        lines.push('', `New clients this ${periodLabel}:`);
+                                        newDetail.clients.slice(0, 3).forEach(c => {
+                                            const hrs = c.hours ? ` (${c.hours} hrs)` : '';
+                                            lines.push(`  + ${c.name}${hrs}`);
                                         });
-                                        if (detail.clients.length > 5) {
-                                            lines.push(`  ... and ${detail.clients.length - 5} more`);
+                                        if (newDetail.clients.length > 3) {
+                                            lines.push(`  ... and ${newDetail.clients.length - 3} more`);
                                         }
-                                        return lines;
                                     }
-                                    return '';
+                                    
+                                    // Show drop-offs
+                                    const dropDetail = data.dropOffDetails[idx];
+                                    if (dropDetail && dropDetail.clients && dropDetail.clients.length > 0) {
+                                        lines.push('', `Drop-offs this ${periodLabel}:`);
+                                        dropDetail.clients.slice(0, 3).forEach(c => {
+                                            lines.push(`  − ${c.name}`);
+                                        });
+                                        if (dropDetail.clients.length > 3) {
+                                            lines.push(`  ... and ${dropDetail.clients.length - 3} more`);
+                                        }
+                                    }
+                                    
+                                    return lines;
                                 }
                             }
                         }
@@ -8023,12 +8327,16 @@ Shows last 4 quarters including current quarter.">ⓘ</span>
                             position: 'left',
                             title: {
                                 display: true,
-                                text: yAxisLabel,
+                                text: 'Client Count',
                                 color: '#1A365C',
                                 font: { weight: '500', size: 11 }
                             },
                             beginAtZero: true,
-                            ticks: { stepSize: 1, color: '#1A365C', font: { size: 10 } },
+                            ticks: { 
+                                stepSize: 1, 
+                                color: '#1A365C', 
+                                font: { size: 10 }
+                            },
                             grid: { color: 'rgba(0,0,0,0.05)' }
                         },
                         y1: {
@@ -8037,12 +8345,15 @@ Shows last 4 quarters including current quarter.">ⓘ</span>
                             position: 'right',
                             title: {
                                 display: true,
-                                text: y1AxisLabel,
+                                text: hoursLabel,
                                 color: '#F57600',
                                 font: { weight: '500', size: 11 }
                             },
                             beginAtZero: true,
-                            ticks: { color: '#F57600', font: { size: 10 } },
+                            ticks: { 
+                                color: '#F57600', 
+                                font: { size: 10 }
+                            },
                             grid: { drawOnChartArea: false }
                         }
                     }
@@ -8050,8 +8361,16 @@ Shows last 4 quarters including current quarter.">ⓘ</span>
             });
         }
         
+        // Keep old function name for backward compatibility
+        function renderNewClientsChartWithView(data, view) {
+            // Convert old data format to new format if needed
+            const dropOffData = calculateDropOffClientsPerWeek(newClientsAllData || [], view === 'week' ? 12 : 4);
+            const combinedData = combineClientFlowData(data, dropOffData, view);
+            renderClientFlowChart(combinedData, view);
+        }
+        
         /**
-         * Load and render the new clients chart
+         * Load and render the client acquisition & drop-off chart
          * Called from calculateClientInsights
          */
         function loadNewClientsChart(allData) {
@@ -8059,29 +8378,44 @@ Shows last 4 quarters including current quarter.">ⓘ</span>
                 // Store data for toggle functionality
                 newClientsAllData = allData;
                 
-                // Calculate based on current view
-                let newClientsData;
-                if (newClientsCurrentView === 'quarter') {
-                    newClientsData = calculateNewClientsPerQuarter(allData, 4);
+                // Calculate new clients and drop-offs based on current view
+                let newData, dropOffData, combinedData;
+                const view = newClientsCurrentView;
+                
+                if (view === 'quarter') {
+                    newData = calculateNewClientsPerQuarter(allData, 4);
+                    dropOffData = calculateDropOffClientsPerQuarter(allData, 4);
+                    combinedData = combineClientFlowData(newData, dropOffData, 'quarter');
                 } else {
-                    newClientsData = calculateNewClientsPerWeek(allData, 12);
+                    newData = calculateNewClientsPerWeek(allData, 12);
+                    dropOffData = calculateDropOffClientsPerWeek(allData, 12);
+                    combinedData = combineClientFlowData(newData, dropOffData, 'week');
                 }
                 
                 // Update summary stats
-                const totalEl = document.getElementById('newClientsTotal');
-                const avgCountEl = document.getElementById('newClientsAvgCount');
+                const totalNewEl = document.getElementById('newClientsTotal');
+                const totalDropOffEl = document.getElementById('dropOffClientsTotal');
                 const avgHoursEl = document.getElementById('newClientsAvgHours');
                 
-                if (totalEl) totalEl.textContent = newClientsData.summary.totalNewClients;
-                if (avgCountEl) avgCountEl.textContent = newClientsData.summary.avgNewClientsPerWeek;
-                if (avgHoursEl) avgHoursEl.textContent = newClientsData.summary.avgHoursPerNewClient + ' hrs';
+                if (totalNewEl) totalNewEl.textContent = combinedData.summary.totalNew;
+                if (totalDropOffEl) totalDropOffEl.textContent = combinedData.summary.totalDropOff;
+                if (avgHoursEl) avgHoursEl.textContent = combinedData.summary.avgHoursPerClient + ' hrs';
                 
-                // Render chart with current view
-                renderNewClientsChartWithView(newClientsData, newClientsCurrentView);
+                // Update labels based on view
+                if (view === 'quarter') {
+                    document.getElementById('newClientsTotalLabel').textContent = 'New (4 qtrs)';
+                    document.getElementById('dropOffClientsTotalLabel').textContent = 'Drop-off (4 qtrs)';
+                } else {
+                    document.getElementById('newClientsTotalLabel').textContent = 'New (12 wks)';
+                    document.getElementById('dropOffClientsTotalLabel').textContent = 'Drop-off (12 wks)';
+                }
                 
-                console.log('New Clients Chart loaded:', newClientsData.summary);
+                // Render the combined chart
+                renderClientFlowChart(combinedData, view);
+                
+                console.log('Client Flow Chart loaded:', combinedData.summary);
             } catch (e) {
-                console.error('Error loading new clients chart:', e);
+                console.error('Error loading client flow chart:', e);
             }
         }
         
