@@ -1932,7 +1932,7 @@
                 <span style="color: var(--orange);">alice.</span><span>care</span>
             </div>
             <div class="login-gate-subtitle">Business Development Tracker</div>
-            <div id="googleSignInBtnGate" class="login-gate-button" style="margin-top: 30px;" onclick="handleLoginGateClick(event)">
+            <div id="googleSignInBtnGate" class="login-gate-button" style="margin-top: 30px;">
                 <span class="material-icons-outlined">login</span>
                 <span>Sign in with Google</span>
             </div>
@@ -2121,6 +2121,18 @@
                 </div>
             </div>
 
+            <!-- Enhanced Activity Timeline -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><span class="material-icons-outlined">history</span> Recent Activity Timeline</h2>
+                </div>
+                <div class="card-body">
+                    <div id="activityTimelineContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
+                        <div style="color: var(--gray-400); text-align: center; padding: 40px; grid-column: 1/-1;">Loading activity...</div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Zone Performance -->
             <div class="card">
                 <div class="card-header">
@@ -2143,39 +2155,6 @@
                         <table id="dueOrgsTable">
                             <thead><tr><th>Organization</th><th>Type</th><th>Zone</th><th>Last Visit</th><th>Due Date</th><th>Actions</th></tr></thead>
                             <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ✅ MOVED: Recent Activity Table (now below Due for Visit) -->
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title"><span class="material-icons-outlined">history</span> Recent Activity (Last 30 Days)</h2>
-                    <div style="display: flex; gap: 8px;">
-                        <button class="btn btn-sm btn-secondary" onclick="sortActivityTable('date')" id="activitySortDate">
-                            <span class="material-icons-outlined" style="font-size: 16px;">calendar_today</span> Sort by Date
-                        </button>
-                        <button class="btn btn-sm btn-secondary" onclick="sortActivityTable('name')" id="activitySortName">
-                            <span class="material-icons-outlined" style="font-size: 16px;">sort_by_alpha</span> Sort by Name
-                        </button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="table-container">
-                        <table id="activityTable" class="sortable-table">
-                            <thead>
-                                <tr>
-                                    <th class="sortable-header" data-sort="date" onclick="sortActivityTable('date')">Date <span class="sort-icon"></span></th>
-                                    <th class="sortable-header" data-sort="name" onclick="sortActivityTable('name')">Organization <span class="sort-icon"></span></th>
-                                    <th>Contact</th>
-                                    <th>Rep</th>
-                                    <th>Outcome</th>
-                                </tr>
-                            </thead>
-                            <tbody id="activityTimelineContainer">
-                                <tr><td colspan="5" style="text-align: center; color: var(--gray-400); padding: 40px;">Loading activity...</td></tr>
-                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -2212,53 +2191,6 @@
                     <option value="Not Interested">Not Interested</option>
                 </select>
 
-                <!-- ✅ NEW: Notes/Comment Field -->
-                <div style="margin-bottom: 16px;">
-                    <label style="display: block; color: rgba(255,255,255,0.8); font-size: 13px; margin-bottom: 6px; font-weight: 500;">
-                        <span class="material-icons-outlined" style="font-size: 16px; vertical-align: middle;">notes</span> Notes / Comments
-                    </label>
-                    <textarea id="checkinNotes" class="checkin-org-select" placeholder="Add any notes about this visit..." style="width: 100%; min-height: 80px; resize: vertical; font-family: inherit;"></textarea>
-                </div>
-
-                <!-- ✅ NEW: Follow-Up Reminder Section -->
-                <div style="margin-bottom: 16px; background: rgba(255,255,255,0.1); border-radius: 8px; overflow: hidden;">
-                    <div onclick="toggleFollowUpSection()" style="padding: 12px 16px; cursor: pointer; display: flex; align-items: center; justify-content: space-between;">
-                        <div style="display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.9);">
-                            <span class="material-icons-outlined">event</span>
-                            <span style="font-weight: 500;">Schedule Follow-Up Reminder</span>
-                        </div>
-                        <span class="material-icons-outlined" id="followUpToggleIcon" style="color: rgba(255,255,255,0.6); transition: transform 0.2s;">expand_more</span>
-                    </div>
-                    <div id="followUpSection" style="display: none; padding: 0 16px 16px 16px; border-top: 1px solid rgba(255,255,255,0.1);">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
-                            <div>
-                                <label style="display: block; color: rgba(255,255,255,0.7); font-size: 12px; margin-bottom: 4px;">Follow-Up Date</label>
-                                <input type="date" id="followUpDate" class="checkin-org-select" style="width: 100%;">
-                            </div>
-                            <div>
-                                <label style="display: block; color: rgba(255,255,255,0.7); font-size: 12px; margin-bottom: 4px;">Time</label>
-                                <input type="time" id="followUpTime" class="checkin-org-select" value="09:00" style="width: 100%;">
-                            </div>
-                        </div>
-                        <div style="margin-top: 12px;">
-                            <label style="display: block; color: rgba(255,255,255,0.7); font-size: 12px; margin-bottom: 4px;">Reminder Description</label>
-                            <input type="text" id="followUpDescription" class="checkin-org-select" placeholder="e.g., Call back to discuss services" style="width: 100%;">
-                        </div>
-                        <div style="margin-top: 12px; display: flex; gap: 8px;">
-                            <button type="button" class="btn" onclick="addFollowUpToCalendar()" style="flex: 1; background: #4285f4; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: 500;">
-                                <span class="material-icons-outlined" style="font-size: 18px;">event</span>
-                                Add to Google Calendar
-                            </button>
-                            <button type="button" class="btn" onclick="downloadFollowUpICS()" style="background: rgba(255,255,255,0.2); color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer;" title="Download .ics file">
-                                <span class="material-icons-outlined" style="font-size: 18px;">download</span>
-                            </button>
-                        </div>
-                        <div style="margin-top: 8px; font-size: 11px; color: rgba(255,255,255,0.5); text-align: center;">
-                            Calendar event will include organization details and your notes
-                        </div>
-                    </div>
-                </div>
-
                 <button class="checkin-btn" onclick="submitCheckin()" id="checkinBtn">
                     <span class="material-icons-outlined">check_circle</span>
                     Complete Check-In
@@ -2269,49 +2201,8 @@
                 <div class="card-header">
                     <h2 class="card-title"><span class="material-icons-outlined">history</span> Today's Visits</h2>
                 </div>
-                <div class="card-body" style="padding: 0;">
-                    <div class="table-container">
-                        <table id="todayVisitsTable" class="sortable-table">
-                            <thead>
-                                <tr>
-                                    <th>Time</th>
-                                    <th>Organization</th>
-                                    <th>Outcome</th>
-                                    <th>Materials</th>
-                                    <th>Notes</th>
-                                    <th>Follow-Up</th>
-                                </tr>
-                            </thead>
-                            <tbody id="todayVisits">
-                                <tr><td colspan="6" style="text-align: center; color: var(--gray-400); padding: 20px;">No visits logged today</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ✅ NEW: Scheduled Follow-Ups Card -->
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title"><span class="material-icons-outlined">event_upcoming</span> Scheduled Follow-Ups</h2>
-                </div>
-                <div class="card-body" style="padding: 0;">
-                    <div class="table-container">
-                        <table id="followUpsTable" class="sortable-table">
-                            <thead>
-                                <tr>
-                                    <th>Due Date</th>
-                                    <th>Organization</th>
-                                    <th>Action</th>
-                                    <th>Created</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody id="followUpsList">
-                                <tr><td colspan="5" style="text-align: center; color: var(--gray-400); padding: 20px;">No follow-ups scheduled</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="card-body">
+                    <div id="todayVisits" style="color: var(--gray-400); text-align: center; padding: 20px;">No visits logged today</div>
                 </div>
             </div>
         </div>
@@ -3402,7 +3293,6 @@
                             text: 'signin_with'
                         }
                     );
-                    googleButtonRendered = true;
                     console.log('✅ Login gate button rendered');
                 }
             } catch (e) {
@@ -3412,11 +3302,6 @@
                 if (signInBtn) {
                     signInBtn.innerHTML = '<span class="material-icons-outlined">login</span> Sign in with Google (Manual)';
                     signInBtn.onclick = () => manualGoogleSignIn();
-                }
-                // Also set fallback for login gate button
-                const gateBtn = document.getElementById('googleSignInBtnGate');
-                if (gateBtn) {
-                    gateBtn.onclick = () => manualGoogleSignIn();
                 }
             }
         }
@@ -3432,41 +3317,7 @@
             window.location.href = authUrl;
         }
         
-        // ✅ NEW: Fallback handler for login gate button click
-        let googleButtonRendered = false;
-        
-        function handleLoginGateClick(event) {
-            // If Google rendered its button, let it handle the click
-            if (googleButtonRendered) {
-                console.log('Google button is rendered, letting it handle the click');
-                return;
-            }
-            
-            console.log('Login gate button clicked - using fallback');
-            event.preventDefault();
-            event.stopPropagation();
-            
-            // Check if Google Sign-In is available and prompt
-            if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
-                try {
-                    google.accounts.id.prompt((notification) => {
-                        console.log('Prompt notification:', notification);
-                        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-                            console.log('Google prompt not displayed, falling back to manual sign-in');
-                            manualGoogleSignIn();
-                        }
-                    });
-                } catch (e) {
-                    console.error('Error prompting Google Sign-In:', e);
-                    manualGoogleSignIn();
-                }
-            } else {
-                console.log('Google Sign-In not available, using manual sign-in');
-                manualGoogleSignIn();
-            }
-        }
-        
-        async function handleGoogleSignInResponse(response) {
+        function handleGoogleSignInResponse(response) {
             console.log('✅ Google Sign-In response received');
             
             try {
@@ -3509,112 +3360,21 @@
                 // Start session monitoring
                 startSessionMonitoring();
                 
-                // ✅ NEW: Store basic user info temporarily
-                const userEmail = decodedToken.email;
-                const userName = decodedToken.name;
+                state.user = {
+                    email: decodedToken.email,
+                    name: decodedToken.name,
+                    picture: decodedToken.picture,
+                    hd: decodedToken.hd,
+                    zones: extractZonesFromEmail(decodedToken.email)
+                };
                 
-                // ✅ NEW: Validate user against team members database
-                console.log('🔐 Validating user against team database...');
-                
-                // First, we need to fetch team data to validate
-                try {
-                    const dataResponse = await apiCall('getAllData');
-                    if (dataResponse && dataResponse.success && dataResponse.data?.teamMembers) {
-                        const teamMembers = dataResponse.data.teamMembers;
-                        
-                        // Find matching team member by email
-                        const teamMember = teamMembers.find(m => 
-                            m.Email && m.Email.toLowerCase() === userEmail.toLowerCase()
-                        );
-                        
-                        if (!teamMember) {
-                            console.error('❌ User not found in team database:', userEmail);
-                            showToast('❌ Access Denied: Your email is not registered in the system. Please contact an administrator.', 'error');
-                            googleSignOut();
-                            return;
-                        }
-                        
-                        if (teamMember.Active !== 'Yes') {
-                            console.error('❌ User account is inactive:', userEmail);
-                            showToast('❌ Access Denied: Your account is inactive. Please contact an administrator.', 'error');
-                            googleSignOut();
-                            return;
-                        }
-                        
-                        console.log('✅ User validated:', teamMember.Name, '| Role:', teamMember.Role, '| Zones:', teamMember.Zones);
-                        
-                        // Set user state with role and zones from database
-                        state.user = {
-                            email: userEmail,
-                            name: teamMember.Name || userName,
-                            picture: decodedToken.picture,
-                            hd: decodedToken.hd,
-                            role: teamMember.Role || 'Rep',
-                            zones: teamMember.Zones ? teamMember.Zones.split(',').map(z => z.trim()) : [],
-                            teamMemberId: teamMember.ID
-                        };
-                        
-                        // Load the rest of the app data
-                        state.organizations = dataResponse.data?.organizations || [];
-                        state.contacts = dataResponse.data?.contacts || [];
-                        state.visits = dataResponse.data?.visits || [];
-                        state.teamMembers = dataResponse.data?.teamMembers || [];
-                        state.emailTemplates = dataResponse.data?.emailTemplates || [];
-                        state.assetCategories = dataResponse.data?.assetCategories || getDefaultAssetCategories();
-                        state.assetItems = dataResponse.data?.assetItems || getDefaultAssetItems();
-                        state.stockHistory = dataResponse.data?.stockHistory || [];
-                        if (dataResponse.data?.settings) {
-                            state.settings = { ...state.settings, ...dataResponse.data.settings };
-                        }
-                        ensureSettingsDefaults();
-                        
-                        // Cache the data
-                        localStorage.setItem('busdev_cache', JSON.stringify({
-                            organizations: state.organizations,
-                            contacts: state.contacts,
-                            visits: state.visits,
-                            teamMembers: state.teamMembers,
-                            emailTemplates: state.emailTemplates,
-                            assetCategories: state.assetCategories,
-                            assetItems: state.assetItems,
-                            stockHistory: state.stockHistory,
-                            settings: state.settings,
-                            user: state.user,
-                            timestamp: Date.now()
-                        }));
-                        
-                    } else {
-                        console.warn('⚠️ Could not fetch team data for validation, using basic auth');
-                        state.user = {
-                            email: userEmail,
-                            name: userName,
-                            picture: decodedToken.picture,
-                            hd: decodedToken.hd,
-                            role: 'Rep',
-                            zones: extractZonesFromEmail(userEmail)
-                        };
-                    }
-                } catch (err) {
-                    console.error('❌ Error validating user:', err);
-                    // Fall back to basic auth if validation fails
-                    state.user = {
-                        email: userEmail,
-                        name: userName,
-                        picture: decodedToken.picture,
-                        hd: decodedToken.hd,
-                        role: 'Rep',
-                        zones: extractZonesFromEmail(userEmail)
-                    };
-                }
-                
-                console.log('✅ User info set:', state.user.email, '| Role:', state.user.role);
+                console.log('✅ User info set:', state.user.email);
                 updateAuthUI();
                 
                 // Load app data after auth UI updates
                 setTimeout(() => {
                     renderAll();
-                    const roleDisplay = state.user.role === 'Admin' ? '👑 Admin' : '📋 Rep';
-                    showToast(`✅ Signed in as ${state.user.name} (${roleDisplay})`, 'success');
+                    showToast('✅ Signed in as ' + state.user.email + ' (Session: 8 hours)', 'success');
                 }, 100);
             } catch (e) {
                 console.error('❌ Error processing sign-in response:', e);
@@ -3630,58 +3390,7 @@
             if (match && match[1]) {
                 return [match[1]];
             }
-            return []; // Default to no zones (will need to be set in team settings)
-        }
-        
-        // ✅ NEW: Helper functions for role-based access
-        function isAdmin() {
-            return state.user?.role === 'Admin';
-        }
-        
-        function isRep() {
-            return state.user?.role === 'Rep' || !state.user?.role;
-        }
-        
-        function getUserZones() {
-            return state.user?.zones || [];
-        }
-        
-        // ✅ NEW: Filter data based on user role and zones
-        function filterByUserAccess(items, zoneField = 'Zone') {
-            if (!state.user) return [];
-            if (isAdmin()) return items; // Admin sees everything
-            
-            const userZones = getUserZones();
-            if (userZones.length === 0) return items; // No zone restriction
-            
-            return items.filter(item => {
-                const itemZone = item[zoneField];
-                if (!itemZone) return true; // Items without zone are visible to all
-                return userZones.includes(itemZone);
-            });
-        }
-        
-        // ✅ NEW: Filter visits by user (reps see only their own visits)
-        function filterVisitsByUser(visits) {
-            if (!state.user) return [];
-            if (isAdmin()) return visits; // Admin sees all visits
-            
-            // Reps see only their own visits and visits in their zones
-            const userZones = getUserZones();
-            const userEmail = state.user.email?.toLowerCase();
-            
-            return visits.filter(v => {
-                // Rep can see their own visits
-                if (v.Rep_Email && v.Rep_Email.toLowerCase() === userEmail) return true;
-                
-                // Rep can see visits in their assigned zones
-                if (userZones.length > 0) {
-                    const org = state.organizations.find(o => String(o.ID) === String(v.Org_ID));
-                    if (org && userZones.includes(org.Zone)) return true;
-                }
-                
-                return false;
-            });
+            return ['All']; // Default to all zones
         }
         
         function decodeJwtToken(token) {
@@ -3963,19 +3672,11 @@
         }
 
         function generateICSFile(route, city, planDate = null) {
-            // ✅ Use the selected plan date, not today's date
-            const dateStr = planDate || getLocalDateString();
+            // Use the selected plan date, not today's date
+            const dateStr = planDate || new Date().toISOString().split('T')[0];
             
             console.log(`📅 ICS Generation started for ${city} on ${dateStr}`);
             console.log(`   Total stops in route: ${route.length}`);
-            console.log(`   Using timezone: America/Los_Angeles (PST/PDT)`);
-            
-            // ✅ Verify the date is being used correctly
-            const includedStops = route.filter(s => s.Include);
-            if (includedStops.length > 0) {
-                console.log(`   First stop arrival: ${includedStops[0]._arrivalDate}`);
-                console.log(`   First stop date check: ${includedStops[0]._arrivalDate.toDateString()}`);
-            }
             
             let icsContent = `BEGIN:VCALENDAR
 VERSION:2.0
@@ -4012,15 +3713,11 @@ END:VTIMEZONE
                 }
                 
                 eventCount++;
-                
-                // ✅ FIXED: Format date in local timezone without UTC conversion
                 const startDateTime = formatDateTimeForICS(stop._arrivalDate);
                 const endDateTime = formatDateTimeForICS(stop._departureDate);
-                const uid = `route-${city.replace(/\s+/g, '-')}-stop${stop.Order}-${Date.now()}-${eventCount}@alicecare.com`;
+                const uid = `route-${city}-stop${stop.Order}-${Date.now()}-${eventCount}@alicecare.com`;
                 
-                console.log(`   Add event ${eventCount}: Stop ${stop.Order} - ${stop.Name}`);
-                console.log(`      Start: ${startDateTime} (from ${stop._arrivalDate})`);
-                console.log(`      End: ${endDateTime} (from ${stop._departureDate})`);
+                console.log(`   Add event ${eventCount}: Stop ${stop.Order} - ${stop.Name} @ ${startDateTime}-${endDateTime}`);
                 
                 const description = `Organization: ${stop.Name}
 Address: ${stop.Address}, ${stop.City}, ${stop.State} ${stop.Zip}
@@ -4047,7 +3744,7 @@ END:VEVENT
             });
 
             icsContent += `END:VCALENDAR`;
-            console.log(`✅ ICS file generated with ${eventCount} events for date ${dateStr}`);
+            console.log(`✅ ICS file generated with ${eventCount} events`);
             return icsContent;
         }
 
@@ -4126,11 +3823,6 @@ END:VEVENT
                 return;
             }
             
-            if (!planDate) {
-                showToast('Please select a plan date', 'warning');
-                return;
-            }
-            
             if (!startTime) {
                 showToast('Please select a start time', 'warning');
                 return;
@@ -4155,7 +3847,7 @@ END:VEVENT
             combinedRoute.forEach((stop, index) => {
                 stop.Order = index + 1;
                 
-                // ✅ FIXED: Create date using selected planDate in LOCAL timezone (not UTC)
+                // Create date using selected planDate in LOCAL timezone (not UTC)
                 let arrivalTime;
                 if (planDate) {
                     const [year, month, day] = planDate.split('-').map(Number);
@@ -4179,11 +3871,10 @@ END:VEVENT
             });
             
             console.log('Route generated:', combinedRoute.length, 'total stops');
-            console.log('Route dates will be for:', planDate);
             
             if (combinedRoute.length === 0) {
                 console.warn('⚠️ No organizations found for selected cities');
-                showToast('No organizations found. Check that organizations have Status=Active and are in the selected cities.', 'warning');
+                showToast('No organizations found. Check that organizations have Status=Active.', 'warning');
                 return;
             }
             
@@ -4194,48 +3885,25 @@ END:VEVENT
             state.currentTravelBuffer = travelBuffer;
             
             console.log('✅ Route plan ready for display');
-            console.log('   Plan date stored:', state.currentRoutePlanDate);
             displayRoute(combinedRoute, selectedOptions.join(', '), duration, planDate, travelBuffer);
-            showToast(`Route generated for ${new Date(planDate).toLocaleDateString()} with ${combinedRoute.length} stops`, 'success');
         }
 
         function displayRoute(route, city, durationMinutes, planDate = '', travelBuffer = 0) {
             const resultsDiv = document.getElementById('routeResults');
             const stopsDiv = document.getElementById('routeStops');
             
-            if (!resultsDiv || !stopsDiv) {
-                console.error('Route display elements not found');
-                return;
-            }
+            if (!resultsDiv || !stopsDiv) return;
             
             document.getElementById('routeResultsCity').textContent = city;
             
-            // ✅ FIXED: Format date for display more prominently
-            let dateDisplay = 'Unscheduled';
-            if (planDate) {
-                const [year, month, day] = planDate.split('-').map(Number);
-                const displayDate = new Date(year, month - 1, day);
-                dateDisplay = displayDate.toLocaleDateString('en-US', {
-                    weekday: 'long', 
-                    month: 'long', 
-                    day: 'numeric', 
-                    year: 'numeric'
-                });
-            }
+            // Format date for display
+            let dateDisplay = planDate ? new Date(planDate).toLocaleDateString('en-US', {weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'}) : 'Unscheduled';
             document.getElementById('routeResultsDate').textContent = dateDisplay;
             
-            // ✅ Calculate total time
-            const totalMinutes = route.length * (durationMinutes + travelBuffer) - travelBuffer;
-            const hours = Math.floor(totalMinutes / 60);
-            const mins = totalMinutes % 60;
-            const totalTimeStr = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
-            
             let stopsHTML = `<div class="route-stats">
-                <span class="stat-badge">📅 ${planDate}</span>
                 <span class="stat-badge">📍 ${route.length} stops</span>
-                <span class="stat-badge">🏁 End: ${route[route.length - 1].EstimatedDepartureTime}</span>
+                <span class="stat-badge">⏱️ ${route[route.length - 1].EstimatedDepartureTime}</span>
                 <span class="stat-badge">⏰ ${durationMinutes} min each</span>
-                <span class="stat-badge">🚗 Total: ~${totalTimeStr}</span>
             </div>`;
             
             stopsHTML += '<div class="route-stops-list">';
@@ -4252,7 +3920,7 @@ END:VEVENT
                             <div class="detail-address">📍 ${stop.Address}, ${stop.City}</div>
                             <div class="detail-time">🕐 ${stop.EstimatedArrivalTime} - ${stop.EstimatedDepartureTime}</div>
                             <div class="detail-overdue" style="color: ${daysOverdueColor};">
-                                📅 ${stop.DaysOverdue > 0 ? stop.DaysOverdue + ' days overdue' : 'On schedule'}
+                                📅 ${stop.DaysOverdue} days overdue
                             </div>
                         </div>
                         <div class="route-stop-footer">
@@ -4269,10 +3937,7 @@ END:VEVENT
             stopsDiv.innerHTML = stopsHTML;
             resultsDiv.style.display = 'block';
             
-            // ✅ Scroll results into view
-            setTimeout(() => {
-                resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 100);
+            resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function updateRouteSelection(index) {
@@ -4295,7 +3960,7 @@ END:VEVENT
             }
             
             try {
-                const planDate = state.currentRoutePlanDate || getLocalDateString();
+                const planDate = state.currentRoutePlanDate || new Date().toISOString().split('T')[0];
                 const icsContent = generateICSFile(state.currentRoute, state.currentRouteCity, planDate);
                 const filename = `${state.currentRouteCity}_Route_${planDate}.ics`;
                 downloadICS(icsContent, filename);
@@ -4533,7 +4198,7 @@ END:VEVENT
             
             // Reset form inputs
             document.getElementById('routeZone').value = '';
-            document.getElementById('routePlanDate').value = getLocalDateString();
+            document.getElementById('routePlanDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('routeStartTime').value = '09:00';
             document.getElementById('routeVisitDuration').value = '30';
             document.getElementById('routeTravelBuffer').value = '15';
@@ -4553,7 +4218,7 @@ END:VEVENT
             state.currentRoute = [];
             state.currentRouteCity = '';
             state.currentRouteZone = '';
-            state.currentRoutePlanDate = getLocalDateString();
+            state.currentRoutePlanDate = new Date().toISOString().split('T')[0];
             state.currentTravelBuffer = 0;
             
             console.log('✅ Route planner cleared - ready for new route');
@@ -4565,7 +4230,7 @@ END:VEVENT
             populateRouteCities();  // Use the new checkbox population function
             
             // Set today as default date
-            const today = getLocalDateString();
+            const today = new Date().toISOString().split('T')[0];
             const dateInput = document.getElementById('routePlanDate');
             if (dateInput) dateInput.value = today;
             
@@ -4952,7 +4617,7 @@ END:VEVENT
         async function apiPost(action, data) {
             try {
                 console.log('📤 POST Request:', action);
-                console.log('Data:', JSON.stringify(data, null, 2));
+                console.log('Data:', data);
                 
                 // Google Apps Script doesn't support CORS with JSON, so use no-cors
                 const response = await fetch(APPS_SCRIPT_URL, {
@@ -4962,47 +4627,12 @@ END:VEVENT
                     body: JSON.stringify({ action, token: googleIdToken, ...data })
                 });
                 
-                console.log('✅ POST sent (no-cors mode)');
+                console.log('✅ POST sent (no-cors mode - cannot read response)');
+                console.log('Data was sent to server. Reloading to verify...');
                 
-                // Brief delay for server processing
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                
-                // ✅ NEW: Reload data from server to verify save and get the real ID
-                console.log('🔄 Reloading data from server to verify save...');
-                try {
-                    const verifyResponse = await apiCall('getAllData');
-                    if (verifyResponse && verifyResponse.success) {
-                        // Update local state with server data
-                        state.organizations = verifyResponse.data?.organizations || state.organizations;
-                        state.contacts = verifyResponse.data?.contacts || state.contacts;
-                        state.visits = verifyResponse.data?.visits || state.visits;
-                        state.teamMembers = verifyResponse.data?.teamMembers || state.teamMembers;
-                        state.emailTemplates = verifyResponse.data?.emailTemplates || state.emailTemplates;
-                        state.assetCategories = verifyResponse.data?.assetCategories || state.assetCategories;
-                        state.assetItems = verifyResponse.data?.assetItems || state.assetItems;
-                        state.stockHistory = verifyResponse.data?.stockHistory || state.stockHistory;
-                        
-                        // Update cache with verified data
-                        localStorage.setItem('busdev_cache', JSON.stringify({
-                            organizations: state.organizations,
-                            contacts: state.contacts,
-                            visits: state.visits,
-                            teamMembers: state.teamMembers,
-                            emailTemplates: state.emailTemplates,
-                            assetCategories: state.assetCategories,
-                            assetItems: state.assetItems,
-                            stockHistory: state.stockHistory,
-                            settings: state.settings,
-                            user: state.user,
-                            timestamp: Date.now()
-                        }));
-                        
-                        console.log('✅ Data verified and cache updated');
-                        console.log('   Visits count:', state.visits.length);
-                    }
-                } catch (verifyErr) {
-                    console.warn('⚠️ Could not verify save:', verifyErr);
-                }
+                // Since we can't read the response with no-cors, assume success and reload data
+                // This verifies the change was actually saved
+                await new Promise(resolve => setTimeout(resolve, 500)); // Brief delay for server processing
                 
                 return { success: true, message: 'Data sent to server' };
             } catch (err) { 
@@ -5099,10 +4729,6 @@ END:VEVENT
             } catch (e) { console.warn('Error rendering today visits:', e); }
             
             try {
-                renderFollowUps();
-            } catch (e) { console.warn('Error rendering follow-ups:', e); }
-            
-            try {
                 renderCheckinAssets();
             } catch (e) { console.warn('Error rendering checkin assets:', e); }
             
@@ -5118,10 +4744,7 @@ END:VEVENT
         function updateUserDisplay() {
             if (state.user) {
                 document.getElementById('userName').textContent = state.user.name || state.user.email;
-                // ✅ UPDATED: Show role and zones
-                const roleIcon = state.user.role === 'Admin' ? '👑' : '📋';
-                const zonesText = state.user.zones?.length > 0 ? state.user.zones.join(', ') : 'All Zones';
-                document.getElementById('userZones').textContent = `${roleIcon} ${zonesText}`;
+                document.getElementById('userZones').textContent = state.user.zones?.join(', ') || 'All';
             }
         }
 
@@ -5170,17 +4793,13 @@ END:VEVENT
             const yearStart = new Date(now.getFullYear(), 0, 1);
             const userZones = state.user?.zones || [];
             
-            // ✅ NEW: Apply role-based filtering first
-            const roleFilteredOrgs = filterByUserAccess(state.organizations, 'Zone');
-            const roleFilteredVisits = filterVisitsByUser(state.visits);
-            
             // ✅ FIXED: Use dashboardZoneFilter if set, otherwise use userZones
-            const selectedZones = dashboardZoneFilter.length > 0 ? dashboardZoneFilter : (isAdmin() ? [] : userZones);
-            const filteredOrgs = selectedZones.length ? roleFilteredOrgs.filter(o => selectedZones.includes(o.Zone)) : roleFilteredOrgs;
-            const filteredVisits = selectedZones.length ? roleFilteredVisits.filter(v => {
+            const selectedZones = dashboardZoneFilter.length > 0 ? dashboardZoneFilter : userZones;
+            const filteredOrgs = selectedZones.length ? state.organizations.filter(o => selectedZones.includes(o.Zone)) : state.organizations;
+            const filteredVisits = selectedZones.length ? state.visits.filter(v => {
                 const org = state.organizations.find(org => org.ID === v.Org_ID);
                 return org && selectedZones.includes(org.Zone);
-            }) : roleFilteredVisits;
+            }) : state.visits;
             
             statOrgs.textContent = filteredOrgs.length;
             statVisitsMonth.textContent = filteredVisits.filter(v => new Date(v.Visit_Date) >= monthStart).length;
@@ -5495,21 +5114,7 @@ END:VEVENT
             });
         }
         
-        // ✅ Activity Table sort state
-        let activitySortColumn = 'date';
-        let activitySortAsc = false; // Default: newest first
-        
-        function sortActivityTable(column) {
-            if (activitySortColumn === column) {
-                activitySortAsc = !activitySortAsc;
-            } else {
-                activitySortColumn = column;
-                activitySortAsc = column === 'name'; // Ascending for name, descending for date
-            }
-            renderActivityTimeline();
-        }
-        
-        // ✅ UPDATED: Activity Timeline as Sortable Table - Now includes Follow-Ups
+        // ✅ NEW: Enhanced Activity Timeline (Card-based, not a list)
         function renderActivityTimeline() {
             const container = document.getElementById('activityTimelineContainer');
             if (!container) return;
@@ -5518,106 +5123,66 @@ END:VEVENT
             const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
             
             // Build activity list from visits
-            let activities = [];
+            const activities = [];
             
-            // ✅ NEW: Apply role-based filtering first
-            let roleFilteredVisits = filterVisitsByUser(state.visits);
-            
-            // ✅ Apply zone filter to visits (dashboard filter)
-            const filteredVisits = dashboardZoneFilter.length > 0 ? roleFilteredVisits.filter(v => {
-                const org = state.organizations.find(org => String(org.ID) === String(v.Org_ID));
+            // ✅ FIXED: Apply zone filter to visits
+            const filteredVisits = dashboardZoneFilter.length > 0 ? state.visits.filter(v => {
+                const org = state.organizations.find(org => org.ID === v.Org_ID);
                 return org && dashboardZoneFilter.includes(org.Zone);
-            }) : roleFilteredVisits;
+            }) : state.visits;
             
             filteredVisits.forEach(v => {
                 const visitDate = new Date(v.Visit_Date);
                 if (visitDate >= thirtyDaysAgo) {
-                    const org = state.organizations.find(o => String(o.ID) === String(v.Org_ID));
-                    const contact = state.contacts.find(c => String(c.ID) === String(v.Contact_ID));
-                    
-                    // Add visit activity
+                    const org = state.organizations.find(o => o.ID === v.Org_ID);
+                    const contact = state.contacts.find(c => c.ID === v.Contact_ID);
                     activities.push({
                         date: visitDate,
-                        dateStr: v.Visit_Date,
                         type: 'Visit',
-                        orgName: org?.Name || 'Unknown Organization',
-                        orgId: v.Org_ID,
+                        orgName: org?.Name || 'Organization',
                         contactName: contact ? `${contact.First_Name} ${contact.Last_Name}` : 'General',
                         outcome: v.Outcome || 'No outcome recorded',
-                        repName: v.Rep_Name || 'Unknown',
-                        icon: 'place',
-                        badgeColor: '#FFF3E0',
-                        badgeTextColor: '#F57600'
+                        repName: v.Rep_Name || 'Unknown'
                     });
-                    
-                    // ✅ NEW: Add follow-up activity if scheduled
-                    if (v.Follow_Up_Date && String(v.Follow_Up_Date).trim()) {
-                        activities.push({
-                            date: visitDate, // Sort by when it was created
-                            dateStr: v.Visit_Date,
-                            type: 'Follow-Up Scheduled',
-                            orgName: org?.Name || 'Unknown Organization',
-                            orgId: v.Org_ID,
-                            contactName: contact ? `${contact.First_Name} ${contact.Last_Name}` : 'General',
-                            outcome: `Due: ${formatDateForDisplay(v.Follow_Up_Date)}${v.Follow_Up_Notes ? ' - ' + v.Follow_Up_Notes : ''}`,
-                            repName: v.Rep_Name || 'Unknown',
-                            icon: 'event',
-                            badgeColor: '#E0F2FE',
-                            badgeTextColor: '#0284C7'
-                        });
-                    }
                 }
             });
             
-            // ✅ Sort based on current sort settings
-            activities.sort((a, b) => {
-                let cmp = 0;
-                if (activitySortColumn === 'date') {
-                    cmp = b.date - a.date; // Newest first by default
-                } else if (activitySortColumn === 'name') {
-                    cmp = a.orgName.localeCompare(b.orgName);
-                }
-                return activitySortAsc ? -cmp : cmp;
-            });
+            // Sort by date (newest first)
+            activities.sort((a, b) => b.date - a.date);
             
             if (activities.length === 0) {
-                container.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--gray-400); padding: 40px;">No recent activity</td></tr>';
+                container.innerHTML = '<div style="color: var(--gray-400); text-align: center; padding: 40px; grid-column: 1/-1;">No recent activity</div>';
                 return;
             }
             
-            // ✅ Render as table rows with activity type icons
-            container.innerHTML = activities.slice(0, 50).map(activity => {
+            container.innerHTML = activities.slice(0, 12).map(activity => {
                 const daysDiff = Math.floor((now - activity.date) / (1000 * 60 * 60 * 24));
-                let timeText = formatDate(activity.dateStr);
+                let timeText = formatDate(activity.date.toISOString().split('T')[0]);
                 if (daysDiff === 0) timeText = 'Today';
                 else if (daysDiff === 1) timeText = 'Yesterday';
                 else if (daysDiff < 7) timeText = `${daysDiff} days ago`;
                 
                 return `
-                    <tr class="clickable-row" onclick="switchTab('directory'); setTimeout(() => openDetailPanel('org', '${activity.orgId}'), 100);">
-                        <td>
-                            <div style="display: flex; align-items: center; gap: 6px;">
-                                <span class="material-icons-outlined" style="font-size: 16px; color: ${activity.badgeTextColor};">${activity.icon}</span>
-                                <div>
-                                    <div style="font-weight: 500;">${timeText}</div>
-                                    <div style="font-size: 11px; color: var(--gray-400);">${activity.type}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><strong>${esc(activity.orgName)}</strong></td>
-                        <td>${esc(activity.contactName)}</td>
-                        <td>${esc(activity.repName)}</td>
-                        <td>
-                            <span class="status-badge" style="background: ${activity.badgeColor}; color: ${activity.badgeTextColor}; font-size: 11px;">
-                                ${esc(activity.outcome)}
-                            </span>
-                        </td>
-                    </tr>
+                    <div style="background: var(--gray-50); border-radius: 8px; padding: 16px; border-left: 4px solid #F57600;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                            <div style="font-weight: 600; color: var(--text-primary);">${esc(activity.orgName)}</div>
+                            <span style="font-size: 12px; background: #FFF3E0; color: #F57600; padding: 4px 8px; border-radius: 4px;">Visit</span>
+                        </div>
+                        <div style="font-size: 14px; color: var(--gray-600); margin-bottom: 6px;">
+                            <span style="font-weight: 500;">Contact:</span> ${esc(activity.contactName)}
+                        </div>
+                        <div style="font-size: 14px; color: var(--gray-600); margin-bottom: 6px;">
+                            <span style="font-weight: 500;">Rep:</span> ${esc(activity.repName)}
+                        </div>
+                        <div style="font-size: 13px; color: var(--gray-600); margin-bottom: 8px;">
+                            <span style="font-weight: 500;">Outcome:</span> ${esc(activity.outcome)}
+                        </div>
+                        <div style="font-size: 12px; color: var(--gray-400);">
+                            <span class="material-icons-outlined" style="font-size: 14px; vertical-align: middle;">schedule</span> ${timeText}
+                        </div>
+                    </div>
                 `;
             }).join('');
-            
-            // Update sort arrows
-            updateSortArrows('activityTable', activitySortColumn, activitySortAsc);
         }
         
         // ✅ NEW: Enhanced Zone Performance
@@ -5694,18 +5259,18 @@ END:VEVENT
         
         // ✅ NEW: Format date as mm/dd/yyyy
         function formatDate(dateStr) {
-            // Use the consistent date formatting helper
-            return formatDateForDisplay(dateStr);
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${month}/${day}/${year}`;
         }
 
         function getVisitDateClass(dateStr) {
             if (!dateStr) return 'visit-never';
-            const visitDateStr = normalizeDate(dateStr);
-            const todayStr = getLocalDateString();
-            
-            // Calculate days difference using normalized strings
-            const visitDate = new Date(visitDateStr);
-            const today = new Date(todayStr);
+            const visitDate = new Date(dateStr);
+            const today = new Date();
             const daysDiff = Math.floor((today - visitDate) / (1000 * 60 * 60 * 24));
             
             if (daysDiff <= 14) return 'visit-recent';      // Within 2 weeks - green
@@ -6088,83 +5653,37 @@ END:VEVENT
                     </div>
                     
                     <div class="detail-section">
-                        <div class="detail-section-title" style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>Recent Activity (${visits.length})</span>
-                            <div style="display: flex; gap: 8px;">
-                                <button class="btn btn-sm" onclick="sortOrgActivityTable('${id}', 'date')" title="Sort by Date">
-                                    <span class="material-icons-outlined" style="font-size: 14px;">schedule</span>
-                                </button>
-                                <button class="btn btn-sm" onclick="sortOrgActivityTable('${id}', 'outcome')" title="Sort by Outcome">
-                                    <span class="material-icons-outlined" style="font-size: 14px;">flag</span>
-                                </button>
-                            </div>
-                        </div>
-                        ${visits.length > 0 ? `
-                            <div class="table-container" style="margin-top: 12px;">
-                                <table class="sortable-table" style="font-size: 13px;" id="orgActivityTable_${id}">
-                                    <thead>
-                                        <tr>
-                                            <th style="width: 100px; cursor: pointer;" onclick="sortOrgActivityTable('${id}', 'date')">Date/Time <span class="sort-icon">▼</span></th>
-                                            <th style="width: 140px; cursor: pointer;" onclick="sortOrgActivityTable('${id}', 'outcome')">Outcome</th>
-                                            <th>Materials</th>
-                                            <th>Notes</th>
-                                            <th style="width: 100px;">Follow-Up</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="orgActivityBody_${id}">
-                                        ${renderOrgActivityRows(id, visits, 5)}
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div id="orgActivityLoadMore_${id}" style="text-align: center; padding: 12px;">
-                                ${visits.length > 5 ? `<button class="btn btn-sm btn-secondary" onclick="loadMoreOrgActivity('${id}')"><span class="material-icons-outlined" style="font-size: 14px;">add</span> Load More (+5)</button>` : ''}
-                                <span style="color: var(--gray-500); font-size: 12px; margin-left: 8px;" id="orgActivityCount_${id}">Showing ${Math.min(5, visits.length)} of ${visits.length}</span>
-                            </div>
-                        ` : '<div style="color:var(--gray-400);text-align:center;padding:20px;">No activity yet</div>'}
-                    </div>
-                    
-                    ${(() => {
-                        // ✅ NEW: Scheduled Follow-Ups for this organization
-                        const orgFollowUps = visits.filter(v => v.Follow_Up_Date && String(v.Follow_Up_Date).trim());
-                        if (orgFollowUps.length === 0) return '';
-                        
-                        const todayStr = getLocalDateString();
-                        
-                        return `
-                        <div class="detail-section">
-                            <div class="detail-section-title">
-                                <span class="material-icons-outlined" style="font-size: 18px; vertical-align: middle; margin-right: 4px;">event_upcoming</span>
-                                Scheduled Follow-Ups (${orgFollowUps.length})
-                            </div>
-                            ${orgFollowUps.map(v => {
-                                const followUpDateStr = normalizeDate(v.Follow_Up_Date);
-                                const isPast = followUpDateStr < todayStr;
-                                const isToday = followUpDateStr === todayStr;
+                        <div class="detail-section-title">Recent Activity</div>
+                        ${visits.length > 0 || emails.length > 0 ? `
+                            ${visits.slice(0, 5).map(v => {
+                                const visitDate = new Date(v.Visit_Date);
+                                const month = String(visitDate.getMonth() + 1).padStart(2, '0');
+                                const day = String(visitDate.getDate()).padStart(2, '0');
+                                const year = visitDate.getFullYear();
+                                const formattedDate = month + '/' + day + '/' + year;
                                 
-                                let statusBadge = '';
-                                let bgColor = 'var(--gray-50)';
-                                if (isPast) {
-                                    statusBadge = '<span class="status-badge status-inactive" style="font-size:10px;margin-left:6px;">OVERDUE</span>';
-                                    bgColor = '#FEF2F2';
-                                } else if (isToday) {
-                                    statusBadge = '<span class="status-badge status-active" style="font-size:10px;margin-left:6px;">TODAY</span>';
-                                    bgColor = '#FFF7ED';
+                                // ✅ NEW: Format time in 12H format if available
+                                let timeStr = '';
+                                if (v.Check_In_Time) {
+                                    const [hours, minutes] = v.Check_In_Time.split(':');
+                                    const h = parseInt(hours);
+                                    const ampm = h >= 12 ? 'PM' : 'AM';
+                                    const displayHours = h % 12 || 12;
+                                    timeStr = ` at ${displayHours}:${minutes} ${ampm}`;
                                 }
                                 
-                                return '<div class="activity-item" style="background:' + bgColor + ';border-radius:6px;padding:12px;margin-bottom:8px;">' +
-                                    '<div class="activity-icon" style="background:#E0F2FE;"><span class="material-icons-outlined" style="color:#0284C7;">event</span></div>' +
-                                    '<div class="activity-content" style="flex:1;">' +
-                                        '<div class="activity-title"><strong>' + formatDateForDisplay(v.Follow_Up_Date) + '</strong>' + statusBadge + '</div>' +
-                                        '<div class="activity-meta">' + esc(v.Follow_Up_Notes || 'No action specified') + '</div>' +
-                                        '<div style="font-size:11px;color:var(--gray-400);margin-top:4px;">From visit on ' + formatDateForDisplay(v.Visit_Date) + '</div>' +
-                                    '</div>' +
-                                    '<button class="btn btn-sm" data-followup-org="' + id + '" data-followup-date="' + normalizeDate(v.Follow_Up_Date) + '" data-followup-notes="' + esc(v.Follow_Up_Notes || '').replace(/"/g, '&quot;') + '" data-visit-notes="' + esc(v.Notes || '').replace(/"/g, '&quot;') + '" data-outcome="' + esc(v.Outcome || '').replace(/"/g, '&quot;') + '" onclick="event.stopPropagation(); addFollowUpFromButton(this)" title="Add to Calendar" style="padding:4px 8px;">' +
-                                        '<span class="material-icons-outlined" style="font-size:16px;">event</span>' +
-                                    '</button>' +
-                                '</div>';
+                                return `
+                                <div class="activity-item">
+                                    <div class="activity-icon visit"><span class="material-icons-outlined">place</span></div>
+                                    <div class="activity-content">
+                                        <div class="activity-title">${esc(v.Outcome || 'Visit')}</div>
+                                        <div class="activity-meta">${formattedDate}${timeStr} ${v.Rep_Name ? `by ${v.Rep_Name}` : ''}</div>
+                                    </div>
+                                </div>
+                            `;
                             }).join('')}
-                        </div>`;
-                    })()}
+                        ` : '<div style="color:var(--gray-400);text-align:center;padding:20px;">No activity yet</div>'}
+                    </div>
                 `;
             } else {
                 // Contact detail
@@ -6237,7 +5756,7 @@ END:VEVENT
                                 <div class="activity-icon visit"><span class="material-icons-outlined">place</span></div>
                                 <div class="activity-content">
                                     <div class="activity-title">${esc(v.Outcome || 'Visit')} at ${esc(org?.Name || '')}</div>
-                                    <div class="activity-meta">${formatDateForDisplay(v.Visit_Date)} ${v.Rep_Name ? `by ${v.Rep_Name}` : ''}</div>
+                                    <div class="activity-meta">${v.Visit_Date} ${v.Rep_Name ? `by ${v.Rep_Name}` : ''}</div>
                                 </div>
                             </div>
                         `).join('') : '<div style="color:var(--gray-400);text-align:center;padding:20px;">No activity yet</div>'}
@@ -6301,18 +5820,8 @@ END:VEVENT
         }
 
         function renderVisits() {
-            // ✅ FIXED: Update route planner cities when visiting the Visits tab
-            try { 
-                populateRouteCities(); 
-                populateRouteZones();
-                // Set today as default date if not already set
-                const dateInput = document.getElementById('routePlanDate');
-                if (dateInput && !dateInput.value) {
-                    dateInput.value = getLocalDateString();
-                }
-            } catch (e) { 
-                console.warn('Error populating route cities:', e); 
-            }
+            // Update route planner cities when visiting the Visits tab
+            try { populateRouteCities(); } catch (e) { console.warn('Error populating route cities:', e); }
             
             // Populate zone filter dynamically
             const zoneSelect = document.getElementById('visitZoneFilter');
@@ -6549,315 +6058,25 @@ END:VEVENT
         }
 
         function renderTodayVisits() {
-            const todayStr = getLocalDateString();
-            console.log('🗓️ Today (local):', todayStr);
-            
-            // Filter visits for today using normalized date comparison
-            const todayVisits = filterVisitsByUser(state.visits.filter(v => {
-                const visitDateStr = normalizeDate(v.Visit_Date);
-                const match = visitDateStr === todayStr;
-                if (v.Visit_Date) {
-                    console.log(`   Visit ${v.ID}: ${v.Visit_Date} → ${visitDateStr} = ${match ? '✅ TODAY' : '❌'}`);
-                }
-                return match;
-            }));
-            
-            console.log('📋 Today visits count:', todayVisits.length);
-            
+            const today = new Date().toISOString().split('T')[0];
+            const todayVisits = state.visits.filter(v => v.Visit_Date === today);
             const container = document.getElementById('todayVisits');
-            if (!container) {
-                console.warn('todayVisits container not found');
-                return;
-            }
             
             if (todayVisits.length === 0) {
-                container.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--gray-400); padding: 20px;">No visits logged today</td></tr>';
+                container.innerHTML = '<div style="color: var(--gray-400); text-align: center; padding: 20px;">No visits logged today</div>';
                 return;
             }
             
             container.innerHTML = todayVisits.map(v => {
-                const org = state.organizations.find(o => String(o.ID) === String(v.Org_ID));
-                const assetsDisplay = getMaterialsDisplay(v);
-                
-                // Format time for display
-                const timeDisplay = formatTimeForDisplay(v.Check_In_Time) || '-';
-                
-                // Follow-up display with formatted date
-                const hasFollowUp = v.Follow_Up_Date && String(v.Follow_Up_Date).trim();
-                const followUpDisplay = hasFollowUp 
-                    ? `<span class="status-badge" style="background: var(--info-light); color: var(--info);">${formatDateForDisplay(v.Follow_Up_Date)}</span>`
-                    : '-';
-                
-                return `<tr class="clickable-row" onclick="switchTab('directory'); setTimeout(() => openDetailPanel('org', '${v.Org_ID}'), 100);">
-                    <td style="white-space: nowrap;">
-                        <span class="material-icons-outlined" style="font-size: 14px; vertical-align: middle; color: var(--gray-500);">schedule</span>
-                        ${timeDisplay}
-                    </td>
-                    <td><strong style="color: var(--navy);">${esc(org?.Name || 'Unknown')}</strong></td>
-                    <td>
-                        <span class="status-badge" style="background: #FFF3E0; color: #F57600; font-size: 11px;">
-                            ${esc(v.Outcome || 'No outcome')}
-                        </span>
-                    </td>
-                    <td style="font-size: 12px; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${esc(assetsDisplay)}">${esc(assetsDisplay)}</td>
-                    <td style="font-size: 12px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${esc(v.Notes || '')}">${v.Notes ? esc(v.Notes) : '-'}</td>
-                    <td>${followUpDisplay}</td>
-                </tr>`;
+                const org = state.organizations.find(o => o.ID === v.Org_ID);
+                return `<div style="padding: 12px; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>${esc(org?.Name || 'Unknown')}</strong>
+                        <div style="font-size: 12px; color: var(--gray-500);">${v.Check_In_Time || ''} - ${esc(v.Outcome || '')}</div>
+                    </div>
+                    <span class="status-badge status-active">Complete</span>
+                </div>`;
             }).join('');
-        }
-        
-        // ✅ NEW: Render Scheduled Follow-Ups table
-        function renderFollowUps() {
-            const container = document.getElementById('followUpsList');
-            if (!container) return;
-            
-            const todayStr = getLocalDateString();
-            
-            // Get all visits with follow-ups (apply role filter)
-            const followUps = filterVisitsByUser(state.visits)
-                .filter(v => v.Follow_Up_Date && String(v.Follow_Up_Date).trim())
-                .map(v => {
-                    const org = state.organizations.find(o => String(o.ID) === String(v.Org_ID));
-                    const followUpDateStr = normalizeDate(v.Follow_Up_Date);
-                    const isPast = followUpDateStr < todayStr;
-                    const isToday = followUpDateStr === todayStr;
-                    return {
-                        ...v,
-                        org,
-                        followUpDateStr,
-                        isPast,
-                        isToday
-                    };
-                })
-                .sort((a, b) => a.followUpDateStr.localeCompare(b.followUpDateStr));
-            
-            if (followUps.length === 0) {
-                container.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--gray-400); padding: 20px;">No follow-ups scheduled</td></tr>';
-                return;
-            }
-            
-            container.innerHTML = followUps.map(f => {
-                let statusBadge = '';
-                let rowStyle = '';
-                if (f.isPast) {
-                    statusBadge = '<span class="status-badge status-inactive" style="font-size: 10px; margin-left: 6px;">OVERDUE</span>';
-                    rowStyle = 'background: #FEF2F2;';
-                } else if (f.isToday) {
-                    statusBadge = '<span class="status-badge status-active" style="font-size: 10px; margin-left: 6px;">TODAY</span>';
-                    rowStyle = 'background: #FFF7ED;';
-                }
-                
-                return `<tr style="${rowStyle}">
-                    <td style="white-space: nowrap;">
-                        <span class="material-icons-outlined" style="font-size: 14px; vertical-align: middle; color: ${f.isPast ? '#EF4444' : f.isToday ? '#F57600' : 'var(--gray-500)'};">event</span>
-                        <strong>${formatDateForDisplay(f.Follow_Up_Date)}</strong>
-                        ${statusBadge}
-                    </td>
-                    <td>
-                        <a href="#" onclick="event.preventDefault(); switchTab('directory'); setTimeout(() => openDetailPanel('org', '${f.Org_ID}'), 100);" style="color: var(--navy); font-weight: 500;">
-                            ${esc(f.org?.Name || 'Unknown')}
-                        </a>
-                    </td>
-                    <td style="font-size: 12px;">${esc(f.Follow_Up_Notes || 'No action specified')}</td>
-                    <td style="font-size: 12px; color: var(--gray-500);">
-                        ${formatDateForDisplay(f.Visit_Date)}
-                    </td>
-                    <td style="text-align: center;">
-                        <button class="btn btn-sm" onclick="event.stopPropagation(); addExistingFollowUpToCalendar('${f.Org_ID}', '${normalizeDate(f.Follow_Up_Date)}', '${esc(f.Follow_Up_Notes || '')}', '${esc(f.Notes || '')}', '${esc(f.Outcome || '')}')" title="Add to Google Calendar" style="padding: 4px 8px;">
-                            <span class="material-icons-outlined" style="font-size: 16px;">event</span>
-                        </button>
-                        <button class="btn btn-sm" onclick="event.stopPropagation(); markFollowUpComplete('${f.ID}')" title="Mark Complete" style="padding: 4px 8px; margin-left: 4px;">
-                            <span class="material-icons-outlined" style="font-size: 16px;">check_circle</span>
-                        </button>
-                    </td>
-                </tr>`;
-            }).join('');
-        }
-        
-        // ✅ NEW: Add existing follow-up to Google Calendar
-        function addExistingFollowUpToCalendar(orgId, followUpDate, followUpNotes, visitNotes, outcome) {
-            const org = state.organizations.find(o => String(o.ID) === String(orgId));
-            if (!org) {
-                showToast('Organization not found', 'error');
-                return;
-            }
-            
-            const eventTitle = `Follow-up: ${org.Name}`;
-            let eventDescription = `Organization: ${org.Name}\n`;
-            if (org.Address) eventDescription += `Address: ${org.Address}, ${org.City}, ${org.State} ${org.Zip}\n`;
-            if (org.Phone) eventDescription += `Phone: ${org.Phone}\n`;
-            eventDescription += `\nLast Visit Outcome: ${outcome}\n`;
-            if (followUpNotes) eventDescription += `\nAction: ${followUpNotes}\n`;
-            if (visitNotes) eventDescription += `\nVisit Notes: ${visitNotes}\n`;
-            eventDescription += `\n---\nCreated from Alice Care BusDev Tracker`;
-            
-            const [year, month, day] = followUpDate.split('-');
-            const startDateTime = `${year}${month}${day}T090000`;
-            const endDateTime = `${year}${month}${day}T093000`;
-            
-            const location = org.Address ? `${org.Address}, ${org.City}, ${org.State} ${org.Zip}` : '';
-            
-            const calendarUrl = new URL('https://calendar.google.com/calendar/render');
-            calendarUrl.searchParams.set('action', 'TEMPLATE');
-            calendarUrl.searchParams.set('text', eventTitle);
-            calendarUrl.searchParams.set('dates', `${startDateTime}/${endDateTime}`);
-            calendarUrl.searchParams.set('details', eventDescription);
-            if (location) calendarUrl.searchParams.set('location', location);
-            calendarUrl.searchParams.set('ctz', 'America/Los_Angeles');
-            
-            window.open(calendarUrl.toString(), '_blank');
-            showToast('Opening Google Calendar...', 'success');
-        }
-        
-        // ✅ NEW: Helper to add follow-up from button with data attributes
-        function addFollowUpFromButton(btn) {
-            const orgId = btn.dataset.followupOrg;
-            const followUpDate = btn.dataset.followupDate;
-            const followUpNotes = btn.dataset.followupNotes || '';
-            const visitNotes = btn.dataset.visitNotes || '';
-            const outcome = btn.dataset.outcome || '';
-            addExistingFollowUpToCalendar(orgId, followUpDate, followUpNotes, visitNotes, outcome);
-        }
-        
-        // ✅ NEW: Helper function to parse materials from visit (handles both Assets_Used and old brochure columns)
-        function getMaterialsDisplay(v) {
-            let assetsDisplay = '-';
-            
-            // Try new Assets_Used format first
-            if (v.Assets_Used && v.Assets_Used !== '{}') {
-                try {
-                    const assets = typeof v.Assets_Used === 'string' ? JSON.parse(v.Assets_Used) : v.Assets_Used;
-                    const assetItems = [];
-                    for (const [itemId, qty] of Object.entries(assets)) {
-                        if (qty > 0) {
-                            const item = state.assetItems.find(a => a.ID === itemId);
-                            assetItems.push((item?.Name || itemId) + ': ' + qty);
-                        }
-                    }
-                    if (assetItems.length > 0) assetsDisplay = assetItems.join(', ');
-                } catch (e) { }
-            }
-            
-            // Fallback to old brochure columns format
-            if (assetsDisplay === '-') {
-                const brochureItems = [];
-                if (parseInt(v.Brochures_General) > 0) brochureItems.push('General: ' + v.Brochures_General);
-                if (parseInt(v.Brochures_Hospice) > 0) brochureItems.push('Hospice: ' + v.Brochures_Hospice);
-                if (parseInt(v.Brochures_Other) > 0) brochureItems.push('Other: ' + v.Brochures_Other);
-                if (parseInt(v.Business_Card) > 0) brochureItems.push('Cards: ' + v.Business_Card);
-                if (brochureItems.length > 0) {
-                    assetsDisplay = brochureItems.join(', ');
-                }
-            }
-            
-            return assetsDisplay;
-        }
-        
-        // ✅ NEW: Org Activity Table Management
-        window.orgActivityState = window.orgActivityState || {};
-        
-        // Helper function to render org activity rows
-        function renderOrgActivityRows(orgId, visits, limit) {
-            // Initialize state if needed
-            if (!window.orgActivityState[orgId]) {
-                window.orgActivityState[orgId] = {
-                    shown: limit || 5,
-                    sortBy: 'date',
-                    sortAsc: false
-                };
-            }
-            
-            const stateData = window.orgActivityState[orgId];
-            
-            // Sort visits using normalized dates
-            let sortedVisits = [...visits];
-            sortedVisits.sort((a, b) => {
-                let cmp = 0;
-                if (stateData.sortBy === 'date') {
-                    cmp = normalizeDate(b.Visit_Date).localeCompare(normalizeDate(a.Visit_Date));
-                } else if (stateData.sortBy === 'outcome') {
-                    cmp = (a.Outcome || '').localeCompare(b.Outcome || '');
-                }
-                return stateData.sortAsc ? -cmp : cmp;
-            });
-            
-            // Render rows up to shown count
-            return sortedVisits.slice(0, stateData.shown).map(v => {
-                const formattedDate = formatDateForDisplay(v.Visit_Date);
-                const timeStr = formatTimeForDisplay(v.Check_In_Time);
-                
-                const assetsDisplay = getMaterialsDisplay(v);
-                
-                const hasFollowUp = v.Follow_Up_Date && String(v.Follow_Up_Date).trim();
-                const followUpDisplay = hasFollowUp 
-                    ? '<span class="status-badge" style="background: var(--info-light); color: var(--info); font-size: 11px;">' + formatDateForDisplay(v.Follow_Up_Date) + '</span>' +
-                      (v.Follow_Up_Notes ? '<div style="font-size: 11px; color: var(--gray-500); margin-top: 4px;">' + esc(v.Follow_Up_Notes) + '</div>' : '')
-                    : '-';
-                
-                return '<tr>' +
-                    '<td style="white-space: nowrap;">' +
-                        '<div style="font-weight: 500;">' + formattedDate + '</div>' +
-                        (timeStr ? '<div style="font-size: 11px; color: var(--gray-500);">' + timeStr + '</div>' : '') +
-                        (v.Rep_Name ? '<div style="font-size: 11px; color: var(--gray-400);">' + esc(v.Rep_Name) + '</div>' : '') +
-                    '</td>' +
-                    '<td><span class="status-badge" style="background: #FFF3E0; color: #F57600; font-size: 11px;">' + esc(v.Outcome || 'No outcome') + '</span></td>' +
-                    '<td style="font-size: 12px; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="' + esc(assetsDisplay) + '">' + esc(assetsDisplay) + '</td>' +
-                    '<td style="font-size: 12px;">' + (v.Notes ? '<div style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="' + esc(v.Notes) + '">' + esc(v.Notes) + '</div>' : '-') + '</td>' +
-                    '<td>' + followUpDisplay + '</td>' +
-                '</tr>';
-            }).join('');
-        }
-        
-        function sortOrgActivityTable(orgId, sortBy) {
-            const stateData = window.orgActivityState[orgId];
-            if (!stateData) return;
-            
-            if (stateData.sortBy === sortBy) {
-                stateData.sortAsc = !stateData.sortAsc;
-            } else {
-                stateData.sortBy = sortBy;
-                stateData.sortAsc = sortBy === 'outcome'; // date desc, outcome asc by default
-            }
-            
-            // Re-render the org detail panel to apply sort
-            openDetailPanel('org', orgId);
-        }
-        
-        function loadMoreOrgActivity(orgId) {
-            const stateData = window.orgActivityState[orgId];
-            if (!stateData) {
-                window.orgActivityState[orgId] = { shown: 10, sortBy: 'date', sortAsc: false };
-            } else {
-                stateData.shown = stateData.shown + 5;
-            }
-            
-            // Re-render the org detail panel to show more
-            openDetailPanel('org', orgId);
-        }
-        
-        // ✅ NEW: Mark follow-up as complete (clears the follow-up date)
-        async function markFollowUpComplete(visitId) {
-            const visit = state.visits.find(v => v.ID === visitId);
-            if (!visit) return;
-            
-            const org = state.organizations.find(o => String(o.ID) === String(visit.Org_ID));
-            
-            if (!confirm(`Mark follow-up for "${org?.Name || 'this organization'}" as complete?`)) return;
-            
-            // Clear follow-up fields
-            visit.Follow_Up_Date = '';
-            visit.Follow_Up_Notes = '';
-            
-            showLoading(true);
-            try {
-                await apiPost('updateVisit', { visit });
-                showToast('Follow-up marked as complete!', 'success');
-                renderFollowUps();
-                renderTodayVisits();
-            } catch (err) {
-                showToast('Failed to update follow-up', 'error');
-            }
-            showLoading(false);
         }
 
         function populateDropdowns() {
@@ -6891,182 +6110,6 @@ END:VEVENT
         // ============================================
         // CHECK-IN
         // ============================================
-        
-        // ✅ NEW: Toggle follow-up section
-        function toggleFollowUpSection() {
-            const section = document.getElementById('followUpSection');
-            const icon = document.getElementById('followUpToggleIcon');
-            if (section.style.display === 'none') {
-                section.style.display = 'block';
-                icon.style.transform = 'rotate(180deg)';
-                // Set default follow-up date to tomorrow (local timezone)
-                const tomorrow = new Date();
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                document.getElementById('followUpDate').value = getLocalDateString(tomorrow);
-            } else {
-                section.style.display = 'none';
-                icon.style.transform = 'rotate(0deg)';
-            }
-        }
-        
-        // ✅ NEW: Add follow-up to Google Calendar (opens in new tab)
-        function addFollowUpToCalendar() {
-            const orgId = document.getElementById('checkinOrg').value;
-            const org = state.organizations.find(o => String(o.ID) === String(orgId));
-            
-            if (!orgId || !org) {
-                showToast('Please select an organization first', 'error');
-                return;
-            }
-            
-            const followUpDate = document.getElementById('followUpDate').value;
-            const followUpTime = document.getElementById('followUpTime').value;
-            const description = document.getElementById('followUpDescription').value;
-            const notes = document.getElementById('checkinNotes').value;
-            const outcome = document.getElementById('checkinOutcome').value;
-            
-            if (!followUpDate) {
-                showToast('Please select a follow-up date', 'error');
-                return;
-            }
-            
-            // Build event title and description
-            const eventTitle = `Follow-up: ${org.Name}`;
-            let eventDescription = `Organization: ${org.Name}\n`;
-            if (org.Address) eventDescription += `Address: ${org.Address}, ${org.City}, ${org.State} ${org.Zip}\n`;
-            if (org.Phone) eventDescription += `Phone: ${org.Phone}\n`;
-            eventDescription += `\nLast Visit Outcome: ${outcome}\n`;
-            if (description) eventDescription += `\nAction: ${description}\n`;
-            if (notes) eventDescription += `\nVisit Notes: ${notes}\n`;
-            eventDescription += `\n---\nCreated from Alice Care BusDev Tracker`;
-            
-            // Create Google Calendar URL
-            // Format: YYYYMMDDTHHMMSS
-            const [year, month, day] = followUpDate.split('-');
-            const [hours, minutes] = followUpTime.split(':');
-            const startDateTime = `${year}${month}${day}T${hours}${minutes}00`;
-            
-            // End time: 30 minutes after start
-            const endDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hours), parseInt(minutes) + 30);
-            const endDateTime = `${endDate.getFullYear()}${String(endDate.getMonth() + 1).padStart(2, '0')}${String(endDate.getDate()).padStart(2, '0')}T${String(endDate.getHours()).padStart(2, '0')}${String(endDate.getMinutes()).padStart(2, '0')}00`;
-            
-            // Build location
-            const location = org.Address ? `${org.Address}, ${org.City}, ${org.State} ${org.Zip}` : '';
-            
-            // Construct Google Calendar URL
-            const calendarUrl = new URL('https://calendar.google.com/calendar/render');
-            calendarUrl.searchParams.set('action', 'TEMPLATE');
-            calendarUrl.searchParams.set('text', eventTitle);
-            calendarUrl.searchParams.set('dates', `${startDateTime}/${endDateTime}`);
-            calendarUrl.searchParams.set('details', eventDescription);
-            if (location) calendarUrl.searchParams.set('location', location);
-            calendarUrl.searchParams.set('ctz', 'America/Los_Angeles');
-            
-            // Open in new tab
-            window.open(calendarUrl.toString(), '_blank');
-            showToast('Opening Google Calendar...', 'success');
-        }
-        
-        // ✅ NEW: Download follow-up as ICS file
-        function downloadFollowUpICS() {
-            const orgId = document.getElementById('checkinOrg').value;
-            const org = state.organizations.find(o => String(o.ID) === String(orgId));
-            
-            if (!orgId || !org) {
-                showToast('Please select an organization first', 'error');
-                return;
-            }
-            
-            const followUpDate = document.getElementById('followUpDate').value;
-            const followUpTime = document.getElementById('followUpTime').value;
-            const description = document.getElementById('followUpDescription').value;
-            const notes = document.getElementById('checkinNotes').value;
-            const outcome = document.getElementById('checkinOutcome').value;
-            
-            if (!followUpDate) {
-                showToast('Please select a follow-up date', 'error');
-                return;
-            }
-            
-            // Build event details
-            const eventTitle = `Follow-up: ${org.Name}`;
-            let eventDescription = `Organization: ${org.Name}\\n`;
-            if (org.Address) eventDescription += `Address: ${org.Address}, ${org.City}, ${org.State} ${org.Zip}\\n`;
-            if (org.Phone) eventDescription += `Phone: ${org.Phone}\\n`;
-            eventDescription += `\\nLast Visit Outcome: ${outcome}\\n`;
-            if (description) eventDescription += `\\nAction: ${description}\\n`;
-            if (notes) eventDescription += `\\nVisit Notes: ${notes.replace(/\n/g, '\\n')}\\n`;
-            eventDescription += `\\n---\\nCreated from Alice Care BusDev Tracker`;
-            
-            // Create dates
-            const [year, month, day] = followUpDate.split('-').map(Number);
-            const [hours, mins] = followUpTime.split(':').map(Number);
-            const startDate = new Date(year, month - 1, day, hours, mins, 0);
-            const endDate = new Date(startDate.getTime() + 30 * 60000); // 30 min duration
-            
-            const formatICSDate = (date) => {
-                return `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}T${String(date.getHours()).padStart(2, '0')}${String(date.getMinutes()).padStart(2, '0')}00`;
-            };
-            
-            const location = org.Address ? `${org.Address}, ${org.City}, ${org.State} ${org.Zip}` : '';
-            const uid = `followup-${org.ID}-${Date.now()}@alicecare.com`;
-            
-            const icsContent = `BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//Alice Care Business Development//Follow-Up//EN
-CALSCALE:GREGORIAN
-METHOD:PUBLISH
-X-WR-TIMEZONE:America/Los_Angeles
-BEGIN:VTIMEZONE
-TZID:America/Los_Angeles
-BEGIN:DAYLIGHT
-TZOFFSETFROM:-0800
-TZOFFSETTO:-0700
-TZNAME:PDT
-DTSTART:20250309T020000
-RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU
-END:DAYLIGHT
-BEGIN:STANDARD
-TZOFFSETFROM:-0700
-TZOFFSETTO:-0800
-TZNAME:PST
-DTSTART:20251102T020000
-RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU
-END:STANDARD
-END:VTIMEZONE
-BEGIN:VEVENT
-UID:${uid}
-DTSTAMP:${formatICSDate(new Date())}
-DTSTART;TZID=America/Los_Angeles:${formatICSDate(startDate)}
-DTEND;TZID=America/Los_Angeles:${formatICSDate(endDate)}
-SUMMARY:${eventTitle}
-DESCRIPTION:${eventDescription}
-LOCATION:${location}
-CATEGORIES:Follow-Up,Alice Care,Business Development
-PRIORITY:5
-STATUS:CONFIRMED
-BEGIN:VALARM
-TRIGGER:-PT30M
-ACTION:DISPLAY
-DESCRIPTION:Reminder: ${eventTitle}
-END:VALARM
-END:VEVENT
-END:VCALENDAR`;
-            
-            // Download
-            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `FollowUp_${org.Name.replace(/\s+/g, '_')}_${followUpDate}.ics`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            showToast('Follow-up reminder downloaded!', 'success');
-        }
-        
         async function submitCheckin() {
             const orgId = document.getElementById('checkinOrg').value;
             if (!orgId) { showToast('Please select an organization', 'error'); return; }
@@ -7098,65 +6141,37 @@ END:VCALENDAR`;
                             Quantity: qty,
                             Date: now.toISOString(),
                             By: state.user?.name || '',
-                            Notes: 'Check-in at ' + (state.organizations.find(o => String(o.ID) === String(orgId))?.Name || 'organization')
+                            Notes: 'Check-in at ' + (state.organizations.find(o => o.ID === orgId)?.Name || 'organization')
                         });
                     }
                 }
             });
             
-            // ✅ Get notes and follow-up data
-            const notes = document.getElementById('checkinNotes').value.trim();
-            const followUpDate = document.getElementById('followUpDate').value;
-            const followUpTime = document.getElementById('followUpTime').value;
-            const followUpDescription = document.getElementById('followUpDescription').value.trim();
-            
             const visit = {
                 Org_ID: orgId,
-                Visit_Date: getLocalDateString(now),  // ✅ Use local date, not UTC
-                Check_In_Time: now.toTimeString().slice(0, 5),  // Already local time
+                Visit_Date: now.toISOString().split('T')[0],
+                Check_In_Time: now.toTimeString().slice(0, 5),
                 Outcome: document.getElementById('checkinOutcome').value,
                 Assets_Used: JSON.stringify(assetsUsed),
-                Notes: notes,
-                Follow_Up_Date: followUpDate || '',
-                Follow_Up_Notes: followUpDescription || '',
                 Rep_Name: state.user?.name || '',
                 Rep_Email: state.user?.email || '',
                 GPS_Lat: state.currentLocation?.lat || '',
                 GPS_Lng: state.currentLocation?.lng || ''
             };
             
-            const org = state.organizations.find(o => String(o.ID) === String(orgId));
-            const orgName = org?.Name || 'organization';
-            
             showLoading(true);
-            showToast(`⏳ Saving check-in at ${orgName}...`, 'info');
-            
             try {
-                // Store visit count before save to verify
-                const visitCountBefore = state.visits.length;
-                
                 await apiPost('addVisit', { visit, assetUpdates: state.assetItems, stockHistory: state.stockHistory.slice(0, Object.keys(assetsUsed).length) });
-                
-                // Check if visits actually increased (apiPost reloads data)
-                const visitCountAfter = state.visits.length;
-                
-                if (visitCountAfter > visitCountBefore) {
-                    console.log('✅ Visit verified saved! Count:', visitCountBefore, '→', visitCountAfter);
-                    showToast(`✅ Check-in at ${orgName} saved successfully!`, 'success');
-                } else {
-                    console.warn('⚠️ Visit count unchanged. May not have saved.');
-                    showToast(`⚠️ Check-in submitted. Please verify in History tab.`, 'warning');
-                }
+                visit.ID = 'temp_' + Date.now();
+                state.visits.push(visit);
                 
                 // Reset form
                 document.getElementById('checkinOrg').value = '';
                 document.getElementById('checkinOrgSearch').value = '';
-                document.getElementById('checkinNotes').value = '';
-                document.getElementById('followUpDate').value = '';
-                document.getElementById('followUpDescription').value = '';
-                document.getElementById('followUpSection').style.display = 'none';
-                document.getElementById('followUpToggleIcon').style.transform = 'rotate(0deg)';
                 assetInputs.forEach(input => input.value = '0');
+                
+                const org = state.organizations.find(o => o.ID === orgId);
+                showToast(`Checked in at ${org?.Name || 'organization'}!`, 'success');
                 
                 // Check for low stock and send alert
                 checkLowStock();
@@ -7167,8 +6182,7 @@ END:VCALENDAR`;
                 
                 renderAll();
             } catch (err) {
-                console.error('❌ Check-in error:', err);
-                showToast('❌ Check-in failed: ' + err.message, 'error');
+                showToast('Check-in failed', 'error');
             }
             showLoading(false);
         }
@@ -7700,7 +6714,7 @@ END:VCALENDAR`;
             document.getElementById('visitId').value = '';
             document.getElementById('visitOrg').value = '';
             document.getElementById('visitContact').innerHTML = '<option value="">Select</option>';
-            document.getElementById('visitDate').value = getLocalDateString();
+            document.getElementById('visitDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('visitOutcome').value = '';
             ['brochGeneral', 'brochHospice', 'brochHomeHealth', 'brochCards'].forEach(id => document.getElementById(id).value = '0');
             document.getElementById('visitNotes').value = '';
@@ -8669,83 +7683,6 @@ END:VCALENDAR`;
         // ============================================
         // UTILITIES
         // ============================================
-        // ============================================
-        // DATE HELPER FUNCTIONS - Use local timezone
-        // ============================================
-        
-        // Get today's date in YYYY-MM-DD format using LOCAL timezone
-        function getLocalDateString(date = new Date()) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
-        
-        // Parse a date string and return YYYY-MM-DD in local timezone
-        function normalizeDate(dateValue) {
-            if (!dateValue) return '';
-            
-            // If it's already a Date object
-            if (dateValue instanceof Date) {
-                return getLocalDateString(dateValue);
-            }
-            
-            // If it's a string
-            const str = String(dateValue).trim();
-            
-            // Handle various formats
-            // ISO format: 2024-12-13T00:00:00.000Z or 2024-12-13
-            // US format: 12/13/2024
-            // Google Sheets format: Fri Dec 13 2024...
-            
-            let date;
-            
-            // Try parsing directly (handles ISO and most standard formats)
-            date = new Date(str);
-            
-            // If invalid, try MM/DD/YYYY
-            if (isNaN(date.getTime()) && str.includes('/')) {
-                const parts = str.split('/');
-                if (parts.length === 3) {
-                    date = new Date(parts[2], parts[0] - 1, parts[1]);
-                }
-            }
-            
-            if (isNaN(date.getTime())) {
-                console.warn('Could not parse date:', dateValue);
-                return str; // Return original string as fallback
-            }
-            
-            return getLocalDateString(date);
-        }
-        
-        // Compare if a visit date matches today (handles timezone and format differences)
-        function isToday(dateValue) {
-            const todayStr = getLocalDateString();
-            const dateStr = normalizeDate(dateValue);
-            return todayStr === dateStr;
-        }
-        
-        // Format date for display (MM/DD/YYYY)
-        function formatDateForDisplay(dateValue) {
-            if (!dateValue) return '-';
-            const normalized = normalizeDate(dateValue);
-            if (!normalized || normalized.length !== 10) return dateValue;
-            const [year, month, day] = normalized.split('-');
-            return `${month}/${day}/${year}`;
-        }
-        
-        // Format time for display (12-hour format)
-        function formatTimeForDisplay(timeStr) {
-            if (!timeStr) return '';
-            const [hours, minutes] = timeStr.split(':');
-            const h = parseInt(hours);
-            if (isNaN(h)) return timeStr;
-            const ampm = h >= 12 ? 'PM' : 'AM';
-            const displayHours = h % 12 || 12;
-            return `${displayHours}:${minutes} ${ampm}`;
-        }
-
         function esc(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
         function showLoading(show) { document.getElementById('loading').classList.toggle('active', show); }
         function showToast(msg, type = 'info') {
