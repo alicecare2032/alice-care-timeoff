@@ -7565,6 +7565,13 @@ END:VCALENDAR`;
             
             const now = new Date();
             
+            // Format time explicitly in local timezone (HH:MM format)
+            const localHours = now.getHours().toString().padStart(2, '0');
+            const localMinutes = now.getMinutes().toString().padStart(2, '0');
+            const localTimeString = `${localHours}:${localMinutes}`;
+            
+            console.log('📍 Check-in time (local):', localTimeString, 'Full date:', now.toString());
+            
             // Collect asset quantities from dynamic inputs
             const assetInputs = document.querySelectorAll('#checkinAssetsGrid input[data-asset-id]');
             const assetsUsed = {};
@@ -7605,7 +7612,7 @@ END:VCALENDAR`;
             const visit = {
                 Org_ID: orgId,
                 Visit_Date: getLocalDateString(now),  // ✅ Use local date, not UTC
-                Check_In_Time: now.toTimeString().slice(0, 5),  // Already local time
+                Check_In_Time: localTimeString,  // ✅ Explicitly local time HH:MM
                 Outcome: document.getElementById('checkinOutcome').value,
                 Assets_Used: JSON.stringify(assetsUsed),
                 Notes: notes,
@@ -9894,11 +9901,32 @@ END:VCALENDAR`;
         // Format time for display (12-hour format)
         function formatTimeForDisplay(timeStr) {
             if (!timeStr) return '';
-            const [hours, minutes] = timeStr.split(':');
-            const h = parseInt(hours);
-            if (isNaN(h)) return timeStr;
-            const ampm = h >= 12 ? 'PM' : 'AM';
-            const displayHours = h % 12 || 12;
+            
+            let hours, minutes;
+            
+            // Check if it's an ISO date string (from Google Sheets Date object)
+            if (typeof timeStr === 'string' && timeStr.includes('T')) {
+                // Parse as Date and extract local time
+                const date = new Date(timeStr);
+                if (!isNaN(date.getTime())) {
+                    hours = date.getHours();
+                    minutes = date.getMinutes().toString().padStart(2, '0');
+                } else {
+                    return timeStr;
+                }
+            } else if (typeof timeStr === 'string' && timeStr.includes(':')) {
+                // Standard "HH:MM" format
+                const parts = timeStr.split(':');
+                hours = parseInt(parts[0]);
+                minutes = parts[1];
+            } else {
+                return timeStr;
+            }
+            
+            if (isNaN(hours)) return timeStr;
+            
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const displayHours = hours % 12 || 12;
             return `${displayHours}:${minutes} ${ampm}`;
         }
 
