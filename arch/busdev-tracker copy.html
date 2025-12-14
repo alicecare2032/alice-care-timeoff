@@ -5,23 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Permissions-Policy" content="identity-credentials-get=()">
     <title>Business Development Tracker | alicecare</title>
-    
-    <!-- iOS Web App Configuration -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="BusDev">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#1A365C">
-    
-    <!-- App Icon for iOS Home Screen (180x180) -->
-    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj4KICA8IS0tIEJhY2tncm91bmQgLS0+CiAgPHJlY3Qgd2lkdGg9IjE4MCIgaGVpZ2h0PSIxODAiIGZpbGw9IiMxQTM2NUMiIHJ4PSIzNiIvPgogIAogIDwhLS0gQUMgVGV4dCAtLT4KICA8dGV4dCB4PSI5MCIgeT0iNzUiIGZvbnQtZmFtaWx5PSItYXBwbGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsICdTZWdvZSBVSScsIFJvYm90bywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI1NiIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI0Y1NzYwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+QUM8L3RleHQ+CiAgCiAgPCEtLSBEaXZpZGVyIExpbmUgLS0+CiAgPGxpbmUgeDE9IjQwIiB5MT0iOTgiIHgyPSIxNDAiIHkyPSI5OCIgc3Ryb2tlPSIjRjU3NjAwIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIAogIDwhLS0gQi5ERVYgVGV4dCAtLT4KICA8dGV4dCB4PSI5MCIgeT0iMTM4IiBmb250LWZhbWlseT0iLWFwcGxlLXN5c3RlbSwgQmxpbmtNYWNTeXN0ZW1Gb250LCAnU2Vnb2UgVUknLCBSb2JvdG8sIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMzYiIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiNGRkZGRkYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPkIuREVWPC90ZXh0Pgo8L3N2Zz4=">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj4KICA8IS0tIEJhY2tncm91bmQgLS0+CiAgPHJlY3Qgd2lkdGg9IjE4MCIgaGVpZ2h0PSIxODAiIGZpbGw9IiMxQTM2NUMiIHJ4PSIzNiIvPgogIAogIDwhLS0gQUMgVGV4dCAtLT4KICA8dGV4dCB4PSI5MCIgeT0iNzUiIGZvbnQtZmFtaWx5PSItYXBwbGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsICdTZWdvZSBVSScsIFJvYm90bywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI1NiIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI0Y1NzYwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+QUM8L3RleHQ+CiAgCiAgPCEtLSBEaXZpZGVyIExpbmUgLS0+CiAgPGxpbmUgeDE9IjQwIiB5MT0iOTgiIHgyPSIxNDAiIHkyPSI5OCIgc3Ryb2tlPSIjRjU3NjAwIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIAogIDwhLS0gQi5ERVYgVGV4dCAtLT4KICA8dGV4dCB4PSI5MCIgeT0iMTM4IiBmb250LWZhbWlseT0iLWFwcGxlLXN5c3RlbSwgQmxpbmtNYWNTeXN0ZW1Gb250LCAnU2Vnb2UgVUknLCBSb2JvdG8sIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMzYiIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiNGRkZGRkYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPkIuREVWPC90ZXh0Pgo8L3N2Zz4=">
-    
-    <!-- Splash Screen for iOS -->
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
@@ -555,105 +538,6 @@
 
         .email-empty .material-icons-outlined { font-size: 64px; margin-bottom: 16px; }
 
-        /* Compose Search Dropdown */
-        .compose-search-dropdown {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border: 1px solid var(--gray-200);
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            max-height: 300px;
-            overflow-y: auto;
-            z-index: 1000;
-            margin-top: 4px;
-        }
-        
-        .compose-search-section {
-            padding: 8px 12px;
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--gray-500);
-            background: var(--gray-50);
-            border-bottom: 1px solid var(--gray-200);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .compose-search-item {
-            padding: 10px 14px;
-            cursor: pointer;
-            border-bottom: 1px solid var(--gray-100);
-            transition: background 0.15s;
-        }
-        
-        .compose-search-item:hover {
-            background: var(--orange-light);
-        }
-        
-        .compose-search-item:last-child {
-            border-bottom: none;
-        }
-        
-        .compose-search-item.org-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .compose-search-item.org-item .org-icon {
-            width: 32px;
-            height: 32px;
-            background: var(--navy);
-            color: white;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            flex-shrink: 0;
-        }
-        
-        .compose-search-item.contact-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .compose-search-item.contact-item .contact-avatar {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, var(--orange) 0%, #e06500 100%);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 600;
-            flex-shrink: 0;
-        }
-        
-        .compose-search-item .item-name {
-            font-weight: 500;
-            color: var(--navy);
-            font-size: 13px;
-        }
-        
-        .compose-search-item .item-meta {
-            font-size: 11px;
-            color: var(--gray-500);
-        }
-        
-        .compose-search-empty {
-            padding: 20px;
-            text-align: center;
-            color: var(--gray-400);
-            font-size: 13px;
-        }
-
         /* Modal */
         .modal-overlay {
             position: fixed;
@@ -827,17 +711,6 @@
         }
 
         @keyframes spin { to { transform: rotate(360deg); } }
-        
-        @keyframes pulse-attention {
-            0%, 100% { 
-                transform: scale(1); 
-                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4);
-            }
-            50% { 
-                transform: scale(1.02); 
-                box-shadow: 0 0 0 6px rgba(220, 53, 69, 0);
-            }
-        }
 
         /* Action Buttons */
         .action-btns { display: flex; gap: 4px; }
@@ -2634,30 +2507,16 @@
             <div class="email-layout">
                 <div class="email-list">
                     <div class="email-list-header">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="font-weight: 600; color: var(--navy);">📬 Group Inbox</span>
-                            <span class="email-inbox-badge" id="emailUnreadCount" style="display: none; background: var(--orange); color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;"></span>
-                        </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn btn-sm" onclick="loadGroupInbox()" title="Refresh">
-                                <span class="material-icons-outlined" style="font-size: 18px;">refresh</span>
-                            </button>
-                            <button class="btn btn-sm" onclick="diagnoseGroupInbox()" title="Diagnose Inbox">
-                                <span class="material-icons-outlined" style="font-size: 18px;">troubleshoot</span>
-                            </button>
-                            <button class="btn btn-sm btn-primary" onclick="openComposeModal()">
-                                <span class="material-icons-outlined">edit</span> Compose
-                            </button>
-                        </div>
+                        <span style="font-weight: 600; color: var(--navy);">Inbox</span>
+                        <button class="btn btn-sm btn-primary" onclick="openComposeModal()">
+                            <span class="material-icons-outlined">edit</span> Compose
+                        </button>
                     </div>
-                    <div style="padding: 10px; border-bottom: 1px solid var(--gray-200); display: flex; gap: 8px;">
-                        <select class="form-select" id="emailDirectionFilter" onchange="filterEmails()" style="font-size: 13px; flex: 1;">
-                            <option value="">All Emails</option>
-                            <option value="received">📥 Received</option>
-                            <option value="sent">📤 Sent</option>
-                        </select>
-                        <select class="form-select" id="emailZoneFilter" onchange="filterEmails()" style="font-size: 13px; flex: 1;">
-                            <option value="">All Zones</option>
+                    <div style="padding: 10px; border-bottom: 1px solid var(--gray-200);">
+                        <select class="form-select" id="emailZoneFilter" onchange="loadInbox()" style="font-size: 13px;">
+                            <option value="">All My Zones</option>
+                            <option value="SMF">SMF Only</option>
+                            <option value="SDG">SDG Only</option>
                         </select>
                     </div>
                     <div class="email-list-content" id="emailList">
@@ -3129,22 +2988,18 @@
         </div>
     </div>
 
-    <!-- Unified Compose Email Modal -->
+    <!-- Compose Email Modal -->
     <div class="modal-overlay" id="composeModal">
-        <div class="modal" style="max-width: 900px; width: 95%;">
-            <div class="modal-header" style="background: linear-gradient(135deg, var(--navy) 0%, #2d4a6f 100%); color: white;">
-                <h3 class="modal-title" style="color: white;">
-                    <span class="material-icons-outlined" style="vertical-align: middle;">email</span>
-                    Compose Email
-                </h3>
+        <div class="modal modal-lg">
+            <div class="modal-header" style="background: var(--navy); color: white;">
+                <h3 class="modal-title" style="color: white;">Compose Email</h3>
                 <button class="modal-close" onclick="closeModal('composeModal')" style="color: white;">&times;</button>
             </div>
-            <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
-                <!-- Template Selection -->
-                <div class="compose-template-selector" id="composeTemplateSelector" style="margin-bottom: 20px;"></div>
+            <div class="modal-body">
+                <div class="template-selector" id="templateSelector"></div>
                 
-                <!-- Custom Variables Section -->
-                <div class="custom-vars-section" id="customVarsSection" style="display: none; margin-bottom: 16px;">
+                <!-- Custom Variables Section (shown when template has custom vars) -->
+                <div class="custom-vars-section" id="customVarsSection" style="display: none;">
                     <div class="custom-vars-header">
                         <span class="material-icons-outlined">edit_note</span>
                         <span>Fill in custom variables:</span>
@@ -3155,78 +3010,33 @@
                     </button>
                 </div>
                 
-                <!-- Recipient Selection -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Organization</label>
+                        <select class="form-select" id="composeOrg" onchange="populateContactsForOrg()"></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Contact</label>
+                        <select class="form-select" id="composeContact"></select>
+                    </div>
+                </div>
                 <div class="form-group">
-                    <label class="form-label" style="font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px;">
-                        <span class="material-icons-outlined" style="font-size: 20px;">people</span>
-                        Select Recipients
-                        <span id="composeRecipientCount" style="background: var(--orange); color: white; padding: 2px 10px; border-radius: 12px; font-size: 12px; margin-left: auto;">0 selected</span>
-                    </label>
-                    
-                    <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
-                        <input type="text" class="form-input" id="composeRecipientSearch" placeholder="Search organizations or contacts..." style="flex: 1; min-width: 200px;" oninput="filterComposeRecipients()">
-                        <select class="form-select" id="composeZoneFilter" style="width: 150px;" onchange="filterComposeRecipients()">
-                            <option value="">All Zones</option>
-                        </select>
-                        <button class="btn btn-sm" onclick="selectAllVisibleRecipients()">Select All</button>
-                        <button class="btn btn-sm" onclick="clearAllRecipients()">Clear All</button>
-                    </div>
-                    
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                        <!-- Organizations Panel -->
-                        <div style="border: 1px solid var(--gray-200); border-radius: 8px; overflow: hidden;">
-                            <div style="background: var(--gray-100); padding: 10px 12px; font-weight: 600; font-size: 13px; border-bottom: 1px solid var(--gray-200);">
-                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                    <input type="checkbox" id="selectAllOrgs" onchange="toggleAllOrgs()">
-                                    🏢 Organizations <span id="orgFilteredCount" style="color: var(--gray-500); font-weight: normal; font-size: 12px;"></span>
-                                </label>
-                            </div>
-                            <div id="composeOrgList" style="max-height: 200px; overflow-y: auto; padding: 8px;"></div>
-                        </div>
-                        
-                        <!-- Contacts Panel -->
-                        <div style="border: 1px solid var(--gray-200); border-radius: 8px; overflow: hidden;">
-                            <div style="background: var(--gray-100); padding: 10px 12px; font-weight: 600; font-size: 13px; border-bottom: 1px solid var(--gray-200);">
-                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                    <input type="checkbox" id="selectAllContacts" onchange="toggleAllContacts()">
-                                    👤 Individual Contacts <span id="contactFilteredCount" style="color: var(--gray-500); font-weight: normal; font-size: 12px;"></span>
-                                </label>
-                            </div>
-                            <div id="composeContactList" style="max-height: 200px; overflow-y: auto; padding: 8px;"></div>
-                        </div>
-                    </div>
+                    <label class="form-label">To Email *</label>
+                    <input type="email" class="form-input" id="composeToEmail" required>
                 </div>
-                
-                <!-- Email Content -->
-                <div class="form-group" style="margin-top: 20px;">
+                <div class="form-group">
                     <label class="form-label">Subject *</label>
-                    <input type="text" class="form-input" id="composeSubject" placeholder="Email subject (use {{organization}} or {{contact_name}} for personalization)">
+                    <input type="text" class="form-input" id="composeSubject" required>
                 </div>
-                
                 <div class="form-group">
                     <label class="form-label">Message *</label>
-                    <div id="composeBodyEditor" style="height: 250px; background: white;"></div>
-                    <div style="margin-top: 8px; font-size: 12px; color: var(--gray-500);">
-                        <strong>Variables:</strong> {{contact_name}}, {{first_name}}, {{last_name}}, {{organization}}, {{title}} - These will be personalized for each recipient
-                    </div>
-                </div>
-                
-                <!-- Preview -->
-                <div class="form-group" style="margin-top: 16px;">
-                    <button class="btn btn-sm" onclick="previewComposeEmail()" style="margin-bottom: 8px;">
-                        <span class="material-icons-outlined" style="font-size: 16px;">visibility</span> Preview Email
-                    </button>
-                    <div id="composeEmailPreview" style="display: none; border: 1px solid var(--gray-200); border-radius: 8px; overflow: hidden;"></div>
+                    <div id="composeBodyEditor" style="height: 200px; background: white;"></div>
                 </div>
             </div>
-            <div class="modal-footer" style="background: var(--gray-50); border-top: 1px solid var(--gray-200);">
-                <div style="flex: 1; text-align: left; font-size: 13px; color: var(--gray-600);">
-                    <span class="material-icons-outlined" style="font-size: 16px; vertical-align: middle;">info</span>
-                    Each recipient will receive an individual personalized email
-                </div>
+            <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeModal('composeModal')">Cancel</button>
-                <button class="btn btn-primary" onclick="sendComposeEmails()" id="composeSendBtn" disabled style="opacity: 0.5;">
-                    <span class="material-icons-outlined">send</span> Send to <span id="composeSendCount">0</span> Recipient(s)
+                <button class="btn btn-primary" onclick="sendEmail()">
+                    <span class="material-icons-outlined">send</span> Send
                 </button>
             </div>
         </div>
@@ -4031,7 +3841,7 @@
         
         // Quill editors
         let templateEditor = null;
-        // composeEditor is declared in EMAIL FUNCTIONS section
+        let composeEditor = null;
         
         const quillToolbar = [
             [{ 'header': [1, 2, 3, false] }],
@@ -4420,71 +4230,7 @@ END:VEVENT
             const mins = totalMinutes % 60;
             const totalTimeStr = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
             
-            // ✅ NEW: Count attention levels
-            const urgentCount = route.filter(s => s.DaysOverdue > 60).length;
-            const overdueCount = route.filter(s => s.DaysOverdue > 30 && s.DaysOverdue <= 60).length;
-            const needsAttentionCount = route.filter(s => s.DaysOverdue > 14 && s.DaysOverdue <= 30).length;
-            
-            let attentionSummary = '';
-            if (urgentCount > 0 || overdueCount > 0) {
-                attentionSummary = `
-                <div class="route-attention-summary" style="
-                    background: linear-gradient(to right, #fff5f5, #fff8f0);
-                    border: 1px solid #fed7aa;
-                    border-radius: 8px;
-                    padding: 12px 16px;
-                    margin-bottom: 16px;
-                    display: flex;
-                    align-items: center;
-                    gap: 16px;
-                    flex-wrap: wrap;
-                ">
-                    <span style="font-weight: 600; color: #333;">
-                        ⚡ Attention Required:
-                    </span>
-                    ${urgentCount > 0 ? `
-                        <span style="
-                            background: #dc3545;
-                            color: white;
-                            padding: 4px 12px;
-                            border-radius: 16px;
-                            font-size: 12px;
-                            font-weight: 600;
-                            display: inline-flex;
-                            align-items: center;
-                            gap: 4px;
-                        ">🔥 ${urgentCount} Urgent (60+ days)</span>
-                    ` : ''}
-                    ${overdueCount > 0 ? `
-                        <span style="
-                            background: #fd7e14;
-                            color: white;
-                            padding: 4px 12px;
-                            border-radius: 16px;
-                            font-size: 12px;
-                            font-weight: 600;
-                            display: inline-flex;
-                            align-items: center;
-                            gap: 4px;
-                        ">⚠️ ${overdueCount} Overdue (30+ days)</span>
-                    ` : ''}
-                    ${needsAttentionCount > 0 ? `
-                        <span style="
-                            background: #ffc107;
-                            color: #333;
-                            padding: 4px 12px;
-                            border-radius: 16px;
-                            font-size: 12px;
-                            font-weight: 600;
-                            display: inline-flex;
-                            align-items: center;
-                            gap: 4px;
-                        ">👀 ${needsAttentionCount} Need Attention (14+ days)</span>
-                    ` : ''}
-                </div>`;
-            }
-            
-            let stopsHTML = attentionSummary + `<div class="route-stats">
+            let stopsHTML = `<div class="route-stats">
                 <span class="stat-badge">📅 ${planDate}</span>
                 <span class="stat-badge">📍 ${route.length} stops</span>
                 <span class="stat-badge">🏁 End: ${route[route.length - 1].EstimatedDepartureTime}</span>
@@ -4497,79 +4243,15 @@ END:VEVENT
             route.forEach((stop, index) => {
                 const daysOverdueColor = stop.DaysOverdue > 60 ? '#dc3545' : stop.DaysOverdue > 30 ? '#fd7e14' : '#28a745';
                 
-                // ✅ NEW: Add attention markers for organizations not visited in a while
-                let attentionMarker = '';
-                let stopBorderStyle = '';
-                
-                if (stop.DaysOverdue > 60) {
-                    // Critical - over 60 days
-                    attentionMarker = `
-                        <div class="attention-marker critical" style="
-                            background: linear-gradient(135deg, #dc3545, #c82333);
-                            color: white;
-                            padding: 4px 10px;
-                            border-radius: 12px;
-                            font-size: 11px;
-                            font-weight: 600;
-                            display: inline-flex;
-                            align-items: center;
-                            gap: 4px;
-                            margin-left: 8px;
-                            animation: pulse-attention 1.5s infinite;
-                        ">
-                            🔥 URGENT - ${stop.DaysOverdue} days
-                        </div>`;
-                    stopBorderStyle = 'border-left: 4px solid #dc3545; background: linear-gradient(to right, #fff5f5, white);';
-                } else if (stop.DaysOverdue > 30) {
-                    // Warning - over 30 days
-                    attentionMarker = `
-                        <div class="attention-marker warning" style="
-                            background: linear-gradient(135deg, #fd7e14, #e67300);
-                            color: white;
-                            padding: 4px 10px;
-                            border-radius: 12px;
-                            font-size: 11px;
-                            font-weight: 600;
-                            display: inline-flex;
-                            align-items: center;
-                            gap: 4px;
-                            margin-left: 8px;
-                        ">
-                            ⚠️ OVERDUE - ${stop.DaysOverdue} days
-                        </div>`;
-                    stopBorderStyle = 'border-left: 4px solid #fd7e14; background: linear-gradient(to right, #fff8f0, white);';
-                } else if (stop.DaysOverdue > 14) {
-                    // Attention - over 14 days
-                    attentionMarker = `
-                        <div class="attention-marker attention" style="
-                            background: #ffc107;
-                            color: #333;
-                            padding: 4px 10px;
-                            border-radius: 12px;
-                            font-size: 11px;
-                            font-weight: 600;
-                            display: inline-flex;
-                            align-items: center;
-                            gap: 4px;
-                            margin-left: 8px;
-                        ">
-                            👀 ${stop.DaysOverdue} days since visit
-                        </div>`;
-                    stopBorderStyle = 'border-left: 4px solid #ffc107;';
-                }
-                
                 stopsHTML += `
-                <div class="route-stop" style="${stopBorderStyle}">
-                    <div class="route-stop-number" style="${stop.DaysOverdue > 60 ? 'background: #dc3545; color: white;' : stop.DaysOverdue > 30 ? 'background: #fd7e14; color: white;' : ''}">${stop.Order}</div>
+                <div class="route-stop">
+                    <div class="route-stop-number">${stop.Order}</div>
                     <div class="route-stop-content">
-                        <div class="route-stop-name">
-                            ${stop.Name}
-                            ${attentionMarker}
-                        </div>
+                        <div class="route-stop-name">${stop.Name}</div>
                         <div class="route-stop-details">
                             <div class="detail-address">📍 ${stop.Address}, ${stop.City}</div>
                             <div class="detail-time">🕐 ${stop.EstimatedArrivalTime} - ${stop.EstimatedDepartureTime}</div>
-                            <div class="detail-overdue" style="color: ${daysOverdueColor}; font-weight: ${stop.DaysOverdue > 30 ? '600' : 'normal'};">
+                            <div class="detail-overdue" style="color: ${daysOverdueColor};">
                                 📅 ${stop.DaysOverdue > 0 ? stop.DaysOverdue + ' days overdue' : 'On schedule'}
                             </div>
                         </div>
@@ -5221,7 +4903,7 @@ END:VEVENT
         // ============================================
         // API
         // ============================================
-        function apiCall(action, params = {}, options = {}) {
+        function apiCall(action, params = {}) {
             return new Promise((resolve, reject) => {
                 console.log('📤 API Call:', action);
                 
@@ -5254,8 +4936,7 @@ END:VEVENT
                 };
                 document.body.appendChild(script);
                 
-                // Timeout - default 20 seconds, extended 45 seconds for heavy operations
-                const timeoutMs = options.extended ? 45000 : 20000;
+                // Timeout after 15 seconds
                 setTimeout(() => { 
                     if (window[callbackName]) { 
                         console.error('❌ JSONP timeout for:', action);
@@ -5264,7 +4945,7 @@ END:VEVENT
                         if (s) s.remove();
                         reject(new Error('Timeout: ' + action)); 
                     } 
-                }, timeoutMs);
+                }, 15000);
             });
         }
 
@@ -7492,417 +7173,151 @@ END:VCALENDAR`;
             showLoading(false);
         }
 
-
         // ============================================
-        // EMAIL FUNCTIONS - Unified Compose System
+        // EMAIL FUNCTIONS
         // ============================================
-        
-        let composeEditor = null;
-        let selectedRecipients = new Set();
-        
-        // ==========================================
-        // INBOX FUNCTIONS
-        // ==========================================
-        
-        async function loadGroupInbox() {
+        async function loadInbox() {
             const emailListEl = document.getElementById('emailList');
-            emailListEl.innerHTML = '<div class="email-empty"><div class="spinner"></div><div style="margin-top: 10px;">Loading emails from group inbox...</div></div>';
+            emailListEl.innerHTML = '<div class="email-empty"><div class="spinner"></div><div style="margin-top: 10px;">Loading emails...</div></div>';
             
             try {
-                // Use extended timeout (45s) and limit to 30 emails for faster loading
-                const response = await apiCall('getGroupInbox', { limit: 30 }, { extended: true });
+                const response = await apiCall('getEmailLog');
                 if (response.success) {
-                    state.emails = response.data || [];
-                    
-                    // Update unread count
-                    const unreadCount = state.emails.filter(e => e.isUnread).length;
-                    const unreadBadge = document.getElementById('emailUnreadCount');
-                    if (unreadCount > 0) {
-                        unreadBadge.textContent = unreadCount;
-                        unreadBadge.style.display = 'inline';
-                    } else {
-                        unreadBadge.style.display = 'none';
-                    }
-                    
-                    // Populate zone filter
-                    populateEmailZoneFilter();
+                    state.emails = response.emails || [];
                 } else {
-                    console.error('Failed to load inbox:', response.error);
                     state.emails = [];
-                    emailListEl.innerHTML = `<div class="email-empty"><span class="material-icons-outlined">error</span><div>Failed to load: ${response.error || 'Unknown error'}</div><div style="margin-top: 10px;"><button class="btn btn-sm" onclick="diagnoseGroupInbox()">Run Diagnosis</button></div></div>`;
-                    return;
                 }
             } catch (err) {
                 console.error('Failed to load inbox:', err);
                 state.emails = [];
-                emailListEl.innerHTML = `<div class="email-empty"><span class="material-icons-outlined">error</span><div>Error: ${err.message}</div></div>`;
-                return;
             }
-            filterEmails();
-        }
-        
-        async function diagnoseGroupInbox() {
-            const viewer = document.getElementById('emailViewer');
-            viewer.innerHTML = `
-                <div style="padding: 20px;">
-                    <h3 style="color: var(--navy); margin-bottom: 16px;">📧 Email Inbox Diagnosis</h3>
-                    <div id="diagnosisResults">
-                        <div class="spinner"></div>
-                        <div style="margin-top: 10px;">Running diagnosis...</div>
-                    </div>
-                </div>
-            `;
-            
-            const results = [];
-            
-            // Test 1: Check API connectivity
-            results.push('<strong>1. API Connectivity:</strong>');
-            try {
-                const testResponse = await apiCall('getEmailLog');
-                results.push(`   ✅ API accessible (Email Log has ${testResponse.emails?.length || 0} entries)`);
-            } catch (err) {
-                results.push(`   ❌ API Error: ${err.message}`);
-            }
-            
-            // Test 2: Run backend diagnosis
-            results.push('<strong>2. Gmail API Tests (from server):</strong>');
-            try {
-                const diagResponse = await apiCall('diagnoseInbox');
-                if (diagResponse.success && diagResponse.tests) {
-                    diagResponse.tests.forEach(test => {
-                        const icon = test.status === 'pass' ? '✅' : test.status === 'fail' ? '❌' : test.status === 'warn' ? '⚠️' : 'ℹ️';
-                        results.push(`   ${icon} ${test.name}: ${test.message}`);
-                    });
-                } else if (diagResponse.error) {
-                    results.push(`   ❌ Diagnosis failed: ${diagResponse.error}`);
-                }
-            } catch (err) {
-                results.push(`   ❌ Could not run server diagnosis: ${err.message}`);
-            }
-            
-            // Test 3: Check Group Inbox
-            results.push('<strong>3. Group Inbox Fetch:</strong>');
-            try {
-                const inboxResponse = await apiCall('getGroupInbox', { limit: 10 });
-                if (inboxResponse.success) {
-                    results.push(`   ✅ Group inbox accessible`);
-                    results.push(`   📬 Found ${inboxResponse.data?.length || 0} emails`);
-                    if (inboxResponse.data && inboxResponse.data.length > 0) {
-                        const latest = inboxResponse.data[0];
-                        results.push(`   📅 Latest: "${latest.subject?.substring(0, 50)}..." (${new Date(latest.date).toLocaleDateString()})`);
-                        results.push(`   📧 Direction: ${latest.direction || 'unknown'}`);
-                    } else {
-                        results.push(`   ⚠️ No emails returned - inbox may be empty or access restricted`);
-                    }
-                } else {
-                    results.push(`   ❌ Error: ${inboxResponse.error}`);
-                }
-            } catch (err) {
-                results.push(`   ❌ Exception: ${err.message}`);
-            }
-            
-            // Test 4: Check organization/contact data for matching
-            results.push('<strong>4. Contact Email Matching Data:</strong>');
-            const contactsWithEmail = state.contacts.filter(c => c.Email);
-            results.push(`   👥 ${contactsWithEmail.length} contacts have email addresses`);
-            const orgsWithEmail = state.organizations.filter(o => o.Email);
-            results.push(`   🏢 ${orgsWithEmail.length} organizations have email addresses`);
-            if (contactsWithEmail.length > 0) {
-                results.push(`   📧 Sample contact emails: ${contactsWithEmail.slice(0, 3).map(c => c.Email).join(', ')}`);
-            }
-            
-            // Suggestions
-            results.push('<strong>5. Troubleshooting Tips:</strong>');
-            results.push(`   • In Apps Script Editor, run diagnoseInbox() directly`);
-            results.push(`   • Check Apps Script execution logs (View > Logs)`);
-            results.push(`   • Verify the deploying user has inbox access`);
-            results.push(`   • For Google Groups: ensure member has "View" permission`);
-            results.push(`   • Re-deploy after any permission changes`);
-            
-            document.getElementById('diagnosisResults').innerHTML = `
-                <pre style="background: var(--gray-50); padding: 16px; border-radius: 8px; font-size: 13px; line-height: 1.8; white-space: pre-wrap;">${results.join('\n')}</pre>
-                <div style="margin-top: 16px;">
-                    <button class="btn btn-primary btn-sm" onclick="loadGroupInbox()">
-                        <span class="material-icons-outlined" style="font-size: 16px;">refresh</span> Retry Loading Inbox
-                    </button>
-                </div>
-            `;
-        }
-        
-        function populateEmailZoneFilter() {
-            const select = document.getElementById('emailZoneFilter');
-            const zones = [...new Set(state.emails.filter(e => e.orgZone).map(e => e.orgZone))].sort();
-            select.innerHTML = '<option value="">All Zones</option>' + 
-                zones.map(z => `<option value="${z}">${z}</option>`).join('');
-        }
-        
-        function filterEmails() {
-            const direction = document.getElementById('emailDirectionFilter').value;
-            const zone = document.getElementById('emailZoneFilter').value;
-            
-            let filtered = [...state.emails];
-            
-            if (direction) {
-                filtered = filtered.filter(e => e.direction === direction);
-            }
-            if (zone) {
-                filtered = filtered.filter(e => e.orgZone === zone);
-            }
-            
-            renderEmailList(filtered);
+            renderEmailList();
         }
 
-        function renderEmailList(emails = state.emails) {
+        function renderEmailList() {
             const el = document.getElementById('emailList');
-            if (!emails || !emails.length) { 
-                el.innerHTML = '<div class="email-empty"><span class="material-icons-outlined">inbox</span><div>No emails found</div></div>'; 
-                return; 
-            }
+            if (!state.emails.length) { el.innerHTML = '<div class="email-empty"><span class="material-icons-outlined">inbox</span><div>No emails</div></div>'; return; }
             
-            el.innerHTML = emails.map(e => {
+            el.innerHTML = state.emails.map(e => {
                 const d = new Date(e.date);
-                const directionIcon = e.direction === 'sent' ? '📤' : '📥';
-                const fromDisplay = e.direction === 'sent' ? `To: ${e.to?.split('<')[0] || e.to}` : e.from?.split('<')[0] || e.from;
-                
-                return `<div class="email-item ${e.isUnread ? 'unread' : ''} ${state.selectedEmail?.id === e.id ? 'active' : ''}" onclick="selectEmail('${e.threadId}', '${e.id}')">
-                    <div class="email-from">
-                        <span>${directionIcon} ${esc(fromDisplay)}</span>
-                        <span class="email-date">${formatEmailDate(d)}</span>
-                    </div>
+                return `<div class="email-item ${e.isUnread ? 'unread' : ''} ${state.selectedEmail?.id === e.id ? 'active' : ''}" onclick="selectEmail('${e.id}')">
+                    <div class="email-from"><span>${esc(e.from?.split('<')[0] || e.from)}</span><span class="email-date">${d.toLocaleDateString()}</span></div>
                     <div class="email-subject">${esc(e.subject || '(No subject)')}</div>
                     <div class="email-snippet">${esc(e.snippet || '')}</div>
-                    <div style="display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap;">
-                        ${e.orgName ? `<span class="email-org-badge">${esc(e.orgName)}</span>` : ''}
-                        ${e.contactName ? `<span class="email-org-badge" style="background: #E0F2FE; color: #0284C7;">${esc(e.contactName)}</span>` : ''}
-                        ${e.messageCount > 1 ? `<span style="background: var(--gray-100); color: var(--gray-600); padding: 2px 6px; border-radius: 4px; font-size: 10px;">${e.messageCount} messages</span>` : ''}
-                    </div>
+                    ${e.orgName ? `<span class="email-org-badge">${esc(e.orgName)}</span>` : ''}
                 </div>`;
             }).join('');
         }
-        
-        function formatEmailDate(date) {
-            const now = new Date();
-            const diff = now - date;
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            
-            if (days === 0) {
-                return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-            } else if (days === 1) {
-                return 'Yesterday';
-            } else if (days < 7) {
-                return date.toLocaleDateString('en-US', { weekday: 'short' });
-            } else {
-                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-            }
-        }
 
-        async function selectEmail(threadId, msgId) {
+        function selectEmail(id) {
+            state.selectedEmail = state.emails.find(e => e.id === id);
+            renderEmailList();
             const viewer = document.getElementById('emailViewer');
-            viewer.innerHTML = '<div class="email-empty"><div class="spinner"></div><div>Loading...</div></div>';
-            
-            // Update selected state
-            state.selectedEmail = state.emails.find(e => e.id === msgId);
-            renderEmailList(getFilteredEmails());
-            
-            try {
-                const response = await apiCall('getEmailThread', { threadId });
-                if (response.success && response.data) {
-                    const messages = response.data;
-                    const e = state.selectedEmail;
-                    
-                    let messagesHtml = messages.map((msg, idx) => `
-                        <div class="email-message ${idx === messages.length - 1 ? 'latest' : 'older'}" style="
-                            ${idx < messages.length - 1 ? 'border-bottom: 1px solid var(--gray-200); padding-bottom: 16px; margin-bottom: 16px; opacity: 0.8;' : ''}
-                        ">
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-                                <div>
-                                    <strong style="color: var(--navy);">${esc(msg.from)}</strong>
-                                    <div style="font-size: 12px; color: var(--gray-500);">To: ${esc(msg.to)}</div>
-                                    ${msg.cc ? `<div style="font-size: 12px; color: var(--gray-500);">Cc: ${esc(msg.cc)}</div>` : ''}
-                                </div>
-                                <span style="font-size: 12px; color: var(--gray-400);">${new Date(msg.date).toLocaleString()}</span>
-                            </div>
-                            <div style="white-space: pre-wrap; line-height: 1.6;">${esc(msg.body)}</div>
-                        </div>
-                    `).join('');
-                    
-                    viewer.innerHTML = `
-                        <div class="email-viewer-header">
-                            <div class="email-viewer-subject">${esc(e?.subject || messages[0]?.subject)}</div>
-                            <div style="font-size: 12px; color: var(--gray-500); margin-top: 4px;">
-                                ${messages.length} message${messages.length > 1 ? 's' : ''} in this thread
-                                ${e?.orgName ? ` • <span style="color: var(--orange);">${esc(e.orgName)}</span>` : ''}
-                            </div>
-                        </div>
-                        <div class="email-viewer-body" style="padding: 20px;">${messagesHtml}</div>
-                        <div class="email-viewer-actions">
-                            <button class="btn btn-primary" onclick="replyToEmail()">
-                                <span class="material-icons-outlined">reply</span> Reply
-                            </button>
-                            ${e?.orgId ? `
-                                <button class="btn btn-secondary" onclick="switchTab('directory'); setTimeout(() => openDetailPanel('org', '${e.orgId}'), 100);">
-                                    <span class="material-icons-outlined">business</span> View Organization
-                                </button>
-                            ` : ''}
-                        </div>
-                    `;
-                    
-                    // Mark as read in local state
-                    if (state.selectedEmail) {
-                        state.selectedEmail.isUnread = false;
-                    }
-                }
-            } catch (err) {
-                console.error('Failed to load thread:', err);
-                viewer.innerHTML = `<div class="email-empty"><span class="material-icons-outlined">error</span><div>Failed to load email</div></div>`;
-            }
-        }
-        
-        function getFilteredEmails() {
-            const direction = document.getElementById('emailDirectionFilter').value;
-            const zone = document.getElementById('emailZoneFilter').value;
-            
-            let filtered = [...state.emails];
-            if (direction) filtered = filtered.filter(e => e.direction === direction);
-            if (zone) filtered = filtered.filter(e => e.orgZone === zone);
-            return filtered;
-        }
-
-        async function loadInbox() {
-            // Legacy function - now calls loadGroupInbox
-            await loadGroupInbox();
-        }
-        
-        function replyToEmail() {
             if (!state.selectedEmail) return;
-            openComposeModal();
-            
-            // Find the contact/org for this email
-            const fromEmail = state.selectedEmail.from?.match(/<(.+)>/)?.[1] || state.selectedEmail.from;
-            const contact = state.contacts.find(c => c.Email?.toLowerCase() === fromEmail?.toLowerCase());
-            
-            if (contact) {
-                selectedRecipients.add('contact_' + contact.ID);
-                updateRecipientCount();
-                populateRecipientLists();
-            }
-            
-            document.getElementById('composeSubject').value = 'Re: ' + state.selectedEmail.subject;
-        }
-
-        // ==========================================
-        // UNIFIED COMPOSE FUNCTIONS
-        // ==========================================
-        
-        function openComposeModal(preselectedContactId = null, preselectedOrgId = null) {
-            openModal('composeModal');
-            selectedRecipients.clear();
-            
-            // Initialize compose editor if not already done
-            if (!composeEditor) {
-                composeEditor = new Quill('#composeBodyEditor', {
-                    theme: 'snow',
-                    placeholder: 'Write your email here...',
-                    modules: {
-                        toolbar: [
-                            ['bold', 'italic', 'underline'],
-                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                            ['link'],
-                            ['clean']
-                        ]
-                    }
-                });
-            }
-            
-            // Clear form
-            document.getElementById('composeSubject').value = '';
-            document.getElementById('composeRecipientSearch').value = '';
-            composeEditor.root.innerHTML = '';
-            document.getElementById('composeEmailPreview').style.display = 'none';
-            document.getElementById('customVarsSection').style.display = 'none';
-            
-            // Populate zone filter
-            const zoneSelect = document.getElementById('composeZoneFilter');
-            const zones = getRoutePlannerZones();
-            zoneSelect.innerHTML = '<option value="">All Zones</option>' + 
-                zones.map(z => `<option value="${z.code}">${z.code} - ${z.name}</option>`).join('');
-            
-            // Reset checkboxes
-            document.getElementById('selectAllOrgs').checked = false;
-            document.getElementById('selectAllContacts').checked = false;
-            
-            // Populate template selector
-            populateComposeTemplates();
-            
-            // Pre-select if provided
-            if (preselectedContactId) {
-                selectedRecipients.add('contact_' + preselectedContactId);
-            }
-            if (preselectedOrgId) {
-                selectedRecipients.add('org_' + preselectedOrgId);
-            }
-            
-            // Populate recipient lists
-            populateRecipientLists();
-            updateRecipientCount();
-        }
-        
-        function populateComposeTemplates() {
-            const container = document.getElementById('composeTemplateSelector');
-            if (!state.emailTemplates || state.emailTemplates.length === 0) {
-                container.innerHTML = '<div style="color: var(--gray-500); font-size: 13px;">No templates available. Create templates in Settings.</div>';
-                return;
-            }
-            
-            container.innerHTML = `
-                <label class="form-label" style="font-size: 13px; margin-bottom: 8px;">Quick Templates:</label>
-                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                    ${state.emailTemplates.map(t => `
-                        <button type="button" class="template-pill" onclick="applyComposeTemplate('${t.ID}')" 
-                                style="padding: 6px 12px; border: 1px solid var(--gray-300); border-radius: 16px; background: white; cursor: pointer; font-size: 12px;">
-                            ${esc(t.Name)}
-                        </button>
-                    `).join('')}
+            const e = state.selectedEmail;
+            viewer.innerHTML = `
+                <div class="email-viewer-header">
+                    <div class="email-viewer-subject">${esc(e.subject)}</div>
+                    <div style="font-size: 13px; color: var(--gray-600);">
+                        <strong>From:</strong> ${esc(e.from)}<br>
+                        <strong>To:</strong> ${esc(e.to)}<br>
+                        <strong>Date:</strong> ${new Date(e.date).toLocaleString()}
+                    </div>
+                </div>
+                <div class="email-viewer-body">${esc(e.body || e.snippet)}</div>
+                <div class="email-viewer-actions">
+                    <button class="btn btn-primary" onclick="replyToEmail()"><span class="material-icons-outlined">reply</span> Reply</button>
                 </div>
             `;
         }
-        
-        function applyComposeTemplate(templateId) {
-            const t = state.emailTemplates.find(x => x.ID === templateId);
+
+        function openComposeModal() { openModal('composeModal'); populateComposeDropdowns(); clearComposeForm(); }
+        function populateComposeDropdowns() {
+            document.getElementById('composeOrg').innerHTML = '<option value="">Select</option>' + state.organizations.map(o => `<option value="${o.ID}">${esc(o.Name)}</option>`).join('');
+        }
+
+        function populateContactsForOrg() {
+            const orgId = document.getElementById('composeOrg').value;
+            const contacts = state.contacts.filter(c => c.Org_ID === orgId);
+            document.getElementById('composeContact').innerHTML = '<option value="">Select</option>' + contacts.map(c => `<option value="${c.ID}" data-email="${c.Email}">${esc(c.First_Name + ' ' + c.Last_Name)}</option>`).join('');
+            document.getElementById('composeContact').onchange = function() {
+                const opt = this.options[this.selectedIndex];
+                if (opt.dataset.email) document.getElementById('composeToEmail').value = opt.dataset.email;
+            };
+        }
+
+        function clearComposeForm() {
+            ['composeOrg', 'composeToEmail', 'composeSubject'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('composeContact').innerHTML = '<option value="">Select</option>';
+            document.querySelectorAll('.template-pill').forEach(b => b.classList.remove('active'));
+            composeEditor.root.innerHTML = '';
+            // Hide custom vars section
+            document.getElementById('customVarsSection').style.display = 'none';
+            document.getElementById('customVarsInputs').innerHTML = '';
+        }
+
+        function applyTemplate(id) {
+            const t = state.emailTemplates.find(x => x.ID === id);
             if (!t) return;
+            document.querySelectorAll('.template-pill').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
             
-            document.getElementById('composeSubject').value = t.Subject || '';
-            composeEditor.root.innerHTML = t.Body || '';
+            const orgId = document.getElementById('composeOrg').value;
+            const contactId = document.getElementById('composeContact').value;
+            const org = state.organizations.find(o => o.ID === orgId);
+            const contact = state.contacts.find(c => c.ID === contactId);
             
-            // Highlight selected template
-            document.querySelectorAll('#composeTemplateSelector .template-pill').forEach(btn => {
-                btn.style.background = 'white';
-                btn.style.borderColor = 'var(--gray-300)';
-            });
-            event.target.style.background = 'var(--orange-light)';
-            event.target.style.borderColor = 'var(--orange)';
+            // Standard variables that come from database
+            const standardVars = {
+                '{{contact_name}}': contact ? (contact.First_Name + ' ' + contact.Last_Name) : '[Contact Name]',
+                '{{organization}}': org?.Name || '[Organization]',
+                '{{zone}}': org?.Zone || '[Zone]',
+                '{{rep_name}}': state.user?.name || '[Your Name]',
+                '{{rep_email}}': state.user?.email || 'busdev@alicecare.com',
+                '{{rep_phone}}': state.user?.phone || '',
+                '{{visit_date}}': new Date().toLocaleDateString()
+            };
             
-            // Check for custom variables
-            const allVarsInContent = [...(t.Subject || '').matchAll(/\{\{([^}]+)\}\}/g), ...(t.Body || '').matchAll(/\{\{([^}]+)\}\}/g)];
-            const standardVars = ['contact_name', 'first_name', 'last_name', 'organization', 'title', 'zone', 'rep_name', 'rep_email', 'rep_phone', 'visit_date'];
-            const customVarNames = [...new Set(allVarsInContent.map(m => m[1]))].filter(v => !standardVars.includes(v.toLowerCase()));
+            let subject = t.Subject || '';
+            let body = t.Body || '';
             
+            // Replace standard variables
+            for (let k in standardVars) { 
+                subject = subject.replace(new RegExp(k.replace(/[{}]/g, '\\$&'), 'g'), standardVars[k]); 
+                body = body.replace(new RegExp(k.replace(/[{}]/g, '\\$&'), 'g'), standardVars[k]); 
+            }
+            
+            // Find remaining custom variables (not in standard list)
+            const allVarsInContent = [...subject.matchAll(/\{\{([^}]+)\}\}/g), ...body.matchAll(/\{\{([^}]+)\}\}/g)];
+            const customVarNames = [...new Set(allVarsInContent.map(m => m[1]))];
+            
+            // Show custom variables section if there are any
             const customVarsSection = document.getElementById('customVarsSection');
             const customVarsInputs = document.getElementById('customVarsInputs');
             
             if (customVarNames.length > 0) {
+                // Build input fields for each custom variable
                 customVarsInputs.innerHTML = customVarNames.map(varName => {
                     const displayName = varName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
                     return `
-                        <div class="custom-var-input-group" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                            <label style="min-width: 120px; font-size: 12px;">{{${varName}}}</label>
-                            <input type="text" class="form-input" data-var="${varName}" placeholder="Enter ${displayName}..." style="flex: 1;">
+                        <div class="custom-var-input-group">
+                            <label>{{${varName}}}</label>
+                            <input type="text" data-var="${varName}" placeholder="Enter ${displayName}...">
                         </div>
                     `;
                 }).join('');
                 customVarsSection.style.display = 'block';
             } else {
                 customVarsSection.style.display = 'none';
+                customVarsInputs.innerHTML = '';
+            }
+            
+            document.getElementById('composeSubject').value = subject;
+            // Set Quill content
+            if (body.includes('<')) {
+                composeEditor.root.innerHTML = body;
+            } else {
+                composeEditor.setText(body);
             }
         }
         
@@ -7915,12 +7330,13 @@ END:VCALENDAR`;
             inputs.forEach(input => {
                 const varName = input.dataset.var;
                 const value = input.value.trim();
+                
                 if (!value) {
                     allFilled = false;
-                    input.style.borderColor = 'red';
+                    input.style.borderColor = 'var(--danger)';
                 } else {
-                    input.style.borderColor = '';
-                    const regex = new RegExp(`\\{\\{${varName}\\}\\}`, 'gi');
+                    input.style.borderColor = 'var(--success)';
+                    const regex = new RegExp(`\\{\\{${varName}\\}\\}`, 'g');
                     subject = subject.replace(regex, value);
                     body = body.replace(regex, value);
                 }
@@ -7931,420 +7347,55 @@ END:VCALENDAR`;
                 return;
             }
             
+            // Update the fields
             document.getElementById('composeSubject').value = subject;
             composeEditor.root.innerHTML = body;
+            
+            // Hide the custom vars section
             document.getElementById('customVarsSection').style.display = 'none';
+            
             showToast('Variables applied!', 'success');
         }
-        
-        function populateRecipientLists() {
-            const searchTerm = (document.getElementById('composeRecipientSearch').value || '').toLowerCase();
-            const zoneFilter = document.getElementById('composeZoneFilter').value;
-            
-            // Filter organizations - sorted A-Z
-            let filteredOrgs = state.organizations
-                .filter(o => o.Status === 'Active')
-                .sort((a, b) => (a.Name || '').localeCompare(b.Name || ''));
-            
-            if (zoneFilter) {
-                filteredOrgs = filteredOrgs.filter(o => o.Zone === zoneFilter);
-            }
-            if (searchTerm) {
-                filteredOrgs = filteredOrgs.filter(o => 
-                    o.Name?.toLowerCase().includes(searchTerm) ||
-                    o.City?.toLowerCase().includes(searchTerm)
-                );
-            }
-            
-            // Filter contacts (only those with emails) - sorted A-Z
-            let filteredContacts = state.contacts
-                .filter(c => c.Email)
-                .sort((a, b) => {
-                    const nameA = ((a.First_Name || '') + ' ' + (a.Last_Name || '')).trim();
-                    const nameB = ((b.First_Name || '') + ' ' + (b.Last_Name || '')).trim();
-                    return nameA.localeCompare(nameB);
-                });
-            
-            if (zoneFilter) {
-                const zoneOrgIds = state.organizations.filter(o => o.Zone === zoneFilter).map(o => o.ID);
-                filteredContacts = filteredContacts.filter(c => zoneOrgIds.includes(c.Org_ID));
-            }
-            if (searchTerm) {
-                filteredContacts = filteredContacts.filter(c => {
-                    const org = state.organizations.find(o => o.ID === c.Org_ID);
-                    return c.First_Name?.toLowerCase().includes(searchTerm) ||
-                           c.Last_Name?.toLowerCase().includes(searchTerm) ||
-                           c.Email?.toLowerCase().includes(searchTerm) ||
-                           org?.Name?.toLowerCase().includes(searchTerm);
-                });
-            }
-            
-            // Update filtered counts
-            document.getElementById('orgFilteredCount').textContent = `(${filteredOrgs.length})`;
-            document.getElementById('contactFilteredCount').textContent = `(${filteredContacts.length})`;
-            
-            // Render organizations
-            const orgListEl = document.getElementById('composeOrgList');
-            if (filteredOrgs.length === 0) {
-                orgListEl.innerHTML = '<div style="color: var(--gray-400); text-align: center; padding: 20px; font-size: 13px;">No organizations found</div>';
-            } else {
-                orgListEl.innerHTML = filteredOrgs.map(o => {
-                    const orgContacts = state.contacts.filter(c => String(c.Org_ID) === String(o.ID) && c.Email);
-                    const isSelected = selectedRecipients.has('org_' + o.ID);
-                    return `
-                        <label class="compose-recipient-item" style="
-                            display: flex; align-items: flex-start; gap: 8px; padding: 8px; 
-                            border-radius: 6px; cursor: pointer; margin-bottom: 4px;
-                            background: ${isSelected ? 'var(--orange-light)' : 'transparent'};
-                            border: 1px solid ${isSelected ? 'var(--orange)' : 'transparent'};
-                            transition: all 0.15s ease;
-                        " onmouseover="this.style.background='${isSelected ? 'var(--orange-light)' : 'var(--gray-50)'}'" 
-                           onmouseout="this.style.background='${isSelected ? 'var(--orange-light)' : 'transparent'}'">
-                            <input type="checkbox" value="org_${o.ID}" 
-                                   ${isSelected ? 'checked' : ''} 
-                                   onchange="toggleRecipient(this, 'org', '${o.ID}')">
-                            <div style="flex: 1; min-width: 0;">
-                                <div style="font-weight: 500; font-size: 13px; color: var(--navy);">${esc(o.Name)}</div>
-                                <div style="font-size: 11px; color: var(--gray-500);">
-                                    ${o.Zone || ''} ${o.City ? '• ' + o.City : ''} • ${orgContacts.length} contact${orgContacts.length !== 1 ? 's' : ''} with email
-                                </div>
-                            </div>
-                        </label>
-                    `;
-                }).join('');
-            }
-            
-            // Render contacts
-            const contactListEl = document.getElementById('composeContactList');
-            if (filteredContacts.length === 0) {
-                contactListEl.innerHTML = '<div style="color: var(--gray-400); text-align: center; padding: 20px; font-size: 13px;">No contacts with email found</div>';
-            } else {
-                contactListEl.innerHTML = filteredContacts.map(c => {
-                    const org = state.organizations.find(o => String(o.ID) === String(c.Org_ID));
-                    const isSelected = selectedRecipients.has('contact_' + c.ID);
-                    return `
-                        <label class="compose-recipient-item" style="
-                            display: flex; align-items: flex-start; gap: 8px; padding: 8px; 
-                            border-radius: 6px; cursor: pointer; margin-bottom: 4px;
-                            background: ${isSelected ? '#E0F2FE' : 'transparent'};
-                            border: 1px solid ${isSelected ? '#0284C7' : 'transparent'};
-                            transition: all 0.15s ease;
-                        " onmouseover="this.style.background='${isSelected ? '#E0F2FE' : 'var(--gray-50)'}'"
-                           onmouseout="this.style.background='${isSelected ? '#E0F2FE' : 'transparent'}'">
-                            <input type="checkbox" value="contact_${c.ID}" 
-                                   ${isSelected ? 'checked' : ''} 
-                                   onchange="toggleRecipient(this, 'contact', '${c.ID}')">
-                            <div style="flex: 1; min-width: 0;">
-                                <div style="font-weight: 500; font-size: 13px;">${esc(c.First_Name || '')} ${esc(c.Last_Name || '')}</div>
-                                <div style="font-size: 11px; color: var(--gray-500);">${esc(c.Email)}</div>
-                                <div style="font-size: 10px; color: var(--gray-400);">${esc(org?.Name || '')} ${c.Title ? '• ' + esc(c.Title) : ''}</div>
-                            </div>
-                        </label>
-                    `;
-                }).join('');
-            }
-        }
-        
-        function filterComposeRecipients() {
-            populateRecipientLists();
-        }
-        
-        function toggleRecipient(checkbox, type, id) {
-            const key = type + '_' + id;
-            console.log('🔄 toggleRecipient:', { type, id, key, checked: checkbox.checked });
-            
-            if (checkbox.checked) {
-                selectedRecipients.add(key);
-            } else {
-                selectedRecipients.delete(key);
-            }
-            
-            console.log('📋 selectedRecipients now:', [...selectedRecipients]);
-            
-            updateRecipientCount();
-            // Update visual styling
-            populateRecipientLists();
-        }
-        
-        function toggleAllOrgs() {
-            const selectAll = document.getElementById('selectAllOrgs').checked;
-            const zoneFilter = document.getElementById('composeZoneFilter').value;
-            const searchTerm = (document.getElementById('composeRecipientSearch').value || '').toLowerCase();
-            
-            let orgs = state.organizations.filter(o => o.Status === 'Active');
-            if (zoneFilter) orgs = orgs.filter(o => o.Zone === zoneFilter);
-            if (searchTerm) {
-                orgs = orgs.filter(o => 
-                    o.Name?.toLowerCase().includes(searchTerm) ||
-                    o.City?.toLowerCase().includes(searchTerm)
-                );
-            }
-            
-            orgs.forEach(o => {
-                const key = 'org_' + o.ID;
-                if (selectAll) {
-                    selectedRecipients.add(key);
-                } else {
-                    selectedRecipients.delete(key);
-                }
-            });
-            
-            updateRecipientCount();
-            populateRecipientLists();
-        }
-        
-        function toggleAllContacts() {
-            const selectAll = document.getElementById('selectAllContacts').checked;
-            const zoneFilter = document.getElementById('composeZoneFilter').value;
-            const searchTerm = (document.getElementById('composeRecipientSearch').value || '').toLowerCase();
-            
-            let contacts = state.contacts.filter(c => c.Email);
-            if (zoneFilter) {
-                const zoneOrgIds = state.organizations.filter(o => o.Zone === zoneFilter).map(o => o.ID);
-                contacts = contacts.filter(c => zoneOrgIds.includes(c.Org_ID));
-            }
-            if (searchTerm) {
-                contacts = contacts.filter(c => {
-                    const org = state.organizations.find(o => o.ID === c.Org_ID);
-                    return c.First_Name?.toLowerCase().includes(searchTerm) ||
-                           c.Last_Name?.toLowerCase().includes(searchTerm) ||
-                           c.Email?.toLowerCase().includes(searchTerm) ||
-                           org?.Name?.toLowerCase().includes(searchTerm);
-                });
-            }
-            
-            contacts.forEach(c => {
-                const key = 'contact_' + c.ID;
-                if (selectAll) {
-                    selectedRecipients.add(key);
-                } else {
-                    selectedRecipients.delete(key);
-                }
-            });
-            
-            updateRecipientCount();
-            populateRecipientLists();
-        }
-        
-        function selectAllVisibleRecipients() {
-            document.getElementById('selectAllOrgs').checked = true;
-            document.getElementById('selectAllContacts').checked = true;
-            toggleAllOrgs();
-            toggleAllContacts();
-        }
-        
-        function clearAllRecipients() {
-            selectedRecipients.clear();
-            document.getElementById('selectAllOrgs').checked = false;
-            document.getElementById('selectAllContacts').checked = false;
-            updateRecipientCount();
-            populateRecipientLists();
-        }
-        
-        function updateRecipientCount() {
-            // Calculate unique email recipients
-            const recipients = getRecipientList();
-            const count = recipients.length;
-            
-            console.log('📊 updateRecipientCount: count =', count);
-            
-            document.getElementById('composeRecipientCount').textContent = count + ' selected';
-            document.getElementById('composeSendCount').textContent = count;
-            
-            // Enable/disable send button
-            const sendBtn = document.getElementById('composeSendBtn');
-            sendBtn.disabled = count === 0;
-            sendBtn.style.opacity = count === 0 ? '0.5' : '1';
-            
-            console.log('🔘 Send button disabled:', sendBtn.disabled);
-        }
-        
-        function getRecipientList() {
-            const recipients = [];
-            const addedEmails = new Set();
-            
-            console.log('📧 Getting recipient list, selectedRecipients:', [...selectedRecipients]);
-            
-            selectedRecipients.forEach(key => {
-                // Split only on FIRST underscore to handle IDs that contain underscores
-                const underscoreIndex = key.indexOf('_');
-                const type = key.substring(0, underscoreIndex);
-                const id = key.substring(underscoreIndex + 1);
-                
-                console.log('Processing:', { key, type, id });
-                
-                if (type === 'org') {
-                    // Get all contacts for this org with email
-                    const orgContacts = state.contacts.filter(c => String(c.Org_ID) === String(id) && c.Email);
-                    const org = state.organizations.find(o => String(o.ID) === String(id));
-                    
-                    console.log('Org contacts found:', orgContacts.length, 'for org:', org?.Name);
-                    
-                    orgContacts.forEach(c => {
-                        if (!addedEmails.has(c.Email.toLowerCase())) {
-                            addedEmails.add(c.Email.toLowerCase());
-                            recipients.push({
-                                email: c.Email,
-                                contactName: ((c.First_Name || '') + ' ' + (c.Last_Name || '')).trim(),
-                                firstName: c.First_Name || '',
-                                lastName: c.Last_Name || '',
-                                title: c.Title || '',
-                                orgName: org?.Name || '',
-                                orgId: org?.ID || '',
-                                contactId: c.ID,
-                                zone: org?.Zone || ''
-                            });
-                        }
-                    });
-                } else if (type === 'contact') {
-                    // Find contact by ID
-                    const contact = state.contacts.find(c => String(c.ID) === String(id));
-                    
-                    console.log('Contact found:', contact ? (contact.First_Name + ' ' + contact.Last_Name) : 'NOT FOUND', 'for id:', id);
-                    
-                    if (contact && contact.Email && !addedEmails.has(contact.Email.toLowerCase())) {
-                        addedEmails.add(contact.Email.toLowerCase());
-                        const org = state.organizations.find(o => String(o.ID) === String(contact.Org_ID));
-                        recipients.push({
-                            email: contact.Email,
-                            contactName: ((contact.First_Name || '') + ' ' + (contact.Last_Name || '')).trim(),
-                            firstName: contact.First_Name || '',
-                            lastName: contact.Last_Name || '',
-                            title: contact.Title || '',
-                            orgName: org?.Name || '',
-                            orgId: org?.ID || '',
-                            contactId: contact.ID,
-                            zone: org?.Zone || ''
-                        });
-                    }
-                }
-            });
-            
-            console.log('📧 Final recipients:', recipients.length, recipients.map(r => r.email));
-            
-            return recipients;
-        }
-        
-        function previewComposeEmail() {
+
+        async function sendEmail() {
+            const to = document.getElementById('composeToEmail').value;
             const subject = document.getElementById('composeSubject').value;
-            const body = composeEditor.root.innerHTML;
-            const recipients = getRecipientList();
-            
-            if (recipients.length === 0) {
-                showToast('Select at least one recipient to preview', 'warning');
-                return;
-            }
-            
-            // Preview with first recipient
-            const r = recipients[0];
-            const previewSubject = subject
-                .replace(/\{\{contact_name\}\}/gi, r.contactName || 'Contact')
-                .replace(/\{\{first_name\}\}/gi, r.firstName || '')
-                .replace(/\{\{last_name\}\}/gi, r.lastName || '')
-                .replace(/\{\{organization\}\}/gi, r.orgName || '');
-            const previewBody = body
-                .replace(/\{\{contact_name\}\}/gi, r.contactName || 'Contact')
-                .replace(/\{\{first_name\}\}/gi, r.firstName || '')
-                .replace(/\{\{last_name\}\}/gi, r.lastName || '')
-                .replace(/\{\{organization\}\}/gi, r.orgName || '')
-                .replace(/\{\{title\}\}/gi, r.title || '');
-            
-            const previewEl = document.getElementById('composeEmailPreview');
-            previewEl.style.display = 'block';
-            previewEl.innerHTML = `
-                <div style="background: linear-gradient(135deg, #1A365C 0%, #2d4a6f 100%); padding: 16px 20px; color: white;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 20px; font-weight: 700;"><span style="color: #F57600;">alice</span>.care</span>
-                        <span style="font-size: 11px; opacity: 0.8;">Home Care Services</span>
-                    </div>
-                </div>
-                <div style="height: 4px; background: #F57600;"></div>
-                <div style="padding: 20px;">
-                    <div style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--gray-200);">
-                        <strong>Preview for:</strong> ${esc(r.contactName)} &lt;${esc(r.email)}&gt;<br>
-                        <strong>Subject:</strong> ${esc(previewSubject)}
-                    </div>
-                    <div style="line-height: 1.6;">${previewBody}</div>
-                </div>
-                <div style="background: var(--gray-50); padding: 16px 20px; border-top: 1px solid var(--gray-200); font-size: 12px; color: var(--gray-600);">
-                    <strong style="color: var(--navy);">${esc(state.user?.name || 'Alice Care Business Development')}</strong><br>
-                    <span style="color: #F57600;">alice</span><span style="color: var(--navy);">.care</span> | Licensed Home Care Organization
-                </div>
-            `;
-            
-            previewEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-        
-        async function sendComposeEmails() {
-            const subject = document.getElementById('composeSubject').value.trim();
-            const body = composeEditor.root.innerHTML;
+            const bodyHtml = composeEditor.root.innerHTML;
             const bodyText = composeEditor.getText().trim();
-            const recipients = getRecipientList();
             
-            if (!subject) {
-                showToast('Please enter a subject', 'error');
-                return;
-            }
-            
-            if (!bodyText) {
-                showToast('Please enter a message', 'error');
-                return;
-            }
-            
-            if (recipients.length === 0) {
-                showToast('Please select at least one recipient', 'error');
-                return;
-            }
-            
-            const confirmMsg = recipients.length === 1 
-                ? `Send email to ${recipients[0].contactName || recipients[0].email}?`
-                : `Send ${recipients.length} individual emails? Each recipient will receive a personalized message.`;
-            
-            if (!confirm(confirmMsg)) {
-                return;
-            }
+            if (!to || !subject || !bodyText) { showToast('Fill all fields', 'error'); return; }
             
             showLoading(true);
-            showToast(`⏳ Sending ${recipients.length} email${recipients.length > 1 ? 's' : ''}...`, 'info');
-            
             try {
-                const result = await apiPost('sendBulkEmails', {
-                    emailData: {
-                        recipients: recipients,
-                        subject: subject,
-                        body: body,
-                        senderName: state.user?.name || 'Alice Care Business Development',
-                        sentBy: state.user?.email || ''
-                    }
-                });
-                
-                showToast(`✅ ${result.message || 'Email(s) sent successfully!'}`, 'success');
+                await apiPost('sendEmail', { emailData: { to, subject, body: bodyHtml, orgId: document.getElementById('composeOrg').value, sentBy: state.user?.email } });
+                showToast('Email sent!', 'success');
                 closeModal('composeModal');
-                
-                // Refresh inbox to show sent emails
-                setTimeout(() => loadGroupInbox(), 2000);
-                
-            } catch (err) {
-                console.error('Email send error:', err);
-                showToast('Failed to send email(s)', 'error');
-            }
-            
+            } catch (err) { showToast('Send failed', 'error'); }
             showLoading(false);
         }
-        
-        // Legacy functions for backward compatibility
-        function openBulkComposeModal() {
-            openComposeModal();
-        }
-        
+
         function composeEmailForOrg(orgId) {
             switchTab('emails');
-            setTimeout(() => openComposeModal(null, orgId), 100);
+            setTimeout(() => { openComposeModal(); document.getElementById('composeOrg').value = orgId; populateContactsForOrg(); }, 100);
         }
 
         function composeEmailForContact(contactId) {
+            const c = state.contacts.find(x => String(x.ID) === String(contactId));
+            if (!c) return;
             switchTab('emails');
-            setTimeout(() => openComposeModal(contactId, null), 100);
+            setTimeout(() => {
+                openComposeModal();
+                document.getElementById('composeOrg').value = c.Org_ID;
+                populateContactsForOrg();
+                setTimeout(() => { document.getElementById('composeContact').value = contactId; if (c.Email) document.getElementById('composeToEmail').value = c.Email; }, 50);
+            }, 100);
+        }
+
+        function replyToEmail() {
+            if (!state.selectedEmail) return;
+            openComposeModal();
+            document.getElementById('composeToEmail').value = state.selectedEmail.from;
+            document.getElementById('composeSubject').value = 'Re: ' + state.selectedEmail.subject;
         }
 
         // ============================================

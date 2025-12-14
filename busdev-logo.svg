@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+  <!-- Background -->
+  <rect width="180" height="180" fill="#1A365C" rx="36"/>
+  
+  <!-- AC Text -->
+  <text x="90" y="75" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="56" font-weight="700" fill="#F57600" text-anchor="middle" dominant-baseline="middle">AC</text>
+  
+  <!-- Divider Line -->
+  <line x1="40" y1="98" x2="140" y2="98" stroke="#F57600" stroke-width="3" stroke-linecap="round"/>
+  
+  <!-- B.DEV Text -->
+  <text x="90" y="138" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="36" font-weight="600" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle">B.DEV</text>
+</svg>
