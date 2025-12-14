@@ -2320,19 +2320,9 @@
                     </div>
                 </div>
 
-                <!-- ✅ NEW: Near Me Quick-Pick Section -->
-                <div id="nearMeSection" style="display: none; margin-bottom: 16px;">
-                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
-                        <span class="material-icons-outlined" style="color: rgba(255,255,255,0.9); font-size: 20px;">near_me</span>
-                        <span style="color: rgba(255,255,255,0.9); font-weight: 600; font-size: 14px;">Near You</span>
-                        <span id="nearMeLoading" style="display: none;"><span class="spinner" style="width: 14px; height: 14px; border-width: 2px;"></span></span>
-                    </div>
-                    <div id="nearMeList" style="display: flex; flex-direction: column; gap: 8px;"></div>
-                </div>
-
-                <!-- ✅ Searchable Organization Input for Check-In -->
+                <!-- ✅ NEW: Searchable Organization Input for Check-In -->
                 <div style="position: relative; margin-bottom: 16px;">
-                    <input type="text" class="checkin-org-select" id="checkinOrgSearch" placeholder="Search organization or select from Near Me above..." oninput="filterCheckinOrganizations()" style="width: 100%;" autocomplete="off">
+                    <input type="text" class="checkin-org-select" id="checkinOrgSearch" placeholder="Search and select organization..." oninput="filterCheckinOrganizations()" style="width: 100%;" autocomplete="off">
                     <div id="checkinOrgSuggestions" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid var(--border-color); border-top: none; max-height: 200px; overflow-y: auto; display: none; z-index: 1000; border-radius: 0 0 4px 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"></div>
                 </div>
                 <input type="hidden" id="checkinOrg">
@@ -7198,186 +7188,23 @@ END:VEVENT
         }
 
         // ============================================
-        // GPS LOCATION & NEAR ME
+        // GPS LOCATION
         // ============================================
-        
-        // Haversine formula to calculate distance between two coordinates (in miles)
-        function calculateDistance(lat1, lng1, lat2, lng2) {
-            const R = 3959; // Earth's radius in miles
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLng = (lng2 - lng1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                      Math.sin(dLng/2) * Math.sin(dLng/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c;
-        }
-        
-        // Cache for geocoded coordinates
-        let geoCache = {};
-        
-        // Load geocache from localStorage
-        function loadGeoCache() {
-            try {
-                const cached = localStorage.getItem('orgGeoCache');
-                if (cached) geoCache = JSON.parse(cached);
-            } catch (e) { geoCache = {}; }
-        }
-        
-        // Save geocache to localStorage
-        function saveGeoCache() {
-            try {
-                localStorage.setItem('orgGeoCache', JSON.stringify(geoCache));
-            } catch (e) { }
-        }
-        
-        // Simple geocoding using Nominatim (OpenStreetMap) - free, no API key
-        async function geocodeAddress(address, city, state, zip) {
-            const cacheKey = `${address}_${city}_${zip}`.toLowerCase().replace(/\s+/g, '_');
-            
-            // Check cache first
-            if (geoCache[cacheKey]) {
-                return geoCache[cacheKey];
-            }
-            
-            // Build search query
-            const query = encodeURIComponent(`${address}, ${city}, ${state} ${zip}`);
-            
-            try {
-                const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=1`, {
-                    headers: { 'User-Agent': 'AliceCare-BusDev-App' }
-                });
-                const data = await response.json();
-                
-                if (data && data.length > 0) {
-                    const result = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-                    geoCache[cacheKey] = result;
-                    saveGeoCache();
-                    return result;
-                }
-            } catch (e) {
-                console.log('Geocoding failed for:', address, e);
-            }
-            
-            // Fallback: try city only
-            const cityKey = `city_${city}_${state}`.toLowerCase().replace(/\s+/g, '_');
-            if (geoCache[cityKey]) {
-                return geoCache[cityKey];
-            }
-            
-            try {
-                const cityQuery = encodeURIComponent(`${city}, ${state}`);
-                const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${cityQuery}&limit=1`, {
-                    headers: { 'User-Agent': 'AliceCare-BusDev-App' }
-                });
-                const data = await response.json();
-                
-                if (data && data.length > 0) {
-                    const result = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-                    geoCache[cityKey] = result;
-                    saveGeoCache();
-                    return result;
-                }
-            } catch (e) { }
-            
-            return null;
-        }
-        
         function getLocation() {
             const gpsEl = document.getElementById('gpsStatus');
-            loadGeoCache();
-            
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     pos => {
                         state.currentLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
                         gpsEl.className = 'checkin-gps active';
                         gpsEl.innerHTML = `<span class="material-icons-outlined">location_on</span><span>GPS Ready</span>`;
-                        
-                        // Load nearby organizations
-                        loadNearbyOrganizations();
                     },
                     err => {
                         gpsEl.className = 'checkin-gps error';
                         gpsEl.innerHTML = `<span class="material-icons-outlined">location_off</span><span>No GPS</span>`;
-                        // Hide near me section if no GPS
-                        document.getElementById('nearMeSection').style.display = 'none';
                     }
                 );
             }
-        }
-        
-        async function loadNearbyOrganizations() {
-            const nearMeSection = document.getElementById('nearMeSection');
-            const nearMeList = document.getElementById('nearMeList');
-            const nearMeLoading = document.getElementById('nearMeLoading');
-            
-            if (!state.currentLocation) {
-                nearMeSection.style.display = 'none';
-                return;
-            }
-            
-            nearMeSection.style.display = 'block';
-            nearMeLoading.style.display = 'inline';
-            nearMeList.innerHTML = '<div style="color: rgba(255,255,255,0.6); font-size: 13px; padding: 8px;">Finding nearby organizations...</div>';
-            
-            const activeOrgs = state.organizations.filter(o => o.Status === 'Active' && o.Address && o.City);
-            const orgsWithDistance = [];
-            
-            // Process organizations in batches to avoid rate limiting
-            const batchSize = 5;
-            for (let i = 0; i < Math.min(activeOrgs.length, 50); i += batchSize) {
-                const batch = activeOrgs.slice(i, i + batchSize);
-                
-                await Promise.all(batch.map(async (org) => {
-                    const coords = await geocodeAddress(org.Address, org.City, org.State || 'CA', org.Zip);
-                    if (coords) {
-                        const distance = calculateDistance(
-                            state.currentLocation.lat, 
-                            state.currentLocation.lng,
-                            coords.lat,
-                            coords.lng
-                        );
-                        orgsWithDistance.push({ ...org, distance, coords });
-                    }
-                }));
-                
-                // Small delay between batches to respect rate limits
-                if (i + batchSize < activeOrgs.length) {
-                    await new Promise(r => setTimeout(r, 200));
-                }
-            }
-            
-            // Sort by distance
-            orgsWithDistance.sort((a, b) => a.distance - b.distance);
-            
-            // Take top 5 nearest
-            const nearest = orgsWithDistance.slice(0, 5);
-            
-            nearMeLoading.style.display = 'none';
-            
-            if (nearest.length === 0) {
-                nearMeList.innerHTML = '<div style="color: rgba(255,255,255,0.5); font-size: 13px; padding: 8px;">No nearby organizations found</div>';
-                return;
-            }
-            
-            nearMeList.innerHTML = nearest.map(org => `
-                <div onclick="selectCheckinOrganization('${org.ID}', '${esc(org.Name).replace(/'/g, "\\'")}'); this.parentElement.querySelectorAll('.near-me-item').forEach(el => el.style.background = 'rgba(255,255,255,0.1)'); this.style.background = 'rgba(245,118,0,0.3)';" 
-                     class="near-me-item"
-                     style="background: rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; cursor: pointer; transition: all 0.2s;">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                        <div style="flex: 1;">
-                            <div style="color: white; font-weight: 600; font-size: 14px;">${esc(org.Name)}</div>
-                            <div style="color: rgba(255,255,255,0.6); font-size: 12px; margin-top: 2px;">
-                                ${esc(org.Address)}, ${esc(org.City)}
-                            </div>
-                        </div>
-                        <div style="background: var(--orange); color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; white-space: nowrap;">
-                            ${org.distance < 0.1 ? '< 0.1' : org.distance.toFixed(1)} mi
-                        </div>
-                    </div>
-                </div>
-            `).join('');
         }
 
         // ============================================
@@ -8889,39 +8716,9 @@ END:VCALENDAR`;
             }
             
             // Filter organizations by name (case insensitive, partial match)
-            let matches = state.organizations.filter(org => 
-                org.Name.toLowerCase().includes(searchTerm) && org.Status === 'Active'
-            );
-            
-            // If we have location, calculate and sort by distance
-            if (state.currentLocation && matches.length > 0) {
-                matches = matches.map(org => {
-                    const cacheKey = `${org.Address}_${org.City}_${org.Zip}`.toLowerCase().replace(/\s+/g, '_');
-                    const cityKey = `city_${org.City}_${org.State || 'CA'}`.toLowerCase().replace(/\s+/g, '_');
-                    const coords = geoCache[cacheKey] || geoCache[cityKey];
-                    
-                    if (coords) {
-                        const distance = calculateDistance(
-                            state.currentLocation.lat,
-                            state.currentLocation.lng,
-                            coords.lat,
-                            coords.lng
-                        );
-                        return { ...org, distance };
-                    }
-                    return { ...org, distance: null };
-                });
-                
-                // Sort by distance (nulls at end)
-                matches.sort((a, b) => {
-                    if (a.distance === null && b.distance === null) return 0;
-                    if (a.distance === null) return 1;
-                    if (b.distance === null) return -1;
-                    return a.distance - b.distance;
-                });
-            }
-            
-            matches = matches.slice(0, 10); // Limit to 10 suggestions
+            const matches = state.organizations.filter(org => 
+                org.Name.toLowerCase().includes(searchTerm)
+            ).slice(0, 10); // Limit to 10 suggestions
             
             if (matches.length === 0) {
                 suggestionsDiv.innerHTML = '<div style="padding: 10px; color: var(--gray-500);">No organizations found</div>';
@@ -8931,15 +8728,11 @@ END:VCALENDAR`;
             
             // Create suggestion items
             suggestionsDiv.innerHTML = matches.map(org => `
-                <div style="padding: 10px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s; background-color: white; color: var(--gray-800); display: flex; justify-content: space-between; align-items: center;" 
+                <div style="padding: 10px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s; background-color: white; color: var(--gray-800);" 
                      onmouseover="this.style.background='var(--gray-100)'" 
                      onmouseout="this.style.background='white'"
-                     onclick="selectCheckinOrganization('${org.ID}', '${esc(org.Name).replace(/'/g, "\\'")}')">
-                    <div>
-                        <strong>${esc(org.Name)}</strong>
-                        <div style="color: var(--gray-500); font-size: 12px;">${esc(org.City || '')} ${org.Zone ? '• ' + org.Zone : ''}</div>
-                    </div>
-                    ${org.distance !== null ? `<span style="background: var(--orange); color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600;">${org.distance < 0.1 ? '< 0.1' : org.distance.toFixed(1)} mi</span>` : ''}
+                     onclick="selectCheckinOrganization('${org.ID}', '${esc(org.Name)}')">
+                    <strong>${esc(org.Name)}</strong> <span style="color: var(--gray-500); font-size: 12px;">[${org.Zone || 'No Zone'}]</span>
                 </div>
             `).join('');
             
