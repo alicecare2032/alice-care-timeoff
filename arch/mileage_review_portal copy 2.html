@@ -1768,7 +1768,7 @@
                 html += `
                     <tr>
                         <td>${formatDate(date)}</td>
-                        <td>${formatUTCTime(time)}</td>
+                        <td>${time}</td>
                         <td>${clientName}</td>
                         <td style="font-size: 12px;">${reason}</td>
                         <td class="text-right">${startMiles.toFixed(1)}</td>
@@ -2166,31 +2166,6 @@
                 month: 'short', 
                 day: 'numeric' 
             });
-        }
-
-        function formatUTCTime(zuluTimeString) {
-            // Convert UTC/Zulu time to user's local time
-            if (!zuluTimeString) return '';
-            
-            try {
-                // If already HH:MM format, return as-is
-                if (typeof zuluTimeString === 'string' && /^\d{1,2}:\d{2}$/.test(zuluTimeString.trim())) {
-                    return zuluTimeString.trim();
-                }
-                
-                // Parse ISO 8601 UTC time and convert to local
-                const date = new Date(zuluTimeString);
-                if (isNaN(date.getTime())) {
-                    return String(zuluTimeString);
-                }
-                
-                const hours = date.getHours();
-                const minutes = date.getMinutes();
-                return String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0');
-            } catch (error) {
-                console.error('Error formatting UTC time:', error, zuluTimeString);
-                return String(zuluTimeString);
-            }
         }
         
         function formatTime(timeValue) {
