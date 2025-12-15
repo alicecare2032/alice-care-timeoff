@@ -2541,7 +2541,12 @@ Note: Clients starting later in the period will naturally show fewer initial hou
                             <div style="background: white; border: 1px solid #E5ECF3; border-radius: 12px; padding: 20px;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
                                     <div>
-                                        <h3 style="color: #1A365C; margin: 0; font-size: 16px;">🔥 High-Hour Providers</h3>
+                                        <h3 style="color: #1A365C; margin: 0; font-size: 16px;">
+                                            🔥 High-Hour Providers
+                                            <a href="javascript:void(0)" onclick="openFormulaDoc('#highhourfig')" style="display: inline-block; margin-left: 8px; font-size: 12px; padding: 3px 8px; background: #E0E7FF; color: #3730A3; border-radius: 4px; text-decoration: none; font-weight: 500; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#C7D2FE'" onmouseout="this.style.background='#E0E7FF'">
+                                                📋 Formula
+                                            </a>
+                                        </h3>
                                         <p style="font-size: 12px; color: #666; margin: 5px 0 0 0;">Q3 Analysis: Caregivers averaging 30+ hours per week</p>
                                     </div>
                                     <select id="highHourLimit" onchange="renderHighHourProviders()" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
@@ -2580,7 +2585,13 @@ Note: Clients starting later in the period will naturally show fewer initial hou
                             <div style="background: white; border: 1px solid #E5ECF3; border-radius: 12px; padding: 20px;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
                                     <div>
-                                        <h3 style="color: #1A365C; margin: 0; font-size: 16px;">⚠️ Dropped From 30+ Hrs <span id="completedProvidersCount" style="background: #10B981; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-left: 8px;">Completed: 0</span></h3>
+                                        <h3 style="color: #1A365C; margin: 0; font-size: 16px;">
+                                            ⚠️ Dropped From 30+ Hrs 
+                                            <a href="javascript:void(0)" onclick="openFormulaDoc('#dropped30')" style="display: inline-block; margin-left: 8px; font-size: 12px; padding: 3px 8px; background: #FEE2E2; color: #991B1B; border-radius: 4px; text-decoration: none; font-weight: 500; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#FECACA'" onmouseout="this.style.background='#FEE2E2'">
+                                                📋 Formula
+                                            </a>
+                                            <span id="completedProvidersCount" style="background: #10B981; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-left: 8px;">Completed: 0</span>
+                                        </h3>
                                         <p style="font-size: 12px; color: #666; margin: 5px 0 0 0;">Q2→Q3 Comparison: Significant engagement decline</p>
                                     </div>
                                     <select id="decliningLimit" onchange="renderDecliningProviders()" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
@@ -9001,6 +9012,22 @@ Shows last 4 quarters including current quarter.">ⓘ</span>
             return div.innerHTML;
         }
         
+        /**
+         * Open formula documentation in a separate browser window
+         */
+        function openFormulaDoc(sectionId) {
+            // Check if formula_documentation.html is in the same directory
+            // Otherwise adjust the path as needed
+            const docUrl = 'formula_documentation.html' + sectionId;
+            const docWindow = window.open(docUrl, 'FormulaDoc', 'width=1200,height=800,resizable=yes,scrollbars=yes');
+            
+            if (docWindow) {
+                docWindow.focus();
+            } else {
+                alert('Unable to open formula documentation. Please check your browser pop-up settings.');
+            }
+        }
+        
         function renderPagination(containerId, totalPages, current, onPageChange) {
             const container = document.getElementById(containerId);
             if (totalPages <= 1) {
@@ -10324,8 +10351,18 @@ Shows last 4 quarters including current quarter.">ⓘ</span>
                     }
                 });
                 
-                const evaluateAvgWeekly = evaluateQHours / 13; // Q3 average
-                const compareAvgWeekly = compareQHours / 13;   // Q2 average
+                // Calculate weeks elapsed for evaluate quarter (Q3)
+                const evaluateQuarterStart = new Date(evaluateYear, (evaluateQuarter - 1) * 3, 1);
+                const evaluateQuarterEnd = new Date(evaluateYear, evaluateQuarter * 3, 0); // Last day of quarter
+                const weeksElapsedEvaluate = Math.max(1, Math.ceil((Math.min(now, evaluateQuarterEnd) - evaluateQuarterStart) / (7 * 24 * 60 * 60 * 1000)));
+                
+                // Calculate weeks elapsed for compare quarter (Q2)
+                const compareQuarterStart = new Date(compareYear, (compareQuarter - 1) * 3, 1);
+                const compareQuarterEnd = new Date(compareYear, compareQuarter * 3, 0); // Last day of quarter
+                const weeksElapsedCompare = Math.max(1, Math.ceil((Math.min(now, compareQuarterEnd) - compareQuarterStart) / (7 * 24 * 60 * 60 * 1000)));
+                
+                const evaluateAvgWeekly = evaluateQHours / weeksElapsedEvaluate; // Q3 average (actual weeks)
+                const compareAvgWeekly = compareQHours / weeksElapsedCompare;   // Q2 average (actual weeks)
                 const hoursChange = evaluateQHours - compareQHours;
                 const changePercent = compareQHours > 0 ? ((evaluateQHours - compareQHours) / compareQHours) * 100 : 0;
                 

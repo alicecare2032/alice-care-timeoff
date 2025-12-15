@@ -723,6 +723,66 @@
                     Providers who have become inactive (no services in 90+ days). Shows their lifetime contribution to help prioritize re-engagement efforts.
                 </div>
             </div>
+
+            <!-- High-Hour Providers (Q3 Quarterly Report) -->
+            <div class="formula-card" id="highhourfig">
+                <div class="formula-title">
+                    <span class="badge badge-table">Table</span>
+                    🔥 High-Hour Providers
+                </div>
+                <div class="formula-box">
+                    Q2 Avg = SUM(Q2 Monthly Hours [Apr, May, Jun]) / Weeks Elapsed in Q2<br>
+                    Q3 Avg = SUM(Q3 Monthly Hours [Jul, Aug, Sep]) / Weeks Elapsed in Q3<br>
+                    Change/Delta = Q3 Avg - Q2 Avg<br><br>
+                    Filter: Q3 Avg ≥ 30 hours/week AND Provider Name ≠ "Unassigned"<br>
+                    Sort: By Q3 Avg (descending)
+                </div>
+                <div class="description">
+                    <strong>Purpose:</strong> Shows providers currently working 30+ average hours per week in Q3, with their trend from Q2.<br><br>
+                    <strong>Weeks Elapsed:</strong> Dynamically calculated based on current date:
+                    <ul style="margin-left: 20px; margin-top: 8px;">
+                        <li>If analyzing past quarter = 13 weeks</li>
+                        <li>If analyzing current quarter = Days from quarter start to today / 7</li>
+                    </ul>
+                    <strong>Delta Color Coding:</strong><br>
+                    • 🟢 Green = Positive (growing hours)<br>
+                    • 🔴 Red = Negative (declining but still 30+)<br>
+                    • Gray = No change<br><br>
+                    <strong>Use Case:</strong> Identify top performers, monitor workload trends, manage retention and burnout risk.
+                </div>
+            </div>
+
+            <!-- Dropped From 30+ Hrs (Quarterly Report) -->
+            <div class="formula-card" id="dropped30">
+                <div class="formula-title">
+                    <span class="badge badge-table">Table</span>
+                    ⚠️ Dropped From 30+ Hrs
+                </div>
+                <div class="formula-box">
+                    Q2 Avg = SUM(Q2 Monthly Hours [Apr, May, Jun]) / Weeks Elapsed in Q2<br>
+                    Q3 Avg = SUM(Q3 Monthly Hours [Jul, Aug, Sep]) / Weeks Elapsed in Q3<br>
+                    Change/Delta = Q3 Avg - Q2 Avg<br><br>
+                    Filter: Q2 Avg ≥ 30 AND Q3 Avg &lt; 30 AND NOT in Completed Sheet AND Provider Name ≠ "Unassigned"<br>
+                    Sort: By Q2 Avg (descending - highest falloff first)<br><br>
+                    Completed Count = COUNT(Providers in Completed Sheet)
+                </div>
+                <div class="description">
+                    <strong>Purpose:</strong> Identifies providers who were high-utilization (30+ hrs/wk) in Q2 but have dropped below 30 in Q3. Early retention risk detection.<br><br>
+                    <strong>Filtering Logic:</strong>
+                    <ul style="margin-left: 20px; margin-top: 8px;">
+                        <li>Must have been 30+ in Q2 baseline</li>
+                        <li>Now below 30 in Q3 current</li>
+                        <li>Excludes providers already marked "Completed" in Completed tracking sheet</li>
+                        <li>Excludes "Unassigned" provider</li>
+                    </ul>
+                    <strong>Completed Badge:</strong> Green badge showing how many of these declining providers you've already contacted.<br><br>
+                    <strong>Data Flow:</strong> Fetches Completed provider list from backend, normalizes names (case-insensitive, whitespace-trimmed), matches against declining providers to filter them out.<br><br>
+                    <strong>Use Case:</strong> Priority list for retention outreach. Contact providers showing significant engagement drops before they become inactive.
+                </div>
+                <div class="note">
+                    💡 Completed providers automatically disappear from this table, so you only see new cases requiring action.
+                </div>
+            </div>
         </div>
 
         <!-- ================================ -->
