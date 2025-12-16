@@ -1,0 +1,1899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>alice.care - HCA Registry Tracker v.1</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #E5ECF3;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .nav-bar {
+            max-width: 1400px;
+            margin: 0 auto 20px;
+            background: white;
+            padding: 15px 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(26, 54, 92, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .logo .alice {
+            color: #F57600;
+            font-weight: 700;
+        }
+        
+        .logo .dot {
+            color: #F57600;
+            font-weight: 700;
+            margin: 0 -2px;
+        }
+        
+        .logo .care {
+            color: #1A365C;
+            font-weight: 400;
+        }
+        
+        .nav-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .back-link {
+            color: #1A365C;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .back-link:hover {
+            background: #E5ECF3;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(26, 54, 92, 0.15);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #1A365C;
+            color: white;
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-content h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .header-content p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            padding: 20px 30px;
+            background: #E5ECF3;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #F57600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(26, 54, 92, 0.15);
+        }
+        
+        .stat-card.active {
+            border-left-color: #1A365C;
+            background: #f8fafc;
+        }
+        
+        .stat-card h3 {
+            font-size: 12px;
+            color: #3D3D3D;
+            margin-bottom: 8px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .stat-card .number {
+            font-size: 28px;
+            color: #1A365C;
+            font-weight: 700;
+        }
+        
+        .stat-card.registered .number { color: #28a745; }
+        .stat-card.expired .number { color: #dc3545; }
+        .stat-card.warning .number { color: #e6a000; }
+        .stat-card.pending .number { color: #17a2b8; }
+        
+        .filters-section {
+            padding: 25px 30px;
+            background: white;
+            border-bottom: 2px solid #E5ECF3;
+        }
+        
+        .filters-title {
+            font-size: 16px;
+            color: #1A365C;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .filter-group label {
+            font-size: 13px;
+            color: #1A365C;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        
+        input[type="text"],
+        input[type="number"],
+        input[type="file"],
+        select,
+        textarea {
+            padding: 10px 14px;
+            border: 2px solid #D3D7DF;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s;
+        }
+        
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #F57600;
+            box-shadow: 0 0 0 3px rgba(245, 118, 0, 0.1);
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: #F57600;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #e06d00;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #E5ECF3;
+            color: #1A365C;
+        }
+        
+        .btn-secondary:hover {
+            background: #d5dce6;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+        
+        .btn-view {
+            background: #1A365C;
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        
+        .btn-view:hover {
+            background: #2d4a73;
+        }
+        
+        .btn-refresh {
+            background: #E5ECF3;
+            color: #1A365C;
+            padding: 6px 10px;
+            font-size: 14px;
+            min-width: 36px;
+        }
+        
+        .btn-refresh:hover {
+            background: #F57600;
+            color: white;
+        }
+        
+        .btn-refresh.loading {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        
+        .btn-refresh.loading::after {
+            content: '';
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #ccc;
+            border-top-color: #1A365C;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 0;
+        }
+        
+        .btn-delete {
+            background: #E5ECF3;
+            color: #dc3545;
+            padding: 6px 10px;
+            font-size: 14px;
+            min-width: 36px;
+        }
+        
+        .btn-delete:hover {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-delete.loading {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        
+        .btn-cdss {
+            background: #E5ECF3;
+            color: #17a2b8;
+            padding: 6px 10px;
+            font-size: 14px;
+            min-width: 36px;
+        }
+        
+        .btn-cdss:hover {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .actions-cell {
+            white-space: nowrap;
+        }
+        
+        .actions-cell .btn {
+            display: inline-flex;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+        
+        .actions-cell .btn:last-child {
+            margin-right: 0;
+        }
+        
+        .row-updating {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .row-updated {
+            animation: highlightRow 1.5s ease-out;
+        }
+        
+        @keyframes highlightRow {
+            0% { background-color: #d4edda; }
+            100% { background-color: #f8fafc; }
+        }
+        
+        .btn-header {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .btn-header:hover {
+            background: rgba(255,255,255,0.25);
+        }
+        
+        /* Table Styles */
+        .table-container {
+            padding: 30px;
+            overflow-x: auto;
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .table-title {
+            font-size: 18px;
+            color: #1A365C;
+            font-weight: 600;
+        }
+        
+        .result-count {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+        
+        .data-table thead {
+            background: #1A365C;
+            color: white;
+        }
+        
+        .data-table thead th {
+            padding: 15px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+        
+        .data-table thead th:first-child {
+            border-radius: 8px 0 0 8px;
+        }
+        
+        .data-table thead th:last-child {
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .data-table thead th:hover {
+            background: #2d4a73;
+        }
+        
+        .data-table thead th .sort-icon {
+            margin-left: 5px;
+            opacity: 0.5;
+        }
+        
+        .data-table thead th.sorted .sort-icon {
+            opacity: 1;
+        }
+        
+        .data-table tbody tr {
+            background: #f8fafc;
+            transition: all 0.2s;
+        }
+        
+        .data-table tbody tr:hover {
+            background: #E5ECF3;
+            transform: scale(1.005);
+        }
+        
+        .data-table tbody td {
+            padding: 15px;
+            font-size: 14px;
+            border-top: 1px solid #E5ECF3;
+            border-bottom: 1px solid #E5ECF3;
+        }
+        
+        .data-table tbody td:first-child {
+            border-left: 1px solid #E5ECF3;
+            border-radius: 8px 0 0 8px;
+        }
+        
+        .data-table tbody td:last-child {
+            border-right: 1px solid #E5ECF3;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        
+        .status-registered {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-expired {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-forfeited {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-suspended {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-revoked {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-denied {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-withdrawn {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+        
+        .status-inactive {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+        
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-notfound,
+        .status-unknown,
+        .status-error {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+        
+        /* Days Badge */
+        .days-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .days-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .days-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .days-ok {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #E5ECF3;
+            border-top-color: #F57600;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .empty-state-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+        
+        .empty-state-text {
+            font-size: 16px;
+            color: #1A365C;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 54, 92, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(26, 54, 92, 0.3);
+        }
+        
+        .modal-header {
+            background: #1A365C;
+            color: white;
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+        
+        .modal-close:hover {
+            opacity: 1;
+        }
+        
+        .modal-body {
+            padding: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: #1A365C;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            padding-top: 10px;
+            border-top: 2px solid #E5ECF3;
+            margin-top: 20px;
+        }
+        
+        /* Lookup Result */
+        .lookup-result {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+            border-left: 4px solid #F57600;
+        }
+        
+        .lookup-result.success {
+            border-left-color: #28a745;
+        }
+        
+        .lookup-result.error {
+            border-left-color: #dc3545;
+        }
+        
+        .lookup-result.pending {
+            border-left-color: #ffc107;
+            background: #fffbeb;
+        }
+        
+        .lookup-result h4 {
+            font-size: 14px;
+            color: #1A365C;
+            margin-bottom: 10px;
+        }
+        
+        .lookup-result p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .lookup-result strong {
+            color: #1A365C;
+        }
+        
+        /* Last Updated */
+        .last-updated {
+            font-size: 12px;
+            color: #999;
+            margin-left: 15px;
+        }
+        
+        /* File Upload Area */
+        .file-upload-area {
+            border: 2px dashed #D3D7DF;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .file-upload-area:hover,
+        .file-upload-area.dragover {
+            border-color: #F57600;
+            background: #fffbf5;
+        }
+        
+        .file-upload-area input[type="file"] {
+            display: none;
+        }
+        
+        .file-upload-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        
+        .file-upload-text {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .file-upload-text strong {
+            color: #F57600;
+        }
+        
+        .selected-file {
+            margin-top: 15px;
+            padding: 10px 15px;
+            background: #e7f3ff;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .selected-file-name {
+            flex: 1;
+            font-size: 14px;
+            color: #1A365C;
+        }
+        
+        .selected-file-remove {
+            background: none;
+            border: none;
+            color: #dc3545;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        
+        /* Import Preview */
+        .import-preview {
+            margin-top: 20px;
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .import-preview h4 {
+            font-size: 14px;
+            color: #1A365C;
+            margin-bottom: 10px;
+        }
+        
+        .import-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .import-stat {
+            text-align: center;
+            padding: 10px;
+            border-radius: 6px;
+        }
+        
+        .import-stat.new {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .import-stat.existing {
+            background: #e7f3ff;
+            color: #0c5460;
+        }
+        
+        .import-stat.removed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .import-stat .count {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .import-stat .label {
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+        
+        .import-details {
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 12px;
+        }
+        
+        .import-details-section {
+            margin-bottom: 10px;
+        }
+        
+        .import-details-section h5 {
+            font-size: 12px;
+            color: #1A365C;
+            margin-bottom: 5px;
+        }
+        
+        .import-details-list {
+            padding-left: 20px;
+            color: #666;
+        }
+        
+        /* Progress Bar */
+        .progress-container {
+            margin-top: 15px;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #E5ECF3;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background: #F57600;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .progress-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            text-align: center;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-bar {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .table-container {
+                padding: 15px;
+            }
+            
+            .data-table {
+                min-width: 900px;
+            }
+            
+            .import-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <div class="nav-bar">
+        <div class="logo">
+            <span class="alice">alice</span><span class="dot">.</span><span class="care">care</span>
+        </div>
+        <div class="nav-actions">
+            <span class="last-updated" id="lastUpdated"></span>
+            <a href="#" class="back-link" onclick="openLookupModal()">🔍 Quick Lookup</a>
+        </div>
+    </div>
+    
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <h1>🏥 HCA Registry Tracker</h1>
+                <p>Monitor caregiver CDSS registration status and expiration dates</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-header" onclick="openImportModal()" title="Import CDSS Roster CSV">📤 Import</button>
+                <button class="btn btn-header" onclick="openAddModal()" title="Add New Caregiver">➕ Add</button>
+                <button class="btn btn-header" onclick="refreshFromSheet()" title="Refresh from Google Sheet">🔄 Refresh</button>
+                <button class="btn btn-header" onclick="refreshAllFromCDSS()" title="Refresh all records from CDSS API">🌐 Refresh All CDSS</button>
+                <button class="btn btn-primary" onclick="exportCSV()">📥 Export CSV</button>
+            </div>
+        </div>
+        
+        <!-- Stats Row -->
+        <div class="stats-row">
+            <div class="stat-card" id="stat-total" onclick="filterByCard('all')">
+                <h3>Total Caregivers</h3>
+                <div class="number" id="total-count">-</div>
+            </div>
+            <div class="stat-card registered" onclick="filterByCard('registered')">
+                <h3>Registered</h3>
+                <div class="number" id="registered-count">-</div>
+            </div>
+            <div class="stat-card warning" onclick="filterByCard('expiring')">
+                <h3>Expiring Soon (90 days)</h3>
+                <div class="number" id="expiring-count">-</div>
+            </div>
+            <div class="stat-card expired" onclick="filterByCard('problem')">
+                <h3>Expired / Problem</h3>
+                <div class="number" id="expired-count">-</div>
+            </div>
+        </div>
+        
+        <!-- Filters Section -->
+        <div class="filters-section">
+            <div class="filters-title">🔍 Filter Caregivers</div>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label>Search Name or HCA ID</label>
+                    <input type="text" id="searchInput" placeholder="Enter name or ID..." oninput="applyFilters()">
+                </div>
+                <div class="filter-group">
+                    <label>Status</label>
+                    <select id="statusFilter" onchange="applyFilters()">
+                        <option value="">All Statuses</option>
+                        <option value="Registered">Registered</option>
+                        <option value="Active">Active</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Expired">Expired</option>
+                        <option value="Forfeited">Forfeited</option>
+                        <option value="Suspended">Suspended</option>
+                        <option value="Revoked">Revoked</option>
+                        <option value="Denied">Denied</option>
+                        <option value="Withdrawn">Withdrawn</option>
+                        <option value="Inactive">Inactive</option>
+                        <option value="Not Found">Not Found</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Expiration</label>
+                    <select id="expirationFilter" onchange="applyFilters()">
+                        <option value="">All</option>
+                        <option value="problem">Problem Status</option>
+                        <option value="expired">Already Expired</option>
+                        <option value="7">Within 7 days</option>
+                        <option value="30">Within 30 days</option>
+                        <option value="60">Within 60 days</option>
+                        <option value="90">Within 90 days</option>
+                        <option value="valid">Valid (90+ days)</option>
+                    </select>
+                </div>
+                <div class="filter-actions">
+                    <button class="btn btn-secondary" onclick="clearFilters()">Clear Filters</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Table Section -->
+        <div class="table-container">
+            <div class="table-header">
+                <div class="table-title">Caregivers List</div>
+                <div class="result-count" id="resultCount">Loading...</div>
+            </div>
+            <div id="tableContent">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <div>Loading caregivers...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Lookup Modal -->
+    <div class="modal" id="lookupModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🔍 Quick CDSS Lookup</h2>
+                <button class="modal-close" onclick="closeLookupModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" id="lookupFirstName" placeholder="Enter first name">
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" id="lookupLastName" placeholder="Enter last name">
+                </div>
+                <div class="form-group">
+                    <label>HCA ID (PER ID)</label>
+                    <input type="text" id="lookupHcaId" placeholder="Enter HCA ID">
+                </div>
+                <div id="lookupResult"></div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="closeLookupModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="performLookup()">🔍 Lookup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Employee Modal -->
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>➕ Add New Caregiver</h2>
+                <button class="modal-close" onclick="closeAddModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>First Name <span style="color:#dc3545;">*</span></label>
+                    <input type="text" id="addFirstName" placeholder="Enter first name">
+                </div>
+                <div class="form-group">
+                    <label>Last Name <span style="color:#dc3545;">*</span></label>
+                    <input type="text" id="addLastName" placeholder="Enter last name">
+                </div>
+                <div class="form-group">
+                    <label>HCA ID (PER ID) <span style="color:#dc3545;">*</span></label>
+                    <input type="text" id="addHcaId" placeholder="Enter HCA ID">
+                </div>
+                <div id="addResult"></div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="closeAddModal()">Cancel</button>
+                    <button class="btn btn-primary" id="addSubmitBtn" onclick="submitNewCaregiver()">➕ Add Caregiver</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Import CDSS Roster Modal -->
+    <div class="modal" id="importModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📤 Import CDSS Roster</h2>
+                <button class="modal-close" onclick="closeImportModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="color:#666;font-size:13px;margin-bottom:15px;">
+                    Upload a CDSS Roster Report CSV file. This will sync your caregiver list with the roster:
+                    matching records will retain their existing data, new caregivers will be added, and 
+                    caregivers not in the roster will be <strong>moved to the "Removed Caregivers" tab</strong> for tracking.
+                </p>
+                
+                <div class="file-upload-area" id="fileUploadArea" onclick="document.getElementById('csvFileInput').click()">
+                    <input type="file" id="csvFileInput" accept=".csv" onchange="handleFileSelect(event)">
+                    <div class="file-upload-icon">📁</div>
+                    <div class="file-upload-text">
+                        <strong>Click to upload</strong> or drag and drop<br>
+                        CDSS Roster Report CSV file
+                    </div>
+                </div>
+                
+                <div id="selectedFileInfo" style="display:none;">
+                    <div class="selected-file">
+                        <span class="selected-file-name" id="selectedFileName"></span>
+                        <button class="selected-file-remove" onclick="clearFileSelection()">&times;</button>
+                    </div>
+                </div>
+                
+                <div id="importPreview" style="display:none;"></div>
+                <div id="importProgress" style="display:none;"></div>
+                <div id="importResult"></div>
+                
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="closeImportModal()">Cancel</button>
+                    <button class="btn btn-success" id="importSubmitBtn" onclick="executeImport()" disabled>📤 Import Roster</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ============================================
+        // CONFIGURATION - UPDATE THIS URL
+        // ============================================
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxLKFlITKdmgcmy0XHw1LDo4WrhhkEHOolSatbopXusIdy7755eV_3HI2QT-imsxz_ePw/exec';
+        
+        // CDSS Lookup Page URL (GitHub Pages with copy buttons)
+        const CDSS_LOOKUP_URL = 'https://alicecare2032.github.io/alice-care-timeoff/cdss-search.html';
+        
+        // ============================================
+        // DATA STORAGE
+        // ============================================
+        let allCaregivers = [];
+        let filteredCaregivers = [];
+        let sortColumn = 'last_name';
+        let sortDirection = 'asc';
+        let importData = null; // Stores parsed CSV data for import
+        
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            if (GOOGLE_SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL') {
+                showConfigWarning();
+            }
+            loadData();
+            setupDragAndDrop();
+        });
+        
+        function showConfigWarning() {
+            var warning = document.createElement('div');
+            warning.id = 'config-warning';
+            warning.style.cssText = 'background:#fff3cd;border-left:4px solid #ffc107;padding:15px 30px;color:#856404;font-size:14px;';
+            warning.innerHTML = '<strong>⚠️ Configuration Required:</strong> To enable refresh and lookup features, deploy the Google Apps Script and update <code>GOOGLE_SCRIPT_URL</code> in this file. <a href="#" onclick="document.getElementById(\'config-warning\').style.display=\'none\';return false;" style="float:right;color:#856404;">Dismiss</a>';
+            var container = document.querySelector('.container');
+            container.insertBefore(warning, container.firstChild);
+        }
+        
+        // ============================================
+        // DATA LOADING
+        // ============================================
+        function loadData() {
+            if (GOOGLE_SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL') {
+                loadSampleData();
+            } else {
+                loadFromGoogleScript();
+            }
+        }
+        
+        function loadFromGoogleScript() {
+            fetch(GOOGLE_SCRIPT_URL + '?page=api')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showError(data.error);
+                        return;
+                    }
+                    allCaregivers = data.data;
+                    filteredCaregivers = [...allCaregivers];
+                    updateStats();
+                    applyFilters();
+                    updateLastUpdated();
+                })
+                .catch(error => {
+                    console.error('Error loading data:', error);
+                    showError('Failed to load data. Using sample data.');
+                    loadSampleData();
+                });
+        }
+        
+        function refreshFromSheet() {
+            document.getElementById('tableContent').innerHTML = 
+                '<div class="loading"><div class="loading-spinner"></div><div>Refreshing data...</div></div>';
+            loadData();
+        }
+        
+        function loadSampleData() {
+            allCaregivers = [
+                { first_name: 'Jecinta', last_name: 'Kinyua', hca_id: '4600897642', status: 'Registered', expiration_date: '2027-10-24', days_remaining: 700, last_checked: '2024-11-24', registry_link: '#' },
+                { first_name: 'Maria', last_name: 'Delgado', hca_id: '4600861511', status: 'Pending', expiration_date: '', days_remaining: null, last_checked: '2024-11-24', registry_link: '#' }
+            ];
+            filteredCaregivers = [...allCaregivers];
+            updateStats();
+            applyFilters();
+            updateLastUpdated();
+        }
+        
+        function showError(message) {
+            document.getElementById('tableContent').innerHTML = 
+                '<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-text">' + message + '</div></div>';
+        }
+        
+        function updateLastUpdated() {
+            document.getElementById('lastUpdated').textContent = 'Last updated: ' + new Date().toLocaleString();
+        }
+        
+        // ============================================
+        // STATISTICS
+        // ============================================
+        function updateStats() {
+            var total = allCaregivers.length;
+            var registered = allCaregivers.filter(c => c.status === 'Registered' || c.status === 'Active').length;
+            var problemStatuses = ['Expired', 'Forfeited', 'Suspended', 'Revoked', 'Denied'];
+            var expired = allCaregivers.filter(c => problemStatuses.includes(c.status) || (c.days_remaining !== null && c.days_remaining <= 0)).length;
+            var expiring = allCaregivers.filter(c => c.days_remaining !== null && c.days_remaining > 0 && c.days_remaining <= 90 && !problemStatuses.includes(c.status)).length;
+            
+            document.getElementById('total-count').textContent = total;
+            document.getElementById('registered-count').textContent = registered;
+            document.getElementById('expired-count').textContent = expired;
+            document.getElementById('expiring-count').textContent = expiring;
+        }
+        
+        // ============================================
+        // FILTERING
+        // ============================================
+        function applyFilters() {
+            var search = document.getElementById('searchInput').value.toLowerCase();
+            var status = document.getElementById('statusFilter').value;
+            var expiration = document.getElementById('expirationFilter').value;
+            var problemStatuses = ['Expired', 'Forfeited', 'Suspended', 'Revoked', 'Denied'];
+            
+            filteredCaregivers = allCaregivers.filter(function(c) {
+                if (search) {
+                    var searchStr = (c.first_name + ' ' + c.last_name + ' ' + c.hca_id).toLowerCase();
+                    if (searchStr.indexOf(search) === -1) return false;
+                }
+                if (status && c.status !== status) return false;
+                if (expiration) {
+                    if (expiration === 'expired') {
+                        if (c.days_remaining === null || c.days_remaining > 0) return false;
+                    } else if (expiration === 'problem') {
+                        if (!problemStatuses.includes(c.status) && (c.days_remaining === null || c.days_remaining > 0)) return false;
+                    } else if (expiration === 'valid') {
+                        if (c.days_remaining === null || c.days_remaining <= 90) return false;
+                    } else {
+                        var days = parseInt(expiration);
+                        if (c.days_remaining === null || c.days_remaining <= 0 || c.days_remaining > days) return false;
+                    }
+                }
+                return true;
+            });
+            sortData();
+            renderTable();
+        }
+        
+        function filterByCard(type) {
+            document.getElementById('searchInput').value = '';
+            document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+            if (type === 'all') {
+                document.getElementById('statusFilter').value = '';
+                document.getElementById('expirationFilter').value = '';
+                document.getElementById('stat-total').classList.add('active');
+            } else if (type === 'registered') {
+                document.getElementById('statusFilter').value = 'Registered';
+                document.getElementById('expirationFilter').value = '';
+                event.currentTarget.classList.add('active');
+            } else if (type === 'expiring') {
+                document.getElementById('statusFilter').value = '';
+                document.getElementById('expirationFilter').value = '90';
+                event.currentTarget.classList.add('active');
+            } else if (type === 'problem') {
+                document.getElementById('statusFilter').value = '';
+                document.getElementById('expirationFilter').value = 'problem';
+                event.currentTarget.classList.add('active');
+            }
+            applyFilters();
+        }
+        
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('expirationFilter').value = '';
+            document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+            applyFilters();
+        }
+        
+        // ============================================
+        // SORTING
+        // ============================================
+        function sortData() {
+            filteredCaregivers.sort(function(a, b) {
+                var aVal = a[sortColumn];
+                var bVal = b[sortColumn];
+                if (sortColumn === 'days_remaining') {
+                    aVal = aVal === null ? 9999 : aVal;
+                    bVal = bVal === null ? 9999 : bVal;
+                }
+                if (typeof aVal === 'string') {
+                    aVal = aVal.toLowerCase();
+                    bVal = (bVal || '').toLowerCase();
+                }
+                if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+                if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+        
+        function handleSort(column) {
+            if (sortColumn === column) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortDirection = 'asc';
+            }
+            sortData();
+            renderTable();
+        }
+        
+        // ============================================
+        // TABLE RENDERING
+        // ============================================
+        function renderTable() {
+            document.getElementById('resultCount').textContent = 'Showing ' + filteredCaregivers.length + ' of ' + allCaregivers.length + ' caregivers';
+            
+            if (filteredCaregivers.length === 0) {
+                document.getElementById('tableContent').innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔍</div><div class="empty-state-text">No caregivers match your filters</div></div>';
+                return;
+            }
+            
+            var getSortIcon = function(col) {
+                if (sortColumn !== col) return '<span class="sort-icon">↕</span>';
+                return '<span class="sort-icon">' + (sortDirection === 'asc' ? '↑' : '↓') + '</span>';
+            };
+            
+            var html = '<table class="data-table"><thead><tr>';
+            html += '<th class="' + (sortColumn === 'first_name' ? 'sorted' : '') + '" onclick="handleSort(\'first_name\')">First Name' + getSortIcon('first_name') + '</th>';
+            html += '<th class="' + (sortColumn === 'last_name' ? 'sorted' : '') + '" onclick="handleSort(\'last_name\')">Last Name' + getSortIcon('last_name') + '</th>';
+            html += '<th class="' + (sortColumn === 'hca_id' ? 'sorted' : '') + '" onclick="handleSort(\'hca_id\')">HCA ID' + getSortIcon('hca_id') + '</th>';
+            html += '<th class="' + (sortColumn === 'status' ? 'sorted' : '') + '" onclick="handleSort(\'status\')">Status' + getSortIcon('status') + '</th>';
+            html += '<th class="' + (sortColumn === 'expiration_date' ? 'sorted' : '') + '" onclick="handleSort(\'expiration_date\')">Expiration' + getSortIcon('expiration_date') + '</th>';
+            html += '<th class="' + (sortColumn === 'days_remaining' ? 'sorted' : '') + '" onclick="handleSort(\'days_remaining\')">Days Left' + getSortIcon('days_remaining') + '</th>';
+            html += '<th class="' + (sortColumn === 'last_checked' ? 'sorted' : '') + '" onclick="handleSort(\'last_checked\')">Last Refresh' + getSortIcon('last_checked') + '</th>';
+            html += '<th>Actions</th></tr></thead><tbody>';
+            
+            filteredCaregivers.forEach(function(c, index) {
+                var statusClass = 'status-' + (c.status || 'unknown').toLowerCase().replace(' ', '');
+                var daysClass = 'days-ok';
+                if (c.days_remaining !== null) {
+                    if (c.days_remaining <= 0) daysClass = 'days-danger';
+                    else if (c.days_remaining <= 30) daysClass = 'days-warning';
+                }
+                var originalIndex = allCaregivers.findIndex(orig => orig.hca_id === c.hca_id);
+                
+                html += '<tr id="row-' + c.hca_id + '">';
+                html += '<td><strong>' + escapeHtml(c.first_name) + '</strong></td>';
+                html += '<td>' + escapeHtml(c.last_name) + '</td>';
+                html += '<td>' + escapeHtml(c.hca_id) + '</td>';
+                html += '<td><span class="status-badge ' + statusClass + '">' + escapeHtml(c.status || 'Unknown') + '</span></td>';
+                html += '<td>' + escapeHtml(c.expiration_date || '-') + '</td>';
+                html += '<td>' + (c.days_remaining !== null ? '<span class="days-badge ' + daysClass + '">' + c.days_remaining + '</span>' : '-') + '</td>';
+                html += '<td>' + escapeHtml(c.last_checked || '-') + '</td>';
+                html += '<td class="actions-cell">';
+                html += '<button class="btn btn-refresh" onclick="refreshRecord(' + originalIndex + ')" title="Refresh from CDSS">🔄</button> ';
+                html += '<button class="btn btn-cdss" onclick="checkCDSS(\'' + escapeHtml(c.first_name) + '\', \'' + escapeHtml(c.last_name) + '\', \'' + escapeHtml(c.hca_id) + '\')" title="Check on CDSS Website">🔍</button> ';
+                html += '<button class="btn btn-delete" onclick="deleteRecord(\'' + escapeHtml(c.hca_id) + '\', \'' + escapeHtml(c.first_name) + '\', \'' + escapeHtml(c.last_name) + '\')" title="Delete">🗑️</button>';
+                html += '</td></tr>';
+            });
+            
+            html += '</tbody></table>';
+            document.getElementById('tableContent').innerHTML = html;
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            var div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // ============================================
+        // LOOKUP MODAL
+        // ============================================
+        function openLookupModal() {
+            document.getElementById('lookupModal').classList.add('active');
+            document.getElementById('lookupFirstName').value = '';
+            document.getElementById('lookupLastName').value = '';
+            document.getElementById('lookupHcaId').value = '';
+            document.getElementById('lookupResult').innerHTML = '';
+        }
+        
+        function closeLookupModal() {
+            document.getElementById('lookupModal').classList.remove('active');
+        }
+        
+        function performLookup() {
+            var firstName = document.getElementById('lookupFirstName').value.trim();
+            var lastName = document.getElementById('lookupLastName').value.trim();
+            var hcaId = document.getElementById('lookupHcaId').value.trim();
+            var resultDiv = document.getElementById('lookupResult');
+            
+            if (!firstName || !lastName || !hcaId) {
+                resultDiv.innerHTML = '<div class="lookup-result error"><h4>⚠️ Missing Information</h4><p>Please fill in all fields.</p></div>';
+                return;
+            }
+            
+            resultDiv.innerHTML = '<div class="lookup-result pending"><h4>🔄 Looking up...</h4><p>Checking CDSS Registry...</p></div>';
+            
+            var lookupUrl = GOOGLE_SCRIPT_URL + '?page=lookup&fname=' + encodeURIComponent(firstName) + '&lname=' + encodeURIComponent(lastName) + '&hca=' + encodeURIComponent(hcaId);
+            
+            fetch(lookupUrl)
+                .then(response => response.json())
+                .then(data => {
+                    var statusClass = data.found ? 'success' : 'error';
+                    resultDiv.innerHTML = '<div class="lookup-result ' + statusClass + '">' +
+                        '<h4>' + (data.found ? '✅ Found' : '❌ Not Found') + '</h4>' +
+                        '<p><strong>Name:</strong> ' + firstName + ' ' + lastName + '</p>' +
+                        '<p><strong>HCA ID:</strong> ' + hcaId + '</p>' +
+                        '<p><strong>Status:</strong> ' + data.status + '</p>' +
+                        (data.expirationDate ? '<p><strong>Expiration:</strong> ' + data.expirationDate + '</p>' : '') +
+                        '<button class="btn btn-cdss" onclick="checkCDSS(\'' + firstName.replace(/'/g, "\\'") + '\', \'' + lastName.replace(/'/g, "\\'") + '\', \'' + hcaId + '\')" style="margin-top:10px;">🔍 Verify on CDSS Website</button>' +
+                        '</div>';
+                })
+                .catch(error => {
+                    resultDiv.innerHTML = '<div class="lookup-result error"><h4>❌ Error</h4><p>' + error.message + '</p></div>';
+                });
+        }
+        
+        // ============================================
+        // ADD EMPLOYEE MODAL
+        // ============================================
+        function openAddModal() {
+            document.getElementById('addModal').classList.add('active');
+            document.getElementById('addFirstName').value = '';
+            document.getElementById('addLastName').value = '';
+            document.getElementById('addHcaId').value = '';
+            document.getElementById('addResult').innerHTML = '';
+        }
+        
+        function closeAddModal() {
+            document.getElementById('addModal').classList.remove('active');
+        }
+        
+        function submitNewCaregiver() {
+            var firstName = document.getElementById('addFirstName').value.trim();
+            var lastName = document.getElementById('addLastName').value.trim();
+            var hcaId = document.getElementById('addHcaId').value.trim();
+            var resultDiv = document.getElementById('addResult');
+            var submitBtn = document.getElementById('addSubmitBtn');
+            
+            if (!firstName || !lastName || !hcaId) {
+                resultDiv.innerHTML = '<div style="margin-top:15px;padding:12px;background:#f8d7da;border-radius:8px;color:#721c24;">⚠️ Please fill in all fields.</div>';
+                return;
+            }
+            
+            var existingCaregiver = allCaregivers.find(c => c.hca_id === hcaId);
+            if (existingCaregiver) {
+                resultDiv.innerHTML = '<div style="margin-top:15px;padding:12px;background:#f8d7da;border-radius:8px;color:#721c24;">⚠️ A caregiver with HCA ID ' + hcaId + ' already exists.</div>';
+                return;
+            }
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '🔄 Adding...';
+            resultDiv.innerHTML = '<div style="margin-top:15px;padding:12px;background:#e7f3ff;border-radius:8px;color:#0c5460;">🔄 Looking up caregiver in CDSS registry...</div>';
+            
+            var lookupUrl = GOOGLE_SCRIPT_URL + '?page=lookup&fname=' + encodeURIComponent(firstName) + '&lname=' + encodeURIComponent(lastName) + '&hca=' + encodeURIComponent(hcaId);
+            
+            fetch(lookupUrl)
+                .then(response => response.json())
+                .then(data => {
+                    var status = data.status || 'Not Found';
+                    var expiration = data.expirationDate || '';
+                    addCaregiverToSheet(firstName, lastName, hcaId, status, expiration);
+                })
+                .catch(error => {
+                    addCaregiverToSheet(firstName, lastName, hcaId, 'Error', '');
+                });
+        }
+        
+        function addCaregiverToSheet(firstName, lastName, hcaId, status, expiration) {
+            var resultDiv = document.getElementById('addResult');
+            var submitBtn = document.getElementById('addSubmitBtn');
+            
+            var addUrl = GOOGLE_SCRIPT_URL + '?page=add&fname=' + encodeURIComponent(firstName) + '&lname=' + encodeURIComponent(lastName) + '&hca=' + encodeURIComponent(hcaId) + '&status=' + encodeURIComponent(status) + '&expiration=' + encodeURIComponent(expiration);
+            
+            fetch(addUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        var daysRemaining = null;
+                        if (expiration) {
+                            var expDate = new Date(expiration);
+                            daysRemaining = Math.ceil((expDate - new Date()) / (1000 * 60 * 60 * 24));
+                        }
+                        allCaregivers.push({
+                            first_name: firstName, last_name: lastName, hca_id: hcaId,
+                            status: status, expiration_date: expiration, days_remaining: daysRemaining,
+                            last_checked: new Date().toISOString().split('T')[0],
+                            registry_link: CDSS_LOOKUP_URL + '?fname=' + encodeURIComponent(firstName) + '&lname=' + encodeURIComponent(lastName) + '&hca=' + encodeURIComponent(hcaId)
+                        });
+                        filteredCaregivers = [...allCaregivers];
+                        updateStats();
+                        applyFilters();
+                        resultDiv.innerHTML = '<div style="margin-top:15px;padding:15px;background:#d4edda;border-radius:8px;color:#155724;">✅ Caregiver added successfully!</div>';
+                        setTimeout(() => { document.getElementById('addFirstName').value = ''; document.getElementById('addLastName').value = ''; document.getElementById('addHcaId').value = ''; }, 500);
+                    } else {
+                        resultDiv.innerHTML = '<div style="margin-top:15px;padding:12px;background:#f8d7da;border-radius:8px;color:#721c24;">❌ Failed: ' + (data.error || 'Unknown error') + '</div>';
+                    }
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '➕ Add Caregiver';
+                })
+                .catch(error => {
+                    resultDiv.innerHTML = '<div style="margin-top:15px;padding:12px;background:#f8d7da;border-radius:8px;color:#721c24;">❌ Error: ' + error.message + '</div>';
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '➕ Add Caregiver';
+                });
+        }
+        
+        // ============================================
+        // IMPORT CDSS ROSTER MODAL
+        // ============================================
+        function openImportModal() {
+            document.getElementById('importModal').classList.add('active');
+            clearFileSelection();
+            document.getElementById('importResult').innerHTML = '';
+            document.getElementById('importPreview').style.display = 'none';
+            document.getElementById('importProgress').style.display = 'none';
+            document.getElementById('importSubmitBtn').disabled = true;
+            importData = null;
+        }
+        
+        function closeImportModal() {
+            document.getElementById('importModal').classList.remove('active');
+        }
+        
+        function setupDragAndDrop() {
+            var uploadArea = document.getElementById('fileUploadArea');
+            if (!uploadArea) return;
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, () => uploadArea.classList.add('dragover'), false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, () => uploadArea.classList.remove('dragover'), false);
+            });
+            
+            uploadArea.addEventListener('drop', function(e) {
+                var files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    document.getElementById('csvFileInput').files = files;
+                    handleFileSelect({ target: { files: files } });
+                }
+            }, false);
+        }
+        
+        function handleFileSelect(event) {
+            var file = event.target.files[0];
+            if (!file) return;
+            
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                document.getElementById('importResult').innerHTML = '<div style="margin-top:15px;padding:12px;background:#f8d7da;border-radius:8px;color:#721c24;">⚠️ Please select a CSV file.</div>';
+                return;
+            }
+            
+            document.getElementById('fileUploadArea').style.display = 'none';
+            document.getElementById('selectedFileInfo').style.display = 'block';
+            document.getElementById('selectedFileName').textContent = file.name;
+            document.getElementById('importResult').innerHTML = '';
+            
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                parseCSVFile(e.target.result);
+            };
+            reader.readAsText(file);
+        }
+        
+        function clearFileSelection() {
+            document.getElementById('csvFileInput').value = '';
+            document.getElementById('fileUploadArea').style.display = 'block';
+            document.getElementById('selectedFileInfo').style.display = 'none';
+            document.getElementById('importPreview').style.display = 'none';
+            document.getElementById('importSubmitBtn').disabled = true;
+            importData = null;
+        }
+        
+        function parseCSVFile(csvText) {
+            var lines = csvText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+            
+            // Find header row with FirstName, LastName, Per_Id
+            var headerIndex = -1;
+            var headers = [];
+            for (var i = 0; i < Math.min(lines.length, 10); i++) {
+                var cols = parseCSVLine(lines[i]);
+                if (cols.some(c => c.toLowerCase().includes('firstname') || c.toLowerCase() === 'first_name') &&
+                    cols.some(c => c.toLowerCase().includes('lastname') || c.toLowerCase() === 'last_name') &&
+                    cols.some(c => c.toLowerCase().includes('per_id') || c.toLowerCase() === 'hca_id')) {
+                    headerIndex = i;
+                    headers = cols.map(h => h.toLowerCase().trim());
+                    break;
+                }
+            }
+            
+            if (headerIndex === -1) {
+                document.getElementById('importResult').innerHTML = '<div style="margin-top:15px;padding:12px;background:#f8d7da;border-radius:8px;color:#721c24;">⚠️ Could not find required columns (FirstName, LastName, Per_Id) in CSV.</div>';
+                return;
+            }
+            
+            // Find column indices
+            var firstNameIdx = headers.findIndex(h => h === 'firstname' || h === 'first_name');
+            var lastNameIdx = headers.findIndex(h => h === 'lastname' || h === 'last_name');
+            var perIdIdx = headers.findIndex(h => h === 'per_id' || h === 'hca_id');
+            
+            // Parse data rows
+            var rosterCaregivers = [];
+            var seenIds = new Set();
+            
+            for (var i = headerIndex + 1; i < lines.length; i++) {
+                var cols = parseCSVLine(lines[i]);
+                if (cols.length <= Math.max(firstNameIdx, lastNameIdx, perIdIdx)) continue;
+                
+                var firstName = (cols[firstNameIdx] || '').trim();
+                var lastName = (cols[lastNameIdx] || '').trim();
+                var perId = (cols[perIdIdx] || '').trim();
+                
+                if (!firstName || !lastName || !perId) continue;
+                if (seenIds.has(perId)) continue; // Skip duplicates
+                seenIds.add(perId);
+                
+                // Normalize name case (Title Case)
+                firstName = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+                lastName = lastName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+                lastName = lastName.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('-');
+                
+                rosterCaregivers.push({ first_name: firstName, last_name: lastName, hca_id: perId });
+            }
+            
+            if (rosterCaregivers.length === 0) {
+                document.getElementById('importResult').innerHTML = '<div style="margin-top:15px;padding:12px;background:#f8d7da;border-radius:8px;color:#721c24;">⚠️ No valid caregiver records found in CSV.</div>';
+                return;
+            }
+            
+            // Compare with existing data
+            var existingIds = new Set(allCaregivers.map(c => c.hca_id));
+            var rosterIds = new Set(rosterCaregivers.map(c => c.hca_id));
+            
+            var newCaregivers = rosterCaregivers.filter(c => !existingIds.has(c.hca_id));
+            var existingCaregivers = rosterCaregivers.filter(c => existingIds.has(c.hca_id));
+            var removedCaregivers = allCaregivers.filter(c => !rosterIds.has(c.hca_id));
+            
+            importData = {
+                roster: rosterCaregivers,
+                new: newCaregivers,
+                existing: existingCaregivers,
+                removed: removedCaregivers
+            };
+            
+            // Show preview
+            var previewHtml = '<div class="import-preview"><h4>📋 Import Preview</h4>';
+            previewHtml += '<div class="import-stats">';
+            previewHtml += '<div class="import-stat new"><div class="count">' + newCaregivers.length + '</div><div class="label">New to Add</div></div>';
+            previewHtml += '<div class="import-stat existing"><div class="count">' + existingCaregivers.length + '</div><div class="label">Existing (Keep)</div></div>';
+            previewHtml += '<div class="import-stat removed"><div class="count">' + removedCaregivers.length + '</div><div class="label">To Move Out</div></div>';
+            previewHtml += '</div>';
+            
+            previewHtml += '<div class="import-details">';
+            if (newCaregivers.length > 0) {
+                previewHtml += '<div class="import-details-section"><h5>➕ New Caregivers:</h5><ul class="import-details-list">';
+                newCaregivers.slice(0, 10).forEach(c => { previewHtml += '<li>' + escapeHtml(c.first_name + ' ' + c.last_name) + ' (' + c.hca_id + ')</li>'; });
+                if (newCaregivers.length > 10) previewHtml += '<li>... and ' + (newCaregivers.length - 10) + ' more</li>';
+                previewHtml += '</ul></div>';
+            }
+            if (removedCaregivers.length > 0) {
+                previewHtml += '<div class="import-details-section"><h5>📤 To Be Moved to "Removed Caregivers" Tab:</h5><ul class="import-details-list">';
+                removedCaregivers.slice(0, 10).forEach(c => { previewHtml += '<li>' + escapeHtml(c.first_name + ' ' + c.last_name) + ' (' + c.hca_id + ')</li>'; });
+                if (removedCaregivers.length > 10) previewHtml += '<li>... and ' + (removedCaregivers.length - 10) + ' more</li>';
+                previewHtml += '</ul></div>';
+            }
+            previewHtml += '</div></div>';
+            
+            document.getElementById('importPreview').innerHTML = previewHtml;
+            document.getElementById('importPreview').style.display = 'block';
+            document.getElementById('importSubmitBtn').disabled = false;
+        }
+        
+        function parseCSVLine(line) {
+            var result = [];
+            var current = '';
+            var inQuotes = false;
+            
+            for (var i = 0; i < line.length; i++) {
+                var char = line[i];
+                if (char === '"') {
+                    if (inQuotes && line[i + 1] === '"') {
+                        current += '"';
+                        i++;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current);
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            result.push(current);
+            return result;
+        }
+        
+        function executeImport() {
+            if (!importData) return;
+            
+            var submitBtn = document.getElementById('importSubmitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '🔄 Importing...';
+            
+            document.getElementById('importProgress').innerHTML = '<div class="progress-container"><div class="progress-bar"><div class="progress-bar-fill" id="importProgressFill"></div></div><div class="progress-text" id="importProgressText">Starting import...</div></div>';
+            document.getElementById('importProgress').style.display = 'block';
+            
+            // Build import payload
+            var payload = {
+                roster: importData.roster.map(c => ({ first_name: c.first_name, last_name: c.last_name, hca_id: c.hca_id }))
+            };
+            
+            // Send to Google Apps Script
+            fetch(GOOGLE_SCRIPT_URL + '?page=import', {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('importProgressFill').style.width = '100%';
+                    document.getElementById('importProgressText').textContent = 'Import complete!';
+                    document.getElementById('importResult').innerHTML = '<div style="margin-top:15px;padding:15px;background:#d4edda;border-radius:8px;color:#155724;">✅ Import successful!<br>Added: ' + (data.added || 0) + ' | Moved to tracking: ' + (data.removed || 0) + ' | Retained: ' + (data.retained || 0) + '</div>';
+                    
+                    // Refresh data from sheet
+                    setTimeout(() => {
+                        loadFromGoogleScript();
+                        closeImportModal();
+                    }, 2000);
+                } else {
+                    document.getElementById('importResult').innerHTML = '<div style="margin-top:15px;padding:12px;background:#f8d7da;border-radius:8px;color:#721c24;">❌ Import failed: ' + (data.error || 'Unknown error') + '</div>';
+                }
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '📤 Import Roster';
+            })
+            .catch(error => {
+                document.getElementById('importResult').innerHTML = '<div style="margin-top:15px;padding:12px;background:#f8d7da;border-radius:8px;color:#721c24;">❌ Error: ' + error.message + '</div>';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '📤 Import Roster';
+            });
+        }
+        
+        // ============================================
+        // REFRESH & DELETE FUNCTIONS
+        // ============================================
+        function refreshRecord(index) {
+            if (index < 0 || index >= allCaregivers.length) return;
+            var c = allCaregivers[index];
+            var row = document.getElementById('row-' + c.hca_id);
+            var btn = row ? row.querySelector('.btn-refresh') : null;
+            
+            if (row) row.classList.add('row-updating');
+            if (btn) { btn.classList.add('loading'); btn.innerHTML = ''; }
+            
+            var lookupUrl = GOOGLE_SCRIPT_URL + '?page=lookup&fname=' + encodeURIComponent(c.first_name) + '&lname=' + encodeURIComponent(c.last_name) + '&hca=' + encodeURIComponent(c.hca_id);
+            
+            fetch(lookupUrl)
+                .then(response => response.json())
+                .then(data => {
+                    allCaregivers[index].status = data.status || 'Unknown';
+                    allCaregivers[index].expiration_date = data.expirationDate || '';
+                    if (data.expirationDate) {
+                        allCaregivers[index].days_remaining = Math.ceil((new Date(data.expirationDate) - new Date()) / (1000 * 60 * 60 * 24));
+                    }
+                    allCaregivers[index].last_checked = new Date().toISOString().split('T')[0];
+                    filteredCaregivers = [...allCaregivers];
+                    updateStats();
+                    applyFilters();
+                    var newRow = document.getElementById('row-' + c.hca_id);
+                    if (newRow) newRow.classList.add('row-updated');
+                })
+                .catch(error => {
+                    if (row) row.classList.remove('row-updating');
+                    if (btn) { btn.classList.remove('loading'); btn.innerHTML = '🔄'; }
+                    alert('Refresh failed: ' + error.message);
+                });
+        }
+        
+        function checkCDSS(firstName, lastName, hcaId) {
+            var url = CDSS_LOOKUP_URL + '?fname=' + encodeURIComponent(firstName) + '&lname=' + encodeURIComponent(lastName) + '&hca=' + encodeURIComponent(hcaId);
+            window.open(url, '_blank');
+        }
+        
+        function refreshAllFromCDSS() {
+            if (!confirm('This will refresh ALL caregivers from CDSS. This may take several minutes. Continue?')) return;
+            document.getElementById('tableContent').innerHTML = '<div class="loading"><div class="loading-spinner"></div><div>Refreshing all records from CDSS... This may take a few minutes.</div></div>';
+            
+            fetch(GOOGLE_SCRIPT_URL + '?page=refreshAll')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Refresh complete! ' + (data.updated || 0) + ' records updated.');
+                        loadFromGoogleScript();
+                    } else {
+                        alert('Refresh failed: ' + (data.error || 'Unknown error'));
+                        loadFromGoogleScript();
+                    }
+                })
+                .catch(error => {
+                    alert('Error: ' + error.message);
+                    loadFromGoogleScript();
+                });
+        }
+        
+        function deleteRecord(hcaId, firstName, lastName) {
+            if (!confirm('Are you sure you want to delete ' + firstName + ' ' + lastName + ' (HCA ID: ' + hcaId + ')?')) return;
+            
+            var row = document.getElementById('row-' + hcaId);
+            if (row) row.classList.add('row-updating');
+            
+            fetch(GOOGLE_SCRIPT_URL + '?page=delete&hca=' + encodeURIComponent(hcaId) + '&fname=' + encodeURIComponent(firstName) + '&lname=' + encodeURIComponent(lastName))
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        allCaregivers = allCaregivers.filter(c => c.hca_id !== hcaId);
+                        filteredCaregivers = [...allCaregivers];
+                        updateStats();
+                        applyFilters();
+                    } else {
+                        if (row) row.classList.remove('row-updating');
+                        alert('Delete failed: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    if (row) row.classList.remove('row-updating');
+                    alert('Error: ' + error.message);
+                });
+        }
+        
+        // ============================================
+        // EXPORT
+        // ============================================
+        function exportCSV() {
+            var headers = ['first_name', 'last_name', 'hca_id', 'status', 'expiration_date', 'days_remaining', 'last_checked', 'registry_link'];
+            var csv = headers.join(',') + '\n';
+            
+            filteredCaregivers.forEach(function(c) {
+                var row = headers.map(function(h) {
+                    var val = c[h] || '';
+                    if (typeof val === 'string' && (val.indexOf(',') > -1 || val.indexOf('"') > -1)) {
+                        val = '"' + val.replace(/"/g, '""') + '"';
+                    }
+                    return val;
+                });
+                csv += row.join(',') + '\n';
+            });
+            
+            var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            var link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'hca_registry_' + new Date().toISOString().split('T')[0] + '.csv';
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+        
+        // Close modals on outside click
+        document.querySelectorAll('.modal').forEach(function(modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) this.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CDSS HCA Registry Search</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1A365C 0%, #2d4a7c 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        .logo {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #1A365C;
+            font-size: 1.5rem;
+            margin: 0 0 10px 0;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+        }
+        .info-box {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            color: #666;
+            font-size: 0.85rem;
+        }
+        .info-value {
+            color: #1A365C;
+            font-weight: 600;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e9ecef;
+            border-top-color: #F57600;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .status {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .manual-section {
+            display: none;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+        .manual-section.show {
+            display: block;
+        }
+        .manual-btn {
+            background: #F57600;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 15px;
+        }
+        .manual-btn:hover {
+            background: #e06800;
+        }
+        .copy-btn {
+            background: #1A365C;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .copy-btn:hover {
+            background: #2d4a7c;
+        }
+        .copy-btn.copied {
+            background: #28a745;
+        }
+        .error-msg {
+            color: #dc3545;
+            font-size: 0.85rem;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://i.ibb.co/6sbknH0/logo-stroke-32pt-style-2-no-stroke.png" alt="Alice Care" class="logo">
+        <h1>CDSS HCA Registry Search</h1>
+        <p class="subtitle">Checking Home Care Aide registration status</p>
+        
+        <div class="info-box">
+            <div class="info-row">
+                <span class="info-label">First Name</span>
+                <span class="info-value" id="display-fname">-</span>
+                <button class="copy-btn" onclick="copyValue('fname')">Copy</button>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Last Name</span>
+                <span class="info-value" id="display-lname">-</span>
+                <button class="copy-btn" onclick="copyValue('lname')">Copy</button>
+            </div>
+            <div class="info-row">
+                <span class="info-label">HCA ID</span>
+                <span class="info-value" id="display-hca">-</span>
+                <button class="copy-btn" onclick="copyValue('hca')">Copy</button>
+            </div>
+        </div>
+
+        <div id="auto-section">
+            <div class="spinner"></div>
+            <p class="status">Redirecting to CDSS Registry...</p>
+        </div>
+
+        <div id="manual-section" class="manual-section">
+            <p class="status">Click below to open the CDSS Registry and enter the information above:</p>
+            <a href="https://www.ccld.dss.ca.gov/hcsregistry/registrysearch.aspx" 
+               target="_blank" 
+               class="manual-btn">
+                Open CDSS Registry Search
+            </a>
+        </div>
+
+        <p id="error-msg" class="error-msg"></p>
+    </div>
+
+    <!-- Hidden form for direct POST attempt -->
+    <form id="cdss-form" method="POST" action="https://www.ccld.dss.ca.gov/hcsregistry/registrysearch.aspx" style="display:none;">
+        <input type="hidden" name="ctl00$MainContentPlaceHolder$txtFirstName" id="form-fname">
+        <input type="hidden" name="ctl00$MainContentPlaceHolder$txtLastName" id="form-lname">
+        <input type="hidden" name="ctl00$MainContentPlaceHolder$txtPerId" id="form-hca">
+        <input type="hidden" name="ctl00$MainContentPlaceHolder$btnSearch" value="Search">
+    </form>
+
+    <script>
+        // Store values globally for copy function
+        let values = { fname: '', lname: '', hca: '' };
+
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                fname: params.get('fname') || params.get('firstName') || '',
+                lname: params.get('lname') || params.get('lastName') || '',
+                hca: params.get('hca') || params.get('id') || params.get('perId') || ''
+            };
+        }
+
+        function copyValue(field) {
+            const value = values[field];
+            if (value) {
+                navigator.clipboard.writeText(value).then(() => {
+                    const btn = event.target;
+                    btn.textContent = 'Copied!';
+                    btn.classList.add('copied');
+                    setTimeout(() => {
+                        btn.textContent = 'Copy';
+                        btn.classList.remove('copied');
+                    }, 1500);
+                });
+            }
+        }
+
+        function showManualFallback() {
+            document.getElementById('auto-section').style.display = 'none';
+            document.getElementById('manual-section').classList.add('show');
+        }
+
+        function init() {
+            values = getUrlParams();
+            
+            // Display values
+            document.getElementById('display-fname').textContent = values.fname || '-';
+            document.getElementById('display-lname').textContent = values.lname || '-';
+            document.getElementById('display-hca').textContent = values.hca || '-';
+
+            // Check if we have all required values
+            if (!values.fname || !values.lname || !values.hca) {
+                document.getElementById('error-msg').textContent = 'Missing required parameters. Please ensure fname, lname, and hca are provided.';
+                document.getElementById('error-msg').style.display = 'block';
+                showManualFallback();
+                return;
+            }
+
+            // Populate form fields
+            document.getElementById('form-fname').value = values.fname;
+            document.getElementById('form-lname').value = values.lname;
+            document.getElementById('form-hca').value = values.hca;
+
+            // Try to submit form after short delay (allows page to render)
+            setTimeout(() => {
+                try {
+                    document.getElementById('cdss-form').submit();
+                } catch (e) {
+                    console.error('Form submission failed:', e);
+                    showManualFallback();
+                }
+            }, 1500);
+
+            // Fallback to manual if redirect doesn't happen in 5 seconds
+            setTimeout(() => {
+                showManualFallback();
+            }, 5000);
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
