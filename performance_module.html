@@ -1,0 +1,2037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>alice.care: End of Year Bonus Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #E5ECF3;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 54, 92, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            backdrop-filter: blur(3px);
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .loading-content {
+            background: white;
+            padding: 40px 60px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #E5ECF3;
+            border-top: 5px solid #F57600;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            color: #1A365C;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .loading-subtext {
+            color: #666;
+            font-size: 13px;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1A365C 0%, #2d5a8c 100%);
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(26, 54, 92, 0.2);
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        /* Tab Navigation */
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(26, 54, 92, 0.1);
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            color: #1A365C;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn:hover {
+            background: #E5ECF3;
+        }
+        
+        .tab-btn.active {
+            background: #F57600;
+            color: white;
+        }
+        
+        /* Tab Content */
+        .tab-panel {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(26, 54, 92, 0.08);
+        }
+        
+        .tab-panel.active {
+            display: block;
+        }
+        
+        /* Section Title */
+        .section-title {
+            font-size: 18px;
+            color: #1A365C;
+            margin-bottom: 25px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: #F57600;
+            border-radius: 2px;
+        }
+        
+        /* Config Section */
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 1800px) {
+            .config-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        @media (max-width: 1400px) {
+            .config-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 1000px) {
+            .config-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .config-card {
+            background: #F9F9F9;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #E0E0E0;
+        }
+        
+        .config-card h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1A365C;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .config-row {
+            margin-bottom: 15px;
+        }
+        
+        .config-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .config-row label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: #3D3D3D;
+            margin-bottom: 6px;
+        }
+        
+        .config-row input,
+        .config-row select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            transition: border-color 0.3s;
+        }
+        
+        .config-row input:focus,
+        .config-row select:focus {
+            outline: none;
+            border-color: #F57600;
+            box-shadow: 0 0 0 3px rgba(245, 118, 0, 0.1);
+        }
+        
+        /* Revenue Table */
+        .revenue-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+            table-layout: fixed;
+        }
+        
+        .revenue-table th {
+            background: #E5ECF3;
+            padding: 12px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: #1A365C;
+            border-bottom: 2px solid #ddd;
+        }
+        
+        .revenue-table th:nth-child(1) { width: 10%; }
+        .revenue-table th:nth-child(2) { width: 18%; }
+        .revenue-table th:nth-child(3) { width: 18%; }
+        .revenue-table th:nth-child(4) { width: 12%; }
+        .revenue-table th:nth-child(5) { width: 22%; }
+        .revenue-table th:nth-child(6) { width: 12%; }
+        
+        .revenue-table td {
+            padding: 12px;
+            border-bottom: 1px solid #E0E0E0;
+            font-size: 13px;
+            vertical-align: top;
+            word-wrap: break-word;
+        }
+        
+        .revenue-table tr:hover {
+            background: #F9F9F9;
+        }
+        
+        .revenue-table input {
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            font-family: 'Poppins', sans-serif;
+            font-size: 12px;
+            box-sizing: border-box;
+        }
+        
+        .revenue-table input:focus {
+            outline: none;
+            border-color: #F57600;
+            box-shadow: 0 0 0 2px rgba(245, 118, 0, 0.1);
+        }
+        
+        /* Distribution Rules */
+        .distribution-rules {
+            background: #E5ECF3;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+        
+        .rule-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        
+        .rule-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .rule-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #1A365C;
+        }
+        
+        .rule-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .rule-slider {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        .rule-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #F57600;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .rule-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #F57600;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .rule-value {
+            min-width: 45px;
+            text-align: right;
+            font-weight: 600;
+            color: #F57600;
+        }
+        
+        .error-msg {
+            color: #d32f2f;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #F57600;
+            box-shadow: 0 2px 10px rgba(26, 54, 92, 0.08);
+        }
+        
+        .stat-card.green { border-left-color: #62B790; }
+        .stat-card.blue { border-left-color: #2196F3; }
+        
+        .stat-card h3 {
+            font-size: 12px;
+            color: #3D3D3D;
+            margin-bottom: 8px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-card .number {
+            font-size: 32px;
+            color: #1A365C;
+            font-weight: 700;
+        }
+        
+        .stat-card .subtitle {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+        
+        /* Team Members Table */
+        .team-table-wrapper {
+            overflow-x: auto;
+            margin-bottom: 25px;
+        }
+        
+        .team-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        
+        .team-table th {
+            background: #E5ECF3;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #1A365C;
+            border-bottom: 2px solid #ddd;
+            white-space: nowrap;
+        }
+        
+        .team-table td {
+            padding: 12px;
+            border-bottom: 1px solid #E0E0E0;
+        }
+        
+        .team-table tr:hover {
+            background: #F9F9F9;
+        }
+        
+        .team-table input {
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            font-family: 'Poppins', sans-serif;
+            font-size: 12px;
+        }
+        
+        .team-table input:focus {
+            outline: none;
+            border-color: #F57600;
+            box-shadow: 0 0 0 2px rgba(245, 118, 0, 0.1);
+        }
+        
+        .team-table select {
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 12px;
+        }
+        
+        .team-table select:focus {
+            outline: none;
+            border-color: #F57600;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-eligible {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+        
+        .status-ineligible {
+            background: #FFEBEE;
+            color: #C62828;
+        }
+        
+        .bonus-amount {
+            font-weight: 700;
+            color: #1A365C;
+        }
+        
+        .bonus-positive {
+            color: #62B790;
+        }
+        
+        .bonus-zero {
+            color: #999;
+        }
+        
+        /* Button */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #F57600;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #E56600;
+            box-shadow: 0 4px 12px rgba(245, 118, 0, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #E5ECF3;
+            color: #1A365C;
+            margin-left: 10px;
+        }
+        
+        .btn-secondary:hover {
+            background: #D0DCE8;
+        }
+        
+        /* Loading Spinner */
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #E0E0E0;
+            border-top: 3px solid #1976D2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+            display: inline-block;
+        }
+        
+        .loading-spinner.active {
+            display: inline-block;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .btn-group {
+            margin-bottom: 25px;
+        }
+        
+        /* Add Team Member Section */
+        .add-member-form {
+            background: #E5ECF3;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-grid .full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #1A365C;
+            margin-bottom: 6px;
+        }
+        
+        .form-group input,
+        .form-group select {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            background: white;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #F57600;
+            box-shadow: 0 0 0 3px rgba(245, 118, 0, 0.1);
+        }
+        
+        /* Summary Panel */
+        .summary-panel {
+            background: #F9F9F9;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #F57600;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #E0E0E0;
+            font-size: 13px;
+        }
+        
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+        
+        .summary-item.total {
+            padding-top: 15px;
+            margin-top: 10px;
+            border-top: 2px solid #ddd;
+            font-weight: 700;
+            font-size: 14px;
+            color: #1A365C;
+        }
+        
+        .summary-label {
+            color: #3D3D3D;
+        }
+        
+        .summary-value {
+            color: #1A365C;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <div class="loading-text">Loading Data</div>
+            <div class="loading-subtext">Syncing with Google Sheets...</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>End of Year Bonus Calculator - <span id="headerYear">2024</span></h1>
+            <p>Configure framework parameters, manage team members, and calculate bonus distributions</p>
+        </div>
+        
+        <!-- Tab Navigation -->
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('config', this)">Configuration</button>
+            <button class="tab-btn" onclick="switchTab('performance', this)">Provider Performance</button>
+            <button class="tab-btn" onclick="switchTab('summary', this)">Bonus Summary</button>
+        </div>
+        
+        <!-- Configuration Tab -->
+        <div id="config" class="tab-panel active">
+            <h2 class="section-title">Bonus Framework Configuration</h2>
+            
+            <div class="config-grid">
+                <!-- Bonus Year -->
+                <div class="config-card">
+                    <h3>Bonus Program</h3>
+                    <div class="config-row">
+                        <label>Bonus Year *</label>
+                        <input type="number" id="bonusYear" min="2020" max="2099" placeholder="Enter year (e.g., 2024)" onchange="handleConfigChange('bonusYear', this.value)" style="padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; width: 100%;">
+                        <div style="font-size: 11px; color: #666; margin-top: 4px;">Select year and click "🔄 Refresh Metrics" to load data</div>
+                    </div>
+                    <div class="config-row">
+                        <label>Total Bonus Pool</label>
+                        <input type="number" id="bonusPool" placeholder="50000" step="1000" value="50000" onchange="handleConfigChange('bonusPool', this.value)" onkeyup="updateCurrencyDisplay('bonusPool', 'bonusPoolDisplay')">
+                        <div id="bonusPoolDisplay" style="font-size: 12px; color: #62B790; font-weight: 600; margin-top: 4px;">$50,000.00</div>
+                    </div>
+                </div>
+                
+                <!-- Company Performance -->
+                <div class="config-card">
+                    <h3>Company Performance</h3>
+                    <div class="config-row">
+                        <label>Annual Revenue Achieved (From Completed Jobs)</label>
+                        <div style="display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: flex-end;">
+                            <div>
+                                <div style="font-size: 11px; color: #1A365C; font-weight: 600; margin-bottom: 6px;">📅 Filtering for: <span id="revenueYearFilter">2024</span></div>
+                                <input type="text" id="annualRevenue" readonly style="background: #E5ECF3; cursor: not-allowed; width: 100%;" placeholder="Loading...">
+                                <div id="annualRevenueDisplay" style="font-size: 13px; color: #62B790; font-weight: 600; margin-top: 6px;">$0.00</div>
+                                <div id="revenueUpdatedAt" style="font-size: 11px; color: #999; margin-top: 4px;">Last updated: --</div>
+                                <div id="revenueRecordCount" style="font-size: 11px; color: #999; margin-top: 2px;">-- completed jobs</div>
+                            </div>
+                            <div style="display: flex; align-items: flex-end; gap: 8px;">
+                                <button class="btn btn-secondary" id="revenueRefreshBtn" onclick="refreshCompletedJobsRevenue()" style="padding: 8px 12px; margin: 0; white-space: nowrap; height: 40px;">🔄 Refresh</button>
+                                <div class="loading-spinner" id="revenueLoadingSpinner"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="config-row">
+                        <label>Company Performance % Weight</label>
+                        <input type="number" id="companyWeight" min="0" max="100" value="70" onchange="handleConfigChange('companyWeight', this.value)">
+                    </div>
+                </div>
+                
+                <!-- Individual Performance -->
+                <div class="config-card">
+                    <h3>Individual Performance</h3>
+                    <div class="config-row">
+                        <label>Individual Performance % Weight</label>
+                        <input type="number" id="individualWeight" min="0" max="100" value="30" onchange="handleConfigChange('individualWeight', this.value)">
+                    </div>
+                </div>
+                
+                <!-- Eligibility Requirements -->
+                <div class="config-card">
+                    <h3>Eligibility Requirements</h3>
+                    <div class="config-row">
+                        <label>Min Months Employed</label>
+                        <input type="number" id="minMonthsEmployed" min="0" value="6" onchange="handleConfigChange('minMonthsEmployed', this.value)">
+                    </div>
+                    <div class="config-row">
+                        <label>Min Avg Hours/Week</label>
+                        <input type="number" id="minHoursPerWeek" min="0" value="15" onchange="handleConfigChange('minHoursPerWeek', this.value)">
+                    </div>
+                </div>
+                
+                <!-- Bonus Distribution Window -->
+                <div class="config-card">
+                    <h3>Bonus Distribution Window</h3>
+                    <div class="config-row">
+                        <label>Window Start Date (MM-DD)</label>
+                        <input type="text" id="bonusWindowStartDate" placeholder="11-01" value="11-01" pattern="\d{2}-\d{2}" onchange="handleConfigChange('bonusWindowStartDate', this.value)">
+                        <div style="font-size: 11px; color: #999; margin-top: 4px;">Format: MM-DD (e.g., 11-01 for Nov 1)</div>
+                    </div>
+                    <div class="config-row">
+                        <label>Window End Date (MM-DD)</label>
+                        <input type="text" id="bonusWindowEndDate" placeholder="12-15" value="12-15" pattern="\d{2}-\d{2}" onchange="handleConfigChange('bonusWindowEndDate', this.value)">
+                        <div style="font-size: 11px; color: #999; margin-top: 4px;">Format: MM-DD (e.g., 12-15 for Dec 15)</div>
+                    </div>
+                    <div style="margin-top: 12px; padding: 10px; border-radius: 6px; background: #f5f5f5; font-size: 13px;">
+                        <strong>Current Status:</strong> <span id="bonusWindowStatus">Checking...</span>
+                    </div>
+                </div>
+            </div>
+            
+            <h2 class="section-title">Revenue Thresholds & Funding</h2>
+            
+            <div style="background: #E3F2FD; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #1976D2;">
+                <p style="font-size: 13px; color: #1A365C; margin: 5px 0;"><strong>How This Works:</strong></p>
+                <ul style="font-size: 12px; color: #1A365C; margin: 8px 0; padding-left: 20px;">
+                    <li><strong>Funding %:</strong> Bonus pool % available for this revenue tier (based on company performance)</li>
+                    <li><strong>Company Portion %:</strong> % of the available funding employees receive when BOTH company AND employee meet their goals</li>
+                    <li><strong>Example:</strong> If company achieves revenue goal ($2M) → 100% funding activated → employees at Level 3 get Company Portion (77%) of their distributed bonus</li>
+                    <li><strong>Below Goal:</strong> If company misses goal, lower Funding % applies → employee receives proportionally less</li>
+                </ul>
+            </div>
+            
+            <table class="revenue-table">
+                <thead>
+                    <tr>
+                        <th>Revenue Range</th>
+                        <th>Min Amount ($)</th>
+                        <th>Max Amount ($)</th>
+                        <th>Funding %</th>
+                        <th>Company Portion %</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="revenueTableBody">
+                </tbody>
+            </table>
+            <button class="btn btn-secondary" onclick="addRevenueThreshold()" style="margin-top: 15px;">+ Add Revenue Threshold</button>
+            <button class="btn btn-secondary" onclick="resetRevenueThresholds()" style="margin-left: 10px;">Reset to Defaults</button>
+            
+            <!-- Performance Distribution and Multipliers Side by Side -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px;">
+                <!-- Performance Rating Distribution -->
+                <div>
+                    <h2 class="section-title">Employee Distribution (% of Team)</h2>
+                    <div style="background: #E3F2FD; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <p style="font-size: 12px; color: #1A365C; margin: 0;"><strong>Team Composition Limits:</strong> Max % of employees in each level (must total 100%)</p>
+                    </div>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
+                        <thead>
+                            <tr style="background: #E5ECF3;">
+                                <th style="padding: 12px; text-align: left; font-size: 12px; font-weight: 600; color: #1A365C; border-bottom: 2px solid #ddd;">Level</th>
+                                <th style="padding: 12px; text-align: center; font-size: 12px; font-weight: 600; color: #1A365C; border-bottom: 2px solid #ddd; width: 80px;">Max %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employeeDistributionBody">
+                            <tr style="border-bottom: 1px solid #E0E0E0;">
+                                <td style="padding: 12px;">
+                                    <div style="font-size: 12px; font-weight: 500; color: #1A365C;">Level 3 - Exceeds Expectations</div>
+                                </td>
+                                <td style="padding: 12px; text-align: center;">
+                                    <input type="number" id="level3EmpPct" min="0" max="100" value="10" style="width: 70px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; text-align: center;" onchange="validateAllDistributions(); saveConfig();">
+                                    <div style="font-size: 10px; color: #666; margin-top: 4px;">%</div>
+                                </td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #E0E0E0;">
+                                <td style="padding: 12px;">
+                                    <div style="font-size: 12px; font-weight: 500; color: #1A365C;">Level 2 - Meets Expectations</div>
+                                </td>
+                                <td style="padding: 12px; text-align: center;">
+                                    <input type="number" id="level2EmpPct" min="0" max="100" value="30" style="width: 70px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; text-align: center;" onchange="validateAllDistributions(); saveConfig();">
+                                    <div style="font-size: 10px; color: #666; margin-top: 4px;">%</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 12px;">
+                                    <div style="font-size: 12px; font-weight: 500; color: #1A365C;">Level 1 - Not Entitled</div>
+                                </td>
+                                <td style="padding: 12px; text-align: center;">
+                                    <input type="number" id="level1EmpPct" min="0" max="100" value="60" style="width: 70px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; text-align: center;" onchange="validateAllDistributions(); saveConfig();">
+                                    <div style="font-size: 10px; color: #666; margin-top: 4px;">%</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="error-msg" id="employeeDistributionError" style="color: #D32F2F; font-weight: 600;"></div>
+                    <div style="margin-top: 10px; padding: 10px; background: #C8E6C9; border-radius: 4px; font-size: 11px; color: #1B5E20; display: none;" id="employeeDistributionValid">
+                        ✓ Valid: 100%
+                    </div>
+                </div>
+                
+                <!-- Budget Distribution -->
+                <div>
+                    <h2 class="section-title">Budget Distribution (% of Pool)</h2>
+                    <div style="background: #FFF3E0; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <p style="font-size: 12px; color: #E65100; margin: 0;"><strong>Pool Allocation:</strong> How to split bonus pool (must total 100%)</p>
+                    </div>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
+                        <thead>
+                            <tr style="background: #E5ECF3;">
+                                <th style="padding: 12px; text-align: left; font-size: 12px; font-weight: 600; color: #1A365C; border-bottom: 2px solid #ddd;">Level</th>
+                                <th style="padding: 12px; text-align: center; font-size: 12px; font-weight: 600; color: #1A365C; border-bottom: 2px solid #ddd; width: 80px;">Budget %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="budgetDistributionBody">
+                            <tr style="border-bottom: 1px solid #E0E0E0;">
+                                <td style="padding: 12px;">
+                                    <div style="font-size: 12px; font-weight: 500; color: #1A365C;">Level 3 - Exceeds Expectations</div>
+                                </td>
+                                <td style="padding: 12px; text-align: center;">
+                                    <input type="number" id="level3BudPct" min="0" max="100" value="60" style="width: 70px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; text-align: center;" onchange="validateAllDistributions(); saveConfig();">
+                                    <div style="font-size: 10px; color: #666; margin-top: 4px;">%</div>
+                                </td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #E0E0E0;">
+                                <td style="padding: 12px;">
+                                    <div style="font-size: 12px; font-weight: 500; color: #1A365C;">Level 2 - Meets Expectations</div>
+                                </td>
+                                <td style="padding: 12px; text-align: center;">
+                                    <input type="number" id="level2BudPct" min="0" max="100" value="30" style="width: 70px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; text-align: center;" onchange="validateAllDistributions(); saveConfig();">
+                                    <div style="font-size: 10px; color: #666; margin-top: 4px;">%</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 12px;">
+                                    <div style="font-size: 12px; font-weight: 500; color: #1A365C;">Level 1 - Not Entitled</div>
+                                </td>
+                                <td style="padding: 12px; text-align: center;">
+                                    <input type="number" id="level1BudPct" min="0" max="100" value="10" style="width: 70px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; text-align: center;" onchange="validateAllDistributions(); saveConfig();">
+                                    <div style="font-size: 10px; color: #666; margin-top: 4px;">%</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="error-msg" id="budgetDistributionError" style="color: #D32F2F; font-weight: 600;"></div>
+                    <div style="margin-top: 10px; padding: 10px; background: #C8E6C9; border-radius: 4px; font-size: 11px; color: #1B5E20; display: none;" id="budgetDistributionValid">
+                        ✓ Valid: 100%
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Provider Performance Tab -->
+        <div id="performance" class="tab-panel">
+            <h2 class="section-title">Provider Performance Analysis</h2>
+            
+            <div style="margin-bottom: 25px; padding: 15px; background: #E5ECF3; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <p style="font-size: 13px; color: #1A365C; margin-bottom: 5px;"><strong>Performance Thresholds for <span id="performanceYear">2024</span></strong></p>
+                    <p style="font-size: 12px; color: #666;">Only providers who started before <span id="cutoffDateDisplay">June 1</span> are eligible for bonuses</p>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <button class="btn btn-secondary" id="refreshBtn" onclick="refreshMetrics()" style="white-space: nowrap;">🔄 Refresh Metrics</button>
+                    <div class="loading-spinner" id="loadingSpinner"></div>
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 25px;">
+                <div class="config-card">
+                    <h3>Level 3 Thresholds (Exceeds)</h3>
+                    <div class="config-row">
+                        <label>Min Jobs/Week</label>
+                        <input type="number" id="level3MinJobsPerWeek" min="0" step="0.5" value="8" onchange="handleConfigChange('level3MinJobsPerWeek', this.value)">
+                    </div>
+                    <div class="config-row">
+                        <label>Max Cancellation %</label>
+                        <input type="number" id="level3MaxCancellationRate" min="0" max="100" step="0.5" value="5" onchange="handleConfigChange('level3MaxCancellationRate', this.value)">
+                    </div>
+                    <div class="config-row">
+                        <label>Min Hours/Week</label>
+                        <input type="number" id="level3MinHoursPerWeek" min="0" step="0.5" value="30" onchange="handleConfigChange('level3MinHoursPerWeek', this.value)">
+                    </div>
+                </div>
+                
+                <div class="config-card">
+                    <h3>Level 2 Thresholds (Meets)</h3>
+                    <div class="config-row">
+                        <label>Min Jobs/Week</label>
+                        <input type="number" id="level2MinJobsPerWeek" min="0" step="0.5" value="5" onchange="handleConfigChange('level2MinJobsPerWeek', this.value)">
+                    </div>
+                    <div class="config-row">
+                        <label>Max Cancellation %</label>
+                        <input type="number" id="level2MaxCancellationRate" min="0" max="100" step="0.5" value="15" onchange="handleConfigChange('level2MaxCancellationRate', this.value)">
+                    </div>
+                    <div class="config-row">
+                        <label>Min Hours/Week</label>
+                        <input type="number" id="level2MinHoursPerWeek" min="0" step="0.5" value="15" onchange="handleConfigChange('level2MinHoursPerWeek', this.value)">
+                    </div>
+                </div>
+            </div>
+            
+            <h2 class="section-title">Provider Performance Metrics</h2>
+            <div class="team-table-wrapper">
+                <table class="team-table">
+                    <thead>
+                        <tr>
+                            <th>Provider Name</th>
+                            <th>Completed Jobs</th>
+                            <th>Cancelled Jobs</th>
+                            <th>Total Hours</th>
+                            <th>Cancel Rate %</th>
+                            <th>Avg Jobs/Week</th>
+                            <th>Avg Hours/Week</th>
+                            <th>Suggested Rating</th>
+                        </tr>
+                    </thead>
+                    <tbody id="performanceTableBody">
+                        <tr style="text-align: center; color: #999;">
+                            <td colspan="8">No provider data available - click Refresh Metrics</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Summary Tab -->
+        <div id="summary" class="tab-panel">
+            <h2 class="section-title">Bonus Distribution Summary <span style="font-size: 14px; font-weight: 400; color: #666;">- Year: <span id="summaryYearDisplay">Not Selected</span></span></h2>
+            
+            <div style="background: #E8F5E9; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #4CAF50;">
+                <p style="font-size: 12px; color: #1B5E20; margin: 0 0 8px 0;"><strong>✓ How Bonuses Are Calculated:</strong></p>
+                <ul style="font-size: 11px; color: #1B5E20; margin: 5px 0; padding-left: 20px;">
+                    <li><strong>Distribution %:</strong> Forced Distribution sliders determine what % of pool each level gets (L3=10%, L2=30%, L1=60%)</li>
+                    <li><strong>Distribution $:</strong> Pool amount × Distribution % = Total for that level</li>
+                    <li><strong>Per Person:</strong> Level total ÷ Number of employees = Bonus per person</li>
+                    <li><strong>Expected:</strong> If Pool=$5,000 → L3: $500÷count, L2: $1,500÷count, L1: $3,000÷count</li>
+                </ul>
+            </div>
+            
+            <div style="background: #F5F5F5; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <h3 style="margin-top: 0; color: #1A365C;">Distribution Breakdown</h3>
+                <table style="width: 100%; font-size: 12px;">
+                    <tr style="border-bottom: 1px solid #ddd;">
+                        <th style="text-align: left; padding: 8px; color: #1A365C; font-weight: 600;">Level</th>
+                        <th style="text-align: center; padding: 8px; color: #1A365C; font-weight: 600;">Distribution %</th>
+                        <th style="text-align: center; padding: 8px; color: #1A365C; font-weight: 600;">Pool Amount</th>
+                        <th style="text-align: center; padding: 8px; color: #1A365C; font-weight: 600;">Employee Count</th>
+                        <th style="text-align: center; padding: 8px; color: #1A365C; font-weight: 600;">Per Person</th>
+                    </tr>
+                    <tr style="background: #E8F5E9; border-bottom: 1px solid #ddd;">
+                        <td style="padding: 8px;"><strong>Level 3 (Exceeds)</strong></td>
+                        <td style="text-align: center; padding: 8px;"><span id="breakdownL3Pct">10</span>%</td>
+                        <td style="text-align: center; padding: 8px;"><strong id="breakdownL3Amount">$500</strong></td>
+                        <td style="text-align: center; padding: 8px;"><span id="breakdownL3Count">--</span></td>
+                        <td style="text-align: center; padding: 8px;"><strong id="breakdownL3PerPerson">$--</strong></td>
+                    </tr>
+                    <tr style="background: #E3F2FD; border-bottom: 1px solid #ddd;">
+                        <td style="padding: 8px;"><strong>Level 2 (Meets)</strong></td>
+                        <td style="text-align: center; padding: 8px;"><span id="breakdownL2Pct">30</span>%</td>
+                        <td style="text-align: center; padding: 8px;"><strong id="breakdownL2Amount">$1,500</strong></td>
+                        <td style="text-align: center; padding: 8px;"><span id="breakdownL2Count">--</span></td>
+                        <td style="text-align: center; padding: 8px;"><strong id="breakdownL2PerPerson">$--</strong></td>
+                    </tr>
+                    <tr style="background: #FFF3E0;">
+                        <td style="padding: 8px;"><strong>Level 1 (Not Entitled)</strong></td>
+                        <td style="text-align: center; padding: 8px;"><span id="breakdownL1Pct">60</span>%</td>
+                        <td style="text-align: center; padding: 8px;"><strong id="breakdownL1Amount">$3,000</strong></td>
+                        <td style="text-align: center; padding: 8px;"><span id="breakdownL1Count">--</span></td>
+                        <td style="text-align: center; padding: 8px;"><strong id="breakdownL1PerPerson">$--</strong></td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="stats-row">
+                <div class="stat-card green">
+                    <h3>Total Bonus Pool</h3>
+                    <div class="number" id="summaryBonusPool">$0.00</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Eligible Employees</h3>
+                    <div class="number" id="summaryEligibleCount">0</div>
+                </div>
+                <div class="stat-card blue">
+                    <h3>Total Bonus Distributed</h3>
+                    <div class="number" id="summaryTotalDistributed">$0.00</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Remaining Pool</h3>
+                    <div class="number" id="summaryRemainingPool">$0.00</div>
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;">
+                <!-- Distribution by Level -->
+                <div>
+                    <h2 class="section-title">Employees by Rating Level</h2>
+                    <div class="summary-panel">
+                        <div class="summary-item">
+                            <span class="summary-label">Level 3 (Exceeds Expectations)</span>
+                            <span class="summary-value" id="summaryLevel3Count">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Level 2 (Meets Expectations)</span>
+                            <span class="summary-value" id="summaryLevel2Count">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Level 1 (Not Entitled)</span>
+                            <span class="summary-value" id="summaryLevel1Count">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Ineligible</span>
+                            <span class="summary-value" id="summaryIneligibleCount">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Financial Summary -->
+                <div>
+                    <h2 class="section-title">Financial Breakdown</h2>
+                    <div class="summary-panel">
+                        <div class="summary-item">
+                            <span class="summary-label">Company Bonus Portion</span>
+                            <span class="summary-value" id="summaryCompanyPortion">$0.00</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Individual Bonus Portion</span>
+                            <span class="summary-value" id="summaryIndividualPortion">$0.00</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Level 3 Total Payout</span>
+                            <span class="summary-value" id="summaryLevel3Payout">$0.00</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Level 2 Total Payout</span>
+                            <span class="summary-value" id="summaryLevel2Payout">$0.00</span>
+                        </div>
+                        <div class="summary-item total">
+                            <span class="summary-label">Total Distributed</span>
+                            <span class="summary-value" id="summaryGrandTotal">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <h2 class="section-title" style="margin-top: 30px;">Employees by Performance Tier</h2>
+            
+            <!-- Level 3 -->
+            <div style="margin-bottom: 30px;">
+                <h3 style="color: #62B790; font-weight: 600; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                    ⭐ Level 3 - Exceeds Expectations
+                    <span style="background: #62B790; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 700;" id="summaryLevel3CountBadge">0</span>
+                </h3>
+                <div class="team-table-wrapper">
+                    <table class="team-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Completed Jobs</th>
+                                <th>Avg Jobs/Week</th>
+                                <th>Total Hours</th>
+                                <th>Cancel Rate %</th>
+                                <th>Individual Bonus %</th>
+                                <th>Final Bonus</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summaryLevel3TableBody">
+                            <tr style="text-align: center; color: #999;"><td colspan="7">No Level 3 employees</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Level 2 -->
+            <div style="margin-bottom: 30px;">
+                <h3 style="color: #2196F3; font-weight: 600; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                    ✓ Level 2 - Meets Expectations
+                    <span style="background: #2196F3; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 700;" id="summaryLevel2CountBadge">0</span>
+                </h3>
+                <div class="team-table-wrapper">
+                    <table class="team-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Completed Jobs</th>
+                                <th>Avg Jobs/Week</th>
+                                <th>Total Hours</th>
+                                <th>Cancel Rate %</th>
+                                <th>Individual Bonus %</th>
+                                <th>Final Bonus</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summaryLevel2TableBody">
+                            <tr style="text-align: center; color: #999;"><td colspan="7">No Level 2 employees</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Level 1 -->
+            <div style="margin-bottom: 30px;">
+                <h3 style="color: #FF9800; font-weight: 600; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                    ○ Level 1 - Not Entitled
+                    <span style="background: #FF9800; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 700;" id="summaryLevel1CountBadge">0</span>
+                </h3>
+                <div class="team-table-wrapper">
+                    <table class="team-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Completed Jobs</th>
+                                <th>Avg Jobs/Week</th>
+                                <th>Total Hours</th>
+                                <th>Cancel Rate %</th>
+                                <th>Individual Bonus %</th>
+                                <th>Final Bonus</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summaryLevel1TableBody">
+                            <tr style="text-align: center; color: #999;"><td colspan="7">No Level 1 employees</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ============================================
+        // CONFIGURATION AND GLOBAL VARIABLES
+        // ============================================
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxhMvytnQzwMot-sAqav1vI25v4HAZChXWS7qZtOYRLROekrus4FChNMgaZrL644fre/exec';
+        
+        let bonusConfig = {
+            bonusYear: null,
+            companyWeight: 70,
+            individualWeight: 30,
+            bonusPool: 50000,
+            minMonthsEmployed: 6,
+            minHoursPerWeek: 15,
+            bonusWindowStartDate: '11-01',
+            bonusWindowEndDate: '12-15',
+            
+            // ========== EMPLOYEE DISTRIBUTION (% of team) ==========
+            // Controls max % of employees in each level (must total 100%)
+            level3EmpPct: 10,   // Max 10% of team can be L3
+            level2EmpPct: 30,   // Max 30% of team can be L2
+            level1EmpPct: 60,   // Min 60% of team must be L1
+            
+            // ========== BUDGET DISTRIBUTION (% of pool) ==========
+            // Controls how to split the bonus pool (must total 100%)
+            level3BudPct: 60,   // L3 gets 60% of pool (highest earners)
+            level2BudPct: 30,   // L2 gets 30% of pool (middle earners)
+            level1BudPct: 10,   // L1 gets 10% of pool (lowest earners)
+            
+            // Performance thresholds
+            level3MinJobsPerWeek: 8,
+            level3MaxCancellationRate: 5,
+            level3MinHoursPerWeek: 30,
+            level2MinJobsPerWeek: 5,
+            level2MaxCancellationRate: 15,
+            level2MinHoursPerWeek: 15,
+            level1MinJobsPerWeek: 0,
+            level1MaxCancellationRate: 100,
+            level1MinHoursPerWeek: 0
+        };
+        
+        let revenueThresholds = [
+            { id: 1, minRevenue: 0, maxRevenue: 1700000, fundingPercent: 0, companyPercent: 0 },
+            { id: 2, minRevenue: 1700000, maxRevenue: 1990000, fundingPercent: 80, companyPercent: 56 },
+            { id: 3, minRevenue: 1990000, maxRevenue: 2500000, fundingPercent: 100, companyPercent: 70 },
+            { id: 4, minRevenue: 2500000, maxRevenue: 999999999, fundingPercent: 110, companyPercent: 77 }
+        ];
+        
+        let teamMembers = [];
+        let providerPerformanceData = [];
+        
+        // ============================================
+        // TAB SWITCHING
+        // ============================================
+        function switchTab(tabName, buttonElement) {
+            console.log(`Switching to tab: ${tabName}`);
+            
+            // Hide all tabs
+            document.querySelectorAll('.tab-panel').forEach(tab => tab.classList.remove('active'));
+            
+            // Deactivate all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected tab
+            const tab = document.getElementById(tabName);
+            if (tab) {
+                tab.classList.add('active');
+                console.log(`✓ Tab ${tabName} is now visible`);
+            } else {
+                console.error(`ERROR: Tab ${tabName} not found!`);
+                return;
+            }
+            
+            // Mark button active
+            if (buttonElement) {
+                buttonElement.classList.add('active');
+            }
+            
+            // Update tables if needed
+            if (tabName === 'performance') {
+                updatePerformanceTable();
+            } else if (tabName === 'summary') {
+                updateSummary();
+            }
+        }
+        
+        // ============================================
+        // REVENUE THRESHOLDS
+        // ============================================
+        function updateRevenueTable() {
+            console.log('Rendering revenue thresholds:', revenueThresholds);
+            const tbody = document.getElementById('revenueTableBody');
+            if (!tbody) {
+                console.error('Revenue table body not found');
+                return;
+            }
+            
+            if (revenueThresholds.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #999;">No revenue thresholds configured</td></tr>';
+                return;
+            }
+            
+            // Sort thresholds by minRevenue
+            const sorted = [...revenueThresholds].sort((a, b) => a.minRevenue - b.minRevenue);
+            
+            // Enforce tier structure: Tier 1 min = 0, each subsequent tier min = previous max + 1
+            for (let i = 0; i < sorted.length; i++) {
+                if (i === 0) {
+                    sorted[i].minRevenue = 0;  // First tier always starts at 0
+                } else {
+                    sorted[i].minRevenue = sorted[i - 1].maxRevenue + 1;  // Next tier starts where previous ends + 1
+                }
+            }
+            
+            tbody.innerHTML = sorted.map((t, idx) => {
+                const minDisplay = formatCurrency(t.minRevenue);
+                const maxDisplay = t.maxRevenue >= 999999999 ? 'Unlimited' : formatCurrency(t.maxRevenue);
+                
+                // Check if tier is invalid (max < min)
+                const isInvalid = t.maxRevenue < t.minRevenue && t.maxRevenue < 999999999;
+                
+                return `
+                    <tr style="${isInvalid ? 'background-color: #FFF3E0;' : ''}">
+                        <td style="background-color: ${isInvalid ? '#FFEBEE' : ''}; font-weight: ${isInvalid ? '600' : 'normal'}; color: ${isInvalid ? '#D32F2F' : 'inherit'};">Tier ${idx + 1}${isInvalid ? ' ❌' : ''}</td>
+                        <td style="background-color: ${isInvalid ? '#FFEBEE' : ''};">
+                            <input type="number" value="${t.minRevenue}" step="1000" ${idx === 0 ? 'disabled' : ''} onchange="updateThreshold(${t.id}, 'minRevenue', this.value)" style="width: 100%; box-sizing: border-box;">
+                            <div style="font-size: 10px; color: #666; margin-top: 3px;">${minDisplay}</div>
+                        </td>
+                        <td style="${isInvalid ? 'background-color: #FFCDD2;' : ''}">
+                            <input type="number" value="${t.maxRevenue >= 999999999 ? '' : t.maxRevenue}" step="1000" placeholder="Unlimited" onchange="updateThreshold(${t.id}, 'maxRevenue', this.value === '' ? 999999999 : this.value)" style="width: 100%; box-sizing: border-box; ${isInvalid ? 'border-color: #D32F2F; border-width: 2px;' : ''}">
+                            <div style="font-size: 10px; color: ${isInvalid ? '#D32F2F' : '#666'}; margin-top: 3px; font-weight: ${isInvalid ? '600' : 'normal'};">${maxDisplay}${isInvalid ? ' ERROR' : ''}</div>
+                        </td>
+                        <td>
+                            <input type="number" value="${t.fundingPercent}" min="0" max="200" onchange="updateThreshold(${t.id}, 'fundingPercent', this.value)" style="width: 100%; box-sizing: border-box;">
+                            <div style="font-size: 10px; color: #666; margin-top: 3px;">%</div>
+                        </td>
+                        <td>
+                            <input type="number" value="${t.companyPercent}" min="0" max="100" onchange="updateThreshold(${t.id}, 'companyPercent', this.value)" style="width: 100%; box-sizing: border-box;">
+                            <div style="font-size: 9px; color: #666; margin-top: 3px;">Tier funding<br/>if co. goal met</div>
+                        </td>
+                        <td><button class="btn btn-secondary" onclick="removeRevenueThreshold(${t.id})" ${sorted.length <= 1 ? 'disabled' : ''} style="width: 100%;">Remove</button></td>
+                    </tr>
+                `;
+            }).join('');
+            
+            // Update the actual revenueThresholds array with enforced values
+            revenueThresholds = sorted;
+            
+            console.log('✓ Revenue table rendered with enforced tier structure');
+        }
+        
+        function updateThreshold(id, field, value) {
+            const t = revenueThresholds.find(x => x.id === id);
+            if (!t) return;
+            t[field] = parseInt(value) || 0;
+            SheetsAPI.saveRevenueThresholds(revenueThresholds);
+            updateRevenueTable();  // Refresh display to show USD
+            console.log(`Updated threshold ${id}.${field} = ${t[field]}`);
+        }
+        
+        function removeRevenueThreshold(id) {
+            if (revenueThresholds.length <= 1) {
+                alert('Must keep at least one threshold');
+                return;
+            }
+            revenueThresholds = revenueThresholds.filter(t => t.id !== id);
+            SheetsAPI.saveRevenueThresholds(revenueThresholds);
+            updateRevenueTable();
+        }
+        
+        function addRevenueThreshold() {
+            const newId = Math.max(...revenueThresholds.map(t => t.id), 0) + 1;
+            
+            // Sort to find the last tier
+            const sorted = [...revenueThresholds].sort((a, b) => a.minRevenue - b.minRevenue);
+            const lastTier = sorted[sorted.length - 1];
+            
+            // New tier starts where last tier ends
+            const newMinRevenue = lastTier ? lastTier.maxRevenue + 1 : 0;
+            
+            revenueThresholds.push({
+                id: newId,
+                minRevenue: newMinRevenue,
+                maxRevenue: 999999999,
+                fundingPercent: 100,
+                companyPercent: 70
+            });
+            
+            revenueThresholds.sort((a, b) => a.minRevenue - b.minRevenue);
+            SheetsAPI.saveRevenueThresholds(revenueThresholds);
+            updateRevenueTable();
+            console.log(`✓ Added new tier starting at ${formatCurrency(newMinRevenue)}`);
+        }
+        
+        function resetRevenueThresholds() {
+            if (!confirm('Reset to defaults?')) return;
+            revenueThresholds = [
+                { id: 1, minRevenue: 0, maxRevenue: 1700000, fundingPercent: 0, companyPercent: 0 },
+                { id: 2, minRevenue: 1700000, maxRevenue: 1990000, fundingPercent: 80, companyPercent: 56 },
+                { id: 3, minRevenue: 1990000, maxRevenue: 2500000, fundingPercent: 100, companyPercent: 70 },
+                { id: 4, minRevenue: 2500000, maxRevenue: 999999999, fundingPercent: 110, companyPercent: 77 }
+            ];
+            SheetsAPI.saveRevenueThresholds(revenueThresholds);
+            updateRevenueTable();
+        }
+        
+        // ============================================
+        // DISTRIBUTION VALIDATION
+        // ============================================
+        function validateAllDistributions() {
+            // Employee Distribution Validation
+            const empL3 = parseInt(document.getElementById('level3EmpPct').value) || 0;
+            const empL2 = parseInt(document.getElementById('level2EmpPct').value) || 0;
+            const empL1 = parseInt(document.getElementById('level1EmpPct').value) || 0;
+            const empTotal = empL3 + empL2 + empL1;
+            
+            const empError = document.getElementById('employeeDistributionError');
+            const empValid = document.getElementById('employeeDistributionValid');
+            
+            if (empTotal === 100) {
+                empError.textContent = '';
+                empError.style.display = 'none';
+                empValid.style.display = 'block';
+            } else {
+                empError.textContent = `❌ Must equal 100% (currently ${empTotal}%)`;
+                empError.style.display = 'block';
+                empValid.style.display = 'none';
+            }
+            
+            // Budget Distribution Validation
+            const budL3 = parseInt(document.getElementById('level3BudPct').value) || 0;
+            const budL2 = parseInt(document.getElementById('level2BudPct').value) || 0;
+            const budL1 = parseInt(document.getElementById('level1BudPct').value) || 0;
+            const budTotal = budL3 + budL2 + budL1;
+            
+            const budError = document.getElementById('budgetDistributionError');
+            const budValid = document.getElementById('budgetDistributionValid');
+            
+            if (budTotal === 100) {
+                budError.textContent = '';
+                budError.style.display = 'none';
+                budValid.style.display = 'block';
+            } else {
+                budError.textContent = `❌ Must equal 100% (currently ${budTotal}%)`;
+                budError.style.display = 'block';
+                budValid.style.display = 'none';
+            }
+            
+            console.log(`Employee Distribution: L3=${empL3}%, L2=${empL2}%, L1=${empL1}% (Total: ${empTotal}%)`);
+            console.log(`Budget Distribution: L3=${budL3}%, L2=${budL2}%, L1=${budL1}% (Total: ${budTotal}%)`);
+            
+            // Update summary if both are valid
+            if (empTotal === 100 && budTotal === 100) {
+                updateSummary();
+            }
+        }
+        
+        // Keep old function for backwards compatibility
+        function validateDistribution() {
+            validateAllDistributions();
+        }
+        
+        // Format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2
+            }).format(amount);
+        }
+        
+        // Update currency display for form inputs
+        function updateCurrencyDisplay(fieldId, displayId) {
+            const field = document.getElementById(fieldId);
+            const display = document.getElementById(displayId);
+            if (field && display) {
+                const value = parseFloat(field.value) || 0;
+                display.textContent = formatCurrency(value);
+            }
+        }
+        
+        // Update bonus pool display
+        function updateBonusPoolDisplay() {
+            const bonusPoolVal = parseFloat(bonusConfig.bonusPool) || 0;
+            const displayEl = document.getElementById('bonusPoolDisplay');
+            if (displayEl) {
+                displayEl.textContent = formatCurrency(bonusPoolVal);
+            }
+        }
+        
+        // ============================================
+        // CONFIG UI
+        // ============================================
+        function updateConfigUI() {
+            if (bonusConfig.bonusYear) {
+                document.getElementById('bonusYear').value = bonusConfig.bonusYear;
+                const yearVal = bonusConfig.bonusYear;
+                document.getElementById('headerYear').textContent = yearVal;
+                if (document.getElementById('performanceYear')) document.getElementById('performanceYear').textContent = yearVal;
+                if (document.getElementById('revenueYearFilter')) document.getElementById('revenueYearFilter').textContent = yearVal;
+            } else {
+                document.getElementById('bonusYear').value = '';
+                document.getElementById('headerYear').textContent = 'Year';
+                if (document.getElementById('performanceYear')) document.getElementById('performanceYear').textContent = 'Year';
+                if (document.getElementById('revenueYearFilter')) document.getElementById('revenueYearFilter').textContent = 'Year';
+            }
+            document.getElementById('bonusPool').value = bonusConfig.bonusPool || 50000;
+            updateBonusPoolDisplay();
+            document.getElementById('companyWeight').value = bonusConfig.companyWeight || 70;
+            document.getElementById('individualWeight').value = bonusConfig.individualWeight || 30;
+            document.getElementById('minMonthsEmployed').value = bonusConfig.minMonthsEmployed || 6;
+            document.getElementById('minHoursPerWeek').value = bonusConfig.minHoursPerWeek || 15;
+            document.getElementById('bonusWindowStartDate').value = bonusConfig.bonusWindowStartDate || '11-01';
+            document.getElementById('bonusWindowEndDate').value = bonusConfig.bonusWindowEndDate || '12-15';
+            
+            // Load Employee Distribution from config
+            if (document.getElementById('level3EmpPct')) {
+                document.getElementById('level3EmpPct').value = bonusConfig.level3EmpPct || 10;
+            }
+            if (document.getElementById('level2EmpPct')) {
+                document.getElementById('level2EmpPct').value = bonusConfig.level2EmpPct || 30;
+            }
+            if (document.getElementById('level1EmpPct')) {
+                document.getElementById('level1EmpPct').value = bonusConfig.level1EmpPct || 60;
+            }
+            
+            // Load Budget Distribution from config
+            if (document.getElementById('level3BudPct')) {
+                document.getElementById('level3BudPct').value = bonusConfig.level3BudPct || 60;
+            }
+            if (document.getElementById('level2BudPct')) {
+                document.getElementById('level2BudPct').value = bonusConfig.level2BudPct || 30;
+            }
+            if (document.getElementById('level1BudPct')) {
+                document.getElementById('level1BudPct').value = bonusConfig.level1BudPct || 10;
+            }
+            
+            // Validate distributions after loading
+            validateAllDistributions();
+            
+            // Update threshold fields if they exist
+            if (document.getElementById('level3MinJobsPerWeek')) {
+                document.getElementById('level3MinJobsPerWeek').value = bonusConfig.level3MinJobsPerWeek || 8;
+            }
+            if (document.getElementById('level3MaxCancellationRate')) {
+                document.getElementById('level3MaxCancellationRate').value = bonusConfig.level3MaxCancellationRate || 5;
+            }
+            if (document.getElementById('level3MinHoursPerWeek')) {
+                document.getElementById('level3MinHoursPerWeek').value = bonusConfig.level3MinHoursPerWeek || 30;
+            }
+            if (document.getElementById('level2MinJobsPerWeek')) {
+                document.getElementById('level2MinJobsPerWeek').value = bonusConfig.level2MinJobsPerWeek || 5;
+            }
+            if (document.getElementById('level2MaxCancellationRate')) {
+                document.getElementById('level2MaxCancellationRate').value = bonusConfig.level2MaxCancellationRate || 15;
+            }
+            if (document.getElementById('level2MinHoursPerWeek')) {
+                document.getElementById('level2MinHoursPerWeek').value = bonusConfig.level2MinHoursPerWeek || 15;
+            }
+            
+            // Display annual revenue if loaded
+            if (bonusConfig.annualRevenue && document.getElementById('annualRevenueDisplay')) {
+                document.getElementById('annualRevenue').value = bonusConfig.annualRevenue.toFixed(2);
+                document.getElementById('annualRevenueDisplay').textContent = formatCurrency(bonusConfig.annualRevenue);
+            }
+        }
+        
+        async function handleConfigChange(field, value) {
+            if (field === 'annualRevenue') return;
+            
+            if (field === 'bonusYear') {
+                bonusConfig[field] = parseInt(value) || null;
+                const yearVal = bonusConfig.bonusYear || 'Year';
+                document.getElementById('headerYear').textContent = yearVal;
+                document.getElementById('performanceYear').textContent = yearVal;
+                document.getElementById('revenueYearFilter').textContent = yearVal;
+                await loadProviderPerformance();
+                await loadCompletedJobsRevenue();
+            } else if (field === 'bonusPool') {
+                bonusConfig[field] = parseFloat(value) || 0;
+                updateBonusPoolDisplay();
+                calculateAll();
+            } else {
+                bonusConfig[field] = isNaN(value) ? value : parseFloat(value);
+                // If threshold changed, recalculate ratings and summary
+                if (field.includes('level') || field.includes('MinJobs') || field.includes('MaxCancel') || field.includes('MinHours')) {
+                    updatePerformanceTable();
+                    calculateAll();
+                }
+            }
+            
+            document.getElementById(field).value = value;
+            
+            await SheetsAPI.saveConfig(bonusConfig);
+        }
+        
+        // Save distribution changes to Google Sheets
+        async function saveConfig() {
+            // Update bonusConfig from DOM values
+            bonusConfig.level3EmpPct = parseInt(document.getElementById('level3EmpPct').value) || 10;
+            bonusConfig.level2EmpPct = parseInt(document.getElementById('level2EmpPct').value) || 30;
+            bonusConfig.level1EmpPct = parseInt(document.getElementById('level1EmpPct').value) || 60;
+            
+            bonusConfig.level3BudPct = parseInt(document.getElementById('level3BudPct').value) || 60;
+            bonusConfig.level2BudPct = parseInt(document.getElementById('level2BudPct').value) || 30;
+            bonusConfig.level1BudPct = parseInt(document.getElementById('level1BudPct').value) || 10;
+            
+            console.log('Saving distribution config:', bonusConfig);
+            
+            try {
+                await SheetsAPI.saveConfig(bonusConfig);
+                console.log('✓ Configuration saved to Google Sheets');
+            } catch (error) {
+                console.error('Error saving config:', error);
+            }
+        }
+        
+        // ============================================
+        // PERFORMANCE RATING LOGIC
+        // ============================================
+        function calculateRating(provider) {
+            const l3Jobs = parseFloat(bonusConfig.level3MinJobsPerWeek) || 8;
+            const l3Cancel = parseFloat(bonusConfig.level3MaxCancellationRate) || 5;
+            const l3Hours = parseFloat(bonusConfig.level3MinHoursPerWeek) || 30;
+            
+            const l2Jobs = parseFloat(bonusConfig.level2MinJobsPerWeek) || 5;
+            const l2Cancel = parseFloat(bonusConfig.level2MaxCancellationRate) || 15;
+            const l2Hours = parseFloat(bonusConfig.level2MinHoursPerWeek) || 15;
+            
+            // Check Level 3 (ALL criteria must be met)
+            if (provider.avgJobsPerWeek >= l3Jobs && 
+                provider.cancellationRate <= l3Cancel && 
+                provider.avgHoursPerWeek >= l3Hours) {
+                return 3;
+            }
+            
+            // Check Level 2 (ALL criteria must be met)
+            if (provider.avgJobsPerWeek >= l2Jobs && 
+                provider.cancellationRate <= l2Cancel && 
+                provider.avgHoursPerWeek >= l2Hours) {
+                return 2;
+            }
+            
+            // Default to Level 1
+            return 1;
+        }
+        
+        function getRatingText(level) {
+            return { 1: 'Level 1', 2: 'Level 2', 3: 'Level 3' }[level] || 'Level 1';
+        }
+        
+        function getRatingColor(level) {
+            return { 1: '#999', 2: '#2196F3', 3: '#62B790' }[level] || '#999';
+        }
+        function updatePerformanceTable() {
+            const tbody = document.getElementById('performanceTableBody');
+            if (!tbody) return;
+            
+            if (providerPerformanceData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px; color: #1976d2;">📅 Select a year above and click "🔄 Refresh Metrics" to load data</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = providerPerformanceData.map(p => {
+                const rating = calculateRating(p);
+                const ratingText = getRatingText(rating);
+                const ratingColor = getRatingColor(rating);
+                return `
+                    <tr>
+                        <td><strong>${p.name}</strong></td>
+                        <td>${p.completedJobs}</td>
+                        <td>${p.cancelledJobs}</td>
+                        <td>${p.totalHours}</td>
+                        <td>${p.cancellationRate}%</td>
+                        <td>${p.avgJobsPerWeek}</td>
+                        <td>${p.avgHoursPerWeek}</td>
+                        <td><span style="font-weight: 600; color: ${ratingColor};">${ratingText}</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        // ============================================
+        // REFRESH METRICS WITH LOADING INDICATOR
+        // ============================================
+        async function refreshMetrics() {
+            // Show spinner and disable button
+            const spinner = document.getElementById('loadingSpinner');
+            const btn = document.getElementById('refreshBtn');
+            
+            if (!bonusConfig.bonusYear) {
+                alert('Please select a year first');
+                return;
+            }
+            
+            spinner.classList.add('active');
+            btn.disabled = true;
+            btn.style.opacity = '0.6';
+            
+            console.log('Starting data refresh...');
+            
+            try {
+                // Load both data sources in parallel
+                await Promise.all([
+                    loadProviderPerformance(),
+                    loadCompletedJobsRevenue()
+                ]);
+                
+                console.log('✓ Data refresh complete');
+            } catch (error) {
+                console.error('Error during refresh:', error);
+            } finally {
+                // Hide spinner and enable button
+                spinner.classList.remove('active');
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            }
+        }
+        
+        // ============================================
+        // REFRESH ANNUAL REVENUE
+        // ============================================
+        async function refreshCompletedJobsRevenue() {
+            const spinner = document.getElementById('revenueLoadingSpinner');
+            const btn = document.getElementById('revenueRefreshBtn');
+            
+            if (!bonusConfig.bonusYear) {
+                alert('Please select a year first');
+                return;
+            }
+            
+            // Show spinner and disable button
+            if (spinner) spinner.classList.add('active');
+            if (btn) btn.disabled = true;
+            if (btn) btn.style.opacity = '0.6';
+            
+            console.log('Refreshing annual revenue...');
+            
+            try {
+                await loadCompletedJobsRevenue();
+                updateSummary(); // Also update summary since revenue might affect calculations
+                console.log('✓ Annual revenue refreshed');
+            } catch (error) {
+                console.error('Error refreshing revenue:', error);
+            } finally {
+                // Hide spinner and enable button
+                if (spinner) spinner.classList.remove('active');
+                if (btn) btn.disabled = false;
+                if (btn) btn.style.opacity = '1';
+            }
+        }
+        
+        async function loadProviderPerformance() {
+            if (!bonusConfig.bonusYear) {
+                console.warn('No year selected, skipping provider performance load');
+                return;
+            }
+            
+            const result = await SheetsAPI.getProviderPerformanceMetrics();
+            if (result && result.success) {
+                providerPerformanceData = result.providers || [];
+                console.log(`✓ Loaded ${providerPerformanceData.length} providers for year ${bonusConfig.bonusYear}`);
+            } else {
+                console.warn('No provider data loaded');
+                providerPerformanceData = [];
+            }
+            updatePerformanceTable();
+            updateSummary();
+        }
+        
+        async function loadCompletedJobsRevenue() {
+            const result = await SheetsAPI.getCompletedJobsRevenue();
+            if (result && result.success) {
+                bonusConfig.annualRevenue = result.revenue || 0;
+                document.getElementById('annualRevenue').value = bonusConfig.annualRevenue.toFixed(2);
+                document.getElementById('annualRevenueDisplay').textContent = formatCurrency(bonusConfig.annualRevenue);
+                document.getElementById('revenueUpdatedAt').textContent = `Updated: ${new Date().toLocaleTimeString()}`;
+                console.log(`✓ Loaded revenue for year ${bonusConfig.bonusYear}: ${formatCurrency(bonusConfig.annualRevenue)}`);
+            } else {
+                document.getElementById('annualRevenueDisplay').textContent = formatCurrency(0);
+                console.warn('No revenue data loaded');
+            }
+        }
+        
+        // ============================================
+        // BONUS SUMMARY
+        // ============================================
+        function updateSummary() {
+            console.log('Calculating comprehensive bonus summary...');
+            
+            // Update year display
+            if (document.getElementById('summaryYearDisplay')) {
+                document.getElementById('summaryYearDisplay').textContent = bonusConfig.bonusYear || 'Not Selected';
+            }
+            
+            // Initialize with empty counts if no provider data
+            let level3Count = 0;
+            let level2Count = 0;
+            let level1Count = 0;
+            let level3Providers = [];
+            let level2Providers = [];
+            let level1Providers = [];
+            
+            if (providerPerformanceData && providerPerformanceData.length > 0) {
+                level3Providers = providerPerformanceData.filter(p => calculateRating(p) === 3);
+                level2Providers = providerPerformanceData.filter(p => calculateRating(p) === 2);
+                level1Providers = providerPerformanceData.filter(p => calculateRating(p) === 1);
+                
+                level3Count = level3Providers.length;
+                level2Count = level2Providers.length;
+                level1Count = level1Providers.length;
+            }
+            
+            const totalBonusPool = parseFloat(bonusConfig.bonusPool) || 0;
+            const companyWeight = parseFloat(bonusConfig.companyWeight) || 70;
+            const individualWeight = parseFloat(bonusConfig.individualWeight) || 30;
+            
+            // ==================== BUDGET DISTRIBUTION ====================
+            // Read from configuration: Budget % for each level
+            const level3BudPct = parseInt(document.getElementById('level3BudPct').value) || bonusConfig.level3BudPct || 60;
+            const level2BudPct = parseInt(document.getElementById('level2BudPct').value) || bonusConfig.level2BudPct || 30;
+            const level1BudPct = parseInt(document.getElementById('level1BudPct').value) || bonusConfig.level1BudPct || 10;
+            
+            // Calculate distribution amounts based on BUDGET %
+            const level3DistAmount = (totalBonusPool * level3BudPct / 100);
+            const level2DistAmount = (totalBonusPool * level2BudPct / 100);
+            const level1DistAmount = (totalBonusPool * level1BudPct / 100);
+            
+            // Per person distribution
+            const level3PerPerson = level3Count > 0 ? level3DistAmount / level3Count : 0;
+            const level2PerPerson = level2Count > 0 ? level2DistAmount / level2Count : 0;
+            const level1PerPerson = level1Count > 0 ? level1DistAmount / level1Count : 0;
+            
+            // ==================== COMPANY vs INDIVIDUAL SPLIT ====================
+            const companyPortion = (totalBonusPool * companyWeight / 100);
+            const individualPortion = (totalBonusPool * individualWeight / 100);
+            
+            const totalEligible = level3Count + level2Count + level1Count;
+            const grandTotal = level3DistAmount + level2DistAmount + level1DistAmount;
+            const remaining = totalBonusPool - grandTotal;
+            
+            // Update breakdown table
+            if (document.getElementById('breakdownL3Pct')) {
+                document.getElementById('breakdownL3Pct').textContent = level3BudPct;
+                document.getElementById('breakdownL3Amount').textContent = formatCurrency(level3DistAmount);
+                document.getElementById('breakdownL3Count').textContent = level3Count;
+                document.getElementById('breakdownL3PerPerson').textContent = level3PerPerson > 0 ? formatCurrency(level3PerPerson) : '$0.00';
+            }
+            if (document.getElementById('breakdownL2Pct')) {
+                document.getElementById('breakdownL2Pct').textContent = level2BudPct;
+                document.getElementById('breakdownL2Amount').textContent = formatCurrency(level2DistAmount);
+                document.getElementById('breakdownL2Count').textContent = level2Count;
+                document.getElementById('breakdownL2PerPerson').textContent = level2PerPerson > 0 ? formatCurrency(level2PerPerson) : '$0.00';
+            }
+            if (document.getElementById('breakdownL1Pct')) {
+                document.getElementById('breakdownL1Pct').textContent = level1BudPct;
+                document.getElementById('breakdownL1Amount').textContent = formatCurrency(level1DistAmount);
+                document.getElementById('breakdownL1Count').textContent = level1Count;
+                document.getElementById('breakdownL1PerPerson').textContent = level1PerPerson > 0 ? formatCurrency(level1PerPerson) : '$0.00';
+            }
+            
+            // Update top stats cards
+            if (document.getElementById('summaryBonusPool')) document.getElementById('summaryBonusPool').textContent = formatCurrency(totalBonusPool);
+            if (document.getElementById('summaryEligibleCount')) document.getElementById('summaryEligibleCount').textContent = totalEligible;
+            if (document.getElementById('summaryTotalDistributed')) document.getElementById('summaryTotalDistributed').textContent = formatCurrency(grandTotal);
+            if (document.getElementById('summaryRemainingPool')) document.getElementById('summaryRemainingPool').textContent = formatCurrency(remaining);
+            
+            // Update core counts
+            if (document.getElementById('summaryLevel3Count')) document.getElementById('summaryLevel3Count').textContent = level3Count;
+            if (document.getElementById('summaryLevel2Count')) document.getElementById('summaryLevel2Count').textContent = level2Count;
+            if (document.getElementById('summaryLevel1Count')) document.getElementById('summaryLevel1Count').textContent = level1Count;
+            if (document.getElementById('summaryIneligibleCount')) document.getElementById('summaryIneligibleCount').textContent = '0';
+            
+            // Update badge counts
+            if (document.getElementById('summaryLevel3CountBadge')) document.getElementById('summaryLevel3CountBadge').textContent = level3Count;
+            if (document.getElementById('summaryLevel2CountBadge')) document.getElementById('summaryLevel2CountBadge').textContent = level2Count;
+            if (document.getElementById('summaryLevel1CountBadge')) document.getElementById('summaryLevel1CountBadge').textContent = level1Count;
+            
+            // Update pool split
+            if (document.getElementById('summaryCompanyPortion')) document.getElementById('summaryCompanyPortion').textContent = formatCurrency(companyPortion);
+            if (document.getElementById('summaryIndividualPortion')) document.getElementById('summaryIndividualPortion').textContent = formatCurrency(individualPortion);
+            
+            // Update distribution totals
+            if (document.getElementById('summaryLevel3Payout')) document.getElementById('summaryLevel3Payout').textContent = formatCurrency(level3DistAmount);
+            if (document.getElementById('summaryLevel2Payout')) document.getElementById('summaryLevel2Payout').textContent = formatCurrency(level2DistAmount);
+            if (document.getElementById('summaryGrandTotal')) document.getElementById('summaryGrandTotal').textContent = formatCurrency(grandTotal);
+            
+            // Populate employee tables
+            populateEmployeeTable('summaryLevel3TableBody', level3Providers, level3PerPerson, 'L3');
+            populateEmployeeTable('summaryLevel2TableBody', level2Providers, level2PerPerson, 'L2');
+            populateEmployeeTable('summaryLevel1TableBody', level1Providers, level1PerPerson, 'L1');
+            
+            console.log(`✓ Summary calculated:`);
+            console.log(`  Levels: L3=${level3Count} employees, L2=${level2Count} employees, L1=${level1Count} employees`);
+            console.log(`  Budget Distribution: L3=${level3BudPct}%, L2=${level2BudPct}%, L1=${level1BudPct}%`);
+            console.log(`  Distribution $: L3=${formatCurrency(level3DistAmount)}, L2=${formatCurrency(level2DistAmount)}, L1=${formatCurrency(level1DistAmount)}`);
+            console.log(`  Per Person: L3=${formatCurrency(level3PerPerson)}/ea, L2=${formatCurrency(level2PerPerson)}/ea, L1=${formatCurrency(level1PerPerson)}/ea`);
+            console.log(`  Pool Split: Company=${formatCurrency(companyPortion)}, Individual=${formatCurrency(individualPortion)}`);
+            console.log(`  Grand Total: ${formatCurrency(grandTotal)} (remaining: ${formatCurrency(remaining)})`);
+        }
+        
+        function populateEmployeeTable(tableBodyId, employees, perPersonBonus, levelCode) {
+            const tbody = document.getElementById(tableBodyId);
+            if (!tbody) return;
+            
+            if (employees.length === 0) {
+                tbody.innerHTML = `<tr style="text-align: center; color: #999;"><td colspan="7">No ${levelCode} employees</td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = employees.map(emp => `
+                <tr>
+                    <td><strong>${emp.name}</strong></td>
+                    <td>${emp.completedJobs}</td>
+                    <td>${emp.avgJobsPerWeek}</td>
+                    <td>${emp.totalHours}</td>
+                    <td>${emp.cancellationRate}%</td>
+                    <td>${((perPersonBonus / (parseFloat(bonusConfig.bonusPool) || 1)) * 100).toFixed(1)}%</td>
+                    <td><strong>${formatCurrency(perPersonBonus)}</strong></td>
+                </tr>
+            `).join('');
+        }
+        
+        function calculateAll() {
+            updateSummary();
+            console.log('All calculations updated');
+        }
+        
+        // ============================================
+        // GOOGLE SHEETS API
+        // ============================================
+        class SheetsAPI {
+            static async getConfig() {
+                try {
+                    const response = await fetch(APPS_SCRIPT_URL + '?action=getConfig');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching config:', error);
+                    return null;
+                }
+            }
+            
+            static async getRevenueThresholds() {
+                try {
+                    const response = await fetch(APPS_SCRIPT_URL + '?action=getRevenueThresholds');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching thresholds:', error);
+                    return null;
+                }
+            }
+            
+            static async saveConfig(config) {
+                try {
+                    await fetch(APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ action: 'saveConfig', data: config })
+                    });
+                } catch (error) {
+                    console.error('Error saving config:', error);
+                }
+            }
+            
+            static async saveRevenueThresholds(thresholds) {
+                try {
+                    await fetch(APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ action: 'saveRevenueThresholds', data: thresholds })
+                    });
+                } catch (error) {
+                    console.error('Error saving thresholds:', error);
+                }
+            }
+            
+            static async getCompletedJobsRevenue() {
+                try {
+                    const response = await fetch(APPS_SCRIPT_URL + '?action=getCompletedJobsRevenue');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching revenue:', error);
+                    return null;
+                }
+            }
+            
+            static async getProviderPerformanceMetrics() {
+                try {
+                    const response = await fetch(APPS_SCRIPT_URL + '?action=getProviderPerformanceMetrics');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching metrics:', error);
+                    return null;
+                }
+            }
+        }
+        
+        // ============================================
+        // LOAD DATA FROM SHEETS
+        // ============================================
+        async function loadAllData() {
+            console.log('Loading data from Sheets...');
+            
+            try {
+                // Load configuration
+                const configResult = await SheetsAPI.getConfig();
+                if (configResult && configResult.success) {
+                    bonusConfig = configResult.data || bonusConfig;
+                    console.log('✓ Configuration loaded');
+                } else if (configResult && !Array.isArray(configResult)) {
+                    // If it's an object with the data directly
+                    bonusConfig = { ...bonusConfig, ...configResult };
+                    console.log('✓ Configuration loaded');
+                }
+                
+                // FALLBACK: If new field names are missing, try to use old field names
+                // Map old level*Pct → level*EmpPct (employee distribution)
+                // Map old level*Payout → level*BudPct (budget distribution)
+                
+                if (!bonusConfig.level3EmpPct && bonusConfig.level3Pct) {
+                    bonusConfig.level3EmpPct = bonusConfig.level3Pct;
+                    console.log('ℹ Mapped level3Pct to level3EmpPct:', bonusConfig.level3EmpPct);
+                }
+                if (!bonusConfig.level2EmpPct && bonusConfig.level2Pct) {
+                    bonusConfig.level2EmpPct = bonusConfig.level2Pct;
+                    console.log('ℹ Mapped level2Pct to level2EmpPct:', bonusConfig.level2EmpPct);
+                }
+                if (!bonusConfig.level1EmpPct && bonusConfig.level1Pct) {
+                    bonusConfig.level1EmpPct = bonusConfig.level1Pct;
+                    console.log('ℹ Mapped level1Pct to level1EmpPct:', bonusConfig.level1EmpPct);
+                }
+                
+                if (!bonusConfig.level3BudPct && bonusConfig.level3Payout) {
+                    bonusConfig.level3BudPct = bonusConfig.level3Payout;
+                    console.log('ℹ Mapped level3Payout to level3BudPct:', bonusConfig.level3BudPct);
+                }
+                if (!bonusConfig.level2BudPct && bonusConfig.level2Payout) {
+                    bonusConfig.level2BudPct = bonusConfig.level2Payout;
+                    console.log('ℹ Mapped level2Payout to level2BudPct:', bonusConfig.level2BudPct);
+                }
+                if (!bonusConfig.level1BudPct && bonusConfig.level1Payout) {
+                    bonusConfig.level1BudPct = bonusConfig.level1Payout;
+                    console.log('ℹ Mapped level1Payout to level1BudPct:', bonusConfig.level1BudPct);
+                }
+                
+                // Load revenue thresholds
+                const thresholdsResult = await SheetsAPI.getRevenueThresholds();
+                if (thresholdsResult && Array.isArray(thresholdsResult) && thresholdsResult.length > 0) {
+                    revenueThresholds = thresholdsResult;
+                    console.log(`✓ Loaded ${thresholdsResult.length} revenue thresholds`);
+                } else if (thresholdsResult && thresholdsResult.success && Array.isArray(thresholdsResult.data)) {
+                    revenueThresholds = thresholdsResult.data;
+                    console.log(`✓ Loaded ${thresholdsResult.data.length} revenue thresholds`);
+                }
+                
+            } catch (error) {
+                console.warn('Error loading from Sheets, using defaults:', error);
+            }
+            
+            // Update UI with loaded data
+            updateConfigUI();
+            updateRevenueTable();
+            validateDistribution();
+            updateSummary();  // Initialize summary with loaded config
+            console.log('✓ Dashboard initialized');
+        }
+        
+        // ============================================
+        // PAGE INITIALIZATION
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded');
+            loadAllData();
+        });
+    </script>
+</body>
+</html>
