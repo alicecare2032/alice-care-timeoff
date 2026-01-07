@@ -4633,94 +4633,166 @@
             
             if (!confirm(confirmMsg)) return;
             
-            // Show sending status
+            // Disable button and show initial status
+            sendBtn.disabled = true;
             statusDiv.style.display = 'block';
             statusDiv.style.background = '#E3F2FD';
             statusDiv.style.border = '1px solid #2196F3';
-            statusDiv.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <div class="spinner" style="width: 20px; height: 20px;"></div>
+            
+            // Use batched processing for reliability
+            await executeBulkSendBatched(reportType, periodValue, year, forceSend, config, statusDiv, sendBtn, periodLabel);
+        }
+        
+        async function executeBulkSendBatched(reportType, periodValue, year, forceSend, config, statusDiv, sendBtn, periodLabel) {
+            const BATCH_SIZE = 5; // Process 5 clients at a time
+            let batchOffset = 0;
+            let totalSent = 0;
+            let totalSkipped = 0;
+            let totalErrors = [];
+            let allSkipped = [];
+            let totalClients = 0;
+            let processedClients = 0;
+            let isFirstBatch = true;
+            
+            const updateProgress = (current, total, message) => {
+                const percent = total > 0 ? Math.round((current / total) * 100) : 0;
+                statusDiv.innerHTML = `
                     <div>
-                        <span style="font-weight: 600;">Sending ${reportType} reports...</span>
-                        <p style="margin: 5px 0 0; font-size: 12px; color: #666;">This may take several minutes. Please wait...</p>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <div class="spinner" style="width: 20px; height: 20px;"></div>
+                            <span style="font-weight: 600;">Sending ${reportType} reports...</span>
+                        </div>
+                        <div style="background: #E5ECF3; border-radius: 4px; height: 8px; overflow: hidden; margin-bottom: 8px;">
+                            <div style="background: #2196F3; height: 100%; width: ${percent}%; transition: width 0.3s;"></div>
+                        </div>
+                        <p style="margin: 0; font-size: 12px; color: #666;">
+                            ${message} (${current}/${total} clients - ${percent}%)
+                        </p>
+                        <p style="margin: 5px 0 0; font-size: 11px; color: #999;">
+                            ✓ ${totalSent} sent | ⏭ ${totalSkipped} skipped | ✗ ${totalErrors.length} errors
+                        </p>
                     </div>
-                </div>
-            `;
-            sendBtn.disabled = true;
+                `;
+            };
             
             try {
-                const params = {
-                    action: 'sendBulkReports',
-                    reportType: reportType,
-                    testMode: config.testMode ? 'true' : 'false',
-                    testEmail: config.testEmail || '',
-                    forceSend: forceSend ? 'true' : 'false',
-                    year: year.toString()
-                };
-                
-                // Add period value for weekly/monthly
-                if (periodValue !== null) {
-                    params.periodValue = periodValue.toString();
-                }
-                
-                const result = await jsonpFetch(params);
-                
-                if (result.success) {
-                    // Build success message
-                    let message = `${result.sentCount} report(s) sent`;
-                    if (result.skippedCount > 0) {
-                        message += `, ${result.skippedCount} skipped`;
-                    }
-                    if (result.errors && result.errors.length > 0) {
-                        message += `, ${result.errors.length} error(s)`;
+                // Process in batches
+                while (true) {
+                    const params = {
+                        action: 'sendBulkReportsBatch',
+                        reportType: reportType,
+                        testMode: config.testMode ? 'true' : 'false',
+                        testEmail: config.testEmail || '',
+                        forceSend: forceSend ? 'true' : 'false',
+                        year: year.toString(),
+                        batchSize: BATCH_SIZE.toString(),
+                        batchOffset: batchOffset.toString()
+                    };
+                    
+                    if (periodValue !== null) {
+                        params.periodValue = periodValue.toString();
                     }
                     
-                    statusDiv.style.background = '#E8F5E9';
-                    statusDiv.style.border = '1px solid #4CAF50';
-                    statusDiv.innerHTML = `
-                        <div style="color: #2E7D32;">
-                            <strong>✓ ${message}</strong>
-                            <p style="margin: 5px 0 0; font-size: 12px;">
-                                Period: ${periodLabel} ${year}
-                                ${config.testMode ? ' (Test Mode)' : ''}
+                    if (isFirstBatch) {
+                        updateProgress(0, 0, 'Starting...');
+                    }
+                    
+                    const result = await jsonpFetch(params, { timeout: 120000 }); // 2 min per batch
+                    
+                    if (!result.success) {
+                        throw new Error(result.error || 'Batch processing failed');
+                    }
+                    
+                    // Update totals
+                    if (isFirstBatch) {
+                        totalClients = result.totalClients || 0;
+                        isFirstBatch = false;
+                    }
+                    
+                    totalSent += result.sentCount || 0;
+                    totalSkipped += result.skippedCount || 0;
+                    if (result.errors) totalErrors = totalErrors.concat(result.errors);
+                    if (result.skipped) allSkipped = allSkipped.concat(result.skipped);
+                    
+                    processedClients = result.processedSoFar || (batchOffset + (result.batchProcessed || 0));
+                    
+                    updateProgress(processedClients, totalClients, `Processing batch ${Math.ceil(processedClients / BATCH_SIZE)}...`);
+                    
+                    // Check if we're done
+                    if (result.isComplete || processedClients >= totalClients) {
+                        break;
+                    }
+                    
+                    // Move to next batch
+                    batchOffset = processedClients;
+                    
+                    // Small delay between batches to prevent overwhelming the server
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+                
+                // All batches complete - show final results
+                let message = `${totalSent} report(s) sent`;
+                if (totalSkipped > 0) {
+                    message += `, ${totalSkipped} skipped`;
+                }
+                if (totalErrors.length > 0) {
+                    message += `, ${totalErrors.length} error(s)`;
+                }
+                
+                statusDiv.style.background = '#E8F5E9';
+                statusDiv.style.border = '1px solid #4CAF50';
+                statusDiv.innerHTML = `
+                    <div style="color: #2E7D32;">
+                        <strong>✓ ${message}</strong>
+                        <p style="margin: 5px 0 0; font-size: 12px;">
+                            Period: ${periodLabel} ${year}
+                            ${config.testMode ? ' (Test Mode)' : ''}
+                        </p>
+                    </div>
+                `;
+                
+                showToast(message, totalSent > 0 ? 'success' : 'warning');
+                
+                // If skipped and not forcing, show option to force
+                if (totalSkipped > 0 && !forceSend) {
+                    statusDiv.innerHTML += `
+                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #C8E6C9;">
+                            <p style="margin: 0 0 10px; font-size: 13px; color: #666;">
+                                ${totalSkipped} report(s) were skipped because they were already sent.
                             </p>
+                            <button class="btn btn-secondary" onclick="showBulkSkippedDetails()" style="font-size: 12px; margin-right: 10px;">
+                                View Skipped
+                            </button>
+                            <button class="btn btn-primary" onclick="executeBulkSend(true)" style="font-size: 12px; background: #F57600;">
+                                Force Resend All
+                            </button>
                         </div>
                     `;
-                    
-                    showToast(message, result.sentCount > 0 ? 'success' : 'warning');
-                    
-                    // If skipped and not forcing, show option to force
-                    if (result.skippedCount > 0 && !forceSend) {
-                        statusDiv.innerHTML += `
-                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #C8E6C9;">
-                                <p style="margin: 0 0 10px; font-size: 13px; color: #666;">
-                                    ${result.skippedCount} report(s) were skipped because they were already sent.
-                                </p>
-                                <button class="btn btn-secondary" onclick="showBulkSkippedDetails()" style="font-size: 12px; margin-right: 10px;">
-                                    View Skipped
-                                </button>
-                                <button class="btn btn-primary" onclick="executeBulkSend(true)" style="font-size: 12px; background: #F57600;">
-                                    Force Resend All
-                                </button>
-                            </div>
-                        `;
-                        // Store skipped info for later
-                        window.lastBulkResult = result;
-                    }
-                    
-                    sendBtn.disabled = false;
-                } else {
-                    statusDiv.style.background = '#FFEBEE';
-                    statusDiv.style.border = '1px solid #EF5350';
-                    statusDiv.innerHTML = `
-                        <div style="color: #C62828;">
-                            <strong>✗ Failed to send reports</strong>
-                            <p style="margin: 5px 0 0; font-size: 12px;">${result.error || 'Unknown error'}</p>
-                        </div>
-                    `;
-                    showToast('Failed: ' + (result.error || 'Unknown error'), 'error');
-                    sendBtn.disabled = false;
+                    // Store skipped info for later
+                    window.lastBulkResult = {
+                        skipped: allSkipped,
+                        skippedCount: totalSkipped,
+                        period: { type: reportType, value: periodValue, year: year }
+                    };
                 }
+                
+                // Show errors if any
+                if (totalErrors.length > 0) {
+                    statusDiv.innerHTML += `
+                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #C8E6C9;">
+                            <p style="margin: 0 0 10px; font-size: 13px; color: #C62828;">
+                                <strong>${totalErrors.length} error(s) occurred:</strong>
+                            </p>
+                            <div style="max-height: 100px; overflow-y: auto; font-size: 11px; color: #666; background: #FFF5F5; padding: 8px; border-radius: 4px;">
+                                ${totalErrors.slice(0, 10).map(e => `<div>• ${escapeHtml(e)}</div>`).join('')}
+                                ${totalErrors.length > 10 ? `<div>...and ${totalErrors.length - 10} more</div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                sendBtn.disabled = false;
+                
             } catch (error) {
                 statusDiv.style.background = '#FFEBEE';
                 statusDiv.style.border = '1px solid #EF5350';
@@ -4728,7 +4800,7 @@
                     <div style="color: #C62828;">
                         <strong>✗ Error sending reports</strong>
                         <p style="margin: 5px 0 0; font-size: 12px;">${error.message}</p>
-                        <p style="margin: 5px 0 0; font-size: 11px; color: #999;">If this is a timeout, the server may still be processing. Check results later.</p>
+                        ${totalSent > 0 ? `<p style="margin: 5px 0 0; font-size: 12px; color: #666;">Progress before error: ${totalSent} sent, ${totalSkipped} skipped</p>` : ''}
                     </div>
                 `;
                 showToast('Error: ' + error.message, 'error');
