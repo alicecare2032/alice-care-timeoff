@@ -536,14 +536,14 @@
                 <table class="data-table" id="weeklyTable">
                     <thead>
                         <tr>
-                            <th>Week</th>
-                            <th class="number">Net Revenue</th>
-                            <th class="number">Regular Hrs</th>
-                            <th class="number">OT Hrs</th>
-                            <th class="number">StandBy Hrs</th>
-                            <th class="number">Total Hrs</th>
-                            <th class="number">Actual Labor $</th>
-                            <th class="number">Margin %</th>
+                            <th class="sortable" data-sort="week" onclick="sortWeeklyTable('week')">Week <span class="sort-icon">⇅</span></th>
+                            <th class="number sortable" data-sort="revenue" onclick="sortWeeklyTable('revenue')">Net Revenue <span class="sort-icon">⇅</span></th>
+                            <th class="number sortable" data-sort="regular" onclick="sortWeeklyTable('regular')">Regular Hrs <span class="sort-icon">⇅</span></th>
+                            <th class="number sortable" data-sort="ot" onclick="sortWeeklyTable('ot')">OT Hrs <span class="sort-icon">⇅</span></th>
+                            <th class="number sortable" data-sort="standby" onclick="sortWeeklyTable('standby')">StandBy Hrs <span class="sort-icon">⇅</span></th>
+                            <th class="number sortable" data-sort="hours" onclick="sortWeeklyTable('hours')">Total Hrs <span class="sort-icon">⇅</span></th>
+                            <th class="number sortable" data-sort="labor" onclick="sortWeeklyTable('labor')">Actual Labor $ <span class="sort-icon">⇅</span></th>
+                            <th class="number sortable" data-sort="margin" onclick="sortWeeklyTable('margin')">Margin % <span class="sort-icon">⇅</span></th>
                         </tr>
                     </thead>
                     <tbody id="weeklyTableBody"></tbody>
@@ -649,13 +649,13 @@
                 <table class="data-table" id="categoryTable">
                     <thead>
                         <tr>
-                            <th>Category</th>
-                            <th>Type</th>
-                            <th class="number">Total Units</th>
-                            <th class="number">Total Cost ($)</th>
-                            <th class="number">% of Labor Cost</th>
-                            <th class="number">Avg Cost/Week</th>
-                            <th class="number">Employees</th>
+                            <th class="sortable" data-sort="name" onclick="sortCategoryTable('name')">Category <span class="sort-icon">⇅</span></th>
+                            <th class="sortable" data-sort="type" onclick="sortCategoryTable('type')">Type <span class="sort-icon">⇅</span></th>
+                            <th class="number sortable" data-sort="units" onclick="sortCategoryTable('units')">Total Units <span class="sort-icon">⇅</span></th>
+                            <th class="number sortable" data-sort="cost" onclick="sortCategoryTable('cost')">Total Cost ($) <span class="sort-icon">⇅</span></th>
+                            <th class="number sortable" data-sort="percent" onclick="sortCategoryTable('percent')">% of Labor Cost <span class="sort-icon">⇅</span></th>
+                            <th class="number sortable" data-sort="avg" onclick="sortCategoryTable('avg')">Avg Cost/Week <span class="sort-icon">⇅</span></th>
+                            <th class="number sortable" data-sort="employees" onclick="sortCategoryTable('employees')">Employees <span class="sort-icon">⇅</span></th>
                         </tr>
                     </thead>
                     <tbody id="categoryTableBody"></tbody>
@@ -1261,13 +1261,79 @@
             filterEmployeeTable();
         }
         
+        // Weekly table sort state
+        window.weeklyTableState = {
+            sortColumn: 'week',
+            sortDirection: 'desc'
+        };
+        
+        // Sort weekly table
+        function sortWeeklyTable(column) {
+            if (window.weeklyTableState.sortColumn === column) {
+                window.weeklyTableState.sortDirection = window.weeklyTableState.sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                window.weeklyTableState.sortColumn = column;
+                window.weeklyTableState.sortDirection = 'desc';
+            }
+            
+            // Update header icons
+            document.querySelectorAll('#weeklyTable .sortable').forEach(th => {
+                th.classList.remove('sort-asc', 'sort-desc');
+                if (th.dataset.sort === column) {
+                    th.classList.add(window.weeklyTableState.sortDirection === 'asc' ? 'sort-asc' : 'sort-desc');
+                    th.querySelector('.sort-icon').textContent = window.weeklyTableState.sortDirection === 'asc' ? '▲' : '▼';
+                } else {
+                    th.querySelector('.sort-icon').textContent = '⇅';
+                }
+            });
+            
+            // Rebuild weekly table with new sort
+            const weeks = window.currentWeeks || getSortedWeeks();
+            const scopeFilter = window.currentScopeFilter || 'all';
+            rebuildWeeklyTable(weeks, scopeFilter);
+        }
+        
+        // Category table sort state
+        window.categoryTableState = {
+            sortColumn: 'cost',
+            sortDirection: 'desc'
+        };
+        
+        // Sort category table
+        function sortCategoryTable(column) {
+            if (window.categoryTableState.sortColumn === column) {
+                window.categoryTableState.sortDirection = window.categoryTableState.sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                window.categoryTableState.sortColumn = column;
+                window.categoryTableState.sortDirection = 'desc';
+            }
+            
+            // Update header icons
+            document.querySelectorAll('#categoryTable .sortable').forEach(th => {
+                th.classList.remove('sort-asc', 'sort-desc');
+                if (th.dataset.sort === column) {
+                    th.classList.add(window.categoryTableState.sortDirection === 'asc' ? 'sort-asc' : 'sort-desc');
+                    th.querySelector('.sort-icon').textContent = window.categoryTableState.sortDirection === 'asc' ? '▲' : '▼';
+                } else {
+                    th.querySelector('.sort-icon').textContent = '⇅';
+                }
+            });
+            
+            // Rebuild category table with new sort
+            rebuildCategoryTable();
+        }
+        
         // Show employee detail (weekly breakdown)
         function showEmployeeDetail(empId, empName) {
             const modal = document.getElementById('employeeDetailModal');
             const title = document.getElementById('employeeDetailTitle');
             const tbody = document.getElementById('employeeDetailBody');
             
-            title.textContent = `${empId} - ${empName} (Weekly Breakdown)`;
+            const normalizedEmpId = empId.replace(/^0+/, '') || '0';
+            const empInfo = EMPLOYEE_RATES[normalizedEmpId];
+            const rate = empInfo ? empInfo.rate : AVG_HOURLY_RATE;
+            
+            title.textContent = `${empId} - ${empName} (Rate: $${rate.toFixed(2)}/hr)`;
             tbody.innerHTML = '';
             
             // Highlight selected row
@@ -1291,11 +1357,27 @@
                 weeks = weeks.slice(-4);
             }
             
-            const normalizedEmpId = empId.replace(/^0+/, '') || '0';
-            const empInfo = EMPLOYEE_RATES[normalizedEmpId];
-            const rate = empInfo ? empInfo.rate : AVG_HOURLY_RATE;
+            // Helper to format cell with $ on top, hours below
+            function formatPayCell(hours, payAmount, showHours = true) {
+                if (hours === 0 && payAmount === 0) return '—';
+                if (showHours && hours > 0) {
+                    return `<div style="font-weight: 600;">${formatCurrency(payAmount)}</div><div style="font-size: 11px; color: #666;">${formatNumber(hours)} hrs</div>`;
+                }
+                return `<div style="font-weight: 600;">${formatCurrency(payAmount)}</div>`;
+            }
             
-            let grandTotal = { R: 0, WOT: 0, STN: 0, HOL: 0, TRN: 0, TCC: 0, MLE: 0, BON: 0, hours: 0, pay: 0 };
+            let grandTotal = { 
+                R: 0, RDol: 0, 
+                WOT: 0, WOTDol: 0, 
+                STN: 0, STNDol: 0, 
+                HOL: 0, HOLDol: 0, 
+                TRN: 0, TRNDol: 0, 
+                TCC: 0, 
+                MLE: 0, 
+                BON: 0, 
+                hours: 0, 
+                pay: 0 
+            };
             
             // Collect weekly data for this employee (reverse chronological)
             for (const week of weeks.slice().reverse()) {
@@ -1315,14 +1397,21 @@
                 const mle = empData.MLE || 0;
                 const bon = empData.BON || 0;
                 
-                const totalHrs = r + wot + stn + hol + trn;
-                const estPay = (r * rate) + (wot * rate * 1.5) + (stn * rate) + (hol * rate * 1.5) + (trn * rate) + tcc + bon;
+                // Calculate pay for each category
+                const rDol = r * rate;
+                const wotDol = wot * rate * 1.5;
+                const stnDol = stn * rate;
+                const holDol = hol * rate * 1.5;
+                const trnDol = trn * rate;
                 
-                grandTotal.R += r;
-                grandTotal.WOT += wot;
-                grandTotal.STN += stn;
-                grandTotal.HOL += hol;
-                grandTotal.TRN += trn;
+                const totalHrs = r + wot + stn + hol + trn;
+                const estPay = rDol + wotDol + stnDol + holDol + trnDol + tcc + mle + bon;
+                
+                grandTotal.R += r; grandTotal.RDol += rDol;
+                grandTotal.WOT += wot; grandTotal.WOTDol += wotDol;
+                grandTotal.STN += stn; grandTotal.STNDol += stnDol;
+                grandTotal.HOL += hol; grandTotal.HOLDol += holDol;
+                grandTotal.TRN += trn; grandTotal.TRNDol += trnDol;
                 grandTotal.TCC += tcc;
                 grandTotal.MLE += mle;
                 grandTotal.BON += bon;
@@ -1331,17 +1420,17 @@
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${week}</td>
-                    <td class="number">${r > 0 ? formatNumber(r) : '—'}</td>
-                    <td class="number">${wot > 0 ? formatNumber(wot) : '—'}</td>
-                    <td class="number">${stn > 0 ? formatNumber(stn) : '—'}</td>
-                    <td class="number">${hol > 0 ? formatNumber(hol) : '—'}</td>
-                    <td class="number">${trn > 0 ? formatNumber(trn) : '—'}</td>
+                    <td style="font-weight: 600;">${week}</td>
+                    <td class="number">${formatPayCell(r, rDol)}</td>
+                    <td class="number">${formatPayCell(wot, wotDol)}</td>
+                    <td class="number">${formatPayCell(stn, stnDol)}</td>
+                    <td class="number">${formatPayCell(hol, holDol)}</td>
+                    <td class="number">${formatPayCell(trn, trnDol)}</td>
                     <td class="number">${tcc > 0 ? formatCurrency(tcc) : '—'}</td>
                     <td class="number">${mle > 0 ? formatCurrency(mle) : '—'}</td>
                     <td class="number">${bon > 0 ? formatCurrency(bon) : '—'}</td>
-                    <td class="number" style="font-weight: 600;">${formatNumber(totalHrs)}</td>
-                    <td class="number" style="font-weight: 600; color: var(--alice-navy);">${formatCurrency(estPay)}</td>
+                    <td class="number" style="font-weight: 600; background: #f0f4f8;">${formatNumber(totalHrs)}</td>
+                    <td class="number" style="font-weight: 700; color: var(--alice-navy); background: #f0f4f8;">${formatCurrency(estPay)}</td>
                 `;
                 tbody.appendChild(row);
             }
@@ -1351,11 +1440,11 @@
             totalsRow.style.cssText = 'background: var(--alice-navy); color: white; font-weight: 600;';
             totalsRow.innerHTML = `
                 <td>TOTAL</td>
-                <td class="number">${formatNumber(grandTotal.R)}</td>
-                <td class="number">${formatNumber(grandTotal.WOT)}</td>
-                <td class="number">${formatNumber(grandTotal.STN)}</td>
-                <td class="number">${formatNumber(grandTotal.HOL)}</td>
-                <td class="number">${formatNumber(grandTotal.TRN)}</td>
+                <td class="number"><div>${formatCurrency(grandTotal.RDol)}</div><div style="font-size: 11px; opacity: 0.8;">${formatNumber(grandTotal.R)} hrs</div></td>
+                <td class="number"><div>${formatCurrency(grandTotal.WOTDol)}</div><div style="font-size: 11px; opacity: 0.8;">${formatNumber(grandTotal.WOT)} hrs</div></td>
+                <td class="number"><div>${formatCurrency(grandTotal.STNDol)}</div><div style="font-size: 11px; opacity: 0.8;">${formatNumber(grandTotal.STN)} hrs</div></td>
+                <td class="number"><div>${formatCurrency(grandTotal.HOLDol)}</div><div style="font-size: 11px; opacity: 0.8;">${formatNumber(grandTotal.HOL)} hrs</div></td>
+                <td class="number"><div>${formatCurrency(grandTotal.TRNDol)}</div><div style="font-size: 11px; opacity: 0.8;">${formatNumber(grandTotal.TRN)} hrs</div></td>
                 <td class="number">${formatCurrency(grandTotal.TCC)}</td>
                 <td class="number">${formatCurrency(grandTotal.MLE)}</td>
                 <td class="number">${formatCurrency(grandTotal.BON)}</td>
@@ -1786,13 +1875,104 @@
             );
         }
         
+        // Rebuild weekly table with sorting
+        function rebuildWeeklyTable(weeks, scopeFilter) {
+            const weeklyBody = document.getElementById('weeklyTableBody');
+            weeklyBody.innerHTML = '';
+            
+            if (!window.weeklyTableData) return;
+            
+            const col = window.weeklyTableState?.sortColumn || 'week';
+            const dir = window.weeklyTableState?.sortDirection === 'asc' ? 1 : -1;
+            
+            let sorted = [...window.weeklyTableData];
+            
+            sorted.sort((a, b) => {
+                switch (col) {
+                    case 'week':
+                        const [y1, w1] = a.week.split('-').map(Number);
+                        const [y2, w2] = b.week.split('-').map(Number);
+                        return dir * ((y1 * 100 + w1) - (y2 * 100 + w2));
+                    case 'revenue': return dir * (a.netRevenue - b.netRevenue);
+                    case 'regular': return dir * (a.regularHrs - b.regularHrs);
+                    case 'ot': return dir * (a.otHrs - b.otHrs);
+                    case 'standby': return dir * (a.standbyHrs - b.standbyHrs);
+                    case 'hours': return dir * (a.totalHours - b.totalHours);
+                    case 'labor': return dir * (a.laborCost - b.laborCost);
+                    case 'margin': return dir * (a.margin - b.margin);
+                    default: return 0;
+                }
+            });
+            
+            for (const d of sorted) {
+                const hasDetail = !d.isRevenueOnly;
+                const row = document.createElement('tr');
+                row.style.background = d.isRevenueOnly ? '#fff9db' : '';
+                row.innerHTML = `
+                    <td>${d.week}${d.isRevenueOnly ? ' <span style="font-size: 10px; color: #999;">(Rev only)</span>' : ''}</td>
+                    <td class="number">${formatCurrency(d.netRevenue)}</td>
+                    <td class="number">${hasDetail ? formatNumber(d.regularHrs) : '—'}</td>
+                    <td class="number">${hasDetail ? formatNumber(d.otHrs) : '—'}</td>
+                    <td class="number">${hasDetail ? formatNumber(d.standbyHrs) : '—'}</td>
+                    <td class="number">${hasDetail ? formatNumber(d.totalHours) : '—'}</td>
+                    <td class="number" style="font-weight: 600; color: var(--alice-navy)">${d.laborCost > 0 ? formatCurrency(d.laborCost) : '—'}</td>
+                    <td class="number" style="color: ${d.margin < 0 ? 'var(--danger)' : d.margin < 20 ? 'var(--warning)' : 'var(--success)'}">${d.laborCost > 0 ? formatNumber(d.margin) + '%' : '—'}</td>
+                `;
+                weeklyBody.appendChild(row);
+            }
+        }
+        
+        // Rebuild category table with sorting
+        function rebuildCategoryTable() {
+            const catBody = document.getElementById('categoryTableBody');
+            catBody.innerHTML = '';
+            
+            if (!window.categoryTableData) return;
+            
+            const col = window.categoryTableState?.sortColumn || 'cost';
+            const dir = window.categoryTableState?.sortDirection === 'asc' ? 1 : -1;
+            
+            let sorted = [...window.categoryTableData];
+            
+            sorted.sort((a, b) => {
+                switch (col) {
+                    case 'name': return dir * a.name.localeCompare(b.name);
+                    case 'type': return dir * a.type.localeCompare(b.type);
+                    case 'units': return dir * (a.totalValue - b.totalValue);
+                    case 'cost': return dir * (a.totalCost - b.totalCost);
+                    case 'percent': return dir * (a.pctOfTotal - b.pctOfTotal);
+                    case 'avg': return dir * (a.avgCost - b.avgCost);
+                    case 'employees': return dir * (a.employeeCount - b.employeeCount);
+                    default: return 0;
+                }
+            });
+            
+            for (const cat of sorted) {
+                const codeInfo = PAY_CODES[cat.code] || { name: cat.code, type: 'unknown', color: '#999' };
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><span style="display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: ${codeInfo.color}; margin-right: 8px;"></span>${cat.name} (${cat.code})</td>
+                    <td><span class="badge ${cat.type === 'hours' ? 'badge-hours' : 'badge-dollars'}">${cat.type === 'hours' ? 'Hours' : 'Dollars'}</span></td>
+                    <td class="number">${cat.type === 'hours' ? formatNumber(cat.totalValue) + ' hrs' : formatCurrency(cat.totalValue)}</td>
+                    <td class="number">${formatCurrency(cat.totalCost)}</td>
+                    <td class="number">${formatNumber(cat.pctOfTotal)}%</td>
+                    <td class="number">${formatCurrency(cat.avgCost)}</td>
+                    <td class="number">${cat.employeeCount}</td>
+                `;
+                catBody.appendChild(row);
+            }
+        }
+        
         // Update tables
         function updateTables(weeks, empFilter, catFilter, scopeFilter = 'all') {
+            // Store data for sorting
+            window.weeklyTableData = [];
+            
             // Weekly table
             const weeklyBody = document.getElementById('weeklyTableBody');
             weeklyBody.innerHTML = '';
             
-            for (const week of weeks.slice().reverse()) {
+            for (const week of weeks) {
                 const wd = weeklyData[week];
                 const grossRevenue = wd.revenue;
                 const netRevenue = getNetRevenue(grossRevenue);
@@ -1828,22 +2008,14 @@
                     }
                 }
                 
-                const hasDetail = !isRevenueOnly;
-                
-                const row = document.createElement('tr');
-                row.style.background = isRevenueOnly ? '#fff9db' : '';
-                row.innerHTML = `
-                    <td>${week}${isRevenueOnly ? ' <span style="font-size: 10px; color: #999;">(Rev only)</span>' : ''}</td>
-                    <td class="number">${formatCurrency(netRevenue)}</td>
-                    <td class="number">${hasDetail ? formatNumber(regularHrs) : '—'}</td>
-                    <td class="number">${hasDetail ? formatNumber(otHrs) : '—'}</td>
-                    <td class="number">${hasDetail ? formatNumber(standbyHrs) : '—'}</td>
-                    <td class="number">${hasDetail ? formatNumber(totalHours) : '—'}</td>
-                    <td class="number" style="font-weight: 600; color: var(--alice-navy)">${laborCost > 0 ? formatCurrency(laborCost) : '—'}</td>
-                    <td class="number" style="color: ${margin < 0 ? 'var(--danger)' : margin < 20 ? 'var(--warning)' : 'var(--success)'}">${laborCost > 0 ? formatNumber(margin) + '%' : '—'}</td>
-                `;
-                weeklyBody.appendChild(row);
+                // Store for sorting
+                window.weeklyTableData.push({
+                    week, netRevenue, regularHrs, otHrs, standbyHrs, totalHours, laborCost, margin, isRevenueOnly
+                });
             }
+            
+            // Apply sorting and render
+            rebuildWeeklyTable(weeks, scopeFilter);
             
             // Employee table
             const empBody = document.getElementById('employeeTableBody');
@@ -2020,24 +2192,27 @@
             const filterValue = document.getElementById('categoryDetailFilter')?.value || 'all';
             const filteredCategories = filterValue === 'all' ? sortedCategories : sortedCategories.filter(c => c.code === filterValue);
             
-            for (const cat of filteredCategories) {
+            // Store category data for sorting
+            window.categoryTableData = filteredCategories.map(cat => {
                 const code = cat.code;
                 const codeInfo = PAY_CODES[code] || { name: code, type: 'unknown' };
                 const avgCost = cat.totalCost / cat.costs.length;
                 const pctOfTotal = totalLaborCost > 0 ? (cat.totalCost / totalLaborCost * 100) : 0;
                 
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><span style="display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: ${codeInfo.color || '#999'}; margin-right: 8px;"></span>${codeInfo.name} (${code})</td>
-                    <td><span class="badge ${codeInfo.type === 'hours' ? 'badge-hours' : 'badge-dollars'}">${codeInfo.type === 'hours' ? 'Hours' : 'Dollars'}</span></td>
-                    <td class="number">${codeInfo.type === 'hours' ? formatNumber(cat.totalValue) + ' hrs' : formatCurrency(cat.totalValue)}</td>
-                    <td class="number">${formatCurrency(cat.totalCost)}</td>
-                    <td class="number">${formatNumber(pctOfTotal)}%</td>
-                    <td class="number">${formatCurrency(avgCost)}</td>
-                    <td class="number">${cat.employeeCount}</td>
-                `;
-                catBody.appendChild(row);
-            }
+                return {
+                    code,
+                    name: codeInfo.name,
+                    type: codeInfo.type,
+                    totalValue: cat.totalValue,
+                    totalCost: cat.totalCost,
+                    pctOfTotal,
+                    avgCost,
+                    employeeCount: cat.employeeCount
+                };
+            });
+            
+            // Rebuild with sorting
+            rebuildCategoryTable();
             
             // Update category trend chart
             updateCategoryTrendChart(weeks, catTotals);
