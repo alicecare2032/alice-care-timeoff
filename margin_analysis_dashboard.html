@@ -420,6 +420,49 @@
             max-height: 0;
             opacity: 0;
         }
+        
+        /* Sortable table headers */
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .sortable:hover {
+            background: #e2e8f0;
+        }
+        
+        .sort-icon {
+            font-size: 10px;
+            opacity: 0.4;
+            margin-left: 4px;
+        }
+        
+        .sortable.sort-asc .sort-icon::after,
+        .sortable.sort-desc .sort-icon::after {
+            opacity: 1;
+        }
+        
+        .sortable.sort-asc .sort-icon {
+            opacity: 1;
+        }
+        
+        .sortable.sort-desc .sort-icon {
+            opacity: 1;
+        }
+        
+        /* Expandable employee row */
+        .employee-row {
+            cursor: pointer;
+        }
+        
+        .employee-row:hover {
+            background: #edf2f7 !important;
+        }
+        
+        .employee-row.selected {
+            background: #e6f3ff !important;
+            border-left: 3px solid var(--alice-navy);
+        }
     </style>
 </head>
 <body>
@@ -427,7 +470,7 @@
         <h1>Margin Analysis Dashboard</h1>
         <p>Alice Care • Payroll vs Revenue Analysis • Payroll: Wks 9-52 2025 | Revenue: Wks 9-53 2025 + Wk 2 2026</p>
         <p style="font-size: 12px; opacity: 0.8; margin-top: 8px;">
-            💰 Actual payroll from Paychex (check date -7d = work week) | +2% workers comp | Revenue net of 3% CC fees
+            Actual payroll from Paychex (check date -7d = work week) | +2% workers comp | Revenue net of 3% CC fees
         </p>
     </div>
     
@@ -508,40 +551,71 @@
             </div>
             
             <div id="employeeTab" class="tab-content">
-                <div style="margin-bottom: 16px; display: flex; gap: 16px; align-items: center;">
-                    <div>
-                        <label style="font-weight: 600; margin-right: 8px;">Filter by Employee:</label>
-                        <select id="employeeFilter" onchange="filterEmployeeTable()" style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-gray);">
-                            <option value="all">All Employees</option>
-                        </select>
+                <div style="margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 16px; align-items: center;">
+                    <div style="position: relative;">
+                        <label style="font-weight: 600; margin-right: 8px;">Search Employee:</label>
+                        <input type="text" id="employeeSearchInput" placeholder="Type name or ID..." 
+                            oninput="filterEmployeeTable()" 
+                            style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-gray); width: 200px;">
+                        <span onclick="clearEmployeeSearch()" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #999; font-size: 14px;">&times;</span>
                     </div>
                     <div>
-                        <label style="font-weight: 600; margin-right: 8px;">Sort by:</label>
-                        <select id="employeeSortFilter" onchange="filterEmployeeTable()" style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-gray);">
-                            <option value="hours">Total Hours</option>
-                            <option value="name">Name</option>
-                            <option value="rate">Rate</option>
-                            <option value="overtime">Overtime</option>
+                        <label style="font-weight: 600; margin-right: 8px;">Period:</label>
+                        <select id="employeePeriodFilter" onchange="filterEmployeeTable()" style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-gray);">
+                            <option value="all">All Time</option>
+                            <option value="year">This Year (2025)</option>
+                            <option value="q4">Q4 2025</option>
+                            <option value="month">Last Month</option>
+                            <option value="4weeks">Last 4 Weeks</option>
                         </select>
+                    </div>
+                    <div style="margin-left: auto; font-size: 12px; color: var(--text-muted);">
+                        <span id="employeeCount">0</span> employees | Click row to expand weekly detail
                     </div>
                 </div>
                 <table class="data-table" id="employeeTable">
                     <thead>
                         <tr>
-                            <th>Employee</th>
-                            <th class="number">Rate</th>
-                            <th class="number">Total Hours</th>
-                            <th class="number">Regular</th>
-                            <th class="number">Overtime</th>
-                            <th class="number">Stand-By</th>
-                            <th class="number">Tips $</th>
-                            <th class="number">Mileage $</th>
-                            <th class="number">Bonus $</th>
-                            <th class="number">Weeks Active</th>
+                            <th class="sortable" data-sort="name" onclick="sortEmployeeTable('name')">Employee <span class="sort-icon">⇅</span></th>
+                            <th class="number sortable" data-sort="rate" onclick="sortEmployeeTable('rate')">Rate <span class="sort-icon">⇅</span></th>
+                            <th class="number sortable" data-sort="hours" onclick="sortEmployeeTable('hours')">Total Hours <span class="sort-icon">⇅</span></th>
+                            <th class="number sortable" data-sort="regular" onclick="sortEmployeeTable('regular')">Regular <span class="sort-icon">⇅</span></th>
+                            <th class="number sortable" data-sort="overtime" onclick="sortEmployeeTable('overtime')">Overtime <span class="sort-icon">⇅</span></th>
+                            <th class="number sortable" data-sort="standby" onclick="sortEmployeeTable('standby')">Stand-By <span class="sort-icon">⇅</span></th>
+                            <th class="number sortable" data-sort="tips" onclick="sortEmployeeTable('tips')">Tips $ <span class="sort-icon">⇅</span></th>
+                            <th class="number sortable" data-sort="mileage" onclick="sortEmployeeTable('mileage')">Mileage $ <span class="sort-icon">⇅</span></th>
+                            <th class="number sortable" data-sort="bonus" onclick="sortEmployeeTable('bonus')">Bonus $ <span class="sort-icon">⇅</span></th>
+                            <th class="number sortable" data-sort="weeks" onclick="sortEmployeeTable('weeks')">Weeks <span class="sort-icon">⇅</span></th>
                         </tr>
                     </thead>
                     <tbody id="employeeTableBody"></tbody>
                 </table>
+                
+                <!-- Employee Detail Modal -->
+                <div id="employeeDetailModal" style="display: none; margin-top: 24px; background: #f8fafc; border-radius: 12px; padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h4 id="employeeDetailTitle" style="margin: 0; color: var(--alice-navy);"></h4>
+                        <button onclick="closeEmployeeDetail()" style="padding: 6px 12px; border-radius: 4px; border: 1px solid var(--border-gray); background: white; cursor: pointer;">Close</button>
+                    </div>
+                    <table class="data-table" id="employeeDetailTable">
+                        <thead>
+                            <tr>
+                                <th>Week</th>
+                                <th class="number">Regular</th>
+                                <th class="number">OT</th>
+                                <th class="number">Stand-By</th>
+                                <th class="number">Holiday</th>
+                                <th class="number">Training</th>
+                                <th class="number">Tips</th>
+                                <th class="number">Mileage</th>
+                                <th class="number">Bonus</th>
+                                <th class="number">Total Hrs</th>
+                                <th class="number">Est. Pay</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employeeDetailBody"></tbody>
+                    </table>
+                </div>
             </div>
             
             <div id="categoryTab" class="tab-content">
@@ -885,17 +959,6 @@
             
             filteredData = [...allData];
             
-            // Populate employee filter
-            const empFilter = document.getElementById('employeeFilter');
-            const sortedEmployees = Array.from(employees).sort((a, b) => parseInt(a) - parseInt(b));
-            for (const emp of sortedEmployees) {
-                const empInfo = EMPLOYEE_RATES[emp];
-                const option = document.createElement('option');
-                option.value = emp;
-                option.textContent = empInfo ? `${emp} - ${empInfo.name}` : `${emp}`;
-                empFilter.appendChild(option);
-            }
-            
             // Populate category detail filter
             const catDetailFilter = document.getElementById('categoryDetailFilter');
             if (catDetailFilter) {
@@ -1116,21 +1179,199 @@
         function resetFilters() {
             document.getElementById('scopeFilter').value = 'all';
             document.getElementById('dateRangeFilter').value = 'all';
-            document.getElementById('employeeFilter').value = 'all';
+            // Clear employee search
+            const empSearch = document.getElementById('employeeSearchInput');
+            if (empSearch) empSearch.value = '';
+            const empPeriod = document.getElementById('employeePeriodFilter');
+            if (empPeriod) empPeriod.value = 'all';
+            window.employeeTableState = { sortColumn: 'hours', sortDirection: 'desc', searchText: '', period: 'all' };
             window.currentScopeFilter = 'all';
             window.currentWeeks = getSortedWeeks();
             filteredData = [...allData];
-            updateDashboard(getSortedWeeks(), 'all', 'all', 'all');
+            updateDashboard(getSortedWeeks(), '', 'all', 'all');
+        }
+        
+        // Employee table state
+        window.employeeTableState = {
+            sortColumn: 'hours',
+            sortDirection: 'desc',
+            searchText: '',
+            period: 'all'
+        };
+        
+        // Clear employee search
+        function clearEmployeeSearch() {
+            document.getElementById('employeeSearchInput').value = '';
+            filterEmployeeTable();
         }
         
         // Filter employee table
         function filterEmployeeTable() {
-            const empFilter = document.getElementById('employeeFilter').value;
-            const sortBy = document.getElementById('employeeSortFilter').value;
-            const scopeFilter = window.currentScopeFilter || 'all';
-            const weeks = window.currentWeeks || getSortedWeeks();
+            const searchInput = document.getElementById('employeeSearchInput');
+            const periodFilter = document.getElementById('employeePeriodFilter');
             
-            updateEmployeeTable(weeks, empFilter, sortBy, scopeFilter);
+            window.employeeTableState.searchText = searchInput ? searchInput.value.toLowerCase() : '';
+            window.employeeTableState.period = periodFilter ? periodFilter.value : 'all';
+            
+            const scopeFilter = window.currentScopeFilter || 'all';
+            let weeks = window.currentWeeks || getSortedWeeks();
+            
+            // Apply period filter
+            const period = window.employeeTableState.period;
+            if (period !== 'all') {
+                const allWeeks = getSortedWeeks();
+                if (period === 'year') {
+                    weeks = allWeeks.filter(w => w.startsWith('2025-'));
+                } else if (period === 'q4') {
+                    weeks = allWeeks.filter(w => {
+                        const [year, wk] = w.split('-').map(Number);
+                        return year === 2025 && wk >= 40 && wk <= 52;
+                    });
+                } else if (period === 'month') {
+                    weeks = allWeeks.slice(-4);
+                } else if (period === '4weeks') {
+                    weeks = allWeeks.slice(-4);
+                }
+            }
+            
+            updateEmployeeTable(weeks, window.employeeTableState.searchText, window.employeeTableState.sortColumn, scopeFilter);
+        }
+        
+        // Sort employee table
+        function sortEmployeeTable(column) {
+            // Toggle direction if same column
+            if (window.employeeTableState.sortColumn === column) {
+                window.employeeTableState.sortDirection = window.employeeTableState.sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                window.employeeTableState.sortColumn = column;
+                window.employeeTableState.sortDirection = 'desc';
+            }
+            
+            // Update header icons
+            document.querySelectorAll('#employeeTable .sortable').forEach(th => {
+                th.classList.remove('sort-asc', 'sort-desc');
+                if (th.dataset.sort === column) {
+                    th.classList.add(window.employeeTableState.sortDirection === 'asc' ? 'sort-asc' : 'sort-desc');
+                    th.querySelector('.sort-icon').textContent = window.employeeTableState.sortDirection === 'asc' ? '▲' : '▼';
+                } else {
+                    th.querySelector('.sort-icon').textContent = '⇅';
+                }
+            });
+            
+            filterEmployeeTable();
+        }
+        
+        // Show employee detail (weekly breakdown)
+        function showEmployeeDetail(empId, empName) {
+            const modal = document.getElementById('employeeDetailModal');
+            const title = document.getElementById('employeeDetailTitle');
+            const tbody = document.getElementById('employeeDetailBody');
+            
+            title.textContent = `${empId} - ${empName} (Weekly Breakdown)`;
+            tbody.innerHTML = '';
+            
+            // Highlight selected row
+            document.querySelectorAll('.employee-row').forEach(r => r.classList.remove('selected'));
+            const selectedRow = document.querySelector(`.employee-row[data-empid="${empId}"]`);
+            if (selectedRow) selectedRow.classList.add('selected');
+            
+            const scopeFilter = window.currentScopeFilter || 'all';
+            const period = window.employeeTableState.period;
+            let weeks = getSortedWeeks();
+            
+            // Apply period filter
+            if (period === 'year') {
+                weeks = weeks.filter(w => w.startsWith('2025-'));
+            } else if (period === 'q4') {
+                weeks = weeks.filter(w => {
+                    const [year, wk] = w.split('-').map(Number);
+                    return year === 2025 && wk >= 40 && wk <= 52;
+                });
+            } else if (period === 'month' || period === '4weeks') {
+                weeks = weeks.slice(-4);
+            }
+            
+            const normalizedEmpId = empId.replace(/^0+/, '') || '0';
+            const empInfo = EMPLOYEE_RATES[normalizedEmpId];
+            const rate = empInfo ? empInfo.rate : AVG_HOURLY_RATE;
+            
+            let grandTotal = { R: 0, WOT: 0, STN: 0, HOL: 0, TRN: 0, TCC: 0, MLE: 0, BON: 0, hours: 0, pay: 0 };
+            
+            // Collect weekly data for this employee (reverse chronological)
+            for (const week of weeks.slice().reverse()) {
+                const wd = weeklyData[week];
+                if (!wd || !wd.employees) continue;
+                
+                // Check both padded and unpadded versions
+                const empData = wd.employees[empId] || wd.employees[normalizedEmpId];
+                if (!empData) continue;
+                
+                const r = empData.R || 0;
+                const wot = empData.WOT || 0;
+                const stn = empData.STN || 0;
+                const hol = empData.HOL || 0;
+                const trn = (empData.TRN || 0) + (empData.ATN || 0);
+                const tcc = empData.TCC || 0;
+                const mle = empData.MLE || 0;
+                const bon = empData.BON || 0;
+                
+                const totalHrs = r + wot + stn + hol + trn;
+                const estPay = (r * rate) + (wot * rate * 1.5) + (stn * rate) + (hol * rate * 1.5) + (trn * rate) + tcc + bon;
+                
+                grandTotal.R += r;
+                grandTotal.WOT += wot;
+                grandTotal.STN += stn;
+                grandTotal.HOL += hol;
+                grandTotal.TRN += trn;
+                grandTotal.TCC += tcc;
+                grandTotal.MLE += mle;
+                grandTotal.BON += bon;
+                grandTotal.hours += totalHrs;
+                grandTotal.pay += estPay;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${week}</td>
+                    <td class="number">${r > 0 ? formatNumber(r) : '—'}</td>
+                    <td class="number">${wot > 0 ? formatNumber(wot) : '—'}</td>
+                    <td class="number">${stn > 0 ? formatNumber(stn) : '—'}</td>
+                    <td class="number">${hol > 0 ? formatNumber(hol) : '—'}</td>
+                    <td class="number">${trn > 0 ? formatNumber(trn) : '—'}</td>
+                    <td class="number">${tcc > 0 ? formatCurrency(tcc) : '—'}</td>
+                    <td class="number">${mle > 0 ? formatCurrency(mle) : '—'}</td>
+                    <td class="number">${bon > 0 ? formatCurrency(bon) : '—'}</td>
+                    <td class="number" style="font-weight: 600;">${formatNumber(totalHrs)}</td>
+                    <td class="number" style="font-weight: 600; color: var(--alice-navy);">${formatCurrency(estPay)}</td>
+                `;
+                tbody.appendChild(row);
+            }
+            
+            // Add totals row
+            const totalsRow = document.createElement('tr');
+            totalsRow.style.cssText = 'background: var(--alice-navy); color: white; font-weight: 600;';
+            totalsRow.innerHTML = `
+                <td>TOTAL</td>
+                <td class="number">${formatNumber(grandTotal.R)}</td>
+                <td class="number">${formatNumber(grandTotal.WOT)}</td>
+                <td class="number">${formatNumber(grandTotal.STN)}</td>
+                <td class="number">${formatNumber(grandTotal.HOL)}</td>
+                <td class="number">${formatNumber(grandTotal.TRN)}</td>
+                <td class="number">${formatCurrency(grandTotal.TCC)}</td>
+                <td class="number">${formatCurrency(grandTotal.MLE)}</td>
+                <td class="number">${formatCurrency(grandTotal.BON)}</td>
+                <td class="number">${formatNumber(grandTotal.hours)}</td>
+                <td class="number">${formatCurrency(grandTotal.pay)}</td>
+            `;
+            tbody.appendChild(totalsRow);
+            
+            modal.style.display = 'block';
+            modal.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        // Close employee detail
+        function closeEmployeeDetail() {
+            document.getElementById('employeeDetailModal').style.display = 'none';
+            document.querySelectorAll('.employee-row').forEach(r => r.classList.remove('selected'));
         }
         
         // Format currency
@@ -1291,7 +1532,7 @@
             // Build explanation of margin change
             if (Math.abs(marginChange) >= 1) {
                 const direction = marginChange > 0 ? 'improved' : 'declined';
-                const directionIcon = marginChange > 0 ? '📈' : '📉';
+                const directionIcon = marginChange > 0 ? '▲' : '▼';
                 
                 insights.push(`<strong>${directionIcon} Margin ${direction} by ${Math.abs(marginChange).toFixed(1)} percentage points</strong> (${priorMargin.toFixed(1)}% → ${recentMargin.toFixed(1)}%)`);
                 
@@ -1319,7 +1560,7 @@
             
             if (Math.abs(costPerHourChange) > 3) {
                 const dir = costPerHourChange > 0 ? 'increased' : 'decreased';
-                insights.push(`<strong>💵 Cost per hour ${dir} by ${Math.abs(costPerHourChange).toFixed(1)}%</strong> (${formatCurrency(priorCostPerHour)} → ${formatCurrency(recentCostPerHour)})`);
+                insights.push(`<strong>Cost per hour ${dir} by ${Math.abs(costPerHourChange).toFixed(1)}%</strong> (${formatCurrency(priorCostPerHour)} → ${formatCurrency(recentCostPerHour)})`);
             }
             
             if (insights.length > 0) {
@@ -1805,22 +2046,24 @@
         // Category detail filter handler
         function updateCategoryDetail() {
             const weeks = window.currentWeeks || getSortedWeeks();
-            const empFilter = document.getElementById('employeeFilter')?.value || 'all';
             const catFilter = document.getElementById('categoryDetailFilter')?.value || 'all';
             const scopeFilter = window.currentScopeFilter || 'all';
-            updateTables(weeks, empFilter, catFilter, scopeFilter);
+            updateTables(weeks, '', catFilter, scopeFilter);
         }
         
         // Category chart filter handler
         // Update employee table with filtering and sorting
-        function updateEmployeeTable(weeks, empFilter, sortBy, scopeFilter = 'all') {
+        function updateEmployeeTable(weeks, searchText, sortColumn, scopeFilter = 'all') {
             const empBody = document.getElementById('employeeTableBody');
             empBody.innerHTML = '';
+            
+            // Close any open detail
+            closeEmployeeDetail();
             
             const empTotals = {};
             for (const week of weeks) {
                 const wd = weeklyData[week];
-                if (!wd.employees) continue;
+                if (!wd || !wd.employees) continue;
                 for (const [empId, codes] of Object.entries(wd.employees)) {
                     const normalizedEmpId = empId.replace(/^0+/, '') || '0';
                     if (scopeFilter === 'caregivers') {
@@ -1828,7 +2071,7 @@
                     }
                     
                     if (!empTotals[empId]) {
-                        empTotals[empId] = { R: 0, WOT: 0, STN: 0, TCC: 0, MLE: 0, BON: 0, TMN: 0, weeks: new Set() };
+                        empTotals[empId] = { R: 0, WOT: 0, STN: 0, TCC: 0, MLE: 0, BON: 0, TMN: 0, HOL: 0, weeks: new Set() };
                     }
                     for (const [code, value] of Object.entries(codes)) {
                         if (scopeFilter === 'caregivers' && ADMIN_CODES_BY_EMPLOYEE[normalizedEmpId]?.includes(code)) {
@@ -1853,34 +2096,66 @@
                         rate: empInfo ? empInfo.rate : AVG_HOURLY_RATE,
                         dept: empInfo ? empInfo.dept : 'Unknown',
                         ...data,
-                        totalHours: data.R + data.WOT + data.STN + data.TMN,
+                        totalHours: data.R + data.WOT + data.STN + data.TMN + data.HOL,
                         weeksActive: data.weeks.size
                     };
                 });
             
-            // Apply employee filter
-            if (empFilter !== 'all') {
-                sortedEmps = sortedEmps.filter(e => e.id === empFilter || e.normalizedId === empFilter);
+            // Apply search filter (by name or ID)
+            if (searchText && searchText.length > 0) {
+                sortedEmps = sortedEmps.filter(e => 
+                    e.name.toLowerCase().includes(searchText) || 
+                    e.id.includes(searchText) ||
+                    e.normalizedId.includes(searchText)
+                );
             }
             
-            // Apply sorting
-            switch (sortBy) {
+            // Apply sorting with direction
+            const dir = window.employeeTableState?.sortDirection === 'asc' ? 1 : -1;
+            const col = sortColumn || 'hours';
+            
+            switch (col) {
                 case 'name':
-                    sortedEmps.sort((a, b) => a.name.localeCompare(b.name));
+                    sortedEmps.sort((a, b) => dir * a.name.localeCompare(b.name));
                     break;
                 case 'rate':
-                    sortedEmps.sort((a, b) => b.rate - a.rate);
+                    sortedEmps.sort((a, b) => dir * (a.rate - b.rate));
+                    break;
+                case 'regular':
+                    sortedEmps.sort((a, b) => dir * (a.R - b.R));
                     break;
                 case 'overtime':
-                    sortedEmps.sort((a, b) => b.WOT - a.WOT);
+                    sortedEmps.sort((a, b) => dir * (a.WOT - b.WOT));
+                    break;
+                case 'standby':
+                    sortedEmps.sort((a, b) => dir * (a.STN - b.STN));
+                    break;
+                case 'tips':
+                    sortedEmps.sort((a, b) => dir * (a.TCC - b.TCC));
+                    break;
+                case 'mileage':
+                    sortedEmps.sort((a, b) => dir * (a.MLE - b.MLE));
+                    break;
+                case 'bonus':
+                    sortedEmps.sort((a, b) => dir * (a.BON - b.BON));
+                    break;
+                case 'weeks':
+                    sortedEmps.sort((a, b) => dir * (a.weeksActive - b.weeksActive));
                     break;
                 case 'hours':
                 default:
-                    sortedEmps.sort((a, b) => b.totalHours - a.totalHours);
+                    sortedEmps.sort((a, b) => dir * (a.totalHours - b.totalHours));
             }
+            
+            // Update employee count
+            const countEl = document.getElementById('employeeCount');
+            if (countEl) countEl.textContent = sortedEmps.length;
             
             for (const emp of sortedEmps) {
                 const row = document.createElement('tr');
+                row.className = 'employee-row';
+                row.dataset.empid = emp.id;
+                row.onclick = () => showEmployeeDetail(emp.id, emp.name);
                 row.innerHTML = `
                     <td><strong>${emp.normalizedId}</strong> ${emp.name}</td>
                     <td class="number">$${emp.rate.toFixed(2)}</td>
