@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AC:Margin Analysis Dashboard</title>
+    <title>Alice Care - Margin Analysis Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -466,11 +466,12 @@
     </style>
 </head>
 <body>
-    <div class="header">
+    <div class="header" id="top">
         <h1>Margin Analysis Dashboard</h1>
         <p>Alice Care • Payroll vs Revenue Analysis • Payroll: Wks 9-52 2025 | Revenue: Wks 9-53 2025 + Wk 2 2026</p>
         <p style="font-size: 12px; opacity: 0.8; margin-top: 8px;">
             Actual payroll from Paychex (check date -7d = work week) | +2% workers comp | Revenue net of 3% CC fees
+            <a href="#definitionsSection" style="color: white; margin-left: 16px; text-decoration: underline;">View Formulas & Definitions</a>
         </p>
     </div>
     
@@ -478,14 +479,14 @@
         <div class="filters-section">
             <div class="filters-row">
                 <div class="filter-group">
-                    <label>Staffing View</label>
+                    <label>Staffing View <a href="#def-staffing-view" style="font-size: 10px; color: #999; text-decoration: none;">?</a></label>
                     <select id="scopeFilter" onchange="applyFilters()">
                         <option value="all">All Staff (Include All)</option>
                         <option value="caregivers">Caregivers Only</option>
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label>Date Range</label>
+                    <label>Date Range <a href="#def-date-range" style="font-size: 10px; color: #999; text-decoration: none;">?</a></label>
                     <select id="dateRangeFilter" onchange="applyFilters()">
                         <option value="all">All Weeks</option>
                         <option value="4">Last 4 Weeks</option>
@@ -502,11 +503,15 @@
         
         <div id="insightsContainer"></div>
         
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-size: 12px; color: var(--text-muted);">Key Performance Indicators</span>
+            <a href="#def-kpis" class="info-link">? formulas</a>
+        </div>
         <div class="kpi-grid" id="kpiGrid"></div>
         
         <div class="charts-grid">
             <div class="chart-card full-width">
-                <div class="chart-title">Revenue vs Labor Cost vs Margin %</div>
+                <div class="chart-title">Revenue vs Labor Cost vs Margin % <a href="#def-revenue-labor-chart" class="info-link">? formula</a></div>
                 <div class="chart-container tall">
                     <canvas id="revenueVsLaborChart"></canvas>
                 </div>
@@ -514,7 +519,7 @@
             
             <div class="chart-card full-width" id="standbySection">
                 <div class="collapsible-header" onclick="toggleSection('standbySection')">
-                    <div class="chart-title" style="margin-bottom: 0;">Stand-By Hours by Week</div>
+                    <div class="chart-title" style="margin-bottom: 0;">Stand-By Hours by Week <a href="#def-standby-chart" class="info-link">? formula</a></div>
                     <span class="collapse-toggle">collapse</span>
                 </div>
                 <div class="collapsible-content">
@@ -528,8 +533,75 @@
         <div class="table-section">
             <div class="tabs">
                 <button class="tab active" onclick="showTab('weekly')">Weekly Summary</button>
+                <button class="tab" onclick="showTab('singleWeek')">Single Week View</button>
                 <button class="tab" onclick="showTab('employee')">By Employee</button>
                 <button class="tab" onclick="showTab('category')">By Category</button>
+                <a href="#definitionsSection" class="info-link" style="margin-left: auto;">View All Formulas</a>
+            </div>
+            
+            <!-- Single Week View Tab -->
+            <div id="singleWeekTab" class="tab-content">
+                <div style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 20px; align-items: center;">
+                    <div>
+                        <label style="font-weight: 600; margin-right: 8px;">Select Week:</label>
+                        <select id="singleWeekSelector" onchange="updateSingleWeekView()" style="padding: 10px 14px; border-radius: 6px; border: 1px solid var(--border-gray); font-size: 14px; min-width: 150px;">
+                        </select>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button onclick="navigateWeek(-1)" style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-gray); background: white; cursor: pointer;">← Prev</button>
+                        <button onclick="navigateWeek(1)" style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-gray); background: white; cursor: pointer;">Next →</button>
+                    </div>
+                    <div style="margin-left: auto; font-size: 13px; color: var(--text-muted);">
+                        <span id="singleWeekComparison"></span>
+                    </div>
+                </div>
+                
+                <!-- Week Summary KPIs -->
+                <div id="singleWeekKPIs" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 24px;"></div>
+                
+                <!-- Two Column Layout -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                    <!-- Employees for this week -->
+                    <div style="background: #f8fafc; border-radius: 12px; padding: 20px;">
+                        <h4 style="margin: 0 0 16px 0; color: var(--alice-navy);">Employees This Week <span id="singleWeekEmpCount" style="font-weight: normal; color: var(--text-muted);"></span></h4>
+                        <div style="max-height: 400px; overflow-y: auto;">
+                            <table class="data-table" id="singleWeekEmployeeTable">
+                                <thead>
+                                    <tr>
+                                        <th>Employee</th>
+                                        <th class="number">Hours</th>
+                                        <th class="number">Est. Pay</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="singleWeekEmployeeBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Categories for this week -->
+                    <div style="background: #f8fafc; border-radius: 12px; padding: 20px;">
+                        <h4 style="margin: 0 0 16px 0; color: var(--alice-navy);">Pay Categories This Week</h4>
+                        <div style="max-height: 400px; overflow-y: auto;">
+                            <table class="data-table" id="singleWeekCategoryTable">
+                                <thead>
+                                    <tr>
+                                        <th>Category</th>
+                                        <th class="number">Units</th>
+                                        <th class="number">Cost</th>
+                                        <th class="number">%</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="singleWeekCategoryBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Week vs Prior Week Comparison -->
+                <div style="margin-top: 24px; background: #f8fafc; border-radius: 12px; padding: 20px;">
+                    <h4 style="margin: 0 0 16px 0; color: var(--alice-navy);">Week-over-Week Comparison</h4>
+                    <div id="singleWeekComparisonTable"></div>
+                </div>
             </div>
             
             <div id="weeklyTab" class="tab-content active">
@@ -622,7 +694,7 @@
                 <!-- Category Legend/Buttons Row -->
                 <div style="margin-bottom: 20px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                        <h4 style="margin: 0; color: var(--alice-navy);">Select Categories (click to toggle)</h4>
+                        <h4 style="margin: 0; color: var(--alice-navy);">Select Categories (click to toggle) <a href="#def-categories" class="info-link">? codes</a></h4>
                         <div>
                             <button onclick="selectAllCategories()" style="padding: 6px 12px; border-radius: 4px; border: 1px solid var(--border-gray); background: white; cursor: pointer; margin-right: 8px; font-size: 12px;">Select All</button>
                             <button onclick="clearAllCategories()" style="padding: 6px 12px; border-radius: 4px; border: 1px solid var(--border-gray); background: white; cursor: pointer; font-size: 12px;">Clear All</button>
@@ -633,7 +705,7 @@
                 
                 <!-- Weekly Trend Chart (Large) -->
                 <div style="background: #f8fafc; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
-                    <h4 style="margin: 0 0 16px 0; color: var(--alice-navy);">Weekly Cost Trend by Category</h4>
+                    <h4 style="margin: 0 0 16px 0; color: var(--alice-navy);">Weekly Cost Trend by Category <a href="#def-category-trend" class="info-link">? formula</a></h4>
                     <div style="height: 350px;">
                         <canvas id="categoryTrendChart"></canvas>
                     </div>
@@ -663,6 +735,252 @@
             </div>
         </div>
     </div>
+    
+    <!-- Definitions & Formulas Section -->
+    <div class="container" id="definitionsSection" style="margin-top: 40px; padding-bottom: 40px;">
+        <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+            <h2 style="color: var(--alice-navy); margin: 0 0 24px 0; padding-bottom: 12px; border-bottom: 2px solid var(--alice-orange);">
+                Definitions & Formula Reference
+            </h2>
+            
+            <!-- Data Sources -->
+            <div id="def-sources" class="def-section">
+                <h3 class="def-title">Data Sources</h3>
+                <table class="def-table">
+                    <tr><td class="def-term">Payroll Data</td><td>Paychex Labor Distribution Detail report (Excel). Check date minus 7 days determines the work week.</td></tr>
+                    <tr><td class="def-term">Revenue Data</td><td>Weekly revenue from billing system. Net revenue = Gross revenue × (1 - 3% CC fees).</td></tr>
+                    <tr><td class="def-term">Week Mapping</td><td>ISO week number based on work period end date (check date - 7 days).</td></tr>
+                    <tr><td class="def-term">Excluded Staff</td><td>Employee #57, #60 (Operations), A001 (Admin salary). #172 Stand-By hours excluded in Caregivers view.</td></tr>
+                </table>
+            </div>
+            
+            <!-- KPI Definitions -->
+            <div id="def-kpis" class="def-section">
+                <h3 class="def-title">KPI Cards</h3>
+                <table class="def-table">
+                    <tr>
+                        <td class="def-term" id="def-net-revenue">Net Revenue</td>
+                        <td>
+                            <strong>Formula:</strong> Gross Revenue × (1 - CC_FEE_RATE)<br>
+                            <strong>Where:</strong> CC_FEE_RATE = 3% (credit card processing fees)<br>
+                            <strong>Example:</strong> $30,000 gross × 0.97 = $29,100 net
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="def-term" id="def-labor-cost">Total Labor Cost</td>
+                        <td>
+                            <strong>Formula:</strong> (Earnings + Reimbursements + Employer Taxes) × (1 + WORKERS_COMP_RATE)<br>
+                            <strong>Where:</strong> WORKERS_COMP_RATE = 2%<br>
+                            <strong>Includes:</strong> All wages, overtime, tips, mileage, bonuses, employer taxes, workers comp
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="def-term" id="def-margin">Margin %</td>
+                        <td>
+                            <strong>Formula:</strong> ((Net Revenue - Labor Cost) / Net Revenue) × 100<br>
+                            <strong>Color coding:</strong> Green ≥ 20%, Yellow 0-20%, Red < 0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="def-term" id="def-avg-margin">Average Margin</td>
+                        <td>
+                            <strong>Formula:</strong> Sum of all weekly (Net Revenue - Labor Cost) / Sum of all Net Revenue × 100<br>
+                            <strong>Note:</strong> Weighted average across all weeks in selected period
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="def-term" id="def-total-hours">Total Hours</td>
+                        <td>
+                            <strong>Formula:</strong> Regular + Overtime + Stand-By + Time Incentive + Holiday + Training<br>
+                            <strong>Excludes:</strong> Dollar-based categories (Tips, Mileage, Bonus)
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+            <!-- Chart Definitions -->
+            <div id="def-charts" class="def-section">
+                <h3 class="def-title">Charts</h3>
+                <table class="def-table">
+                    <tr>
+                        <td class="def-term" id="def-revenue-labor-chart">Revenue vs Labor Chart</td>
+                        <td>
+                            <strong>Blue line (Net Revenue):</strong> Weekly gross revenue after 3% CC fee deduction<br>
+                            <strong>Orange line (Labor Cost):</strong> Weekly total labor including 2% workers comp<br>
+                            <strong>Green area (Margin %):</strong> Weekly margin percentage on secondary Y-axis<br>
+                            <strong>Scope filter:</strong> "Caregivers Only" excludes admin staff (#57, #60, A001)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="def-term" id="def-standby-chart">Stand-By Hours Chart</td>
+                        <td>
+                            <strong>Shows:</strong> Weekly Stand-By/On-Call hours (STN category)<br>
+                            <strong>Caregivers view:</strong> Excludes #172 stand-by hours (admin function)<br>
+                            <strong>Purpose:</strong> Monitor on-call coverage costs
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="def-term" id="def-category-trend">Category Trend Chart</td>
+                        <td>
+                            <strong>Shows:</strong> Weekly cost by selected pay categories<br>
+                            <strong>Selection:</strong> Click category buttons to toggle visibility<br>
+                            <strong>Cost calculation:</strong> Hours × Rate (or direct $ for dollar-based categories)
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+            <!-- Pay Categories -->
+            <div id="def-categories" class="def-section">
+                <h3 class="def-title">Pay Categories & Rates</h3>
+                <table class="def-table">
+                    <tr><th style="width: 120px;">Code</th><th style="width: 150px;">Name</th><th style="width: 80px;">Type</th><th>Cost Calculation</th></tr>
+                    <tr><td>R</td><td>Regular Hours</td><td>Hours</td><td>Hours × Employee Rate (avg $24.50/hr)</td></tr>
+                    <tr><td>WOT</td><td>Overtime</td><td>Hours</td><td>Hours × Employee Rate × 1.5</td></tr>
+                    <tr><td>STN</td><td>Stand-By/On-Call</td><td>Hours</td><td>Hours × Employee Rate</td></tr>
+                    <tr><td>HOL</td><td>Holiday</td><td>Hours</td><td>Hours × Employee Rate × 1.5</td></tr>
+                    <tr><td>TMN</td><td>Time Incentive</td><td>Hours</td><td>Hours × Employee Rate</td></tr>
+                    <tr><td>TRN/ATN</td><td>Training</td><td>Hours</td><td>Hours × Employee Rate</td></tr>
+                    <tr><td>SICK</td><td>Sick Leave</td><td>Hours</td><td>Hours × Employee Rate</td></tr>
+                    <tr><td>VAC</td><td>Vacation</td><td>Hours</td><td>Hours × Employee Rate</td></tr>
+                    <tr><td>TCC</td><td>Tips</td><td>Dollars</td><td>Direct dollar amount (pass-through)</td></tr>
+                    <tr><td>MLE</td><td>Mileage</td><td>Dollars</td><td>Direct dollar amount (reimbursement)</td></tr>
+                    <tr><td>BON</td><td>Bonus/Incentives</td><td>Dollars</td><td>Direct dollar amount</td></tr>
+                    <tr><td>SAL</td><td>Salary</td><td>Dollars</td><td>Direct dollar amount (admin only)</td></tr>
+                </table>
+            </div>
+            
+            <!-- Table Definitions -->
+            <div id="def-tables" class="def-section">
+                <h3 class="def-title">Tables</h3>
+                <table class="def-table">
+                    <tr>
+                        <td class="def-term" id="def-weekly-table">Weekly Summary</td>
+                        <td>
+                            <strong>Columns:</strong> Week, Net Revenue, Regular/OT/StandBy/Total Hours, Labor Cost, Margin %<br>
+                            <strong>Yellow rows:</strong> Revenue-only weeks (no payroll data yet)<br>
+                            <strong>Sorting:</strong> Click any column header to sort
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="def-term" id="def-employee-table">By Employee</td>
+                        <td>
+                            <strong>Shows:</strong> Employee totals for selected period<br>
+                            <strong>Rate:</strong> Individual hourly rate from Paychex (Column I)<br>
+                            <strong>Click row:</strong> Expands to show weekly breakdown with $ and hours<br>
+                            <strong>Period filter:</strong> All Time, This Year, Q4, Last Month, Last 4 Weeks
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="def-term" id="def-category-table">By Category</td>
+                        <td>
+                            <strong>Shows:</strong> Totals by pay category across all employees<br>
+                            <strong>% of Labor:</strong> Category cost / Total labor cost × 100<br>
+                            <strong>Employees:</strong> Count of unique employees with that category
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+            <!-- Insights Section -->
+            <div id="def-insights" class="def-section">
+                <h3 class="def-title">Margin Analysis Insights</h3>
+                <table class="def-table">
+                    <tr>
+                        <td class="def-term" id="def-margin-change">Margin Change</td>
+                        <td>
+                            <strong>Comparison:</strong> Most recent 4 weeks vs prior 4 weeks<br>
+                            <strong>Threshold:</strong> Only shown if change ≥ 1 percentage point<br>
+                            <strong>Drivers:</strong> Shows revenue, labor, and hours changes > 3%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="def-term" id="def-cost-per-hour">Cost per Hour</td>
+                        <td>
+                            <strong>Formula:</strong> Total Labor Cost / Total Hours<br>
+                            <strong>Threshold:</strong> Only shown if change > 3%<br>
+                            <strong>Indicates:</strong> Changes in pay mix, overtime, or bonus levels
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+            <!-- Filters -->
+            <div id="def-filters" class="def-section">
+                <h3 class="def-title">Filter Behavior</h3>
+                <table class="def-table">
+                    <tr>
+                        <td class="def-term" id="def-staffing-view">Staffing View</td>
+                        <td>
+                            <strong>All Staff:</strong> Includes all employees in calculations<br>
+                            <strong>Caregivers Only:</strong> Excludes #57 (Poole), #60 (Jepsen), A001 (Admin), and #172's Stand-By hours<br>
+                            <strong>Affects:</strong> All KPIs, charts, and tables update when changed
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="def-term" id="def-date-range">Date Range</td>
+                        <td>
+                            <strong>All Weeks:</strong> Full data range (Week 9 2025 - Week 2 2026)<br>
+                            <strong>Last 4/8/12 Weeks:</strong> Rolling window from most recent data<br>
+                            <strong>Affects:</strong> All KPIs, charts, and tables update when changed
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 12px; color: var(--text-muted);">
+                <strong>Last Updated:</strong> January 2026 | <strong>Data Range:</strong> Week 52 2024 - Week 52 2025 (Payroll), Week 9 2025 - Week 2 2026 (Revenue)
+                <a href="#top" style="float: right; color: var(--alice-orange); text-decoration: none;">↑ Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        .def-section { margin-bottom: 28px; }
+        .def-title { 
+            color: var(--alice-navy); 
+            font-size: 16px; 
+            margin: 0 0 12px 0; 
+            padding-bottom: 8px; 
+            border-bottom: 1px solid #e2e8f0; 
+        }
+        .def-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-size: 13px; 
+        }
+        .def-table th, .def-table td { 
+            padding: 10px 12px; 
+            border: 1px solid #e2e8f0; 
+            text-align: left; 
+            vertical-align: top; 
+        }
+        .def-table th { 
+            background: #f7fafc; 
+            font-weight: 600; 
+            color: var(--alice-navy); 
+        }
+        .def-table tr:nth-child(even) { background: #fafafa; }
+        .def-term { 
+            font-weight: 600; 
+            color: var(--alice-navy); 
+            white-space: nowrap; 
+            width: 180px; 
+        }
+        .info-link { 
+            font-size: 11px; 
+            color: var(--text-muted); 
+            text-decoration: none; 
+            margin-left: 8px; 
+            padding: 2px 6px; 
+            background: #f0f4f8; 
+            border-radius: 4px; 
+        }
+        .info-link:hover { 
+            background: var(--alice-orange); 
+            color: white; 
+        }
+    </style>
     
     <script>
         // Pay codes configuration
@@ -1656,7 +1974,7 @@
                 container.innerHTML = `
                     <div class="insight-card" id="insightsSection">
                         <div class="collapsible-header" onclick="toggleSection('insightsSection')">
-                            <div class="insight-title" style="margin-bottom: 0;">Margin Analysis - Why Margins Changed (Recent 4 Weeks vs Prior 4)</div>
+                            <div class="insight-title" style="margin-bottom: 0;">Margin Analysis - Why Margins Changed (Recent 4 Weeks vs Prior 4) <a href="#def-margin-change" class="info-link">? formula</a></div>
                             <span class="collapse-toggle">collapse</span>
                         </div>
                         <div class="collapsible-content">
@@ -2521,6 +2839,310 @@
             }
         }
         
+        // Single Week View Functions
+        function initializeSingleWeekSelector() {
+            const selector = document.getElementById('singleWeekSelector');
+            if (!selector) return;
+            
+            const weeks = getSortedWeeks().slice().reverse(); // Most recent first
+            selector.innerHTML = weeks.map(w => `<option value="${w}">${w}</option>`).join('');
+            
+            // Default to most recent week with payroll data
+            const weekWithPayroll = weeks.find(w => !weeklyData[w]?.revenueOnly);
+            if (weekWithPayroll) {
+                selector.value = weekWithPayroll;
+            }
+        }
+        
+        function navigateWeek(direction) {
+            const selector = document.getElementById('singleWeekSelector');
+            const weeks = getSortedWeeks();
+            const currentIndex = weeks.indexOf(selector.value);
+            const newIndex = currentIndex + direction;
+            
+            if (newIndex >= 0 && newIndex < weeks.length) {
+                selector.value = weeks[newIndex];
+                updateSingleWeekView();
+            }
+        }
+        
+        function updateSingleWeekView() {
+            const selector = document.getElementById('singleWeekSelector');
+            const selectedWeek = selector?.value;
+            if (!selectedWeek) return;
+            
+            const scopeFilter = window.currentScopeFilter || 'all';
+            const wd = weeklyData[selectedWeek];
+            if (!wd) return;
+            
+            const isRevenueOnly = wd.revenueOnly;
+            const netRevenue = getNetRevenue(wd.revenue);
+            const laborCost = isRevenueOnly ? 0 : calculateLaborCost(wd, true, scopeFilter);
+            const margin = (netRevenue > 0 && laborCost > 0) ? ((netRevenue - laborCost) / netRevenue * 100) : 0;
+            
+            // Calculate hours
+            let totalHours = 0, regularHrs = 0, otHrs = 0, standbyHrs = 0;
+            if (!isRevenueOnly && wd.employees) {
+                for (const [empId, codes] of Object.entries(wd.employees)) {
+                    const normalizedEmpId = empId.replace(/^0+/, '') || '0';
+                    if (scopeFilter === 'caregivers' && ADMIN_EMPLOYEES.includes(normalizedEmpId)) continue;
+                    
+                    regularHrs += codes.R || 0;
+                    otHrs += codes.WOT || 0;
+                    if (!(scopeFilter === 'caregivers' && ADMIN_CODES_BY_EMPLOYEE[normalizedEmpId]?.includes('STN'))) {
+                        standbyHrs += codes.STN || 0;
+                    }
+                    totalHours += (codes.R || 0) + (codes.WOT || 0) + (codes.STN || 0) + (codes.TMN || 0);
+                }
+            }
+            
+            // Update KPIs
+            const kpiContainer = document.getElementById('singleWeekKPIs');
+            kpiContainer.innerHTML = `
+                <div class="kpi-card">
+                    <div class="kpi-label">Net Revenue</div>
+                    <div class="kpi-value">${formatCurrency(netRevenue)}</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Labor Cost</div>
+                    <div class="kpi-value">${isRevenueOnly ? '—' : formatCurrency(laborCost)}</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Margin</div>
+                    <div class="kpi-value" style="color: ${margin < 0 ? 'var(--danger)' : margin < 20 ? 'var(--warning)' : 'var(--success)'}">
+                        ${isRevenueOnly ? '—' : formatNumber(margin) + '%'}
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Total Hours</div>
+                    <div class="kpi-value">${isRevenueOnly ? '—' : formatNumber(totalHours)}</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Regular</div>
+                    <div class="kpi-value">${isRevenueOnly ? '—' : formatNumber(regularHrs)}</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Overtime</div>
+                    <div class="kpi-value">${isRevenueOnly ? '—' : formatNumber(otHrs)}</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Stand-By</div>
+                    <div class="kpi-value">${isRevenueOnly ? '—' : formatNumber(standbyHrs)}</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Gross Margin $</div>
+                    <div class="kpi-value">${isRevenueOnly ? '—' : formatCurrency(netRevenue - laborCost)}</div>
+                </div>
+            `;
+            
+            // Update Employees Table
+            const empBody = document.getElementById('singleWeekEmployeeBody');
+            empBody.innerHTML = '';
+            
+            if (!isRevenueOnly && wd.employees) {
+                const empList = [];
+                for (const [empId, codes] of Object.entries(wd.employees)) {
+                    const normalizedEmpId = empId.replace(/^0+/, '') || '0';
+                    if (scopeFilter === 'caregivers' && ADMIN_EMPLOYEES.includes(normalizedEmpId)) continue;
+                    
+                    const empInfo = EMPLOYEE_RATES[normalizedEmpId];
+                    const rate = empInfo ? empInfo.rate : AVG_HOURLY_RATE;
+                    const name = empInfo ? empInfo.name : `Employee ${empId}`;
+                    
+                    let hours = 0, pay = 0;
+                    for (const [code, value] of Object.entries(codes)) {
+                        if (scopeFilter === 'caregivers' && ADMIN_CODES_BY_EMPLOYEE[normalizedEmpId]?.includes(code)) continue;
+                        
+                        if (['R', 'STN', 'TMN', 'ATN', 'TRN', 'HOL', 'SICK', 'VAC'].includes(code)) {
+                            hours += value;
+                            if (code === 'WOT') {
+                                pay += value * rate * 1.5;
+                            } else if (code === 'HOL') {
+                                pay += value * rate * 1.5;
+                            } else {
+                                pay += value * rate;
+                            }
+                        } else if (code === 'WOT') {
+                            hours += value;
+                            pay += value * rate * 1.5;
+                        } else if (['TCC', 'MLE', 'BON'].includes(code)) {
+                            pay += value;
+                        }
+                    }
+                    
+                    empList.push({ empId, normalizedEmpId, name, hours, pay });
+                }
+                
+                empList.sort((a, b) => b.hours - a.hours);
+                
+                document.getElementById('singleWeekEmpCount').textContent = `(${empList.length} employees)`;
+                
+                for (const emp of empList) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><strong>${emp.normalizedEmpId}</strong> ${emp.name}</td>
+                        <td class="number">${formatNumber(emp.hours)}</td>
+                        <td class="number">${formatCurrency(emp.pay)}</td>
+                    `;
+                    empBody.appendChild(row);
+                }
+                
+                // Add total row
+                const totalRow = document.createElement('tr');
+                totalRow.style.cssText = 'background: var(--alice-navy); color: white; font-weight: 600;';
+                totalRow.innerHTML = `
+                    <td>TOTAL</td>
+                    <td class="number">${formatNumber(empList.reduce((s, e) => s + e.hours, 0))}</td>
+                    <td class="number">${formatCurrency(empList.reduce((s, e) => s + e.pay, 0))}</td>
+                `;
+                empBody.appendChild(totalRow);
+            } else {
+                empBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--text-muted);">No payroll data for this week</td></tr>';
+                document.getElementById('singleWeekEmpCount').textContent = '';
+            }
+            
+            // Update Categories Table
+            const catBody = document.getElementById('singleWeekCategoryBody');
+            catBody.innerHTML = '';
+            
+            if (!isRevenueOnly && wd.employees) {
+                const catTotals = {};
+                let totalCost = 0;
+                
+                for (const [empId, codes] of Object.entries(wd.employees)) {
+                    const normalizedEmpId = empId.replace(/^0+/, '') || '0';
+                    if (scopeFilter === 'caregivers' && ADMIN_EMPLOYEES.includes(normalizedEmpId)) continue;
+                    
+                    const empInfo = EMPLOYEE_RATES[normalizedEmpId];
+                    const rate = empInfo ? empInfo.rate : AVG_HOURLY_RATE;
+                    
+                    for (const [code, value] of Object.entries(codes)) {
+                        if (scopeFilter === 'caregivers' && ADMIN_CODES_BY_EMPLOYEE[normalizedEmpId]?.includes(code)) continue;
+                        
+                        if (!catTotals[code]) catTotals[code] = { units: 0, cost: 0 };
+                        catTotals[code].units += value;
+                        
+                        if (code === 'WOT' || code === 'HOL') {
+                            catTotals[code].cost += value * rate * 1.5;
+                        } else if (['R', 'STN', 'TMN', 'ATN', 'TRN', 'SICK', 'VAC'].includes(code)) {
+                            catTotals[code].cost += value * rate;
+                        } else {
+                            catTotals[code].cost += value;
+                        }
+                        totalCost += catTotals[code].cost;
+                    }
+                }
+                
+                // Recalculate total for percentages
+                totalCost = Object.values(catTotals).reduce((s, c) => s + c.cost, 0);
+                
+                const sortedCats = Object.entries(catTotals)
+                    .map(([code, data]) => ({ code, ...data }))
+                    .sort((a, b) => b.cost - a.cost);
+                
+                for (const cat of sortedCats) {
+                    const codeInfo = PAY_CODES[cat.code] || { name: cat.code, type: 'unknown', color: '#999' };
+                    const pct = totalCost > 0 ? (cat.cost / totalCost * 100) : 0;
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><span style="display: inline-block; width: 10px; height: 10px; border-radius: 2px; background: ${codeInfo.color}; margin-right: 6px;"></span>${codeInfo.name}</td>
+                        <td class="number">${codeInfo.type === 'hours' ? formatNumber(cat.units) + ' hrs' : formatCurrency(cat.units)}</td>
+                        <td class="number">${formatCurrency(cat.cost)}</td>
+                        <td class="number">${formatNumber(pct)}%</td>
+                    `;
+                    catBody.appendChild(row);
+                }
+            } else {
+                catBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No payroll data for this week</td></tr>';
+            }
+            
+            // Week-over-Week Comparison
+            const compContainer = document.getElementById('singleWeekComparisonTable');
+            const weeks = getSortedWeeks();
+            const currentIndex = weeks.indexOf(selectedWeek);
+            const priorWeek = currentIndex > 0 ? weeks[currentIndex - 1] : null;
+            
+            if (priorWeek && !isRevenueOnly) {
+                const priorWd = weeklyData[priorWeek];
+                const priorRevenueOnly = priorWd?.revenueOnly;
+                
+                if (priorWd && !priorRevenueOnly) {
+                    const priorNetRevenue = getNetRevenue(priorWd.revenue);
+                    const priorLaborCost = calculateLaborCost(priorWd, true, scopeFilter);
+                    const priorMargin = (priorNetRevenue > 0 && priorLaborCost > 0) ? ((priorNetRevenue - priorLaborCost) / priorNetRevenue * 100) : 0;
+                    
+                    let priorHours = 0;
+                    for (const [empId, codes] of Object.entries(priorWd.employees || {})) {
+                        const normalizedEmpId = empId.replace(/^0+/, '') || '0';
+                        if (scopeFilter === 'caregivers' && ADMIN_EMPLOYEES.includes(normalizedEmpId)) continue;
+                        priorHours += (codes.R || 0) + (codes.WOT || 0) + (codes.STN || 0) + (codes.TMN || 0);
+                    }
+                    
+                    const revChange = priorNetRevenue > 0 ? ((netRevenue - priorNetRevenue) / priorNetRevenue * 100) : 0;
+                    const laborChange = priorLaborCost > 0 ? ((laborCost - priorLaborCost) / priorLaborCost * 100) : 0;
+                    const marginChange = margin - priorMargin;
+                    const hoursChange = priorHours > 0 ? ((totalHours - priorHours) / priorHours * 100) : 0;
+                    
+                    const arrow = (val) => val > 0 ? '▲' : val < 0 ? '▼' : '—';
+                    const color = (val, inverse = false) => {
+                        if (inverse) val = -val;
+                        return val > 0 ? 'var(--success)' : val < 0 ? 'var(--danger)' : 'inherit';
+                    };
+                    
+                    compContainer.innerHTML = `
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th class="number">${priorWeek}</th>
+                                    <th class="number">${selectedWeek}</th>
+                                    <th class="number">Change</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Net Revenue</td>
+                                    <td class="number">${formatCurrency(priorNetRevenue)}</td>
+                                    <td class="number">${formatCurrency(netRevenue)}</td>
+                                    <td class="number" style="color: ${color(revChange)}">${arrow(revChange)} ${formatNumber(Math.abs(revChange))}%</td>
+                                </tr>
+                                <tr>
+                                    <td>Labor Cost</td>
+                                    <td class="number">${formatCurrency(priorLaborCost)}</td>
+                                    <td class="number">${formatCurrency(laborCost)}</td>
+                                    <td class="number" style="color: ${color(laborChange, true)}">${arrow(laborChange)} ${formatNumber(Math.abs(laborChange))}%</td>
+                                </tr>
+                                <tr>
+                                    <td>Margin %</td>
+                                    <td class="number">${formatNumber(priorMargin)}%</td>
+                                    <td class="number">${formatNumber(margin)}%</td>
+                                    <td class="number" style="color: ${color(marginChange)}">${arrow(marginChange)} ${formatNumber(Math.abs(marginChange))} pts</td>
+                                </tr>
+                                <tr>
+                                    <td>Total Hours</td>
+                                    <td class="number">${formatNumber(priorHours)}</td>
+                                    <td class="number">${formatNumber(totalHours)}</td>
+                                    <td class="number" style="color: ${color(hoursChange)}">${arrow(hoursChange)} ${formatNumber(Math.abs(hoursChange))}%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    `;
+                    
+                    document.getElementById('singleWeekComparison').textContent = `Comparing to prior week: ${priorWeek}`;
+                } else {
+                    compContainer.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Prior week has no payroll data for comparison</p>';
+                    document.getElementById('singleWeekComparison').textContent = '';
+                }
+            } else if (isRevenueOnly) {
+                compContainer.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Revenue-only week - no payroll data available</p>';
+                document.getElementById('singleWeekComparison').textContent = '';
+            } else {
+                compContainer.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No prior week available for comparison</p>';
+                document.getElementById('singleWeekComparison').textContent = '';
+            }
+        }
+        
         // Tab switching
         function showTab(tabName) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -2528,6 +3150,12 @@
             
             document.querySelector(`.tab[onclick="showTab('${tabName}')"]`).classList.add('active');
             document.getElementById(`${tabName}Tab`).classList.add('active');
+            
+            // Initialize single week view when tab is shown
+            if (tabName === 'singleWeek') {
+                initializeSingleWeekSelector();
+                updateSingleWeekView();
+            }
         }
         
         // Main update function
