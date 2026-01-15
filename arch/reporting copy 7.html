@@ -2193,9 +2193,7 @@
                     <label>Year</label>
                     <select id="reportYear">
                         <option value="2024">2024</option>
-                        <option value="2025">2025</option>
-                        <option value="2026">2026</option>
-                        <option value="2027">2027</option>
+                        <option value="2025" selected>2025</option>
                     </select>
                 </div>
                 
@@ -4646,10 +4644,7 @@
         }
         
         async function executeBulkSendBatched(reportType, periodValue, year, forceSend, config, statusDiv, sendBtn, periodLabel) {
-            const BATCH_SIZE = 3; // REDUCED: Process 3 clients at a time for reliability
-            const MAX_RETRIES = 3; // Retry failed batches up to 3 times
-            const RETRY_DELAY_BASE = 2000; // Start with 2 second delay, doubles each retry
-            
+            const BATCH_SIZE = 5; // Process 5 clients at a time
             let batchOffset = 0;
             let totalSent = 0;
             let totalSkipped = 0;
@@ -4658,9 +4653,8 @@
             let totalClients = 0;
             let processedClients = 0;
             let isFirstBatch = true;
-            let consecutiveFailures = 0;
             
-            const updateProgress = (current, total, message, retryInfo = '') => {
+            const updateProgress = (current, total, message) => {
                 const percent = total > 0 ? Math.round((current / total) * 100) : 0;
                 statusDiv.innerHTML = `
                     <div>
@@ -4677,41 +4671,15 @@
                         <p style="margin: 5px 0 0; font-size: 11px; color: #999;">
                             ✓ ${totalSent} sent | ⏭ ${totalSkipped} skipped | ✗ ${totalErrors.length} errors
                         </p>
-                        ${retryInfo ? `<p style="margin: 5px 0 0; font-size: 11px; color: #F57600;">${retryInfo}</p>` : ''}
                     </div>
                 `;
             };
             
-            // Helper function to execute a batch with retry logic
-            async function executeBatchWithRetry(params, retryCount = 0) {
-                try {
-                    // Use longer timeout for optimized batch (90 seconds)
-                    const result = await jsonpFetch(params, { timeout: 90000 });
-                    
-                    if (!result.success) {
-                        throw new Error(result.error || 'Batch processing failed');
-                    }
-                    
-                    return result;
-                } catch (error) {
-                    if (retryCount < MAX_RETRIES) {
-                        const delay = RETRY_DELAY_BASE * Math.pow(2, retryCount);
-                        updateProgress(processedClients, totalClients, 
-                            `Batch failed, retrying in ${delay/1000}s...`,
-                            `Retry ${retryCount + 1}/${MAX_RETRIES}: ${error.message}`);
-                        
-                        await new Promise(resolve => setTimeout(resolve, delay));
-                        return executeBatchWithRetry(params, retryCount + 1);
-                    }
-                    throw error;
-                }
-            }
-            
             try {
-                // Process in batches using OPTIMIZED endpoint
+                // Process in batches
                 while (true) {
                     const params = {
-                        action: 'sendBulkReportsBatchOptimized', // Use optimized version
+                        action: 'sendBulkReportsBatch',
                         reportType: reportType,
                         testMode: config.testMode ? 'true' : 'false',
                         testEmail: config.testEmail || '',
@@ -4729,8 +4697,11 @@
                         updateProgress(0, 0, 'Starting...');
                     }
                     
-                    const result = await executeBatchWithRetry(params);
-                    consecutiveFailures = 0; // Reset on success
+                    const result = await jsonpFetch(params, { timeout: 120000 }); // 2 min per batch
+                    
+                    if (!result.success) {
+                        throw new Error(result.error || 'Batch processing failed');
+                    }
                     
                     // Update totals
                     if (isFirstBatch) {
@@ -4745,9 +4716,7 @@
                     
                     processedClients = result.processedSoFar || (batchOffset + (result.batchProcessed || 0));
                     
-                    // Show execution time if available
-                    const execTime = result.executionTimeMs ? ` (${(result.executionTimeMs/1000).toFixed(1)}s)` : '';
-                    updateProgress(processedClients, totalClients, `Processing batch ${Math.ceil(processedClients / BATCH_SIZE)}${execTime}...`);
+                    updateProgress(processedClients, totalClients, `Processing batch ${Math.ceil(processedClients / BATCH_SIZE)}...`);
                     
                     // Check if we're done
                     if (result.isComplete || processedClients >= totalClients) {
@@ -4757,8 +4726,8 @@
                     // Move to next batch
                     batchOffset = processedClients;
                     
-                    // Delay between batches to prevent overwhelming the server
-                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    // Small delay between batches to prevent overwhelming the server
+                    await new Promise(resolve => setTimeout(resolve, 500));
                 }
                 
                 // All batches complete - show final results
