@@ -1,0 +1,2000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>alice.care: Employee Hours Audit Report</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #E5ECF3;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 54, 92, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            backdrop-filter: blur(3px);
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .loading-content {
+            background: white;
+            padding: 40px 60px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #E5ECF3;
+            border-top: 5px solid #F57600;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            color: #1A365C;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(26, 54, 92, 0.15);
+            overflow: hidden;
+        }
+        
+        /* Header */
+        .header {
+            background: #1A365C;
+            color: white;
+            padding: 25px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: #F57600;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo-icon svg {
+            width: 28px;
+            height: 28px;
+            fill: white;
+        }
+        
+        .logo-text h1 {
+            font-size: 22px;
+            font-weight: 700;
+        }
+        
+        .logo-text p {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #F57600;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #E06800;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        /* Filter Section */
+        .filter-section {
+            padding: 20px 30px;
+            background: #F8FAFC;
+            border-bottom: 1px solid #E2E8F0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-end;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .filter-group label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748B;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .filter-group select,
+        .filter-group input {
+            padding: 10px 14px;
+            border: 1px solid #CBD5E1;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            background: white;
+            min-width: 100px;
+        }
+        
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: #F57600;
+            box-shadow: 0 0 0 3px rgba(245, 118, 0, 0.1);
+        }
+        
+        /* Searchable Dropdown */
+        .search-dropdown {
+            position: relative;
+        }
+        
+        .search-input {
+            width: 280px;
+            padding: 10px 14px 10px 38px;
+            border: 1px solid #CBD5E1;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            background: white;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #F57600;
+            box-shadow: 0 0 0 3px rgba(245, 118, 0, 0.1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            color: #94A3B8;
+        }
+        
+        .dropdown-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #CBD5E1;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .dropdown-list.active {
+            display: block;
+        }
+        
+        .dropdown-item {
+            padding: 12px 14px;
+            cursor: pointer;
+            font-size: 14px;
+            border-bottom: 1px solid #F1F5F9;
+        }
+        
+        .dropdown-item:hover,
+        .dropdown-item.highlighted {
+            background: #FFF7ED;
+            color: #F57600;
+        }
+        
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .no-results {
+            padding: 20px;
+            text-align: center;
+            color: #94A3B8;
+            font-size: 13px;
+        }
+        
+        /* Content Area */
+        .content {
+            padding: 25px 30px;
+        }
+        
+        /* Info Box */
+        .info-box {
+            background: #FFF7ED;
+            border: 1px solid #FDBA74;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        
+        .info-box.blue {
+            background: #EFF6FF;
+            border-color: #93C5FD;
+        }
+        
+        .info-box svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+            color: #F57600;
+            margin-top: 2px;
+        }
+        
+        .info-box.blue svg {
+            color: #3B82F6;
+        }
+        
+        .info-box-content {
+            flex: 1;
+        }
+        
+        .info-box-content h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1A365C;
+            margin-bottom: 4px;
+        }
+        
+        .info-box-content p {
+            font-size: 12px;
+            color: #64748B;
+            line-height: 1.5;
+        }
+        
+        /* Employee Banner */
+        .employee-banner {
+            background: linear-gradient(135deg, #1A365C 0%, #2D4A7C 100%);
+            color: white;
+            padding: 20px 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .employee-banner h2 {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .employee-banner p {
+            font-size: 13px;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+        
+        .period-badge {
+            background: #F57600;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        /* Tables */
+        .table-container {
+            border: 1px solid #E2E8F0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .table-scroll {
+            overflow-x: auto;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            min-width: 1200px;
+        }
+        
+        .data-table th {
+            background: #F8FAFC;
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 600;
+            color: #475569;
+            border-bottom: 2px solid #E2E8F0;
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .data-table th:hover {
+            background: #F1F5F9;
+        }
+        
+        .data-table th .sort-icon {
+            display: inline-block;
+            margin-left: 5px;
+            opacity: 0.3;
+            font-size: 10px;
+        }
+        
+        .data-table th.sorted-asc .sort-icon,
+        .data-table th.sorted-desc .sort-icon {
+            opacity: 1;
+            color: #F57600;
+        }
+        
+        .data-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #F1F5F9;
+            color: #334155;
+        }
+        
+        .data-table tbody tr:hover {
+            background: #FAFAFA;
+        }
+        
+        .data-table tbody tr.expandable {
+            cursor: pointer;
+        }
+        
+        .data-table tbody tr.expandable:hover {
+            background: #FFF7ED;
+        }
+        
+        .data-table tbody tr.total-row {
+            background: #F8FAFC;
+            font-weight: 600;
+        }
+        
+        .data-table tbody tr.total-row td {
+            border-top: 2px solid #E2E8F0;
+            color: #1A365C;
+        }
+        
+        .data-table .expand-icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            line-height: 18px;
+            text-align: center;
+            background: #E2E8F0;
+            border-radius: 4px;
+            margin-right: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #64748B;
+            transition: all 0.2s;
+        }
+        
+        .data-table tr.expanded .expand-icon {
+            background: #F57600;
+            color: white;
+        }
+        
+        /* Detail Table */
+        .detail-row {
+            display: none;
+        }
+        
+        .detail-row.visible {
+            display: table-row;
+        }
+        
+        .detail-row td {
+            padding: 0;
+            background: #FAFAFA;
+        }
+        
+        .detail-content {
+            padding: 15px 20px 15px 45px;
+        }
+        
+        .detail-table-scroll {
+            overflow-x: auto;
+        }
+        
+        .detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            min-width: 1000px;
+        }
+        
+        .detail-table th {
+            background: #F1F5F9;
+            padding: 10px 8px;
+            text-align: left;
+            font-weight: 600;
+            color: #64748B;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+        }
+        
+        .detail-table th:hover {
+            background: #E2E8F0;
+        }
+        
+        .detail-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #F1F5F9;
+        }
+        
+        .detail-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* Hour Highlighting */
+        .hours-positive {
+            color: #059669;
+            font-weight: 600;
+        }
+        
+        .hours-overtime {
+            color: #F57600;
+            font-weight: 600;
+        }
+        
+        .hours-zero {
+            color: #CBD5E1;
+        }
+        
+        /* Summary Cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .summary-card {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        .summary-card.highlight {
+            background: linear-gradient(135deg, #1A365C 0%, #2D4A7C 100%);
+            color: white;
+            border: none;
+        }
+        
+        .summary-card.overtime {
+            background: linear-gradient(135deg, #F57600 0%, #FB923C 100%);
+            color: white;
+            border: none;
+        }
+        
+        .summary-card .label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.8;
+            margin-bottom: 6px;
+        }
+        
+        .summary-card .value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .summary-card .decimal {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 2px;
+        }
+        
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border-top: 1px solid #E2E8F0;
+            font-size: 13px;
+            color: #64748B;
+        }
+        
+        .pagination select {
+            padding: 6px 10px;
+            border: 1px solid #CBD5E1;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 13px;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 30px;
+            color: #64748B;
+        }
+        
+        .empty-state svg {
+            width: 60px;
+            height: 60px;
+            stroke: #CBD5E1;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h3 {
+            font-size: 18px;
+            color: #1A365C;
+            margin-bottom: 8px;
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+            z-index: 10001;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .toast.error { background: #DC2626; }
+        .toast.success { background: #059669; }
+        .toast.warning { background: #F57600; }
+        
+        /* Print */
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; }
+            .filter-section, .btn, .header-actions { display: none; }
+            .detail-row { display: table-row !important; }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .filter-section {
+                flex-direction: column;
+            }
+            
+            .search-input {
+                width: 100%;
+            }
+            
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <div class="loading-text" id="loadingText">Loading...</div>
+        </div>
+    </div>
+    
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+    
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                </div>
+                <div class="logo-text">
+                    <h1>Employee Hours Audit</h1>
+                    <p>Personal Attendant Payroll Breakdown</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="expandAll()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                    <span id="expandBtnText">Expand All</span>
+                </button>
+                <button class="btn btn-secondary" onclick="window.print()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 6 2 18 2 18 9"/>
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                        <rect x="6" y="14" width="12" height="8"/>
+                    </svg>
+                    Print
+                </button>
+            </div>
+        </div>
+        
+        <!-- Filters -->
+        <div class="filter-section">
+            <div class="filter-group">
+                <label>Employee</label>
+                <div class="search-dropdown" id="employeeDropdown">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <input type="text" class="search-input" id="employeeSearch" placeholder="Type to search employee..." autocomplete="off">
+                    <div class="dropdown-list" id="employeeList"></div>
+                </div>
+            </div>
+            
+            <div class="filter-group">
+                <label>Week #</label>
+                <input type="number" id="weekNumber" min="1" max="53" placeholder="1-53" style="width: 80px;">
+            </div>
+            
+            <div class="filter-group">
+                <label>Year</label>
+                <select id="yearSelect"></select>
+            </div>
+            
+            <button class="btn btn-primary" onclick="generateReport()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                </svg>
+                Generate Report
+            </button>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <!-- Info Boxes -->
+            <div class="info-box blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="16" x2="12" y2="12"/>
+                    <line x1="12" y1="8" x2="12.01" y2="8"/>
+                </svg>
+                <div class="info-box-content">
+                    <h4>Personal Attendant Overtime Rules (CA Labor Code §1451)</h4>
+                    <p>
+                        <strong>Overtime (1.5x):</strong> After 9 hours/day OR 40 hours/week &nbsp;|&nbsp;
+                        <strong>No Double Time:</strong> Personal Attendants are not entitled to double time &nbsp;|&nbsp;
+                        <strong>Holiday Pay (1.5x):</strong> Company recognized holidays &nbsp;|&nbsp;
+                        <strong>Workweek:</strong> Monday 12:01 AM through Sunday midnight
+                    </p>
+                </div>
+            </div>
+            
+            <div class="info-box blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="16" x2="12" y2="12"/>
+                    <line x1="12" y1="8" x2="12.01" y2="8"/>
+                </svg>
+                <div class="info-box-content">
+                    <h4>Time Calculations</h4>
+                    <p>
+                        <strong>Regular (R):</strong> Actual worked time from clock-in to clock-out (columns E & F) &nbsp;|&nbsp;
+                        <strong>Non Worked (TMN):</strong> Scheduled time minus actual worked time (when caregiver works less than scheduled) &nbsp;|&nbsp;
+                        <strong>OT Calculation:</strong> Only Regular hours count toward overtime thresholds - TMN hours are excluded
+                    </p>
+                </div>
+            </div>
+            
+            <div class="info-box blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="16" x2="12" y2="12"/>
+                    <line x1="12" y1="8" x2="12.01" y2="8"/>
+                </svg>
+                <div class="info-box-content">
+                    <h4>Overnight Shift Splitting</h4>
+                    <p>
+                        When a shift crosses midnight, hours are <strong>split between days</strong>. Hours before midnight count for the start date, hours after midnight count for the next day. 
+                        Post-midnight hours that fall into the next week are <strong>excluded</strong> from this week's report.<br>
+                        <strong style="color: #F57600;">● Orange end time</strong> = ends next day &nbsp;|&nbsp;
+                        <strong style="color: #DC2626;">● Red end time</strong> = ends next week &nbsp;|&nbsp;
+                        <strong style="color: #3B82F6;">● Blue start time</strong> = continued from previous day
+                    </p>
+                </div>
+            </div>
+            
+            <div class="info-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <div class="info-box-content">
+                    <h4>Note: Cancel Credit Hours</h4>
+                    <p>
+                        Cancel credit hours for cancellations are <strong>not reported</strong> in this audit. The source data excludes cancelled shifts, 
+                        so we cannot determine cancellation timing relative to the 24-hour policy. The actual payroll report (not this high-level audit) 
+                        contains the complete cancel credit calculations.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Report Container -->
+            <div id="reportContainer">
+                <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    <h3>Select an Employee</h3>
+                    <p>Search for an employee and select a pay week to generate the hours audit report.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ============================================
+        // CONFIGURATION
+        // ============================================
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycby9_bAzLkMv85BLy8OGbTav9hnX4vPp0hiTF-0xzgUo4Bpk2Nh_XkBuJWThpyqq-bpl/exec';
+        
+        // California Personal Attendant OT Rules (Labor Code Section 1451)
+        const DAILY_OT_THRESHOLD = 9; // Hours - OT after 9 hours/day
+        const WEEKLY_OT_THRESHOLD = 40; // Hours - OT after 40 hours/week
+        // NOTE: Personal Attendants are NOT entitled to double time pay
+        // NOTE: Only Regular (R) hours count toward OT - TMN hours are excluded
+        
+        // Company Holidays (1.5x pay)
+        const HOLIDAYS = {
+            '2025-01-01': "New Year's Day",
+            '2025-04-20': 'Easter',
+            '2025-05-26': 'Memorial Day',
+            '2025-07-04': 'Independence Day',
+            '2025-09-01': 'Labor Day',
+            '2025-11-27': 'Thanksgiving',
+            '2025-12-25': 'Christmas',
+            '2026-01-01': "New Year's Day",
+            '2026-04-05': 'Easter',
+            '2026-05-25': 'Memorial Day',
+            '2026-07-04': 'Independence Day',
+            '2026-09-07': 'Labor Day',
+            '2026-11-26': 'Thanksgiving',
+            '2026-12-25': 'Christmas',
+        };
+        
+        // State
+        let reportData = [];
+        let providers = [];
+        let selectedProvider = null;
+        let allExpanded = false;
+        let sortState = { main: { col: 'date', dir: 'asc' } };
+        
+        // ============================================
+        // JSONP FETCH
+        // ============================================
+        function jsonpFetch(params, options = {}) {
+            return new Promise((resolve, reject) => {
+                const callbackName = 'jsonp_callback_' + Date.now() + '_' + Math.round(100000 * Math.random());
+                const script = document.createElement('script');
+                const timeout = options.timeout || 60000;
+                
+                const url = new URL(WEBAPP_URL);
+                Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+                url.searchParams.append('callback', callbackName);
+                
+                let isCompleted = false;
+                let timeoutId = setTimeout(() => {
+                    if (!isCompleted) {
+                        isCompleted = true;
+                        delete window[callbackName];
+                        script.remove();
+                        reject(new Error('Request timed out'));
+                    }
+                }, timeout);
+                
+                window[callbackName] = function(data) {
+                    if (!isCompleted) {
+                        isCompleted = true;
+                        clearTimeout(timeoutId);
+                        delete window[callbackName];
+                        script.remove();
+                        resolve(data);
+                    }
+                };
+                
+                script.onerror = function() {
+                    if (!isCompleted) {
+                        isCompleted = true;
+                        clearTimeout(timeoutId);
+                        delete window[callbackName];
+                        script.remove();
+                        reject(new Error('Network error'));
+                    }
+                };
+                
+                script.src = url.toString();
+                document.body.appendChild(script);
+            });
+        }
+        
+        // ============================================
+        // UI HELPERS
+        // ============================================
+        function showLoading(text = 'Loading...') {
+            document.getElementById('loadingText').textContent = text;
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+        
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+        
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+        
+        // ============================================
+        // TIME/DATE HELPERS
+        // ============================================
+        function minutesToHHMM(minutes) {
+            if (!minutes || minutes <= 0) return '0h : 0m';
+            const hrs = Math.floor(minutes / 60);
+            const mins = Math.round(minutes % 60);
+            return `${hrs}h : ${mins}m`;
+        }
+        
+        function minutesToDecimal(minutes) {
+            if (!minutes || minutes <= 0) return '0.00';
+            return (minutes / 60).toFixed(2);
+        }
+        
+        function parseTimeToMinutes(timeStr) {
+            if (!timeStr) return null;
+            const str = timeStr.toString().trim();
+            
+            // Handle HH:MM:SS or HH:MM format (24-hour)
+            const parts = str.split(':');
+            if (parts.length >= 2 && !str.includes('/') && !str.includes('M')) {
+                return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+            }
+            return null;
+        }
+        
+        // Parse full datetime like "01/11/2026, 07:58 PM" or "01/12/2026, 08:09 AM"
+        // Returns date object in LOCAL time (PST), not UTC
+        function parseDateTime(dateTimeStr) {
+            if (!dateTimeStr) return null;
+            const str = dateTimeStr.toString().trim();
+            
+            // Try parsing as full datetime: "MM/DD/YYYY, HH:MM AM/PM" or "MM/DD/YYYY, HH:MM:SS AM/PM"
+            const dateTimeMatch = str.match(/(\d{1,2})\/(\d{1,2})\/(\d{4}),?\s*(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)?/i);
+            if (dateTimeMatch) {
+                const month = parseInt(dateTimeMatch[1]) - 1;
+                const day = parseInt(dateTimeMatch[2]);
+                const year = parseInt(dateTimeMatch[3]);
+                let hours = parseInt(dateTimeMatch[4]);
+                const minutes = parseInt(dateTimeMatch[5]);
+                const ampm = dateTimeMatch[6];
+                
+                if (ampm) {
+                    if (ampm.toUpperCase() === 'PM' && hours !== 12) hours += 12;
+                    if (ampm.toUpperCase() === 'AM' && hours === 12) hours = 0;
+                }
+                
+                // Create date in local time (not UTC)
+                return new Date(year, month, day, hours, minutes);
+            }
+            
+            // Try parsing as just time: "HH:MM AM/PM"
+            const timeMatch = str.match(/(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)?/i);
+            if (timeMatch) {
+                let hours = parseInt(timeMatch[1]);
+                const minutes = parseInt(timeMatch[2]);
+                const ampm = timeMatch[3];
+                
+                if (ampm) {
+                    if (ampm.toUpperCase() === 'PM' && hours !== 12) hours += 12;
+                    if (ampm.toUpperCase() === 'AM' && hours === 12) hours = 0;
+                }
+                
+                return { hours, minutes, isTimeOnly: true };
+            }
+            
+            return null;
+        }
+        
+        // Get date key in YYYY-MM-DD format WITHOUT timezone conversion
+        function getLocalDateKey(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        // Parse scheduled date from various formats: "1/11/26", "1/11/2026", "2026-01-11"
+        function parseScheduledDate(dateStr) {
+            if (!dateStr) return null;
+            const str = dateStr.toString().trim();
+            
+            // Format: M/D/YY or M/D/YYYY
+            const mdyMatch = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+            if (mdyMatch) {
+                const month = parseInt(mdyMatch[1]) - 1;
+                const day = parseInt(mdyMatch[2]);
+                let year = parseInt(mdyMatch[3]);
+                if (year < 100) {
+                    year += year < 50 ? 2000 : 1900; // 26 -> 2026, 99 -> 1999
+                }
+                return new Date(year, month, day, 12, 0, 0);
+            }
+            
+            // Format: YYYY-MM-DD
+            const isoMatch = str.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            if (isoMatch) {
+                return new Date(parseInt(isoMatch[1]), parseInt(isoMatch[2]) - 1, parseInt(isoMatch[3]), 12, 0, 0);
+            }
+            
+            // Fallback: try native parsing with noon time to avoid UTC issues
+            const fallback = new Date(str);
+            if (!isNaN(fallback)) {
+                return new Date(fallback.getFullYear(), fallback.getMonth(), fallback.getDate(), 12, 0, 0);
+            }
+            
+            return null;
+        }
+        
+        // Format date with day of week: "2026-01-11 (Sun)"
+        // IMPORTANT: Parse YYYY-MM-DD manually to avoid UTC interpretation
+        function formatDateWithDay(dateStr) {
+            // dateStr is in format "YYYY-MM-DD"
+            const parts = dateStr.split('-');
+            const year = parseInt(parts[0]);
+            const month = parseInt(parts[1]) - 1; // JS months are 0-indexed
+            const day = parseInt(parts[2]);
+            
+            // Create date in LOCAL time (not UTC)
+            const date = new Date(year, month, day, 12, 0, 0); // Use noon to avoid any DST issues
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const dayOfWeek = days[date.getDay()];
+            return `${dateStr} (${dayOfWeek})`;
+        }
+        
+        // Parse Excel serial time format to display time
+        // The Z means UTC, so we need to convert to local time
+        function parseExcelTime(timeValue) {
+            if (!timeValue) return '--';
+            const str = timeValue.toString().trim();
+            
+            // Handle Excel serial date format: any "1899-..." or ISO format with T and Z
+            if (str.startsWith('1899') || (str.includes('T') && str.includes('Z'))) {
+                try {
+                    const date = new Date(str);
+                    if (!isNaN(date.getTime())) {
+                        let hours = date.getHours(); // Gets LOCAL hours (converted from UTC)
+                        const mins = date.getMinutes().toString().padStart(2, '0');
+                        const ampm = hours >= 12 ? 'PM' : 'AM';
+                        hours = hours % 12 || 12;
+                        return `${hours}:${mins} ${ampm}`;
+                    }
+                } catch (e) {
+                    console.log('Error in parseExcelTime:', str, e);
+                }
+            }
+            
+            // Handle already formatted time like "9:07:00 AM" or "9:07 AM"
+            const ampmMatch = str.match(/(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)/i);
+            if (ampmMatch) {
+                return `${ampmMatch[1]}:${ampmMatch[2]} ${ampmMatch[3].toUpperCase()}`;
+            }
+            
+            // Handle 24-hour format like "17:07:00" or "17:07"
+            const time24Match = str.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
+            if (time24Match) {
+                let hours = parseInt(time24Match[1]);
+                const mins = time24Match[2];
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12 || 12;
+                return `${hours}:${mins} ${ampm}`;
+            }
+            
+            return str;
+        }
+        
+        // Parse time string to minutes since midnight (for calculations)
+        // Handles: "9:07:00 AM", "12:02:00 PM", "1899-12-30T17:07:00.000Z", "1899-12-31T..."
+        function parseTimeToMinutes(timeValue) {
+            if (!timeValue) return null;
+            const str = timeValue.toString().trim();
+            
+            // Handle Excel serial date format: any "1899-..." or ISO format with T and Z
+            if (str.startsWith('1899') || (str.includes('T') && str.includes('Z'))) {
+                try {
+                    const date = new Date(str);
+                    if (!isNaN(date.getTime())) {
+                        const hours = date.getHours(); // Local hours
+                        const mins = date.getMinutes();
+                        return hours * 60 + mins;
+                    }
+                } catch (e) {
+                    console.log('Error parsing time to minutes:', str, e);
+                }
+            }
+            
+            // Handle AM/PM format: "9:07:00 AM" or "12:02 PM"
+            const ampmMatch = str.match(/(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)/i);
+            if (ampmMatch) {
+                let hours = parseInt(ampmMatch[1]);
+                const mins = parseInt(ampmMatch[2]);
+                const ampm = ampmMatch[3].toUpperCase();
+                
+                // Convert to 24-hour
+                if (ampm === 'PM' && hours !== 12) hours += 12;
+                if (ampm === 'AM' && hours === 12) hours = 0;
+                
+                return hours * 60 + mins;
+            }
+            
+            // Handle 24-hour format: "17:07:00" or "17:07"
+            const time24Match = str.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
+            if (time24Match) {
+                const hours = parseInt(time24Match[1]);
+                const mins = parseInt(time24Match[2]);
+                return hours * 60 + mins;
+            }
+            
+            return null;
+        }
+        
+        // Format time for display - handles Excel serial format but keeps AM/PM as-is
+        function formatTimeForDisplay(timeValue) {
+            if (!timeValue) return '--';
+            const str = timeValue.toString().trim();
+            
+            // Handle Excel serial date format: any "1899-..." or ISO format with T and Z
+            // Examples: "1899-12-30T03:58:00.000Z", "1899-12-31T19:57:00.000Z"
+            if (str.startsWith('1899') || (str.includes('T') && str.includes('Z'))) {
+                try {
+                    const date = new Date(str);
+                    if (!isNaN(date.getTime())) {
+                        let hours = date.getHours(); // Local hours (converted from UTC)
+                        const mins = date.getMinutes().toString().padStart(2, '0');
+                        const ampm = hours >= 12 ? 'PM' : 'AM';
+                        hours = hours % 12 || 12;
+                        return `${hours}:${mins} ${ampm}`;
+                    }
+                } catch (e) {
+                    console.log('Error parsing time:', str, e);
+                }
+            }
+            
+            // If already in readable format like "9:07:00 AM", clean it up
+            const ampmMatch = str.match(/(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)/i);
+            if (ampmMatch) {
+                return `${parseInt(ampmMatch[1])}:${ampmMatch[2]} ${ampmMatch[3].toUpperCase()}`;
+            }
+            
+            // Return as-is if nothing matches
+            return str;
+        }
+        
+        function getWeekNumber(dateStr) {
+            // ISO week number (Monday = start of week) using LOCAL time
+            // Parse YYYY-MM-DD manually to avoid UTC interpretation
+            let date;
+            if (typeof dateStr === 'string' && dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                const parts = dateStr.split('-');
+                date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]), 12, 0, 0);
+            } else {
+                date = new Date(dateStr);
+            }
+            
+            // Create a copy to avoid modifying original
+            const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            // Set to nearest Thursday: current date + 4 - current day number (Mon=1, Sun=7)
+            const dayNum = d.getDay() || 7;
+            d.setDate(d.getDate() + 4 - dayNum);
+            // Get first day of year
+            const yearStart = new Date(d.getFullYear(), 0, 1);
+            // Calculate week number
+            const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            return weekNo;
+        }
+        
+        function getWeekYear(dateStr) {
+            // Get the year that the ISO week belongs to (for weeks spanning year boundaries)
+            // Parse YYYY-MM-DD manually to avoid UTC interpretation
+            let date;
+            if (typeof dateStr === 'string' && dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                const parts = dateStr.split('-');
+                date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]), 12, 0, 0);
+            } else {
+                date = new Date(dateStr);
+            }
+            
+            const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            const dayNum = d.getDay() || 7;
+            d.setDate(d.getDate() + 4 - dayNum);
+            return d.getFullYear();
+        }
+        
+        function isHoliday(dateStr) {
+            // dateStr is already in YYYY-MM-DD format from getLocalDateKey
+            return HOLIDAYS[dateStr] || null;
+        }
+        
+        // ============================================
+        // SEARCHABLE DROPDOWN
+        // ============================================
+        function initializeSearchableDropdown() {
+            const input = document.getElementById('employeeSearch');
+            const list = document.getElementById('employeeList');
+            let highlightedIndex = -1;
+            
+            input.addEventListener('focus', () => {
+                renderDropdownList('');
+                list.classList.add('active');
+            });
+            
+            input.addEventListener('input', (e) => {
+                renderDropdownList(e.target.value);
+                highlightedIndex = -1;
+            });
+            
+            input.addEventListener('keydown', (e) => {
+                const items = list.querySelectorAll('.dropdown-item');
+                
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    highlightedIndex = Math.min(highlightedIndex + 1, items.length - 1);
+                    updateHighlight(items);
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    highlightedIndex = Math.max(highlightedIndex - 1, 0);
+                    updateHighlight(items);
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (highlightedIndex >= 0 && items[highlightedIndex]) {
+                        selectProvider(items[highlightedIndex].dataset.provider);
+                    }
+                } else if (e.key === 'Escape') {
+                    list.classList.remove('active');
+                }
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('#employeeDropdown')) {
+                    list.classList.remove('active');
+                }
+            });
+            
+            function updateHighlight(items) {
+                items.forEach((item, i) => {
+                    item.classList.toggle('highlighted', i === highlightedIndex);
+                });
+                if (items[highlightedIndex]) {
+                    items[highlightedIndex].scrollIntoView({ block: 'nearest' });
+                }
+            }
+        }
+        
+        function renderDropdownList(filter) {
+            const list = document.getElementById('employeeList');
+            const filtered = providers.filter(p => 
+                p.toLowerCase().includes(filter.toLowerCase())
+            );
+            
+            if (filtered.length === 0) {
+                list.innerHTML = '<div class="no-results">No employees found</div>';
+            } else {
+                list.innerHTML = filtered.map(p => 
+                    `<div class="dropdown-item" data-provider="${escapeHtml(p)}" onclick="selectProvider('${escapeHtml(p).replace(/'/g, "\\'")}')">${escapeHtml(p)}</div>`
+                ).join('');
+            }
+        }
+        
+        function selectProvider(provider) {
+            selectedProvider = provider;
+            document.getElementById('employeeSearch').value = provider;
+            document.getElementById('employeeList').classList.remove('active');
+        }
+        
+        // ============================================
+        // FILTER INITIALIZATION
+        // ============================================
+        function initializeFilters() {
+            const yearSelect = document.getElementById('yearSelect');
+            const currentYear = new Date().getFullYear();
+            for (let y = currentYear; y >= currentYear - 3; y--) {
+                yearSelect.innerHTML += `<option value="${y}">${y}</option>`;
+            }
+            
+            // Set current week
+            const now = new Date();
+            const start = new Date(now.getFullYear(), 0, 1);
+            const currentWeek = Math.ceil((now - start) / (7 * 24 * 60 * 60 * 1000));
+            document.getElementById('weekNumber').value = currentWeek;
+        }
+        
+        // ============================================
+        // DATA LOADING
+        // ============================================
+        async function loadProviders() {
+            try {
+                showLoading('Loading Employees...');
+                const result = await jsonpFetch({ action: 'getServiceReport' });
+                
+                if (result.success && result.data) {
+                    const providerSet = new Set();
+                    result.data.forEach(row => {
+                        if (row['Provider Name']) {
+                            providerSet.add(row['Provider Name']);
+                        }
+                    });
+                    providers = Array.from(providerSet).sort();
+                }
+                hideLoading();
+            } catch (error) {
+                hideLoading();
+                showToast('Failed to load employees: ' + error.message, 'error');
+            }
+        }
+        
+        async function generateReport() {
+            if (!selectedProvider) {
+                showToast('Please select an employee', 'warning');
+                return;
+            }
+            
+            const week = document.getElementById('weekNumber').value;
+            const year = document.getElementById('yearSelect').value;
+            
+            if (!week || week < 1 || week > 53) {
+                showToast('Please enter a valid week number (1-53)', 'warning');
+                return;
+            }
+            
+            const filters = { 
+                provider: selectedProvider,
+                week: week,
+                year: year
+            };
+            
+            try {
+                showLoading(`Loading hours for ${selectedProvider}...`);
+                
+                const result = await jsonpFetch({ action: 'getServiceReport', ...filters });
+                
+                if (result.success && result.data) {
+                    // Filter for this provider and exclude cancelled shifts
+                    // Load a wider date range to capture overnight shifts that might spill into selected week
+                    const targetWeek = parseInt(week);
+                    const targetYear = parseInt(year);
+                    
+                    reportData = result.data.filter(row => {
+                        if (row['Provider Name'] !== selectedProvider) return false;
+                        if (!row['Status'] || row['Status'].toLowerCase().includes('cancel')) return false;
+                        
+                        const scheduledDate = row['Scheduled Date'];
+                        if (!scheduledDate) return false;
+                        
+                        // Parse scheduled date properly - could be "1/11/26" or "1/11/2026" or other formats
+                        const rowDate = parseScheduledDate(scheduledDate);
+                        if (!rowDate) return false;
+                        
+                        const rowYear = rowDate.getFullYear();
+                        const rowDateKey = getLocalDateKey(rowDate);
+                        const rowWeek = getWeekNumber(rowDateKey);
+                        
+                        // Include shifts from target week AND the week before (to capture overnight spillover)
+                        const isTargetWeek = rowYear === targetYear && rowWeek === targetWeek;
+                        const isPreviousWeek = rowYear === targetYear && rowWeek === targetWeek - 1;
+                        const isPreviousYearLastWeek = targetWeek === 1 && rowYear === targetYear - 1 && rowWeek >= 52;
+                        
+                        return isTargetWeek || isPreviousWeek || isPreviousYearLastWeek;
+                    });
+                    
+                    console.log('Loaded data (including previous week for overnight shifts):', reportData.length, 'shifts');
+                    console.log('Sample row:', reportData[0]); // Debug: see column names
+                    
+                    if (reportData.length === 0) {
+                        document.getElementById('reportContainer').innerHTML = `
+                            <div class="empty-state">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="8" y1="12" x2="16" y2="12"/>
+                                </svg>
+                                <h3>No Services Found</h3>
+                                <p>No completed services found for ${escapeHtml(selectedProvider)} in Week ${week}, ${year}.</p>
+                            </div>
+                        `;
+                    } else {
+                        renderReport(filters);
+                    }
+                }
+                
+                hideLoading();
+            } catch (error) {
+                hideLoading();
+                showToast('Failed to generate report: ' + error.message, 'error');
+            }
+        }
+        
+        // ============================================
+        // HOURS CALCULATION ENGINE
+        // ============================================
+        function calculateHoursBreakdown(data, targetWeek, targetYear) {
+            // First, process all shifts and split overnight ones
+            const shiftSegments = [];
+            
+            data.forEach((service, idx) => {
+                const scheduledDate = service['Scheduled Date'];
+                if (!scheduledDate) return;
+                
+                // Service Duration is in MINUTES (column G)
+                const serviceDurationMinutes = parseFloat(service['Service Duration']) || 0;
+                
+                // Get display times from columns P and Q - keep as-is for display
+                const startTimeRaw = service['StartTIME'] || service['StartTime'] || '';
+                const endTimeRaw = service['EndTime'] || service['EndTIME'] || '';
+                
+                // Format for display (handles Excel serial format if needed)
+                const startTimeDisplay = formatTimeForDisplay(startTimeRaw);
+                const endTimeDisplay = formatTimeForDisplay(endTimeRaw);
+                
+                // Parse times to calculate R (worked minutes)
+                const startTimeParsed = parseTimeToMinutes(startTimeRaw);
+                const endTimeParsed = parseTimeToMinutes(endTimeRaw);
+                
+                if (startTimeParsed === null || endTimeParsed === null) {
+                    // Can't parse times, skip
+                    console.log('Could not parse times for shift', idx);
+                    return;
+                }
+                
+                // Determine if overnight: end time is LESS than start time means it crossed midnight
+                // Example: start 19:00 (1140 mins) -> end 08:00 (480 mins) = overnight
+                const isOvernight = endTimeParsed < startTimeParsed;
+                
+                // Parse scheduled date
+                const schedDate = parseScheduledDate(scheduledDate);
+                if (!schedDate) return;
+                const startDateKey = getLocalDateKey(schedDate);
+                
+                // Debug first few rows
+                if (idx < 3) {
+                    console.log(`=== Shift ${idx} ===`);
+                    console.log('StartTIME raw:', startTimeRaw, '| parsed mins:', startTimeParsed, '| display:', startTimeDisplay);
+                    console.log('EndTime raw:', endTimeRaw, '| parsed mins:', endTimeParsed, '| display:', endTimeDisplay);
+                    console.log('Service Duration (mins):', serviceDurationMinutes);
+                    console.log('Is Overnight:', isOvernight, '(end < start:', endTimeParsed, '<', startTimeParsed, ')');
+                }
+                
+                if (isOvernight) {
+                    // OVERNIGHT SHIFT - split at midnight
+                    // Minutes from start until midnight (1440 = minutes in a day)
+                    const minutesBeforeMidnight = 1440 - startTimeParsed;
+                    // Minutes from midnight until end
+                    const minutesAfterMidnight = endTimeParsed;
+                    
+                    // Total R (worked minutes)
+                    const totalWorkedMinutes = minutesBeforeMidnight + minutesAfterMidnight;
+                    
+                    // TMN calculation: Service Duration - R (only if R < Service Duration)
+                    let tmnMinutes = 0;
+                    if (totalWorkedMinutes < serviceDurationMinutes) {
+                        tmnMinutes = serviceDurationMinutes - totalWorkedMinutes;
+                    }
+                    
+                    // Calculate end date (next day)
+                    const endDate = new Date(schedDate);
+                    endDate.setDate(endDate.getDate() + 1);
+                    const endDateKey = getLocalDateKey(endDate);
+                    
+                    // Check if crossing to next week
+                    const startWeek = getWeekNumber(startDateKey);
+                    const endWeek = getWeekNumber(endDateKey);
+                    const crossesToNextWeek = startWeek !== endWeek;
+                    
+                    if (idx < 3) {
+                        console.log('OVERNIGHT detected:', startDateKey, '->', endDateKey);
+                        console.log('Minutes before midnight:', minutesBeforeMidnight);
+                        console.log('Minutes after midnight:', minutesAfterMidnight);
+                        console.log('Total R:', totalWorkedMinutes, '| TMN:', tmnMinutes);
+                        console.log('Crosses to next week:', crossesToNextWeek);
+                    }
+                    
+                    // Segment 1: Hours on start date (before midnight)
+                    if (minutesBeforeMidnight > 0) {
+                        shiftSegments.push({
+                            service,
+                            dateKey: startDateKey,
+                            workedMinutes: minutesBeforeMidnight,
+                            serviceDurationMinutes: serviceDurationMinutes,
+                            tmnMinutes: tmnMinutes, // TMN goes on first segment only
+                            startTimeDisplay: startTimeDisplay,
+                            endTimeDisplay: endTimeDisplay,
+                            isOvernightSegment: true,
+                            segmentType: 'before-midnight',
+                            crossesToNextDay: true,
+                            crossesToNextWeek: crossesToNextWeek,
+                            endDateKey: endDateKey
+                        });
+                    }
+                    
+                    // Segment 2: Hours on end date (after midnight)
+                    if (minutesAfterMidnight > 0) {
+                        shiftSegments.push({
+                            service,
+                            dateKey: endDateKey,
+                            workedMinutes: minutesAfterMidnight,
+                            serviceDurationMinutes: 0, // Don't double count
+                            tmnMinutes: 0, // TMN already on first segment
+                            startTimeDisplay: startTimeDisplay,
+                            endTimeDisplay: endTimeDisplay,
+                            isOvernightSegment: true,
+                            segmentType: 'after-midnight',
+                            crossesFromPrevDay: true,
+                            startDateKey: startDateKey
+                        });
+                    }
+                } else {
+                    // Same day shift
+                    let workedMinutes = endTimeParsed - startTimeParsed;
+                    if (workedMinutes < 0) workedMinutes += 1440; // Handle edge case
+                    
+                    // TMN calculation: Service Duration - R (only if R < Service Duration)
+                    let tmnMinutes = 0;
+                    if (workedMinutes < serviceDurationMinutes) {
+                        tmnMinutes = serviceDurationMinutes - workedMinutes;
+                    }
+                    
+                    if (idx < 3) {
+                        console.log('Same day shift');
+                        console.log('R (worked):', workedMinutes, '| TMN:', tmnMinutes);
+                    }
+                    
+                    shiftSegments.push({
+                        service,
+                        dateKey: startDateKey,
+                        workedMinutes: workedMinutes,
+                        serviceDurationMinutes: serviceDurationMinutes,
+                        tmnMinutes: tmnMinutes,
+                        startTimeDisplay: startTimeDisplay,
+                        endTimeDisplay: endTimeDisplay,
+                        isOvernightSegment: false,
+                        segmentType: 'full',
+                        crossesToNextDay: false,
+                        crossesToNextWeek: false
+                    });
+                }
+            });
+            
+            // FILTER: Only include segments whose date falls within the target week
+            const filteredSegments = shiftSegments.filter(segment => {
+                const segmentWeek = getWeekNumber(segment.dateKey);
+                const segmentYear = getWeekYear(segment.dateKey);
+                return segmentWeek === targetWeek && segmentYear === targetYear;
+            });
+            
+            // Group filtered segments by date
+            const byDate = {};
+            filteredSegments.forEach(segment => {
+                if (!byDate[segment.dateKey]) {
+                    byDate[segment.dateKey] = [];
+                }
+                byDate[segment.dateKey].push(segment);
+            });
+            
+            // Sort dates chronologically for OT calculation
+            const chronologicalDates = Object.keys(byDate).sort();
+            const otCalculations = {};
+            
+            // Track weekly totals (only for this week)
+            let weeklyTotalWorked = 0;
+            
+            const dailyOtThreshold = DAILY_OT_THRESHOLD * 60; // 9h = 540 min
+            const weeklyOtThreshold = WEEKLY_OT_THRESHOLD * 60; // 40h = 2400 min
+            
+            chronologicalDates.forEach(dateKey => {
+                const segments = byDate[dateKey].sort((a, b) => {
+                    // For after-midnight segments, they should come first in the day
+                    if (a.segmentType === 'after-midnight' && b.segmentType !== 'after-midnight') return -1;
+                    if (b.segmentType === 'after-midnight' && a.segmentType !== 'after-midnight') return 1;
+                    
+                    // Sort by start time for proper OT calculation
+                    const timeA = parseTimeToMinutes(a.startTimeDisplay);
+                    const timeB = parseTimeToMinutes(b.startTimeDisplay);
+                    if (timeA === null || timeB === null) return 0;
+                    return timeA - timeB;
+                });
+                
+                const holidayName = isHoliday(dateKey);
+                
+                let dailyRegular = 0;
+                let dailyOvertime = 0;
+                let dailyHoliday = 0;
+                let dailyTMN = 0;
+                let dailyTotalWorked = 0;
+                
+                const shiftsWithBreakdown = segments.map(segment => {
+                    const workedMinutes = segment.workedMinutes;
+                    const tmnMinutes = segment.tmnMinutes;
+                    
+                    const shift = {
+                        service: segment.service,
+                        serviceDurationMinutes: segment.serviceDurationMinutes,
+                        workedMinutes: workedMinutes,
+                        regularMinutes: 0,
+                        overtimeMinutes: 0,
+                        holidayMinutes: 0,
+                        nonWorkedMinutes: tmnMinutes,
+                        standByMinutes: 0,
+                        isOvernightSegment: segment.isOvernightSegment,
+                        segmentType: segment.segmentType,
+                        // Display times from Columns P and Q
+                        startTimeDisplay: segment.startTimeDisplay,
+                        endTimeDisplay: segment.endTimeDisplay,
+                        // Cross-day/week flags
+                        crossesToNextDay: segment.crossesToNextDay,
+                        crossesToNextWeek: segment.crossesToNextWeek,
+                        crossesFromPrevDay: segment.crossesFromPrevDay,
+                        endDateKey: segment.endDateKey,
+                        startDateKey: segment.startDateKey
+                    };
+                    
+                    dailyTMN += tmnMinutes;
+                    
+                    // If holiday, all WORKED hours are holiday hours
+                    if (holidayName) {
+                        shift.holidayMinutes = workedMinutes;
+                        dailyHoliday += workedMinutes;
+                        weeklyTotalWorked += workedMinutes;
+                        dailyTotalWorked += workedMinutes;
+                        return shift;
+                    }
+                    
+                    // Calculate Regular vs Overtime
+                    // OT is based on WORKED hours (R), not TMN
+                    if (dailyTotalWorked >= dailyOtThreshold) {
+                        // Already over daily threshold - all OT
+                        shift.overtimeMinutes = workedMinutes;
+                    } else if (dailyTotalWorked + workedMinutes > dailyOtThreshold) {
+                        // Split at daily threshold
+                        const regularPortion = dailyOtThreshold - dailyTotalWorked;
+                        shift.regularMinutes = regularPortion;
+                        shift.overtimeMinutes = workedMinutes - regularPortion;
+                    } else if (weeklyTotalWorked >= weeklyOtThreshold) {
+                        // Already over weekly threshold - all OT
+                        shift.overtimeMinutes = workedMinutes;
+                    } else if (weeklyTotalWorked + workedMinutes > weeklyOtThreshold) {
+                        // Split at weekly threshold
+                        const regularPortion = weeklyOtThreshold - weeklyTotalWorked;
+                        shift.regularMinutes = regularPortion;
+                        shift.overtimeMinutes = workedMinutes - regularPortion;
+                    } else {
+                        // Under both thresholds - all regular
+                        shift.regularMinutes = workedMinutes;
+                    }
+                    
+                    dailyRegular += shift.regularMinutes;
+                    dailyOvertime += shift.overtimeMinutes;
+                    dailyTotalWorked += workedMinutes;
+                    weeklyTotalWorked += workedMinutes;
+                    
+                    return shift;
+                });
+                
+                otCalculations[dateKey] = {
+                    date: dateKey,
+                    holidayName,
+                    shifts: shiftsWithBreakdown,
+                    totals: {
+                        regular: dailyRegular,
+                        nonWorked: dailyTMN,
+                        standBy: 0,
+                        overtime: dailyOvertime,
+                        holiday: dailyHoliday
+                    },
+                    weeklyRunningTotal: weeklyTotalWorked
+                };
+            });
+            
+            // Build result array in display order
+            let displayDates = chronologicalDates;
+            if (sortState.main.col === 'date' && sortState.main.dir === 'desc') {
+                displayDates = [...chronologicalDates].reverse();
+            }
+            
+            return displayDates.map(dateKey => otCalculations[dateKey]);
+        }
+        
+        // ============================================
+        // RENDER REPORT
+        // ============================================
+        function renderReport(filters) {
+            const targetWeek = parseInt(filters.week);
+            const targetYear = parseInt(filters.year);
+            
+            const breakdown = calculateHoursBreakdown(reportData, targetWeek, targetYear);
+            
+            if (breakdown.length === 0) {
+                document.getElementById('reportContainer').innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="8" y1="12" x2="16" y2="12"/>
+                        </svg>
+                        <h3>No Data</h3>
+                        <p>No valid service records found.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Calculate totals
+            const totals = {
+                regular: 0, nonWorked: 0, mealPremium: 0, standBy: 0,
+                cancelCredit: 0, overtime: 0, doubleTime: 0,
+                incentive: 0, tips: 0, holiday: 0
+            };
+            
+            let totalShifts = 0;
+            breakdown.forEach(day => {
+                Object.keys(totals).forEach(key => {
+                    totals[key] += day.totals[key] || 0;
+                });
+                totalShifts += day.shifts.length;
+            });
+            
+            const periodLabel = `Week ${filters.week}, ${filters.year}`;
+            const totalWorked = totals.regular + totals.overtime + totals.holiday;
+            
+            // Sort icons
+            const getSortIcon = (col) => sortState.main.col === col ? (sortState.main.dir === 'asc' ? '▲' : '▼') : '↕';
+            const getSortClass = (col) => sortState.main.col === col ? (sortState.main.dir === 'asc' ? 'sorted-asc' : 'sorted-desc') : '';
+            
+            let html = `
+                <!-- Employee Banner -->
+                <div class="employee-banner">
+                    <div>
+                        <h2>${escapeHtml(selectedProvider)}</h2>
+                        <p>Personal Attendant • ${breakdown.length} Work Days • ${totalShifts} Shifts</p>
+                    </div>
+                    <div class="period-badge">${periodLabel}</div>
+                </div>
+                
+                <!-- Summary Cards -->
+                <div class="summary-grid">
+                    <div class="summary-card highlight">
+                        <div class="label">Total Worked</div>
+                        <div class="value">${minutesToHHMM(totalWorked)}</div>
+                        <div class="decimal">${minutesToDecimal(totalWorked)} hrs</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="label">Regular (1.0x)</div>
+                        <div class="value">${minutesToHHMM(totals.regular)}</div>
+                        <div class="decimal">${minutesToDecimal(totals.regular)} hrs</div>
+                    </div>
+                    <div class="summary-card overtime">
+                        <div class="label">Overtime (1.5x)</div>
+                        <div class="value">${minutesToHHMM(totals.overtime)}</div>
+                        <div class="decimal">${minutesToDecimal(totals.overtime)} hrs</div>
+                    </div>
+                    <div class="summary-card" style="background: #FEF3C7; border-color: #F59E0B;">
+                        <div class="label">Non-Worked HRS (TMN)</div>
+                        <div class="value">${minutesToHHMM(totals.nonWorked)}</div>
+                        <div class="decimal">${minutesToDecimal(totals.nonWorked)} hrs</div>
+                    </div>
+                    ${totals.holiday > 0 ? `
+                    <div class="summary-card" style="background: linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%); color: white; border: none;">
+                        <div class="label">Holiday (1.5x)</div>
+                        <div class="value">${minutesToHHMM(totals.holiday)}</div>
+                        <div class="decimal">${minutesToDecimal(totals.holiday)} hrs</div>
+                    </div>
+                    ` : ''}
+                </div>
+                
+                <!-- Main Data Table -->
+                <div class="table-container">
+                    <div class="table-scroll">
+                        <table class="data-table" id="mainTable">
+                            <thead>
+                                <tr>
+                                    <th class="${getSortClass('date')}" onclick="sortMainTable('date')">Date ↑ <span class="sort-icon">${getSortIcon('date')}</span></th>
+                                    <th class="${getSortClass('regular')}" onclick="sortMainTable('regular')">Regular Hours <span class="sort-icon">${getSortIcon('regular')}</span></th>
+                                    <th class="${getSortClass('nonWorked')}" onclick="sortMainTable('nonWorked')">Non-Worked HRS (TMN) <span class="sort-icon">${getSortIcon('nonWorked')}</span></th>
+                                    <th class="${getSortClass('standBy')}" onclick="sortMainTable('standBy')">Stand By <span class="sort-icon">${getSortIcon('standBy')}</span></th>
+                                    <th class="${getSortClass('overtime')}" onclick="sortMainTable('overtime')">Over Time Hours <span class="sort-icon">${getSortIcon('overtime')}</span></th>
+                                    <th class="${getSortClass('holiday')}" onclick="sortMainTable('holiday')">Holiday Hours <span class="sort-icon">${getSortIcon('holiday')}</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+            
+            // Add rows for each day
+            breakdown.forEach((day, index) => {
+                const t = day.totals;
+                html += `
+                    <tr class="expandable" onclick="toggleRow(${index})" id="row-${index}">
+                        <td>
+                            <span class="expand-icon">+</span>
+                            ${formatDateWithDay(day.date)}${day.holidayName ? ` <span style="color: #7C3AED; font-size: 11px;">🎉 ${day.holidayName}</span>` : ''}
+                        </td>
+                        <td class="${t.regular > 0 ? 'hours-positive' : 'hours-zero'}">${minutesToHHMM(t.regular)}</td>
+                        <td class="${t.nonWorked > 0 ? 'hours-positive' : 'hours-zero'}">${minutesToHHMM(t.nonWorked)}</td>
+                        <td class="${t.standBy > 0 ? 'hours-positive' : 'hours-zero'}">${minutesToHHMM(t.standBy)}</td>
+                        <td class="${t.overtime > 0 ? 'hours-overtime' : 'hours-zero'}">${minutesToHHMM(t.overtime)}</td>
+                        <td class="${t.holiday > 0 ? 'hours-overtime' : 'hours-zero'}">${minutesToHHMM(t.holiday)}</td>
+                    </tr>
+                    <tr class="detail-row" id="detail-${index}">
+                        <td colspan="6">
+                            <div class="detail-content">
+                                <div class="detail-table-scroll">
+                                    <table class="detail-table" id="detail-table-${index}">
+                                        <thead>
+                                            <tr>
+                                                <th>Customer</th>
+                                                <th>Start</th>
+                                                <th>End</th>
+                                                <th>Regular Coverage</th>
+                                                <th>StandBy Coverage</th>
+                                                <th>Non-Worked (TMN)</th>
+                                                <th>Overtime</th>
+                                                <th>Holiday Hours</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${day.shifts.map(shift => {
+                                                // Format times - use formatTimeForDisplay as safety fallback
+                                                let startDisplay = shift.startTimeDisplay || '--';
+                                                let endDisplay = shift.endTimeDisplay || '--';
+                                                
+                                                // Safety fallback: if still showing raw format, reformat
+                                                if (startDisplay.includes('1899') || startDisplay.includes('T')) {
+                                                    startDisplay = formatTimeForDisplay(startDisplay);
+                                                }
+                                                if (endDisplay.includes('1899') || endDisplay.includes('T')) {
+                                                    endDisplay = formatTimeForDisplay(endDisplay);
+                                                }
+                                                
+                                                let startStyle = '';
+                                                let endStyle = '';
+                                                
+                                                if (shift.segmentType === 'before-midnight') {
+                                                    // This is the portion before midnight - color the end time
+                                                    if (shift.crossesToNextWeek) {
+                                                        endStyle = 'color: #DC2626; font-weight: 600;'; // Red for next week
+                                                        endDisplay += ' <span style="font-size: 10px;">(+1 wk)</span>';
+                                                    } else if (shift.crossesToNextDay) {
+                                                        endStyle = 'color: #F57600; font-weight: 600;'; // Orange for next day
+                                                        endDisplay += ' <span style="font-size: 10px;">(+1 day)</span>';
+                                                    }
+                                                } else if (shift.segmentType === 'after-midnight') {
+                                                    // This is the portion after midnight - color the start time
+                                                    startStyle = 'color: #3B82F6; font-weight: 600;'; // Blue for from previous day
+                                                    startDisplay += ' <span style="font-size: 10px;">(prev day)</span>';
+                                                }
+                                                
+                                                const rowStyle = shift.isOvernightSegment ? 'background: #FEF3C7;' : '';
+                                                
+                                                return `
+                                                <tr style="${rowStyle}">
+                                                    <td>${escapeHtml(shift.service['Customer Name'] || '--')}${shift.isOvernightSegment ? ' <span style="font-size: 10px; color: #92400E;">(overnight)</span>' : ''}</td>
+                                                    <td style="${startStyle}">${startDisplay}</td>
+                                                    <td style="${endStyle}">${endDisplay}</td>
+                                                    <td class="${shift.regularMinutes > 0 ? 'hours-positive' : 'hours-zero'}">${minutesToHHMM(shift.regularMinutes)}</td>
+                                                    <td class="hours-zero">${minutesToHHMM(shift.standByMinutes)}</td>
+                                                    <td class="${shift.nonWorkedMinutes > 0 ? 'hours-positive' : 'hours-zero'}">${minutesToHHMM(shift.nonWorkedMinutes)}</td>
+                                                    <td class="${shift.overtimeMinutes > 0 ? 'hours-overtime' : 'hours-zero'}">${minutesToHHMM(shift.overtimeMinutes)}</td>
+                                                    <td class="${shift.holidayMinutes > 0 ? 'hours-overtime' : 'hours-zero'}">${minutesToHHMM(shift.holidayMinutes)}</td>
+                                                </tr>
+                                            `}).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            // Total row
+            html += `
+                        <tr class="total-row">
+                            <td><strong>total</strong></td>
+                            <td class="${totals.regular > 0 ? 'hours-positive' : ''}">${minutesToHHMM(totals.regular)}</td>
+                            <td class="${totals.nonWorked > 0 ? 'hours-positive' : ''}">${minutesToHHMM(totals.nonWorked)}</td>
+                            <td class="${totals.standBy > 0 ? 'hours-positive' : ''}">${minutesToHHMM(totals.standBy)}</td>
+                            <td class="${totals.overtime > 0 ? 'hours-overtime' : ''}">${minutesToHHMM(totals.overtime)}</td>
+                            <td class="${totals.holiday > 0 ? 'hours-overtime' : ''}">${minutesToHHMM(totals.holiday)}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span>Items per page:</span>
+                <select disabled><option>10</option></select>
+                <span>1 - ${breakdown.length} of ${breakdown.length}</span>
+            </div>
+        </div>
+            `;
+            
+            document.getElementById('reportContainer').innerHTML = html;
+        }
+        
+        // ============================================
+        // TABLE INTERACTIONS
+        // ============================================
+        function toggleRow(index) {
+            const row = document.getElementById(`row-${index}`);
+            const detail = document.getElementById(`detail-${index}`);
+            
+            row.classList.toggle('expanded');
+            detail.classList.toggle('visible');
+            
+            const icon = row.querySelector('.expand-icon');
+            icon.textContent = row.classList.contains('expanded') ? '−' : '+';
+        }
+        
+        function expandAll() {
+            allExpanded = !allExpanded;
+            const rows = document.querySelectorAll('.expandable');
+            const details = document.querySelectorAll('.detail-row');
+            
+            rows.forEach((row, i) => {
+                const detail = details[i];
+                if (allExpanded) {
+                    row.classList.add('expanded');
+                    detail.classList.add('visible');
+                    row.querySelector('.expand-icon').textContent = '−';
+                } else {
+                    row.classList.remove('expanded');
+                    detail.classList.remove('visible');
+                    row.querySelector('.expand-icon').textContent = '+';
+                }
+            });
+            
+            document.getElementById('expandBtnText').textContent = allExpanded ? 'Collapse All' : 'Expand All';
+        }
+        
+        function sortMainTable(column) {
+            if (sortState.main.col === column) {
+                sortState.main.dir = sortState.main.dir === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortState.main.col = column;
+                sortState.main.dir = 'asc';
+            }
+            
+            const filters = {
+                provider: selectedProvider,
+                week: document.getElementById('weekNumber').value,
+                year: document.getElementById('yearSelect').value
+            };
+            
+            renderReport(filters);
+        }
+        
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        document.addEventListener('DOMContentLoaded', async () => {
+            initializeFilters();
+            initializeSearchableDropdown();
+            await loadProviders();
+        });
+    </script>
+</body>
+</html>
