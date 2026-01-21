@@ -2766,6 +2766,7 @@
                 
                 if (data.success && data.data) {
                     smartsheetColumnMapping = data.columnMapping || {};
+                    console.log('Column mapping received:', smartsheetColumnMapping);
                     
                     // Filter out empty rows and ensure proper data structure
                     processDataRaw = data.data
@@ -2775,6 +2776,9 @@
                                    task.deliverable && task.deliverable.toString().trim() !== '';
                         })
                         .map(task => {
+                            // Log rowId for debugging
+                            console.log(`Task #${task.taskNumber} has rowId: ${task.rowId}`);
+                            
                             // Ensure scenarios object exists with proper structure
                             if (!task.scenarios) {
                                 task.scenarios = {
@@ -2871,22 +2875,44 @@
         }
         
         async function saveTaskToSmartsheet(task, updates) {
-            if (!smartsheetConfig.connected || !task.rowId) return false;
+            console.log('saveTaskToSmartsheet called:', { 
+                connected: smartsheetConfig.connected, 
+                rowId: task.rowId,
+                taskNumber: task.taskNumber,
+                updates: updates 
+            });
+            
+            if (!smartsheetConfig.connected) {
+                console.log('Not connected to Smartsheet');
+                return false;
+            }
+            
+            if (!task.rowId) {
+                console.log('Task has no rowId - cannot update Smartsheet');
+                return false;
+            }
             
             try {
                 const url = buildProxyUrl('updateRow');
+                console.log('Sending update to:', url);
+                
+                const payload = {
+                    sheetId: smartsheetConfig.sheetId,
+                    rowId: task.rowId,
+                    updates: updates,
+                    columnMapping: smartsheetColumnMapping
+                };
+                console.log('Payload:', payload);
+                
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        sheetId: smartsheetConfig.sheetId,
-                        rowId: task.rowId,
-                        updates: updates,
-                        columnMapping: smartsheetColumnMapping
-                    })
+                    body: JSON.stringify(payload)
                 });
                 
                 const data = await response.json();
+                console.log('Smartsheet response:', data);
+                
                 if (data.success) {
                     smartsheetConfig.lastSync = new Date().toISOString();
                     saveSmartsheetConfigToStorage();
@@ -7620,7 +7646,7 @@
             selectedRoles = [];
         }
         
-        function saveTaskEdit() {
+        async function saveTaskEdit() {
             if (!editingTaskNumber) return;
             
             const taskIndex = processDataRaw.findIndex(t => t.taskNumber === editingTaskNumber);
@@ -7637,15 +7663,21 @@
                 // Get links from link editor rows
                 const linksText = getLinksFromEditor();
                 
-                // Update task data
-                processDataRaw[taskIndex].deliverable = document.getElementById('editDeliverable').value || '';
-                processDataRaw[taskIndex].category = document.getElementById('editCategory').value || '';
-                processDataRaw[taskIndex].description = descriptionHtml;
-                processDataRaw[taskIndex].owner = document.getElementById('editOwner').value || '';
-                processDataRaw[taskIndex].whereWorkDone = selectedRoles.join('\n');
-                processDataRaw[taskIndex].informed = document.getElementById('editInformed').value || '';
-                processDataRaw[taskIndex].dependencies = dependenciesText;
-                processDataRaw[taskIndex].links = linksText;
+                // Build updates object for Smartsheet
+                const updates = {
+                    deliverable: document.getElementById('editDeliverable').value || '',
+                    category: document.getElementById('editCategory').value || '',
+                    description: descriptionHtml,
+                    owner: document.getElementById('editOwner').value || '',
+                    whereWorkDone: selectedRoles.join('\n'),
+                    informed: document.getElementById('editInformed').value || '',
+                    dependencies: dependenciesText,
+                    links: linksText
+                };
+                
+                // Update local task data
+                const task = processDataRaw[taskIndex];
+                Object.assign(task, updates);
                 
                 // Store task number before closing modal
                 const savedTaskNum = editingTaskNumber;
@@ -7655,6 +7687,9 @@
                 
                 // Refresh views with error handling
                 try {
+                    // Regenerate dependency connections
+                    dependencyConnections = generateDependencyConnections(processDataRaw);
+                    
                     if (currentView === 'list') {
                         renderListView();
                     } else {
@@ -7667,8 +7702,17 @@
                     console.error('Error refreshing view:', renderError);
                 }
                 
-                // Show success message
-                showToast('✓ Task #' + editingTaskNumber + ' updated! Export CSV to save permanently.');
+                // Sync to Smartsheet if connected
+                if (smartsheetConfig.connected && task.rowId) {
+                    const syncSuccess = await saveTaskToSmartsheet(task, updates);
+                    if (syncSuccess) {
+                        showToast('✓ Task #' + savedTaskNum + ' saved to Smartsheet');
+                    } else {
+                        showToast('✓ Task #' + savedTaskNum + ' saved locally (Smartsheet sync failed)', true);
+                    }
+                } else {
+                    showToast('✓ Task #' + savedTaskNum + ' updated locally. Connect to Smartsheet to persist.');
+                }
                 
             } catch (error) {
                 console.error('Error saving task:', error);
