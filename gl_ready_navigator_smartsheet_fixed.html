@@ -6922,18 +6922,26 @@
         
         function sanitizeHtml(html) {
             if (!html) return '';
+            if (typeof html !== 'string') html = String(html);
             
-            // Simple and safe - just use textContent extraction
             try {
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = String(html);
+                // Check if document is available
+                if (typeof document === 'undefined' || !document.createElement) {
+                    console.warn('sanitizeHtml: document not available');
+                    return html;
+                }
                 
-                // If it parsed successfully, return the innerHTML
-                // This automatically sanitizes dangerous scripts
-                return tempDiv.innerHTML || escapeHtml(String(html));
+                const tempDiv = document.createElement('div');
+                if (!tempDiv) {
+                    console.warn('sanitizeHtml: could not create div');
+                    return html;
+                }
+                
+                tempDiv.innerHTML = html;
+                return tempDiv.innerHTML || html;
             } catch (err) {
                 console.warn('sanitizeHtml fallback:', err.message);
-                return escapeHtml(String(html));
+                return html;
             }
         }
         
