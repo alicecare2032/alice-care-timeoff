@@ -2060,7 +2060,6 @@
         .link-row-header span:last-child {
             width: 28px;
         }
-    </style>
         
         /* ========================================
            SMARTSHEET INTEGRATION STYLES
@@ -3155,50 +3154,2689 @@
         }
         
         // ========================================
-        // FALLBACK DATA (if Smartsheet not configured)
+        // EMBEDDED DATA (Full dataset - also serves as fallback)
         // ========================================
         
-        // Sample fallback data (minimal set - configure Smartsheet for full data)
-        const FALLBACK_DATA = [
-            {
+        // Full task data from source
+        const EMBEDDED_PROCESS_DATA = 
+        [
+        {
                 "governanceProcess": "PDLC",
                 "category": "PMs",
                 "taskNumber": "1",
                 "deliverable": "Program Manager assigned",
-                "description": "After Receiving approval from leadership, the HC PMO will assign a program manager.",
+                "description": "* After Receiving approval from leadership or after KICK\n* OFF approval, the HC PMO will assign a program manager to assist with the PDLC process and guide the program through the required steps Has a Program Manager been assigned.",
                 "owner": "",
-                "whereWorkDone": "",
-                "informed": "",
-                "dependencies": "",
-                "links": "",
-                "scenarios": {
-                    "noiToGl": false, "productToGl": false, "solutionBuyCapex": false,
-                    "fqToIq": false, "iqToFq": false, "skuUpdate": false,
-                    "significantArchChange": false, "newRouteToMarket": false, "changeOrder": false
-                },
-                "depth": 1
-            },
-            {
-                "governanceProcess": "PDLC",
-                "category": "PMs",
-                "taskNumber": "2",
-                "deliverable": "Review Core Team Members",
-                "description": "Confirm that all relevant core team members are part of the core team calls.",
-                "owner": "Program Manager",
                 "whereWorkDone": "",
                 "informed": "",
                 "dependencies": "Program Manager assigned",
                 "links": "",
                 "scenarios": {
-                    "noiToGl": true, "productToGl": false, "solutionBuyCapex": false,
-                    "fqToIq": false, "iqToFq": false, "skuUpdate": false,
-                    "significantArchChange": false, "newRouteToMarket": false, "changeOrder": false
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": false,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": false,
+                        "newRouteToMarket": false,
+                        "changeOrder": false
+                },
+                "depth": 1
+        },
+        {
+                "governanceProcess": "PDLC",
+                "category": "PMs",
+                "taskNumber": "2",
+                "deliverable": "Review Core Team Members",
+                "description": "* The assigned program manager must confirm that all relevant core team members and value chain partners are part of the core team calls Mandatory partners that must be part of all program discussions: \n* End to End Operationalization Lead has been assigned\n* HPE Services PSM (aka BSM) and CPSM Assigned\n* CPQ Lead If the offer is any subscription, pay per use, or subscription pay per use (see attachment): OCX Offer Lead.",
+                "owner": "Program Manager",
+                "whereWorkDone": "",
+                "informed": "",
+                "dependencies": "Program Manager assigned\nReview Core Team Members",
+                "links": "image.png",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": false,
+                        "solutionBuyCapex": false,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": false,
+                        "newRouteToMarket": false,
+                        "changeOrder": false
                 },
                 "depth": 2
-            }
-        ];
+        },
+        {
+                "governanceProcess": "PDLC",
+                "category": "PMs",
+                "taskNumber": "3",
+                "deliverable": "Assessment of the Business Case",
+                "description": "Actions to complete the business case and plan in preparation of the Strategy Council Approval with an understanding of the activities required for a HPE GreenLake Flex Solution.",
+                "owner": "Program Manager",
+                "whereWorkDone": "",
+                "informed": "",
+                "dependencies": "Assessment of the Business Case\nPricing Council Approval",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": false,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": true,
+                        "newRouteToMarket": true,
+                        "changeOrder": false
+                },
+                "depth": 7
+        },
+        {
+                "governanceProcess": "NOI",
+                "category": "OCX",
+                "taskNumber": "4",
+                "deliverable": "OCX BMQ",
+                "description": "* OCX Business Model questionnaire will help the OCX Offer Lead understand what the offering is all about in order to create a mock up.",
+                "owner": "OCX Offer Lead",
+                "whereWorkDone": "OCX Offer Lead",
+                "informed": "Product Mgr\nGL Product Mgr",
+                "dependencies": "Order Booking (Mock Run through)",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": false,
+                        "solutionBuyCapex": false,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": false,
+                        "newRouteToMarket": false,
+                        "changeOrder": false
+                },
+                "depth": 4
+        },
+        {
+                "governanceProcess": "PDLC",
+                "category": "PMs",
+                "taskNumber": "5",
+                "deliverable": "Define HW/SW/Services Market Opportunity",
+                "description": "* Market Opportunity and Market Share, Competitive Landscape, Alignment to HPE Strategy, Industry Direction, Profitability (ROI)\n* Key Questions to consider: Is this CAPEX only Will HPE GreenLake Flex Solution be required Is it IaaS SaaS.",
+                "owner": "Program Manager",
+                "whereWorkDone": "Product Mgr\nPMO Program Mgr\nSVC-SPM\nGo-To-Market\nChannel\nGL Channel",
+                "informed": "",
+                "dependencies": "Define HW/SW/Services Market Opportunity",
+                "links": "Hybrid Cloud Product Offer Document",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": false,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": true,
+                        "newRouteToMarket": true,
+                        "changeOrder": false
+                },
+                "depth": 1
+        },
+        {
+                "governanceProcess": "PDLC - GreenLake",
+                "category": "PMs",
+                "taskNumber": "6",
+                "deliverable": "Define E2E customer experience",
+                "description": "* The end to End experience has to include: Lead to Win\n* Order to Activations: Adopt, Expand and Refresh (including End of Terms) Ecosystem assessment including ISV, GSI etc.\n* Lifecycle management Upgrades.",
+                "owner": "Program Manager",
+                "whereWorkDone": "Product Mgr\nSVC-SPM",
+                "informed": "OCX Offer Lead",
+                "dependencies": "CPQ Pre-Assessment (IQ/FQ)  & Order Booking",
+                "links": "HPE GreenLake Flex Solution E2E Process Interactive Navigator",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": false,
+                        "newRouteToMarket": false,
+                        "changeOrder": true
+                },
+                "depth": 3
+        },
+        {
+                "governanceProcess": "PDLC",
+                "category": "PMs",
+                "taskNumber": "7",
+                "deliverable": "Routes to market (Direct/Partner)",
+                "description": "* Need to consider Direct and Channel Partner GTM Relationships\n* enablement Need to consider the Indirect Ecosystem requirements Are we targeting specific partners Note:\n* Product line assignment required for new SKUs.",
+                "owner": "Program Manager",
+                "whereWorkDone": "Product Mgr\nSVC-SPM\nPartner / GTM\nGo-To-Market\nChannel\nGL Channel",
+                "informed": "OCX Offer Lead",
+                "dependencies": "Define HW/SW/Services Market Opportunity\nRoutes to market (Direct/Partner)\nVendor Partner Relationships - enablement",
+                "links": "New Solutions Engagement for partners",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": true,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": true,
+                        "newRouteToMarket": true,
+                        "changeOrder": false
+                },
+                "depth": 6
+        },
+        {
+                "governanceProcess": "PDLC - GreenLake",
+                "category": "GTM (Go To Market) Readiness",
+                "taskNumber": "8",
+                "deliverable": "GTM / Commercialization",
+                "description": "* Create Plan (Direct Indirect)Define and Create prelimianry GTM Plan\n* The final execution will happen in Build under Finalize GTM Plan Prepare for the MOC and Communication of the Offer to the appropriate Audience Work with NPI Launch team for the communication and ensure there is focus on the HPE GreenLake solution:\n* QuickSpecs\n* Website\n* Collaterals (Customer Partner Facing) Evalaute: Field Interest and readiness Check Developvalidate Gaps for Routes to Market PartnerGTM Agreement: In this phase, the PM works on a plan with the partner team to understand the requirements related to HPE Channel Partners and Indirect Ecosystem requirements\n* Are we targeting specific partners Do we differentiate between different partner personas E.g\n* MSP, SP, reseller, etc\n* What is the Channel Value Proposition.",
+                "owner": "Program Manager",
+                "whereWorkDone": "Partner / GTM\nGo-To-Market\nMarketing\nLaunch\nChannel\nGL Channel",
+                "informed": "OCX Offer Lead",
+                "dependencies": "Define HW/SW/Services Market Opportunity\nDefine E2E customer experience\nRoutes to market (Direct/Partner)\nDefine Metering \nStrategy \nand desired UoM & GLP Requirements for metering integration\nCreation & Training: Create Seller - Partner Training",
+                "links": "New Solutions Engagement for partners",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": false,
+                        "solutionBuyCapex": false,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": true,
+                        "significantArchChange": false,
+                        "newRouteToMarket": true,
+                        "changeOrder": false
+                },
+                "depth": 7
+        },
+        {
+                "governanceProcess": "PDLC - GreenLake",
+                "category": "PMs",
+                "taskNumber": "9",
+                "deliverable": "Define Consumption Model",
+                "description": "Define Consumption Model Architecture Strategy.",
+                "owner": "Program Manager",
+                "whereWorkDone": "Product Mgr\nSVC-SPM\nMetering\nOCX Offer Lead",
+                "informed": "OCX Offer Lead",
+                "dependencies": "Define Consumption Model\nReference  / Technology Architecture\nDefine Metering \nStrategy \nand desired UoM & GLP Requirements for metering integration",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": true,
+                        "newRouteToMarket": false,
+                        "changeOrder": false
+                },
+                "depth": 2
+        },
+        {
+                "governanceProcess": "GreenLake",
+                "category": "HPE Services",
+                "taskNumber": "10",
+                "deliverable": "Design HPE GreenLake Experience",
+                "description": "The End to End experience is looking at an HPE GreenLake Experience From day 0 to day 2.",
+                "owner": "SVC-SPM Product Mgr",
+                "whereWorkDone": "Product Mgr\nSVC-CPSM\nGL Pricing SME\nPricing Tools\nPresales\nCPQ Tools (OCA, IQ, FQ)",
+                "informed": "OCX Offer Lead",
+                "dependencies": "Define E2E customer experience\nDesign HPE GreenLake Experience",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": true,
+                        "newRouteToMarket": false,
+                        "changeOrder": true
+                },
+                "depth": 4
+        },
+        {
+                "governanceProcess": "GreenLake",
+                "category": "Partner Alliances",
+                "taskNumber": "11",
+                "deliverable": "Vendor Partner Relationships - enablement",
+                "description": "If a vendor is included in a solution Is ISV or Third Party software included in the solution Do we have a contractual agreement in place that we can lean for a GL deal Do we have contractual agreements in place to support the vendor solution in a service model.",
+                "owner": "Program Manager",
+                "whereWorkDone": "Product Mgr\nPartner Alliance Team\nWISE",
+                "informed": "",
+                "dependencies": "Service Support Model",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": false,
+                        "newRouteToMarket": false,
+                        "changeOrder": false
+                },
+                "depth": 5
+        },
+        {
+                "governanceProcess": "GreenLake",
+                "category": "Finance",
+                "taskNumber": "12",
+                "deliverable": "Finance Compliance BU",
+                "description": "Obtain BU Finance Leadership support to pursue new GTM opportunity.",
+                "owner": "Program Manager",
+                "whereWorkDone": "BU Finance Leader (i.e. HC,Compute)",
+                "informed": "",
+                "dependencies": "",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": true,
+                        "newRouteToMarket": false,
+                        "changeOrder": true
+                },
+                "depth": 0
+        },
+        {
+                "governanceProcess": "PDLC",
+                "category": "Pricing",
+                "taskNumber": "13",
+                "deliverable": "Pricing Strategy",
+                "description": "* Pricing Strategy plan: Create Configuration Pricing Framework (DirectChannel) Need to consider : Rate Card vs\n* Cost Plus Analysis for Flex Solution Define FQ IQ If APSMS included, is it priced through E3T and MSSEMSST What are the channel margins.",
+                "owner": "Program Manager",
+                "whereWorkDone": "SVC-SPM\nGL Pricing SME\nPricing Tools\nPresales\nCPQ Tools (OCA, IQ, FQ)",
+                "informed": "NSI Operation\nChannel\nGL Channel\nOCX Offer Lead",
+                "dependencies": "Pricing Strategy\nDefine Metering \nStrategy \nand desired UoM & GLP Requirements for metering integration",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": true,
+                        "solutionBuyCapex": true,
+                        "fqToIq": true,
+                        "iqToFq": true,
+                        "skuUpdate": false,
+                        "significantArchChange": true,
+                        "newRouteToMarket": true,
+                        "changeOrder": false
+                },
+                "depth": 4
+        },
+        {
+                "governanceProcess": "PDLC",
+                "category": "Pricing",
+                "taskNumber": "14",
+                "deliverable": "Determine the need for a New SKU",
+                "description": "Determine if New SKUs (TrackingTrigger SKUs andor new product SKUs) andor new Rate Card are required to support Flex Offer Define Tracking SKU Enablement SKU (understand why we are creating the tracking SKU) This action includes SaaS Tracking SKU and Offer Tracking SKU for Financial Reporting.",
+                "owner": "Program Manager",
+                "whereWorkDone": "GL Pricing SME\nOCX Offer Lead",
+                "informed": "NSI Operation\nOCX Offer Lead",
+                "dependencies": "Create \"Enablement SaaS SKU\nEnterprise Financial Reporting (EFR)",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": true,
+                        "solutionBuyCapex": true,
+                        "fqToIq": true,
+                        "iqToFq": false,
+                        "skuUpdate": true,
+                        "significantArchChange": true,
+                        "newRouteToMarket": false,
+                        "changeOrder": true
+                },
+                "depth": 12
+        },
+        {
+                "governanceProcess": "GreenLake",
+                "category": "CPQ Tools",
+                "taskNumber": "15",
+                "deliverable": "CPQ Pre-Assessment (IQ/FQ)  & Order Booking",
+                "description": "* Complete CPQ Pre\n* Assessment\n* DRAFT (IQFQ) to determine, based on the opportunity, market, and segment, the CPQ Tool that will support the solution in the market\n* and it will help to determine if there are enhancements required to meet the solution requirements\n* FQ\n* IQ (NGQ)\n* OCA The Pre\n* Assessment should also include the Order booking pre\n* assessment with Compass and all other other tools to have an end\n* to\n* end view of the implications or impact of the new offer\n* Pre\n* assessment should consider impact to the Entitlement process.",
+                "owner": "Program Manager",
+                "whereWorkDone": "CPQ Team",
+                "informed": "",
+                "dependencies": "Define HW/SW/Services Market Opportunity\nCPQ Pre-Assessment (IQ/FQ)  & Order Booking\nOrder Booking (Mock Run through)",
+                "links": "CPQ Offering Summary Template",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": true,
+                        "solutionBuyCapex": true,
+                        "fqToIq": true,
+                        "iqToFq": true,
+                        "skuUpdate": true,
+                        "significantArchChange": true,
+                        "newRouteToMarket": true,
+                        "changeOrder": true
+                },
+                "depth": 2
+        },
+        {
+                "governanceProcess": "PDLC",
+                "category": "PMs",
+                "taskNumber": "16",
+                "deliverable": "Reference  / Technology Architecture",
+                "description": "* Provide detailed reference and technology architecture to complete the actions related to starting and ending the BOM\n* This action is fundamental to the construction of the solution.",
+                "owner": "Program Manager",
+                "whereWorkDone": "Engineering\nGL Engr",
+                "informed": "",
+                "dependencies": "Reference  / Technology Architecture",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": true,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": true,
+                        "newRouteToMarket": false,
+                        "changeOrder": false
+                },
+                "depth": 1
+        },
+        {
+                "governanceProcess": "PDLC GreenLake",
+                "category": "PMs",
+                "taskNumber": "17",
+                "deliverable": "Sizers",
+                "description": "* (PM to understand the program sizer to utilize) (Sizers will help SAs to size the deal per customer requirements: i.e., SSET, SAF, etc.) Sizer can also include Ninja Star API\n* Ninja SaaS for CPQ Team.",
+                "owner": "Program Manager",
+                "whereWorkDone": "Program Manager",
+                "informed": "",
+                "dependencies": "",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": true,
+                        "solutionBuyCapex": true,
+                        "fqToIq": true,
+                        "iqToFq": true,
+                        "skuUpdate": true,
+                        "significantArchChange": true,
+                        "newRouteToMarket": true,
+                        "changeOrder": false
+                },
+                "depth": 0
+        },
+        {
+                "governanceProcess": "GreenLake",
+                "category": "PMs",
+                "taskNumber": "18",
+                "deliverable": "Start and End BOM",
+                "description": "Create start and end BOM (Bill of Materials) (could be multiple based on the type of solution) Not needed for SW only offerings.",
+                "owner": "Program Manager",
+                "whereWorkDone": "Program Manager",
+                "informed": "",
+                "dependencies": "Reference  / Technology Architecture\nStart and End BOM",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": true,
+                        "significantArchChange": true,
+                        "newRouteToMarket": false,
+                        "changeOrder": true
+                },
+                "depth": 2
+        },
+        {
+                "governanceProcess": "",
+                "category": "Integration Center",
+                "taskNumber": "19",
+                "deliverable": "Solution Overview",
+                "description": "* Solution Overview: One off solution or multiple instances Roll\n* out plan and projected timeline Hardware information Rack or standalone HW solution Qty of servers and distribution across racks Storage hardware specs Switches and overall network logic Cabling maps and rack elevation diagrams Custom hardware slotting requirements (drives or cards slotting) 3PO and CFE requirements if applicable Onsite installation requirements Software licenses () GTM strategy (which countries are we delivering, Public vs Private sector) This will help understand the optimal sourcing logic so the proper plants can be engaged as well as how BOMs should be structured Logistics and delivery requirements (if any) need to be understood, particularly for Public Sector.",
+                "owner": "Program Manager",
+                "whereWorkDone": "Integration Center SME",
+                "informed": "OCX Offer Lead",
+                "dependencies": "GTM / Commercialization\nReference  / Technology Architecture\nStart and End BOM\nSolution Overview\nDefine Metering \nStrategy \nand desired UoM & GLP Requirements for metering integration",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": true,
+                        "newRouteToMarket": true,
+                        "changeOrder": false
+                },
+                "depth": 8
+        },
+        {
+                "governanceProcess": "PDLC - GreenLake",
+                "category": "GL SW Engr",
+                "taskNumber": "20",
+                "deliverable": "Define Metering \nStrategy \nand desired UoM & GLP Requirements for metering integration",
+                "description": "* The section mentioned is crucial for the GreenLake Consumption model\n* It is essential to comprehend and define the metering strategy and the desired Unit of Measure (UoM)\n* You can refer to the UoM documentation to select from the existing and approved ones\n* It is important to determine if a new UoM is necessary, keeping in mind that implementing a new UoM requires additional steps\n* Identify whether metering billing (usage analytics) exist and if new Metering Billing\n* Usage and Analytics is required.",
+                "owner": "Program Manager",
+                "whereWorkDone": "Product Mgr\nMetering\nSVC-SPM\nGL Contracts Team\nSVC-CPSM",
+                "informed": "OCX Offer Lead",
+                "dependencies": "Define Consumption Model\nDefine Metering \nStrategy \nand desired UoM & GLP Requirements for metering integration\nSizers",
+                "links": "https://hpe.sharepoint.com/:w:/r/sites/msteams_27d5a1/_layouts/15/Doc.aspx?sourcedoc=%7BC32AC8EF-8F5B-4C9F-BDD8-CB0E29D05343%7D&file=2.%20Metering%20strategy%20doc.docx&action=default&mobileredirect=true   \n\nhttps://hpe.sharepoint.com/sites/UOM-DB/SitePages/GreenLake-UoM-%E2%80%93-Additional-Documentation.aspx\n\nhttps://hpe.sharepoint.com/sites/UOM-DB",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": true,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": true,
+                        "newRouteToMarket": false,
+                        "changeOrder": false
+                },
+                "depth": 3
+        },
+        {
+                "governanceProcess": "NPI Launch",
+                "category": "GTM (Go To Market) Readiness",
+                "taskNumber": "21",
+                "deliverable": "Marketing: Brand Approval",
+                "description": "* Confirm Brand\n* compliant and approved Series name for NPI Launch\n* driven work, hierarchy, core GreenLake content (Product Catalog).",
+                "owner": "Program Manager",
+                "whereWorkDone": "Marketing\nLaunch Mgr",
+                "informed": "OCX Offer Lead",
+                "dependencies": "",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": true,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": false,
+                        "newRouteToMarket": false,
+                        "changeOrder": false
+                },
+                "depth": 0
+        },
+        {
+                "governanceProcess": "GreenLake",
+                "category": "PMs",
+                "taskNumber": "22",
+                "deliverable": "Location Strategy",
+                "description": "* The location strategy has an impact on the design of the solution, location strategy would include On\n* Prem, Colo, and Geographical Coverage.",
+                "owner": "Program Manager",
+                "whereWorkDone": "Product Mgr\nSVC-SPM \nHPEFS\nColo Team\nOCX Offer Lead",
+                "informed": "OCX Offer Lead",
+                "dependencies": "Location Strategy",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": true,
+                        "solutionBuyCapex": true,
+                        "fqToIq": true,
+                        "iqToFq": true,
+                        "skuUpdate": false,
+                        "significantArchChange": true,
+                        "newRouteToMarket": true,
+                        "changeOrder": false
+                },
+                "depth": 1
+        },
+        {
+                "governanceProcess": "GreenLake",
+                "category": "HPE Services",
+                "taskNumber": "23",
+                "deliverable": "Entitlment",
+                "description": "* Define Entitlement requirements and workflow triggers\n* (what systems etc.) Make sure to understand the packaging What is the Package that should be used Is the standard GL packageOffer If not, is this a new package Are any SOGs to be included Are any Deliverables to be enabled When should the Proactive Entitlement Support contract be set up in the system Will the Casper file be included Involve the Entitlement Process Owner for New Packages or Changes in the Entitlement Process\n* UAT Entitlement.",
+                "owner": "Program Manager",
+                "whereWorkDone": "SVC-SPM",
+                "informed": "",
+                "dependencies": "Define Metering \nStrategy \nand desired UoM & GLP Requirements for metering integration\nPack and shipment requirements (standard vs secure)",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": true,
+                        "solutionBuyCapex": true,
+                        "fqToIq": true,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": true,
+                        "newRouteToMarket": false,
+                        "changeOrder": false
+                },
+                "depth": 12
+        },
+        {
+                "governanceProcess": "GreenLake",
+                "category": "HPE Services",
+                "taskNumber": "24",
+                "deliverable": "Service Owned Good",
+                "description": "* SOG: Service Owned Good, required to connect with the entitlment\n* Order Processing Service Packaging.",
+                "owner": "SVC-SPM",
+                "whereWorkDone": "SVC-SPM",
+                "informed": "NSI Operation",
+                "dependencies": "Pricing Strategy\nService Owned Good\nCreate \"Enablement SaaS SKU",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": false,
+                        "newRouteToMarket": false,
+                        "changeOrder": false
+                },
+                "depth": 5
+        },
+        {
+                "governanceProcess": "GreenLake",
+                "category": "PMs",
+                "taskNumber": "25",
+                "deliverable": "ISV",
+                "description": "* WW ISV Enablement Team (Wise) enablement (once determined WISE is required)\n* ISV Wise data has to flow in S4\n* Does the Licensing Model allow for a as a Service model.",
+                "owner": "SVC-SPM  Product Mgr",
+                "whereWorkDone": "SVC-SPM\nWISE\nProduct Mgr",
+                "informed": "",
+                "dependencies": "Service Support Model",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": true,
+                        "iqToFq": false,
+                        "skuUpdate": true,
+                        "significantArchChange": true,
+                        "newRouteToMarket": false,
+                        "changeOrder": true
+                },
+                "depth": 5
+        },
+        {
+                "governanceProcess": "PDLC",
+                "category": "PMs",
+                "taskNumber": "26",
+                "deliverable": "Competitive Reference Prices",
+                "description": "* Competitive Reference prices\n* Complete a competitive pricing analysis for the HPE GreenLake Solution (i.e\n* Dell vs\n* HPE vs\n* Cloud Service Providers).",
+                "owner": "Program Manager",
+                "whereWorkDone": "Pricing\nFinance\nCompetitive Team\nOCX Offer Lead",
+                "informed": "OCX Offer Lead",
+                "dependencies": "Competitive Reference Prices",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": true,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": true,
+                        "significantArchChange": true,
+                        "newRouteToMarket": false,
+                        "changeOrder": false
+                },
+                "depth": 1
+        },
+        {
+                "governanceProcess": "GreenLake",
+                "category": "HPE Services",
+                "taskNumber": "27",
+                "deliverable": "Service Offering Mix",
+                "description": "* Define Services offeringmix (This item must occur first before the servicecustomer experience can be mapped, so you need to add this as a separate item early in the beginning of Define) E2E customer experience mapping Total customer experience Including price, margins, costs, compensation model Questions: 1\n* Is this service experience or customer experience The produced content points to customer journey map which is a services process, in which case Services BSM should be the owner\n* 2\n* Is Journey mapping expected for all GL FS.",
+                "owner": "SVC-SPM",
+                "whereWorkDone": "Product Mgr\nGL Product Mgr\nSVC-SPM\nSVC-CPSM",
+                "informed": "NSI Operation",
+                "dependencies": "Define HW/SW/Services Market Opportunity\nDefine E2E customer experience\nDefine Consumption Model\nService Support Model\nCompensation Model\nEngineering transfer of information and content to HPE Services",
+                "links": "Customer Journey Map",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": true,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": false,
+                        "newRouteToMarket": false,
+                        "changeOrder": false
+                },
+                "depth": 5
+        },
+        {
+                "governanceProcess": "GreenLake",
+                "category": "HPE Services",
+                "taskNumber": "28",
+                "deliverable": "Service Support Model",
+                "description": "* Define the end2end service delivery model from day 0 to day 1 and beyond The goal is to look at the end 2 end service model from APS, GMS, Reactive and Proactive Services\n* Day\n* 1: refers to all process prior to a deal being won (Delivery involvement in day\n* 1 tends to be light but some engagement in deal governance for delivery opinions etc.) Day 0: refers to the process from purchase commit through to delivery of the equipment to a customers site (Delivery engagement is starting to ramp up here in readiness for installation work including now doing on\n* site audits for GL orders after order booking) Day 1: refers to the processes covering installation and activation and aligns to what we would call to Delivery to Activation TAT (Delivery engagement is obviously heavy here with Goran and Scotts org and start of Macs engagement for deals with MS) Day 2: refers to the processes post activation (again heavy Delivery engagement) including Solutionproduct Life Cycle Managemen.",
+                "owner": "SVC-SPM\nSVC-CPSM",
+                "whereWorkDone": "SVC-SPM\nSVC-CPSM",
+                "informed": "NSI Operation\nOCX Offer Lead",
+                "dependencies": "Define HW/SW/Services Market Opportunity\nDefine Consumption Model\nCPQ Pre-Assessment (IQ/FQ)  & Order Booking\nService Support Model\nPartner Delivery Services\nService Launch Commit\nCreation & Training: HP Service Delivery\nOrder Booking (Mock Run through)",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": true,
+                        "solutionBuyCapex": true,
+                        "fqToIq": true,
+                        "iqToFq": true,
+                        "skuUpdate": false,
+                        "significantArchChange": true,
+                        "newRouteToMarket": true,
+                        "changeOrder": true
+                },
+                "depth": 4
+        },
+        {
+                "governanceProcess": "GreenLake",
+                "category": "Partner Alliances",
+                "taskNumber": "28.1",
+                "deliverable": "Partner Delivery Services",
+                "description": "What are the HPE services included within the solution and can the Partners deliver any of these, or can we reduce these for Partners Delivery and installation services When do partner certifications get triggered.",
+                "owner": "Program Manager",
+                "whereWorkDone": "Channel\nGL Channel\nGTM\nProduct Manager",
+                "informed": "",
+                "dependencies": "Partner Delivery Services",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": false,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": false,
+                        "newRouteToMarket": false,
+                        "changeOrder": false
+                },
+                "depth": 1
+        },
+        {
+                "governanceProcess": "",
+                "category": "Finance",
+                "taskNumber": "29",
+                "deliverable": "Finance Compliance GEO",
+                "description": "Obtain GEO Finance Leadership support to transact new GTM opportunity in their GEO.",
+                "owner": "Program Manager",
+                "whereWorkDone": "GEO Finance Leader (i.e. LASER,:LAC...)",
+                "informed": "",
+                "dependencies": "Finance Compliance BU",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": true,
+                        "skuUpdate": false,
+                        "significantArchChange": true,
+                        "newRouteToMarket": true,
+                        "changeOrder": true
+                },
+                "depth": 1
+        },
+        {
+                "governanceProcess": "PDLC",
+                "category": "Pricing",
+                "taskNumber": "30",
+                "deliverable": "Pricing Proposal",
+                "description": "* Prepare Pricing Proposal for Required New Product SKUs andor new Rate Card or Cost model for Flex Solution\n* If a new Rate CardSKU it would involve the World Wide Strategy Team\n* Does the solution Meet the Price Standards (YN)\n* If does not required a new SKU or Rate Card it would go to an GL Pricing SME (Robert Lane team).",
+                "owner": "Program Manager",
+                "whereWorkDone": "GL Pricing SME",
+                "informed": "NSI Operation\nOCX Offer Lead",
+                "dependencies": "Finance Compliance BU\nPricing Strategy\nReference  / Technology Architecture\nStart and End BOM\nDefine Metering \nStrategy \nand desired UoM & GLP Requirements for metering integration\nLocation Strategy\nService Offering Mix\nService Support Model\nPricing Proposal\nCompensation Model\nCompliance (Global Trade, Data Privacy)",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": true,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": true,
+                        "skuUpdate": true,
+                        "significantArchChange": true,
+                        "newRouteToMarket": true,
+                        "changeOrder": false
+                },
+                "depth": 6
+        },
+        {
+                "governanceProcess": "PDLC - GreenLake - CPQ",
+                "category": "CPQ Tools",
+                "taskNumber": "31",
+                "deliverable": "CPQ Commit",
+                "description": "* CPQ Capability AssessmentAnalyze Platform (New UoM, Brand New Platform)\n* COMMITTED (IQFQ)\n* e2e Requirements\n* Get Ts Cs details\n* Part of Impact Analysis (IQFQ)\n* Get UoM (IQFQ)\n* Billing Tier Definition plus method to calculate (IQ)\n* Get Special Order Booking treatment details\n* Part of Impact Analysis (Also Order BookingServices) (IQFQ)\n* Identify Technology (IQ)\n* Get other special considerations\n* Part of Impact Analysis) (IQFQ)\n* Get Complete Care SKUs for the supported Platforms (IQ)\n* Provide End BoM Logic and End BoM Requirements (IQ)\n* Get 3PO SW behavior (WISE Process)\n* Part of Impact Analysis (FQ)\n* Get Product Line (and associated variablesmapping)\n* Part of Impact Analysis (Future IQ) (FQ)\n* Approve Billing Tier Definition (GL FinanceControllership) (IQ).",
+                "owner": "CPQ SME",
+                "whereWorkDone": "CPQ Team",
+                "informed": "",
+                "dependencies": "CPQ Pre-Assessment (IQ/FQ)  & Order Booking\nDefine Metering \nStrategy \nand desired UoM & GLP Requirements for metering integration\nLocation Strategy\nISV\nService Offering Mix\nService Support Model\nPricing Proposal\nOrder Booking (Mock Run through)",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": true,
+                        "solutionBuyCapex": true,
+                        "fqToIq": true,
+                        "iqToFq": true,
+                        "skuUpdate": true,
+                        "significantArchChange": true,
+                        "newRouteToMarket": true,
+                        "changeOrder": true
+                },
+                "depth": 7
+        },
+        {
+                "governanceProcess": "PDLC",
+                "category": "Pricing",
+                "taskNumber": "32",
+                "deliverable": "Pricing Review / Approval",
+                "description": "* Receive Pricing Review and Approvals\n* Does the solution Meet the Price Standards (YN)\n* If No, requires exception approval\n* Includes Pricing Localization Strategy across HW and SW and Services the full solution\n* Include: New Product SKU andor Rate Card Pricing Approvals\n* Upload cost of Service SKU.",
+                "owner": "Product Mgr\nGL Product Mgr",
+                "whereWorkDone": "Product Mgr\nPricing\nFinance\nSVC-SPM",
+                "informed": "NSI Operation\nOCX Offer Lead",
+                "dependencies": "Pricing Strategy\nPricing Review / Approval\nPricing Council Approval",
+                "links": "HPE WorldWide and Geo Product Pricing - NPI & SPA Proposal Templates - All Documents (sharepoint.com)",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": true,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": true,
+                        "skuUpdate": false,
+                        "significantArchChange": true,
+                        "newRouteToMarket": true,
+                        "changeOrder": true
+                },
+                "depth": 5
+        },
+        {
+                "governanceProcess": "GreenLake",
+                "category": "HPE Services",
+                "taskNumber": "33",
+                "deliverable": "Tenant Onboarding",
+                "description": "Tenant onboarding (Billing Manager) Question: is this Deal by deal service delivery process Or is this just getting on the billing manager If billing manager, only needed if new UoM.",
+                "owner": "Program Manager",
+                "whereWorkDone": "Billing Manager",
+                "informed": "OCX Offer Lead",
+                "dependencies": "Pricing Strategy\nDefine Metering \nStrategy \nand desired UoM & GLP Requirements for metering integration\nTenant Onboarding\nCreation & Training: HP Service Delivery",
+                "links": "Deployment Guide",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": false,
+                        "newRouteToMarket": false,
+                        "changeOrder": false
+                },
+                "depth": 5
+        },
+        {
+                "governanceProcess": "PDLC - GTM",
+                "category": "PMs",
+                "taskNumber": "34",
+                "deliverable": "Compensation Model",
+                "description": "* Review Sales compensation model, incentives for DirectIndirect Make sure selling motion and target audience are aligned\n* (GTM Commercialization:\n* GTM Strategy package, including target customer prodile, deployments models, SWOT, Target stratefy PTB, Key initiatives to be planned\n* Sales and Delivery readiness enablment training plans, skills and resources\n* Partner rebates.",
+                "owner": "Program Manager",
+                "whereWorkDone": "Compensation\nChannel\nGL Channel",
+                "informed": "OCX Offer Lead",
+                "dependencies": "Partner Delivery Services\nCompensation Model\nCreation & Training: HP Service Delivery\nCreation & Training: Create Seller - Partner Training",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": true,
+                        "iqToFq": true,
+                        "skuUpdate": false,
+                        "significantArchChange": false,
+                        "newRouteToMarket": true,
+                        "changeOrder": false
+                },
+                "depth": 2
+        },
+        {
+                "governanceProcess": "GreenLake",
+                "category": "NSI Operation",
+                "taskNumber": "35",
+                "deliverable": "Define Sku`s & Material Number",
+                "description": "* Compass Material number already available in the System Is the Compass Material Number automated and available in the GLFQGLIQ pricing file If not, Any manual process required to have the correct CMN booked by Sols Ops Get approval from Finance\n* Kimberly for New Compass OC Material numbers set up as per the requirement\n* Compass Material numbers set up request to Sunny\n* OC Material Number setup request to Laura Manning\n* Brazil\n* OC request to Araya, Jeffry.",
+                "owner": "Program Manager",
+                "whereWorkDone": "NSI Operation\nOCX Offer Lead",
+                "informed": "",
+                "dependencies": "Pricing Review / Approval\nDefine Sku`s & Material Number\nSku`s & Material Number Setup \nPricing Council Approval",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": true,
+                        "iqToFq": false,
+                        "skuUpdate": true,
+                        "significantArchChange": true,
+                        "newRouteToMarket": false,
+                        "changeOrder": true
+                },
+                "depth": 7
+        },
+        {
+                "governanceProcess": "PDLC - GreenLake",
+                "category": "PMs",
+                "taskNumber": "36",
+                "deliverable": "Compliance (Global Trade, Data Privacy)",
+                "description": "* Compliance (Global Trade, Data Privacy)\n* Need to verrify compliance in case there are exceptions due to Country, Region, or, as an example, SaaSCapex Deal\n* Global Trade: Does not need to be part of the core team, only the extended team Provide PRD Engaged after concept commit If transacting through S4, Global Trade does not need to get involved\n* If outside S4, then Global Trade must be involved\n* BRIM\n* related product SKUs should go through Global Trade\n* Global Trade point of contact available from HPE GL Operationalization Lead Need GL Trade approval before executing Commit.",
+                "owner": "Program Manager",
+                "whereWorkDone": "Compliance\nGL Contracts Team\nOCX Offer Lead\nGL Trade",
+                "informed": "NSI Operation",
+                "dependencies": "Review Core Team Members\nDetermine the need for a New SKU\nStart and End BOM\nCompliance (Global Trade, Data Privacy)",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": true,
+                        "newRouteToMarket": true,
+                        "changeOrder": false
+                },
+                "depth": 3
+        },
+        {
+                "governanceProcess": "PDLC - GTM",
+                "category": "PMs",
+                "taskNumber": "37",
+                "deliverable": "Engineering transfer of information and content to HPE Services",
+                "description": "Required for development of development for training and support the readiness of the HPE Services staff.",
+                "owner": "Program Manager",
+                "whereWorkDone": "SVC-CPSM",
+                "informed": "",
+                "dependencies": "Contract (SOW)",
+                "links": "Service Delivery Guide",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": true,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": true,
+                        "significantArchChange": true,
+                        "newRouteToMarket": false,
+                        "changeOrder": true
+                },
+                "depth": 3
+        },
+        {
+                "governanceProcess": "GreenLake",
+                "category": "Supply Chain - SW",
+                "taskNumber": "38",
+                "deliverable": "Create \"Enablement SaaS SKU",
+                "description": "Create of Enablement SKU for SaaS offering and only in consideration for SaaS.",
+                "owner": "Product Mgr",
+                "whereWorkDone": "Product Mgr\nOCX Offer Lead",
+                "informed": "NSI Operation",
+                "dependencies": "Marketing: Brand Approval\nCreate \"Enablement SaaS SKU",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": true,
+                        "iqToFq": false,
+                        "skuUpdate": true,
+                        "significantArchChange": true,
+                        "newRouteToMarket": false,
+                        "changeOrder": true
+                },
+                "depth": 1
+        },
+        {
+                "governanceProcess": "",
+                "category": "PMs",
+                "taskNumber": "39",
+                "deliverable": "Deliver early HW equipment",
+                "description": "* Required for development of development for training and support the readiness of the HPE Services staff\n* Not needed for SW only offerings.",
+                "owner": "Program Manager",
+                "whereWorkDone": "SVC-CPSM",
+                "informed": "OCX Offer Lead",
+                "dependencies": "",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": true,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": true,
+                        "significantArchChange": true,
+                        "newRouteToMarket": true,
+                        "changeOrder": false
+                },
+                "depth": 0
+        },
+        {
+                "governanceProcess": "PDLC - GTM",
+                "category": "PMs",
+                "taskNumber": "40",
+                "deliverable": "Localization and Translation Plan",
+                "description": "Product Manager will need to define the translation and localization requirments.",
+                "owner": "Program Manager",
+                "whereWorkDone": "GL Contracts Team\nMarketing",
+                "informed": "",
+                "dependencies": "Localization and Translation Plan",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": false,
+                        "newRouteToMarket": false,
+                        "changeOrder": false
+                },
+                "depth": 1
+        },
+        {
+                "governanceProcess": "GreenLake",
+                "category": "Contract / EFR",
+                "taskNumber": "41",
+                "deliverable": "Review of the HPE Contracts-Intake Form",
+                "description": "* Complete the review of the HPE Contract\n* Intake Form Requires work with contract team: Provide to HPE GL Contracts team\n* When submitting the form select also GL Ready or write it in the comments\n* After submitting the form: Record the CR.",
+                "owner": "Program Manager",
+                "whereWorkDone": "GL Contracts Team",
+                "informed": "OCX Offer Lead",
+                "dependencies": "Review Core Team Members\nFinance Compliance BU\nDefine Metering \nStrategy \nand desired UoM & GLP Requirements for metering integration\nCompliance (Global Trade, Data Privacy)\nReview of the HPE Contracts-Intake Form\nTesting CPQ Tools",
+                "links": "Contract Intake Form",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": true,
+                        "solutionBuyCapex": true,
+                        "fqToIq": true,
+                        "iqToFq": true,
+                        "skuUpdate": false,
+                        "significantArchChange": true,
+                        "newRouteToMarket": true,
+                        "changeOrder": true
+                },
+                "depth": 4
+        },
+        {
+                "governanceProcess": "GreenLake",
+                "category": "Finance",
+                "taskNumber": "42",
+                "deliverable": "Enterprise Financial Reporting (EFR)",
+                "description": "* AaS offering financial questionnaire for BU\n* Enterprise Financial Reporting (EFR) Used for revenue recognition\n* (12\n* 21 weeks output) The Product team CORE TEAM needs to provide the following information:\n* Description of exactly what the offering is and how it is sold\n* Service Description document that will be provided to the customer\n* All terms and conditions documents that are applicable\n* If there is software included, please complete the EFR as a service questionnaire\n* Service description is NOT the product description Process:\n* The contract team is the point of contact Documentation sent to the contract and EFR will include: EFR questioner Hybrid Cloud Product Offer Documentation (PRD or similar) (format DOC or PPTX) Service Definition Concept Commit Presentation Resources: Core team must provide the financial contact that is working on the program Overview: When a program is submitted using the Contract Intake a single meeting that will include ContractEFR will take place with the Product and Program Manager and Financial Contact\n* Others: When clearly stated, sustaining solutions will receive Preliminary approval and not hold up the release or the publication Net new solution or new business models will require a full review.",
+                "owner": "Program Manager",
+                "whereWorkDone": "BU Finance\nGEO Finance\nOCX Offer Lead",
+                "informed": "",
+                "dependencies": "Program Manager assigned\nReview Core Team Members\nFinance Compliance BU\nSolution Overview\nService Offering Mix\nFinance Compliance GEO\nPricing Review / Approval\nCompensation Model\nReview of the HPE Contracts-Intake Form\nEnterprise Financial Reporting (EFR)\nService Launch Commit\nCreation& Training and documentation for Integration team\nPublish HPE GL Flex Solutions SOW and Service Description (WW English)",
+                "links": "EFR Questioner",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": false,
+                        "newRouteToMarket": true,
+                        "changeOrder": true
+                },
+                "depth": 11
+        },
+        {
+                "governanceProcess": "",
+                "category": "Integration Center",
+                "taskNumber": "43",
+                "deliverable": "Integration requirements by day 0",
+                "description": "* Are there any firmware, RAID, BIOS or iLO settings required Image and software load and configuration requirements IP addressing Any requirements for remote validation or configuration by non\n* Supply Chain HPE team members or customer Not needed for SW only offerings.",
+                "owner": "Program Manager",
+                "whereWorkDone": "Integration Center SME",
+                "informed": "",
+                "dependencies": "Review Core Team Members\nSolution Overview",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": true,
+                        "significantArchChange": true,
+                        "newRouteToMarket": false,
+                        "changeOrder": false
+                },
+                "depth": 9
+        },
+        {
+                "governanceProcess": "GreenLake CPQ",
+                "category": "CPQ Tools",
+                "taskNumber": "44",
+                "deliverable": "Service SKU & Casper",
+                "description": "* Quoting System changes (GLFQ, IQ, ASQ, OCA...etc.) UoM and Booking instructions built into GLFQ MSSE for GMS E3T APS Provide Complete Care SKUs for supported platforms (IQ Input) Ensure Complete Care is in CASPER (FQ Input) Upload Complete Care file (IQ) Pre\n* defined SKU based APS and MS added in OCA (how will the Delivery team deliver these Services) PSA Project Template\n* CPSM (Service Readiness group)\n* Troy Jones org.",
+                "owner": "CPQ SME",
+                "whereWorkDone": "CPQ Team\nGL Contracts Team\nOCX Offer Lead",
+                "informed": "NSI Operation",
+                "dependencies": "Partner Delivery Services\nService SKU & Casper\nCreation & Training: HP Service Delivery",
+                "links": "\"Quote Tool User Stories\nhttps://hpe.sharepoint.com/teams/FYE2010ServicesCO/FYE2022",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": true,
+                        "iqToFq": true,
+                        "skuUpdate": true,
+                        "significantArchChange": true,
+                        "newRouteToMarket": false,
+                        "changeOrder": true
+                },
+                "depth": 2
+        },
+        {
+                "governanceProcess": "GreenLake CPQ",
+                "category": "CPQ Tools",
+                "taskNumber": "45",
+                "deliverable": "Sizers",
+                "description": "* Ninja Stars is updated based on KES request\n* storage only (MSA\n* Future capability) (IQ Input).",
+                "owner": "CPQ SME",
+                "whereWorkDone": "CPQ Team\nGL Contracts Team",
+                "informed": "",
+                "dependencies": "",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": true,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": true,
+                        "significantArchChange": true,
+                        "newRouteToMarket": true,
+                        "changeOrder": false
+                },
+                "depth": 0
+        },
+        {
+                "governanceProcess": "GreenLake CPQ",
+                "category": "CPQ Tools",
+                "taskNumber": "46",
+                "deliverable": "Creation Smart Templates (IQ)",
+                "description": "* Upload Admin Tables (PL MAT\n* BRIM\n* TECHCHK\n* BRIM, GLSS IBP (NGQ) (IQ) Provide Smart Template Content (IQ Input).",
+                "owner": "Program Manager",
+                "whereWorkDone": "CPQ SME\nCPQ Team\nGL Contracts Team\nOCX Offer Lead",
+                "informed": "",
+                "dependencies": "",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": true,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": true,
+                        "significantArchChange": true,
+                        "newRouteToMarket": false,
+                        "changeOrder": false
+                },
+                "depth": 0
+        },
+        {
+                "governanceProcess": "GreenLake",
+                "category": "NSI Operation",
+                "taskNumber": "47",
+                "deliverable": "Sku`s & Material Number Setup ",
+                "description": "* ((Compass Material Number PCCC)):Complete the setup of Get approval from Finance\n* Kimberly for New Compass OC Material numbers set up as per the requirement\n* Compass Material numbers set up request to Sunny\n* OC Material Number setup request to Laura Manning\n* Brazil\n* OC request to Araya, Jeffry\n* Profit CenterCost Center (PCCC) updated in the Compass Material Number.",
+                "owner": "Program Manager",
+                "whereWorkDone": "NSI Opertation",
+                "informed": "OCX Offer Lead",
+                "dependencies": "Define Sku`s & Material Number\nSku`s & Material Number Setup ",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": true,
+                        "skuUpdate": false,
+                        "significantArchChange": false,
+                        "newRouteToMarket": false,
+                        "changeOrder": true
+                },
+                "depth": 1
+        },
+        {
+                "governanceProcess": "GreenLake",
+                "category": "NSI Operation",
+                "taskNumber": "48",
+                "deliverable": "Billing & Invoicing",
+                "description": "Is the metering data available in the GLBM (GreenLake Billing Manager) What is the reserved How are the Overages to be invoiced Should the Overages be split between the PLs If so, what are the PLs and is there any ratio available.",
+                "owner": "Program Manager",
+                "whereWorkDone": "Product Mgr\nGL Product Mgr\nOCX Offer Lead",
+                "informed": "",
+                "dependencies": "Billing & Invoicing",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": false,
+                        "solutionBuyCapex": false,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": false,
+                        "newRouteToMarket": false,
+                        "changeOrder": false
+                },
+                "depth": 1
+        },
+        {
+                "governanceProcess": "GreenLake",
+                "category": "NSI Operation",
+                "taskNumber": "49",
+                "deliverable": "Documentation",
+                "description": "* Document the Process that will be deployed and the changes impacting Sols Ops Q2C(Entitlement Contract\n* ZDEP).",
+                "owner": "Program Manager",
+                "whereWorkDone": "NSI Opertation",
+                "informed": "OCX Offer Lead",
+                "dependencies": "",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": true,
+                        "iqToFq": true,
+                        "skuUpdate": false,
+                        "significantArchChange": true,
+                        "newRouteToMarket": true,
+                        "changeOrder": true
+                },
+                "depth": 0
+        },
+        {
+                "governanceProcess": "GreenLake",
+                "category": "HPE Services",
+                "taskNumber": "50",
+                "deliverable": "Service Launch Commit",
+                "description": "To reveive HPE Service Launch Commit.",
+                "owner": "Program Manager",
+                "whereWorkDone": "SVC-SPM",
+                "informed": "",
+                "dependencies": "Service Launch Commit",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": true,
+                        "solutionBuyCapex": true,
+                        "fqToIq": true,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": false,
+                        "newRouteToMarket": false,
+                        "changeOrder": false
+                },
+                "depth": 1
+        },
+        {
+                "governanceProcess": "",
+                "category": "HPE Services",
+                "taskNumber": "51",
+                "deliverable": "Creation & Training: HP Service Delivery",
+                "description": "Build the training.",
+                "owner": "SVC-CPSM",
+                "whereWorkDone": "Program Manager",
+                "informed": "NSI Operation",
+                "dependencies": "Creation & Training: HP Service Delivery",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": true,
+                        "newRouteToMarket": false,
+                        "changeOrder": true
+                },
+                "depth": 1
+        },
+        {
+                "governanceProcess": "PDLC - GTM",
+                "category": "PMs",
+                "taskNumber": "52",
+                "deliverable": "Creation & Training: Create Pre SalesTraining",
+                "description": "Rember to include all the steps required to complete a quote and the tools to use and the differences.",
+                "owner": "Presales",
+                "whereWorkDone": "Program Manager",
+                "informed": "NSI Operation\nOCX Offer Lead",
+                "dependencies": "",
+                "links": "GreenLake Presales Training Deck",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": true,
+                        "newRouteToMarket": false,
+                        "changeOrder": true
+                },
+                "depth": 0
+        },
+        {
+                "governanceProcess": "GreenLake",
+                "category": "NSI Operation",
+                "taskNumber": "53",
+                "deliverable": "Creation & Training Sols Ops",
+                "description": "* Get feedback from Sols OPs, Finance, and Business Compliance before the training is Delivered to the Sols Ops audience\n* Work with CPSM and other key resources on the questions received during the Training Session.",
+                "owner": "GL Business Ops",
+                "whereWorkDone": "NSI Operation\n\"GL Business Operation\nProduct Mgr\nGL Product Mgr\"",
+                "informed": "",
+                "dependencies": "Finance Compliance BU\nFinance Compliance GEO\nCreation & Training Sols Ops\nFinance Compliance Controllership",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": true,
+                        "iqToFq": true,
+                        "skuUpdate": false,
+                        "significantArchChange": true,
+                        "newRouteToMarket": false,
+                        "changeOrder": true
+                },
+                "depth": 3
+        },
+        {
+                "governanceProcess": "PDLC - GTM",
+                "category": "PMs",
+                "taskNumber": "54",
+                "deliverable": "Creation & Training: Create Seller - Partner Training",
+                "description": "* Build the training Disti vs\n* Reseller Enablement Channel value prop gets done at what point.",
+                "owner": "Program Manager",
+                "whereWorkDone": "Channel\nGL Channel\nPresales\nProduct Mgr\nGL Product Mgr",
+                "informed": "",
+                "dependencies": "",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": true,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": true,
+                        "newRouteToMarket": true,
+                        "changeOrder": true
+                },
+                "depth": 0
+        },
+        {
+                "governanceProcess": "",
+                "category": "Integration Center",
+                "taskNumber": "55",
+                "deliverable": "Creation& Training and documentation for Integration team",
+                "description": "Construct and deliver the training and documentation for the Integration Center to deliversupport the Solution.",
+                "owner": "Integration Center SME",
+                "whereWorkDone": "Integration Center SME",
+                "informed": "Product Mgr\nGL Product Mgr\nOCX Offer Lead",
+                "dependencies": "Integration requirements by day 0\nCreation& Training and documentation for Integration team",
+                "links": "GreenLake Presales Training Deck",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": true,
+                        "newRouteToMarket": false,
+                        "changeOrder": false
+                },
+                "depth": 10
+        },
+        {
+                "governanceProcess": "PDLC - GreenLake",
+                "category": "Contract / EFR",
+                "taskNumber": "56",
+                "deliverable": "Contract (SOW)",
+                "description": "This step is one of the last actions and likely at the end of Phase 3 Work with the HPE GL Contracts team Create Modify Service Description.",
+                "owner": "Program Manager",
+                "whereWorkDone": "Product Mgr\nContracts\nSVC-SPM",
+                "informed": "OCX Offer Lead",
+                "dependencies": "Enterprise Financial Reporting (EFR)\nPublish HPE GL Flex Solutions SOW and Service Description (WW English)",
+                "links": "FAST Contracts",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": true,
+                        "solutionBuyCapex": true,
+                        "fqToIq": true,
+                        "iqToFq": true,
+                        "skuUpdate": false,
+                        "significantArchChange": true,
+                        "newRouteToMarket": true,
+                        "changeOrder": true
+                },
+                "depth": 2
+        },
+        {
+                "governanceProcess": "GreenLake - CPQ",
+                "category": "CPQ Tools",
+                "taskNumber": "57",
+                "deliverable": "Testing CPQ Tools",
+                "description": "Unit UAT Testing e2e testing and validation in production (andor UAT) (IQFQ).",
+                "owner": "CPQ SME",
+                "whereWorkDone": "CPQ Team\nGL Contracts Team\nOCX Offer Lead",
+                "informed": "",
+                "dependencies": "",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": true,
+                        "solutionBuyCapex": true,
+                        "fqToIq": true,
+                        "iqToFq": true,
+                        "skuUpdate": true,
+                        "significantArchChange": true,
+                        "newRouteToMarket": true,
+                        "changeOrder": true
+                },
+                "depth": 0
+        },
+        {
+                "governanceProcess": "GreenLake - CPQ",
+                "category": "CPQ Tools",
+                "taskNumber": "58",
+                "deliverable": "Go Live Approved/ Release in Production (IQ/FQ)",
+                "description": "Unit UAT Testing e2e testing and validation in production (andor UAT) (IQFQ) KB Live (IQFQ).",
+                "owner": "CPQ SME",
+                "whereWorkDone": "CPQ Team\nGL Contracts Team\nOCX Offer Lead",
+                "informed": "",
+                "dependencies": "Go Live Approved/ Release in Production (IQ/FQ)",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": true,
+                        "iqToFq": true,
+                        "skuUpdate": true,
+                        "significantArchChange": true,
+                        "newRouteToMarket": true,
+                        "changeOrder": true
+                },
+                "depth": 1
+        },
+        {
+                "governanceProcess": "GreenLake",
+                "category": "NSI Operation",
+                "taskNumber": "59",
+                "deliverable": "Order Booking (Mock Run through)",
+                "description": "* Booking\n* Mock Run Through\n* recommend to include both APS and MS Solution Ops.",
+                "owner": "Program Manager",
+                "whereWorkDone": "SVC-SPM\nSVC-CPSM\nSolution Operations\nDelivery\nSolution Architect\nSupply Chain - HW\nSupply Chain - SW\nOCX Offer Lead",
+                "informed": "",
+                "dependencies": "CPQ Pre-Assessment (IQ/FQ)  & Order Booking\nOrder Booking (Mock Run through)",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": true,
+                        "iqToFq": true,
+                        "skuUpdate": false,
+                        "significantArchChange": false,
+                        "newRouteToMarket": false,
+                        "changeOrder": true
+                },
+                "depth": 3
+        },
+        {
+                "governanceProcess": "",
+                "category": "Integration Center",
+                "taskNumber": "60",
+                "deliverable": "Pack and shipment requirements (standard vs secure)",
+                "description": "Secure packaging (serialized tape and serialized seal on trailer) Dedicate truck requirements White Glove delivery requirements Clearance credentials requirements for Drivers and White Glove delivery teams.",
+                "owner": "Integration Center SME",
+                "whereWorkDone": "Integration Center SME",
+                "informed": "Product Mgr\nGL Product Mgr",
+                "dependencies": "Creation& Training and documentation for Integration team\nPack and shipment requirements (standard vs secure)",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": false,
+                        "newRouteToMarket": false,
+                        "changeOrder": false
+                },
+                "depth": 11
+        },
+        {
+                "governanceProcess": "GreenLake",
+                "category": "PMs",
+                "taskNumber": "61",
+                "deliverable": "SaaS Testing Process",
+                "description": "E2E testing: CPQ (Padayambath, Saritha) S4 (Stefan, Daniel), Solution Ops, Delivery (Entitlement testing process currently being worked).",
+                "owner": "Program Manager",
+                "whereWorkDone": "SVC-SPM\nSVC-CPSM\nSolution Operations\nDelivery\nSolution Architect\nSupply Chain - HW\nSupply Chain - SW\nOCX Offer Lead",
+                "informed": "",
+                "dependencies": "SaaS Testing Process",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": true,
+                        "skuUpdate": true,
+                        "significantArchChange": true,
+                        "newRouteToMarket": false,
+                        "changeOrder": false
+                },
+                "depth": 1
+        },
+        {
+                "governanceProcess": "",
+                "category": "PMs",
+                "taskNumber": "62",
+                "deliverable": "Capacity Planning",
+                "description": "* Capacity Planning Guidance document\n* to assist HPE Account Support Managers (ASMs) andor Utility Delivery Managers (UDMs) with ascertaining when GreenLake customers with may require additional capacity (of the Solution).",
+                "owner": "GL Product Mgr",
+                "whereWorkDone": "Metering",
+                "informed": "",
+                "dependencies": "Capacity Planning",
+                "links": "Capacity Planning Guidance",
+                "scenarios": {
+                        "noiToGl": false,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": false,
+                        "newRouteToMarket": false,
+                        "changeOrder": false
+                },
+                "depth": 1
+        },
+        {
+                "governanceProcess": "GreenLake",
+                "category": "Finance",
+                "taskNumber": "63",
+                "deliverable": "Finance Compliance Controllership",
+                "description": "* Align with Finance Compliance on Lease eligibility (Software, SaaS, etc.) Rev\n* Rec\n* tracking (i.e\n* Compass, tracking SKUs etc.).",
+                "owner": "Program Manager",
+                "whereWorkDone": "Finance\nControllership\nOCX Offer Lead",
+                "informed": "NSI Operation",
+                "dependencies": "Finance Compliance BU\nFinance Compliance GEO\nFinance Compliance Controllership",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": true,
+                        "skuUpdate": false,
+                        "significantArchChange": false,
+                        "newRouteToMarket": true,
+                        "changeOrder": true
+                },
+                "depth": 2
+        },
+        {
+                "governanceProcess": "PDLC",
+                "category": "Pricing",
+                "taskNumber": "64",
+                "deliverable": "Pricing Council Approval",
+                "description": "Any solution has to go through a pricing council Optain GonoGO of approval of formal pricing model (Pricing Commit) Pricing approval will require the provider to provide GMs, competitive TCO views comparisons to the CapEx version of any GL Solution to ensure adequate pricing across our business models.",
+                "owner": "Program Manager",
+                "whereWorkDone": "Pricing Team\nOCX Offer Lead",
+                "informed": "",
+                "dependencies": "Finance Compliance BU\nFinance Compliance GEO\nPricing Review / Approval\nFinance Compliance Controllership\nPricing Council Approval",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": true,
+                        "solutionBuyCapex": true,
+                        "fqToIq": true,
+                        "iqToFq": false,
+                        "skuUpdate": true,
+                        "significantArchChange": true,
+                        "newRouteToMarket": true,
+                        "changeOrder": true
+                },
+                "depth": 6
+        },
+        {
+                "governanceProcess": "GreenLake",
+                "category": "PMs",
+                "taskNumber": "65",
+                "deliverable": "Publish HPE GL Flex Solutions SOW and Service Description (WW English)",
+                "description": "Publish HPE GL Flex Solutions SOW and Service Description (WW English).",
+                "owner": "Program Manager",
+                "whereWorkDone": "GL Contracts Team",
+                "informed": "",
+                "dependencies": "Contract (SOW)\nPublish HPE GL Flex Solutions SOW and Service Description (WW English)",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": true,
+                        "iqToFq": true,
+                        "skuUpdate": false,
+                        "significantArchChange": true,
+                        "newRouteToMarket": true,
+                        "changeOrder": true
+                },
+                "depth": 1
+        },
+        {
+                "governanceProcess": "PDLC - GTM",
+                "category": "PMs",
+                "taskNumber": "66",
+                "deliverable": "Handhold first customers",
+                "description": "* Identify the steps and resources required to support the first deal or the HPE SellersPartners involved in the first deal what does this mean\n* Support complex deals what does this mean Is this through the salesquoting process only If this includes delivery\n* Theres no white glove or handhold process in services for this\n* Or maybe add on a case by case basis.",
+                "owner": "Go To Market",
+                "whereWorkDone": "Presales, Solution Ops, Supply Chain, Services Delivery\nGEO Finance",
+                "informed": "",
+                "dependencies": "Partner Delivery Services\nHandhold first customers",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": false,
+                        "newRouteToMarket": false,
+                        "changeOrder": false
+                },
+                "depth": 2
+        },
+        {
+                "governanceProcess": "GreenLake",
+                "category": "GTM (Go To Market) Readiness",
+                "taskNumber": "67",
+                "deliverable": "MapBook updates",
+                "description": "Submit MapBook updates working with Lisa Newman The Mapbook update will be posted in Siesmic in for direct and indirect.",
+                "owner": "Program Manager",
+                "whereWorkDone": "Marketing",
+                "informed": "Channel\nGL Channel",
+                "dependencies": "MapBook updates",
+                "links": "MapBook",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": false,
+                        "solutionBuyCapex": true,
+                        "fqToIq": true,
+                        "iqToFq": true,
+                        "skuUpdate": false,
+                        "significantArchChange": true,
+                        "newRouteToMarket": true,
+                        "changeOrder": true
+                },
+                "depth": 1
+        },
+        {
+                "governanceProcess": "PDLC",
+                "category": "PMs",
+                "taskNumber": "68",
+                "deliverable": "GA Release",
+                "description": "",
+                "owner": "Program Manager",
+                "whereWorkDone": "",
+                "informed": "OCX Offer Lead",
+                "dependencies": "",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": true,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": false,
+                        "newRouteToMarket": false,
+                        "changeOrder": false
+                },
+                "depth": 0
+        },
+        {
+                "governanceProcess": "PDLC",
+                "category": "HPE Services",
+                "taskNumber": "69",
+                "deliverable": "Service FSD",
+                "description": "",
+                "owner": "Program Manager",
+                "whereWorkDone": "SVC-SPM\nSVC-CPSM\nSolution Operations\nDelivery\nSolution Architect\nSupply Chain - HW\nSupply Chain - SW",
+                "informed": "OCX Offer Lead",
+                "dependencies": "",
+                "links": "",
+                "scenarios": {
+                        "noiToGl": true,
+                        "productToGl": true,
+                        "solutionBuyCapex": true,
+                        "fqToIq": false,
+                        "iqToFq": false,
+                        "skuUpdate": false,
+                        "significantArchChange": false,
+                        "newRouteToMarket": false,
+                        "changeOrder": false
+                },
+                "depth": 0
+        }
+];
+;
         
-        // Initialize data (will be replaced by Smartsheet data if connected)
+        // Full dependency connections from source
+        const EMBEDDED_DEPENDENCY_CONNECTIONS = 
+        [
+        {
+                "from": "1",
+                "to": "1",
+                "fromDeliverable": "Program Manager assigned",
+                "toDeliverable": "Program Manager assigned"
+        },
+        {
+                "from": "1",
+                "to": "2",
+                "fromDeliverable": "Program Manager assigned",
+                "toDeliverable": "Review Core Team Members"
+        },
+        {
+                "from": "2",
+                "to": "2",
+                "fromDeliverable": "Review Core Team Members",
+                "toDeliverable": "Review Core Team Members"
+        },
+        {
+                "from": "3",
+                "to": "3",
+                "fromDeliverable": "Assessment of the Business Case",
+                "toDeliverable": "Assessment of the Business Case"
+        },
+        {
+                "from": "64",
+                "to": "3",
+                "fromDeliverable": "Pricing Council Approval",
+                "toDeliverable": "Assessment of the Business Case"
+        },
+        {
+                "from": "59",
+                "to": "4",
+                "fromDeliverable": "Order Booking (Mock Run through)",
+                "toDeliverable": "OCX BMQ"
+        },
+        {
+                "from": "5",
+                "to": "5",
+                "fromDeliverable": "Define HW/SW/Services Market Opportunity",
+                "toDeliverable": "Define HW/SW/Services Market Opportunity"
+        },
+        {
+                "from": "15",
+                "to": "6",
+                "fromDeliverable": "CPQ Pre-Assessment (IQ/FQ)  & Order Booking",
+                "toDeliverable": "Define E2E customer experience"
+        },
+        {
+                "from": "5",
+                "to": "7",
+                "fromDeliverable": "Define HW/SW/Services Market Opportunity",
+                "toDeliverable": "Routes to market (Direct/Partner)"
+        },
+        {
+                "from": "7",
+                "to": "7",
+                "fromDeliverable": "Routes to market (Direct/Partner)",
+                "toDeliverable": "Routes to market (Direct/Partner)"
+        },
+        {
+                "from": "11",
+                "to": "7",
+                "fromDeliverable": "Vendor Partner Relationships - enablement",
+                "toDeliverable": "Routes to market (Direct/Partner)"
+        },
+        {
+                "from": "5",
+                "to": "8",
+                "fromDeliverable": "Define HW/SW/Services Market Opportunity",
+                "toDeliverable": "GTM / Commercialization"
+        },
+        {
+                "from": "6",
+                "to": "8",
+                "fromDeliverable": "Define E2E customer experience",
+                "toDeliverable": "GTM / Commercialization"
+        },
+        {
+                "from": "7",
+                "to": "8",
+                "fromDeliverable": "Routes to market (Direct/Partner)",
+                "toDeliverable": "GTM / Commercialization"
+        },
+        {
+                "from": "20",
+                "to": "8",
+                "fromDeliverable": "Define Metering \nStrategy \nand desired UoM & GLP Requirements for metering integration",
+                "toDeliverable": "GTM / Commercialization",
+                "fuzzy": true
+        },
+        {
+                "from": "54",
+                "to": "8",
+                "fromDeliverable": "Creation & Training: Create Seller - Partner Training",
+                "toDeliverable": "GTM / Commercialization"
+        },
+        {
+                "from": "9",
+                "to": "9",
+                "fromDeliverable": "Define Consumption Model",
+                "toDeliverable": "Define Consumption Model"
+        },
+        {
+                "from": "16",
+                "to": "9",
+                "fromDeliverable": "Reference  / Technology Architecture",
+                "toDeliverable": "Define Consumption Model"
+        },
+        {
+                "from": "20",
+                "to": "9",
+                "fromDeliverable": "Define Metering \nStrategy \nand desired UoM & GLP Requirements for metering integration",
+                "toDeliverable": "Define Consumption Model",
+                "fuzzy": true
+        },
+        {
+                "from": "6",
+                "to": "10",
+                "fromDeliverable": "Define E2E customer experience",
+                "toDeliverable": "Design HPE GreenLake Experience"
+        },
+        {
+                "from": "10",
+                "to": "10",
+                "fromDeliverable": "Design HPE GreenLake Experience",
+                "toDeliverable": "Design HPE GreenLake Experience"
+        },
+        {
+                "from": "28",
+                "to": "11",
+                "fromDeliverable": "Service Support Model",
+                "toDeliverable": "Vendor Partner Relationships - enablement"
+        },
+        {
+                "from": "13",
+                "to": "13",
+                "fromDeliverable": "Pricing Strategy",
+                "toDeliverable": "Pricing Strategy"
+        },
+        {
+                "from": "20",
+                "to": "13",
+                "fromDeliverable": "Define Metering \nStrategy \nand desired UoM & GLP Requirements for metering integration",
+                "toDeliverable": "Pricing Strategy",
+                "fuzzy": true
+        },
+        {
+                "from": "38",
+                "to": "14",
+                "fromDeliverable": "Create \"Enablement SaaS SKU",
+                "toDeliverable": "Determine the need for a New SKU"
+        },
+        {
+                "from": "42",
+                "to": "14",
+                "fromDeliverable": "Enterprise Financial Reporting (EFR)",
+                "toDeliverable": "Determine the need for a New SKU"
+        },
+        {
+                "from": "5",
+                "to": "15",
+                "fromDeliverable": "Define HW/SW/Services Market Opportunity",
+                "toDeliverable": "CPQ Pre-Assessment (IQ/FQ)  & Order Booking"
+        },
+        {
+                "from": "15",
+                "to": "15",
+                "fromDeliverable": "CPQ Pre-Assessment (IQ/FQ)  & Order Booking",
+                "toDeliverable": "CPQ Pre-Assessment (IQ/FQ)  & Order Booking"
+        },
+        {
+                "from": "59",
+                "to": "15",
+                "fromDeliverable": "Order Booking (Mock Run through)",
+                "toDeliverable": "CPQ Pre-Assessment (IQ/FQ)  & Order Booking"
+        },
+        {
+                "from": "16",
+                "to": "16",
+                "fromDeliverable": "Reference  / Technology Architecture",
+                "toDeliverable": "Reference  / Technology Architecture"
+        },
+        {
+                "from": "16",
+                "to": "18",
+                "fromDeliverable": "Reference  / Technology Architecture",
+                "toDeliverable": "Start and End BOM"
+        },
+        {
+                "from": "18",
+                "to": "18",
+                "fromDeliverable": "Start and End BOM",
+                "toDeliverable": "Start and End BOM"
+        },
+        {
+                "from": "8",
+                "to": "19",
+                "fromDeliverable": "GTM / Commercialization",
+                "toDeliverable": "Solution Overview"
+        },
+        {
+                "from": "16",
+                "to": "19",
+                "fromDeliverable": "Reference  / Technology Architecture",
+                "toDeliverable": "Solution Overview"
+        },
+        {
+                "from": "18",
+                "to": "19",
+                "fromDeliverable": "Start and End BOM",
+                "toDeliverable": "Solution Overview"
+        },
+        {
+                "from": "19",
+                "to": "19",
+                "fromDeliverable": "Solution Overview",
+                "toDeliverable": "Solution Overview"
+        },
+        {
+                "from": "20",
+                "to": "19",
+                "fromDeliverable": "Define Metering \nStrategy \nand desired UoM & GLP Requirements for metering integration",
+                "toDeliverable": "Solution Overview",
+                "fuzzy": true
+        },
+        {
+                "from": "9",
+                "to": "20",
+                "fromDeliverable": "Define Consumption Model",
+                "toDeliverable": "Define Metering \nStrategy \nand desired UoM & GLP Requirements for metering integration"
+        },
+        {
+                "from": "20",
+                "to": "20",
+                "fromDeliverable": "Define Metering \nStrategy \nand desired UoM & GLP Requirements for metering integration",
+                "toDeliverable": "Define Metering \nStrategy \nand desired UoM & GLP Requirements for metering integration",
+                "fuzzy": true
+        },
+        {
+                "from": "45",
+                "to": "20",
+                "fromDeliverable": "Sizers",
+                "toDeliverable": "Define Metering \nStrategy \nand desired UoM & GLP Requirements for metering integration"
+        },
+        {
+                "from": "22",
+                "to": "22",
+                "fromDeliverable": "Location Strategy",
+                "toDeliverable": "Location Strategy"
+        },
+        {
+                "from": "20",
+                "to": "23",
+                "fromDeliverable": "Define Metering \nStrategy \nand desired UoM & GLP Requirements for metering integration",
+                "toDeliverable": "Entitlment",
+                "fuzzy": true
+        },
+        {
+                "from": "60",
+                "to": "23",
+                "fromDeliverable": "Pack and shipment requirements (standard vs secure)",
+                "toDeliverable": "Entitlment"
+        },
+        {
+                "from": "13",
+                "to": "24",
+                "fromDeliverable": "Pricing Strategy",
+                "toDeliverable": "Service Owned Good"
+        },
+        {
+                "from": "24",
+                "to": "24",
+                "fromDeliverable": "Service Owned Good",
+                "toDeliverable": "Service Owned Good"
+        },
+        {
+                "from": "38",
+                "to": "24",
+                "fromDeliverable": "Create \"Enablement SaaS SKU",
+                "toDeliverable": "Service Owned Good"
+        },
+        {
+                "from": "28",
+                "to": "25",
+                "fromDeliverable": "Service Support Model",
+                "toDeliverable": "ISV"
+        },
+        {
+                "from": "26",
+                "to": "26",
+                "fromDeliverable": "Competitive Reference Prices",
+                "toDeliverable": "Competitive Reference Prices"
+        },
+        {
+                "from": "5",
+                "to": "27",
+                "fromDeliverable": "Define HW/SW/Services Market Opportunity",
+                "toDeliverable": "Service Offering Mix"
+        },
+        {
+                "from": "6",
+                "to": "27",
+                "fromDeliverable": "Define E2E customer experience",
+                "toDeliverable": "Service Offering Mix"
+        },
+        {
+                "from": "9",
+                "to": "27",
+                "fromDeliverable": "Define Consumption Model",
+                "toDeliverable": "Service Offering Mix"
+        },
+        {
+                "from": "28",
+                "to": "27",
+                "fromDeliverable": "Service Support Model",
+                "toDeliverable": "Service Offering Mix"
+        },
+        {
+                "from": "34",
+                "to": "27",
+                "fromDeliverable": "Compensation Model",
+                "toDeliverable": "Service Offering Mix"
+        },
+        {
+                "from": "37",
+                "to": "27",
+                "fromDeliverable": "Engineering transfer of information and content to HPE Services",
+                "toDeliverable": "Service Offering Mix"
+        },
+        {
+                "from": "5",
+                "to": "28",
+                "fromDeliverable": "Define HW/SW/Services Market Opportunity",
+                "toDeliverable": "Service Support Model"
+        },
+        {
+                "from": "9",
+                "to": "28",
+                "fromDeliverable": "Define Consumption Model",
+                "toDeliverable": "Service Support Model"
+        },
+        {
+                "from": "15",
+                "to": "28",
+                "fromDeliverable": "CPQ Pre-Assessment (IQ/FQ)  & Order Booking",
+                "toDeliverable": "Service Support Model"
+        },
+        {
+                "from": "28",
+                "to": "28",
+                "fromDeliverable": "Service Support Model",
+                "toDeliverable": "Service Support Model"
+        },
+        {
+                "from": "28.1",
+                "to": "28",
+                "fromDeliverable": "Partner Delivery Services",
+                "toDeliverable": "Service Support Model"
+        },
+        {
+                "from": "50",
+                "to": "28",
+                "fromDeliverable": "Service Launch Commit",
+                "toDeliverable": "Service Support Model"
+        },
+        {
+                "from": "51",
+                "to": "28",
+                "fromDeliverable": "Creation & Training: HP Service Delivery",
+                "toDeliverable": "Service Support Model"
+        },
+        {
+                "from": "59",
+                "to": "28",
+                "fromDeliverable": "Order Booking (Mock Run through)",
+                "toDeliverable": "Service Support Model"
+        },
+        {
+                "from": "28.1",
+                "to": "28.1",
+                "fromDeliverable": "Partner Delivery Services",
+                "toDeliverable": "Partner Delivery Services"
+        },
+        {
+                "from": "12",
+                "to": "29",
+                "fromDeliverable": "Finance Compliance BU",
+                "toDeliverable": "Finance Compliance GEO"
+        },
+        {
+                "from": "12",
+                "to": "30",
+                "fromDeliverable": "Finance Compliance BU",
+                "toDeliverable": "Pricing Proposal"
+        },
+        {
+                "from": "13",
+                "to": "30",
+                "fromDeliverable": "Pricing Strategy",
+                "toDeliverable": "Pricing Proposal"
+        },
+        {
+                "from": "16",
+                "to": "30",
+                "fromDeliverable": "Reference  / Technology Architecture",
+                "toDeliverable": "Pricing Proposal"
+        },
+        {
+                "from": "18",
+                "to": "30",
+                "fromDeliverable": "Start and End BOM",
+                "toDeliverable": "Pricing Proposal"
+        },
+        {
+                "from": "20",
+                "to": "30",
+                "fromDeliverable": "Define Metering \nStrategy \nand desired UoM & GLP Requirements for metering integration",
+                "toDeliverable": "Pricing Proposal",
+                "fuzzy": true
+        },
+        {
+                "from": "22",
+                "to": "30",
+                "fromDeliverable": "Location Strategy",
+                "toDeliverable": "Pricing Proposal"
+        },
+        {
+                "from": "27",
+                "to": "30",
+                "fromDeliverable": "Service Offering Mix",
+                "toDeliverable": "Pricing Proposal"
+        },
+        {
+                "from": "28",
+                "to": "30",
+                "fromDeliverable": "Service Support Model",
+                "toDeliverable": "Pricing Proposal"
+        },
+        {
+                "from": "30",
+                "to": "30",
+                "fromDeliverable": "Pricing Proposal",
+                "toDeliverable": "Pricing Proposal"
+        },
+        {
+                "from": "34",
+                "to": "30",
+                "fromDeliverable": "Compensation Model",
+                "toDeliverable": "Pricing Proposal"
+        },
+        {
+                "from": "36",
+                "to": "30",
+                "fromDeliverable": "Compliance (Global Trade, Data Privacy)",
+                "toDeliverable": "Pricing Proposal"
+        },
+        {
+                "from": "15",
+                "to": "31",
+                "fromDeliverable": "CPQ Pre-Assessment (IQ/FQ)  & Order Booking",
+                "toDeliverable": "CPQ Commit"
+        },
+        {
+                "from": "20",
+                "to": "31",
+                "fromDeliverable": "Define Metering \nStrategy \nand desired UoM & GLP Requirements for metering integration",
+                "toDeliverable": "CPQ Commit",
+                "fuzzy": true
+        },
+        {
+                "from": "22",
+                "to": "31",
+                "fromDeliverable": "Location Strategy",
+                "toDeliverable": "CPQ Commit"
+        },
+        {
+                "from": "25",
+                "to": "31",
+                "fromDeliverable": "ISV",
+                "toDeliverable": "CPQ Commit"
+        },
+        {
+                "from": "27",
+                "to": "31",
+                "fromDeliverable": "Service Offering Mix",
+                "toDeliverable": "CPQ Commit"
+        },
+        {
+                "from": "28",
+                "to": "31",
+                "fromDeliverable": "Service Support Model",
+                "toDeliverable": "CPQ Commit"
+        },
+        {
+                "from": "30",
+                "to": "31",
+                "fromDeliverable": "Pricing Proposal",
+                "toDeliverable": "CPQ Commit"
+        },
+        {
+                "from": "59",
+                "to": "31",
+                "fromDeliverable": "Order Booking (Mock Run through)",
+                "toDeliverable": "CPQ Commit"
+        },
+        {
+                "from": "13",
+                "to": "32",
+                "fromDeliverable": "Pricing Strategy",
+                "toDeliverable": "Pricing Review / Approval"
+        },
+        {
+                "from": "32",
+                "to": "32",
+                "fromDeliverable": "Pricing Review / Approval",
+                "toDeliverable": "Pricing Review / Approval"
+        },
+        {
+                "from": "64",
+                "to": "32",
+                "fromDeliverable": "Pricing Council Approval",
+                "toDeliverable": "Pricing Review / Approval"
+        },
+        {
+                "from": "13",
+                "to": "33",
+                "fromDeliverable": "Pricing Strategy",
+                "toDeliverable": "Tenant Onboarding"
+        },
+        {
+                "from": "20",
+                "to": "33",
+                "fromDeliverable": "Define Metering \nStrategy \nand desired UoM & GLP Requirements for metering integration",
+                "toDeliverable": "Tenant Onboarding",
+                "fuzzy": true
+        },
+        {
+                "from": "33",
+                "to": "33",
+                "fromDeliverable": "Tenant Onboarding",
+                "toDeliverable": "Tenant Onboarding"
+        },
+        {
+                "from": "51",
+                "to": "33",
+                "fromDeliverable": "Creation & Training: HP Service Delivery",
+                "toDeliverable": "Tenant Onboarding"
+        },
+        {
+                "from": "28.1",
+                "to": "34",
+                "fromDeliverable": "Partner Delivery Services",
+                "toDeliverable": "Compensation Model"
+        },
+        {
+                "from": "34",
+                "to": "34",
+                "fromDeliverable": "Compensation Model",
+                "toDeliverable": "Compensation Model"
+        },
+        {
+                "from": "51",
+                "to": "34",
+                "fromDeliverable": "Creation & Training: HP Service Delivery",
+                "toDeliverable": "Compensation Model"
+        },
+        {
+                "from": "54",
+                "to": "34",
+                "fromDeliverable": "Creation & Training: Create Seller - Partner Training",
+                "toDeliverable": "Compensation Model"
+        },
+        {
+                "from": "32",
+                "to": "35",
+                "fromDeliverable": "Pricing Review / Approval",
+                "toDeliverable": "Define Sku`s & Material Number"
+        },
+        {
+                "from": "35",
+                "to": "35",
+                "fromDeliverable": "Define Sku`s & Material Number",
+                "toDeliverable": "Define Sku`s & Material Number"
+        },
+        {
+                "from": "47",
+                "to": "35",
+                "fromDeliverable": "Sku`s & Material Number Setup",
+                "toDeliverable": "Define Sku`s & Material Number"
+        },
+        {
+                "from": "64",
+                "to": "35",
+                "fromDeliverable": "Pricing Council Approval",
+                "toDeliverable": "Define Sku`s & Material Number"
+        },
+        {
+                "from": "2",
+                "to": "36",
+                "fromDeliverable": "Review Core Team Members",
+                "toDeliverable": "Compliance (Global Trade, Data Privacy)"
+        },
+        {
+                "from": "14",
+                "to": "36",
+                "fromDeliverable": "Determine the need for a New SKU",
+                "toDeliverable": "Compliance (Global Trade, Data Privacy)"
+        },
+        {
+                "from": "18",
+                "to": "36",
+                "fromDeliverable": "Start and End BOM",
+                "toDeliverable": "Compliance (Global Trade, Data Privacy)"
+        },
+        {
+                "from": "36",
+                "to": "36",
+                "fromDeliverable": "Compliance (Global Trade, Data Privacy)",
+                "toDeliverable": "Compliance (Global Trade, Data Privacy)"
+        },
+        {
+                "from": "56",
+                "to": "37",
+                "fromDeliverable": "Contract (SOW)",
+                "toDeliverable": "Engineering transfer of information and content to HPE Services"
+        },
+        {
+                "from": "21",
+                "to": "38",
+                "fromDeliverable": "Marketing: Brand Approval",
+                "toDeliverable": "Create \"Enablement SaaS SKU"
+        },
+        {
+                "from": "38",
+                "to": "38",
+                "fromDeliverable": "Create \"Enablement SaaS SKU",
+                "toDeliverable": "Create \"Enablement SaaS SKU"
+        },
+        {
+                "from": "40",
+                "to": "40",
+                "fromDeliverable": "Localization and Translation Plan",
+                "toDeliverable": "Localization and Translation Plan"
+        },
+        {
+                "from": "2",
+                "to": "41",
+                "fromDeliverable": "Review Core Team Members",
+                "toDeliverable": "Review of the HPE Contracts-Intake Form"
+        },
+        {
+                "from": "12",
+                "to": "41",
+                "fromDeliverable": "Finance Compliance BU",
+                "toDeliverable": "Review of the HPE Contracts-Intake Form"
+        },
+        {
+                "from": "20",
+                "to": "41",
+                "fromDeliverable": "Define Metering \nStrategy \nand desired UoM & GLP Requirements for metering integration",
+                "toDeliverable": "Review of the HPE Contracts-Intake Form",
+                "fuzzy": true
+        },
+        {
+                "from": "36",
+                "to": "41",
+                "fromDeliverable": "Compliance (Global Trade, Data Privacy)",
+                "toDeliverable": "Review of the HPE Contracts-Intake Form"
+        },
+        {
+                "from": "41",
+                "to": "41",
+                "fromDeliverable": "Review of the HPE Contracts-Intake Form",
+                "toDeliverable": "Review of the HPE Contracts-Intake Form"
+        },
+        {
+                "from": "57",
+                "to": "41",
+                "fromDeliverable": "Testing CPQ Tools",
+                "toDeliverable": "Review of the HPE Contracts-Intake Form"
+        },
+        {
+                "from": "1",
+                "to": "42",
+                "fromDeliverable": "Program Manager assigned",
+                "toDeliverable": "Enterprise Financial Reporting (EFR)"
+        },
+        {
+                "from": "2",
+                "to": "42",
+                "fromDeliverable": "Review Core Team Members",
+                "toDeliverable": "Enterprise Financial Reporting (EFR)"
+        },
+        {
+                "from": "12",
+                "to": "42",
+                "fromDeliverable": "Finance Compliance BU",
+                "toDeliverable": "Enterprise Financial Reporting (EFR)"
+        },
+        {
+                "from": "19",
+                "to": "42",
+                "fromDeliverable": "Solution Overview",
+                "toDeliverable": "Enterprise Financial Reporting (EFR)"
+        },
+        {
+                "from": "27",
+                "to": "42",
+                "fromDeliverable": "Service Offering Mix",
+                "toDeliverable": "Enterprise Financial Reporting (EFR)"
+        },
+        {
+                "from": "29",
+                "to": "42",
+                "fromDeliverable": "Finance Compliance GEO",
+                "toDeliverable": "Enterprise Financial Reporting (EFR)"
+        },
+        {
+                "from": "32",
+                "to": "42",
+                "fromDeliverable": "Pricing Review / Approval",
+                "toDeliverable": "Enterprise Financial Reporting (EFR)"
+        },
+        {
+                "from": "34",
+                "to": "42",
+                "fromDeliverable": "Compensation Model",
+                "toDeliverable": "Enterprise Financial Reporting (EFR)"
+        },
+        {
+                "from": "41",
+                "to": "42",
+                "fromDeliverable": "Review of the HPE Contracts-Intake Form",
+                "toDeliverable": "Enterprise Financial Reporting (EFR)"
+        },
+        {
+                "from": "42",
+                "to": "42",
+                "fromDeliverable": "Enterprise Financial Reporting (EFR)",
+                "toDeliverable": "Enterprise Financial Reporting (EFR)"
+        },
+        {
+                "from": "50",
+                "to": "42",
+                "fromDeliverable": "Service Launch Commit",
+                "toDeliverable": "Enterprise Financial Reporting (EFR)"
+        },
+        {
+                "from": "55",
+                "to": "42",
+                "fromDeliverable": "Creation& Training and documentation for Integration team",
+                "toDeliverable": "Enterprise Financial Reporting (EFR)"
+        },
+        {
+                "from": "65",
+                "to": "42",
+                "fromDeliverable": "Publish HPE GL Flex Solutions SOW and Service Description (WW English)",
+                "toDeliverable": "Enterprise Financial Reporting (EFR)"
+        },
+        {
+                "from": "2",
+                "to": "43",
+                "fromDeliverable": "Review Core Team Members",
+                "toDeliverable": "Integration requirements by day 0"
+        },
+        {
+                "from": "19",
+                "to": "43",
+                "fromDeliverable": "Solution Overview",
+                "toDeliverable": "Integration requirements by day 0"
+        },
+        {
+                "from": "28.1",
+                "to": "44",
+                "fromDeliverable": "Partner Delivery Services",
+                "toDeliverable": "Service SKU & Casper"
+        },
+        {
+                "from": "44",
+                "to": "44",
+                "fromDeliverable": "Service SKU & Casper",
+                "toDeliverable": "Service SKU & Casper"
+        },
+        {
+                "from": "51",
+                "to": "44",
+                "fromDeliverable": "Creation & Training: HP Service Delivery",
+                "toDeliverable": "Service SKU & Casper"
+        },
+        {
+                "from": "35",
+                "to": "47",
+                "fromDeliverable": "Define Sku`s & Material Number",
+                "toDeliverable": "Sku`s & Material Number Setup "
+        },
+        {
+                "from": "47",
+                "to": "47",
+                "fromDeliverable": "Sku`s & Material Number Setup",
+                "toDeliverable": "Sku`s & Material Number Setup "
+        },
+        {
+                "from": "48",
+                "to": "48",
+                "fromDeliverable": "Billing & Invoicing",
+                "toDeliverable": "Billing & Invoicing"
+        },
+        {
+                "from": "50",
+                "to": "50",
+                "fromDeliverable": "Service Launch Commit",
+                "toDeliverable": "Service Launch Commit"
+        },
+        {
+                "from": "51",
+                "to": "51",
+                "fromDeliverable": "Creation & Training: HP Service Delivery",
+                "toDeliverable": "Creation & Training: HP Service Delivery"
+        },
+        {
+                "from": "12",
+                "to": "53",
+                "fromDeliverable": "Finance Compliance BU",
+                "toDeliverable": "Creation & Training Sols Ops"
+        },
+        {
+                "from": "29",
+                "to": "53",
+                "fromDeliverable": "Finance Compliance GEO",
+                "toDeliverable": "Creation & Training Sols Ops"
+        },
+        {
+                "from": "53",
+                "to": "53",
+                "fromDeliverable": "Creation & Training Sols Ops",
+                "toDeliverable": "Creation & Training Sols Ops"
+        },
+        {
+                "from": "63",
+                "to": "53",
+                "fromDeliverable": "Finance Compliance Controllership",
+                "toDeliverable": "Creation & Training Sols Ops"
+        },
+        {
+                "from": "43",
+                "to": "55",
+                "fromDeliverable": "Integration requirements by day 0",
+                "toDeliverable": "Creation& Training and documentation for Integration team"
+        },
+        {
+                "from": "55",
+                "to": "55",
+                "fromDeliverable": "Creation& Training and documentation for Integration team",
+                "toDeliverable": "Creation& Training and documentation for Integration team"
+        },
+        {
+                "from": "42",
+                "to": "56",
+                "fromDeliverable": "Enterprise Financial Reporting (EFR)",
+                "toDeliverable": "Contract (SOW)"
+        },
+        {
+                "from": "65",
+                "to": "56",
+                "fromDeliverable": "Publish HPE GL Flex Solutions SOW and Service Description (WW English)",
+                "toDeliverable": "Contract (SOW)"
+        },
+        {
+                "from": "58",
+                "to": "58",
+                "fromDeliverable": "Go Live Approved/ Release in Production (IQ/FQ)",
+                "toDeliverable": "Go Live Approved/ Release in Production (IQ/FQ)"
+        },
+        {
+                "from": "15",
+                "to": "59",
+                "fromDeliverable": "CPQ Pre-Assessment (IQ/FQ)  & Order Booking",
+                "toDeliverable": "Order Booking (Mock Run through)"
+        },
+        {
+                "from": "59",
+                "to": "59",
+                "fromDeliverable": "Order Booking (Mock Run through)",
+                "toDeliverable": "Order Booking (Mock Run through)"
+        },
+        {
+                "from": "55",
+                "to": "60",
+                "fromDeliverable": "Creation& Training and documentation for Integration team",
+                "toDeliverable": "Pack and shipment requirements (standard vs secure)"
+        },
+        {
+                "from": "60",
+                "to": "60",
+                "fromDeliverable": "Pack and shipment requirements (standard vs secure)",
+                "toDeliverable": "Pack and shipment requirements (standard vs secure)"
+        },
+        {
+                "from": "61",
+                "to": "61",
+                "fromDeliverable": "SaaS Testing Process",
+                "toDeliverable": "SaaS Testing Process"
+        },
+        {
+                "from": "62",
+                "to": "62",
+                "fromDeliverable": "Capacity Planning",
+                "toDeliverable": "Capacity Planning"
+        },
+        {
+                "from": "12",
+                "to": "63",
+                "fromDeliverable": "Finance Compliance BU",
+                "toDeliverable": "Finance Compliance Controllership"
+        },
+        {
+                "from": "29",
+                "to": "63",
+                "fromDeliverable": "Finance Compliance GEO",
+                "toDeliverable": "Finance Compliance Controllership"
+        },
+        {
+                "from": "63",
+                "to": "63",
+                "fromDeliverable": "Finance Compliance Controllership",
+                "toDeliverable": "Finance Compliance Controllership"
+        },
+        {
+                "from": "12",
+                "to": "64",
+                "fromDeliverable": "Finance Compliance BU",
+                "toDeliverable": "Pricing Council Approval"
+        },
+        {
+                "from": "29",
+                "to": "64",
+                "fromDeliverable": "Finance Compliance GEO",
+                "toDeliverable": "Pricing Council Approval"
+        },
+        {
+                "from": "32",
+                "to": "64",
+                "fromDeliverable": "Pricing Review / Approval",
+                "toDeliverable": "Pricing Council Approval"
+        },
+        {
+                "from": "63",
+                "to": "64",
+                "fromDeliverable": "Finance Compliance Controllership",
+                "toDeliverable": "Pricing Council Approval"
+        },
+        {
+                "from": "64",
+                "to": "64",
+                "fromDeliverable": "Pricing Council Approval",
+                "toDeliverable": "Pricing Council Approval"
+        },
+        {
+                "from": "56",
+                "to": "65",
+                "fromDeliverable": "Contract (SOW)",
+                "toDeliverable": "Publish HPE GL Flex Solutions SOW and Service Description (WW English)"
+        },
+        {
+                "from": "65",
+                "to": "65",
+                "fromDeliverable": "Publish HPE GL Flex Solutions SOW and Service Description (WW English)",
+                "toDeliverable": "Publish HPE GL Flex Solutions SOW and Service Description (WW English)"
+        },
+        {
+                "from": "28.1",
+                "to": "66",
+                "fromDeliverable": "Partner Delivery Services",
+                "toDeliverable": "Handhold first customers"
+        },
+        {
+                "from": "66",
+                "to": "66",
+                "fromDeliverable": "Handhold first customers",
+                "toDeliverable": "Handhold first customers"
+        },
+        {
+                "from": "67",
+                "to": "67",
+                "fromDeliverable": "MapBook updates",
+                "toDeliverable": "MapBook updates"
+        }
+];
+        
+        // Initialize data (will try Smartsheet first, fall back to embedded data)
         async function initializeData() {
             showLoading('Initializing...');
             
@@ -3211,15 +5849,15 @@
                 const success = await refreshFromSmartsheet();
                 
                 if (!success) {
-                    // Use fallback data
-                    processDataRaw = FALLBACK_DATA;
-                    dependencyConnections = generateDependencyConnections(FALLBACK_DATA);
-                    updateSyncStatus('offline', 'Using local data');
+                    // Use embedded fallback data
+                    processDataRaw = JSON.parse(JSON.stringify(EMBEDDED_PROCESS_DATA));
+                    dependencyConnections = JSON.parse(JSON.stringify(EMBEDDED_DEPENDENCY_CONNECTIONS));
+                    updateSyncStatus('offline', 'Using embedded data');
                 }
             } else {
-                // No Smartsheet configured, use fallback
-                processDataRaw = FALLBACK_DATA;
-                dependencyConnections = generateDependencyConnections(FALLBACK_DATA);
+                // No Smartsheet configured, use embedded data
+                processDataRaw = JSON.parse(JSON.stringify(EMBEDDED_PROCESS_DATA));
+                dependencyConnections = JSON.parse(JSON.stringify(EMBEDDED_DEPENDENCY_CONNECTIONS));
                 updateSyncStatus('offline', 'Configure Smartsheet to sync');
             }
             
