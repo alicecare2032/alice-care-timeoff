@@ -2878,9 +2878,9 @@
             console.log('saveTaskToSmartsheet called:', { 
                 connected: smartsheetConfig.connected, 
                 rowId: task.rowId,
-                taskNumber: task.taskNumber,
-                updates: updates 
+                taskNumber: task.taskNumber
             });
+            console.log('Updates to save:', updates);
             
             if (!smartsheetConfig.connected) {
                 console.log('Not connected to Smartsheet');
@@ -2889,6 +2889,14 @@
             
             if (!task.rowId) {
                 console.log('Task has no rowId - cannot update Smartsheet');
+                return false;
+            }
+            
+            // Check if columnMapping exists
+            console.log('Column mapping keys:', Object.keys(smartsheetColumnMapping));
+            if (Object.keys(smartsheetColumnMapping).length === 0) {
+                console.error('Column mapping is empty - cannot update Smartsheet');
+                showToast('Error: Column mapping not loaded. Try refreshing.', true);
                 return false;
             }
             
@@ -2902,7 +2910,7 @@
                     updates: updates,
                     columnMapping: smartsheetColumnMapping
                 };
-                console.log('Payload:', payload);
+                console.log('Full payload:', JSON.stringify(payload, null, 2));
                 
                 const response = await fetch(url, {
                     method: 'POST',
@@ -2910,7 +2918,17 @@
                     body: JSON.stringify(payload)
                 });
                 
-                const data = await response.json();
+                const responseText = await response.text();
+                console.log('Raw response:', responseText);
+                
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (e) {
+                    console.error('Failed to parse response as JSON:', responseText);
+                    throw new Error('Invalid response from server');
+                }
+                
                 console.log('Smartsheet response:', data);
                 
                 if (data.success) {
@@ -2918,6 +2936,9 @@
                     saveSmartsheetConfigToStorage();
                     return true;
                 }
+                
+                // Log the detailed error
+                console.error('Smartsheet API error details:', data.details || data.error);
                 throw new Error(data.error || 'Update failed');
             } catch (error) {
                 console.error('Smartsheet update error:', error);
@@ -6902,47 +6923,17 @@
         function sanitizeHtml(html) {
             if (!html) return '';
             
+            // Simple and safe - just use textContent extraction
             try {
-                // Allow only safe tags
-                const allowedTags = ['b', 'i', 'u', 'strong', 'em', 'br', 'p', 'ul', 'ol', 'li', 'a', 'span', 'div'];
-                const doc = new DOMParser().parseFromString(html, 'text/html');
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = String(html);
                 
-                // Check if body exists
-                if (!doc || !doc.body) {
-                    console.warn('DOMParser returned null body, returning escaped HTML');
-                    return escapeHtml(html);
-                }
-                
-                function cleanNode(node) {
-                    if (!node) return;
-                    if (node.nodeType === 3) return; // Text node
-                    if (node.nodeType === 1) { // Element node
-                        const tagName = node.tagName.toLowerCase();
-                        if (!allowedTags.includes(tagName)) {
-                            // Replace with text content
-                            const text = document.createTextNode(node.textContent);
-                            if (node.parentNode) {
-                                node.parentNode.replaceChild(text, node);
-                            }
-                            return;
-                        }
-                        // Clean attributes except href and style for links
-                        Array.from(node.attributes || []).forEach(attr => {
-                            if (attr.name !== 'href' && attr.name !== 'style') {
-                                node.removeAttribute(attr.name);
-                            }
-                        });
-                        // Recursively clean children
-                        Array.from(node.childNodes || []).forEach(cleanNode);
-                    }
-                }
-                
-                cleanNode(doc.body);
-                return doc.body.innerHTML;
+                // If it parsed successfully, return the innerHTML
+                // This automatically sanitizes dangerous scripts
+                return tempDiv.innerHTML || escapeHtml(String(html));
             } catch (err) {
-                console.error('Error sanitizing HTML:', err);
-                // Return escaped HTML as fallback
-                return escapeHtml(html);
+                console.warn('sanitizeHtml fallback:', err.message);
+                return escapeHtml(String(html));
             }
         }
         
