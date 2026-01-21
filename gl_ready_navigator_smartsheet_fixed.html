@@ -2286,7 +2286,7 @@
                     </svg>
                     Refresh
                 </button>
-                <button class="sync-btn" onclick="openConfigModal()" title="Smartsheet Settings">
+                <button class="sync-btn" id="settingsBtn" onclick="openConfigModal()" title="Smartsheet Settings" style="display: none;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
                     </svg>
@@ -2767,24 +2767,30 @@
                 if (data.success && data.data) {
                     smartsheetColumnMapping = data.columnMapping || {};
                     
-                    // Transform and ensure proper data structure
-                    processDataRaw = data.data.map(task => {
-                        // Ensure scenarios object exists with proper structure
-                        if (!task.scenarios) {
-                            task.scenarios = {
-                                noiToGl: false,
-                                productToGl: false,
-                                solutionBuyCapex: false,
-                                fqToIq: false,
-                                iqToFq: false,
-                                skuUpdate: false,
-                                significantArchChange: false,
-                                newRouteToMarket: false,
-                                changeOrder: false
-                            };
-                        }
-                        return task;
-                    });
+                    // Filter out empty rows and ensure proper data structure
+                    processDataRaw = data.data
+                        .filter(task => {
+                            // Exclude rows without taskNumber or deliverable
+                            return task.taskNumber && task.taskNumber.toString().trim() !== '' &&
+                                   task.deliverable && task.deliverable.toString().trim() !== '';
+                        })
+                        .map(task => {
+                            // Ensure scenarios object exists with proper structure
+                            if (!task.scenarios) {
+                                task.scenarios = {
+                                    noiToGl: false,
+                                    productToGl: false,
+                                    solutionBuyCapex: false,
+                                    fqToIq: false,
+                                    iqToFq: false,
+                                    skuUpdate: false,
+                                    significantArchChange: false,
+                                    newRouteToMarket: false,
+                                    changeOrder: false
+                                };
+                            }
+                            return task;
+                        });
                     
                     // Regenerate dependency connections
                     dependencyConnections = generateDependencyConnections(processDataRaw);
@@ -6969,6 +6975,8 @@
             
             if (enteredPin === EDIT_PIN) {
                 isEditAuthenticated = true;
+                // Show Settings button when edit mode is enabled
+                document.getElementById('settingsBtn').style.display = 'flex';
                 closePinModal();
                 openEditModal(taskNumber);
             } else {
