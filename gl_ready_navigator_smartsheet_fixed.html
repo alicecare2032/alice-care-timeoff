@@ -6865,7 +6865,8 @@
                 // Check if description already contains HTML tags (not escaped)
                 if (/<[a-z][\s\S]*>/i.test(desc)) {
                     // Already has HTML, sanitize and return
-                    return sanitizeHtml(desc);
+                    const sanitized = sanitizeHtml(desc);
+                    return sanitized || escapeHtml(desc);
                 }
                 
                 // Check for escaped HTML (entities like &lt;)
@@ -6874,11 +6875,12 @@
                     const textarea = document.createElement('textarea');
                     textarea.innerHTML = desc;
                     const decoded = textarea.value;
-                    return sanitizeHtml(decoded);
+                    const sanitized = sanitizeHtml(decoded);
+                    return sanitized || escapeHtml(decoded);
                 }
                 
                 // Convert plain text to HTML
-                let html = desc
+                let html = escapeHtml(desc)
                     .replace(/\n\* /g, '</li><li>')  // Convert bullet points
                     .replace(/^\* /g, '<li>')         // First bullet
                     .replace(/\n/g, '<br>');          // Regular newlines
@@ -6892,8 +6894,8 @@
                 return html;
             } catch (err) {
                 console.error('Error rendering description:', err);
-                // Return plain text as-is, let browser handle it
-                return desc || '-';
+                // Return escaped text as-is
+                return escapeHtml(String(desc || '-'));
             }
         }
         
@@ -6904,6 +6906,12 @@
                 // Allow only safe tags
                 const allowedTags = ['b', 'i', 'u', 'strong', 'em', 'br', 'p', 'ul', 'ol', 'li', 'a', 'span', 'div'];
                 const doc = new DOMParser().parseFromString(html, 'text/html');
+                
+                // Check if body exists
+                if (!doc || !doc.body) {
+                    console.warn('DOMParser returned null body, returning escaped HTML');
+                    return escapeHtml(html);
+                }
                 
                 function cleanNode(node) {
                     if (!node) return;
@@ -6933,9 +6941,8 @@
                 return doc.body.innerHTML;
             } catch (err) {
                 console.error('Error sanitizing HTML:', err);
-                // Return the HTML as-is instead of escaping it
-                // The browser's innerHTML will handle any dangerous content
-                return html;
+                // Return escaped HTML as fallback
+                return escapeHtml(html);
             }
         }
         
