@@ -2625,10 +2625,18 @@
         // ========================================
         
         const STORAGE_KEY = 'glReadySmartsheetConfig';
+        
+        // Default configuration - edit these values for your deployment
+        const DEFAULT_CONFIG = {
+            proxyUrl: 'https://navigator-smartsheet-f9atc7e9dbg7ecbu.westus2-01.azurewebsites.net/api/smartsheet-proxy?code=El87jjpGfT0h5aluqugB1kIEW5pjlwj0yn9nYTIXBxLkAzFu0VeKXg==',
+            sheetId: '7590044349976452',
+            refreshInterval: 5
+        };
+        
         let smartsheetConfig = {
-            proxyUrl: '',
-            sheetId: '',
-            refreshInterval: 5,
+            proxyUrl: DEFAULT_CONFIG.proxyUrl,
+            sheetId: DEFAULT_CONFIG.sheetId,
+            refreshInterval: DEFAULT_CONFIG.refreshInterval,
             lastSync: null,
             connected: false
         };
@@ -2639,14 +2647,18 @@
             try {
                 const saved = localStorage.getItem(STORAGE_KEY);
                 if (saved) {
-                    smartsheetConfig = { ...smartsheetConfig, ...JSON.parse(saved) };
-                    document.getElementById('configProxyUrl').value = smartsheetConfig.proxyUrl || '';
-                    document.getElementById('configSheetId').value = smartsheetConfig.sheetId || '';
-                    document.getElementById('configRefreshInterval').value = smartsheetConfig.refreshInterval || 5;
-                    
-                    if (smartsheetConfig.connected) {
-                        updateSyncStatus('connected', 'Connected');
-                    }
+                    const parsed = JSON.parse(saved);
+                    smartsheetConfig = { ...smartsheetConfig, ...parsed };
+                }
+                // If no saved config, defaults are already set
+                
+                // Populate form fields
+                document.getElementById('configProxyUrl').value = smartsheetConfig.proxyUrl || '';
+                document.getElementById('configSheetId').value = smartsheetConfig.sheetId || '';
+                document.getElementById('configRefreshInterval').value = smartsheetConfig.refreshInterval || 5;
+                
+                if (smartsheetConfig.connected) {
+                    updateSyncStatus('connected', 'Connected');
                 }
             } catch (e) { console.error('Error loading config:', e); }
         }
@@ -2768,6 +2780,21 @@
                     smartsheetColumnMapping = data.columnMapping || {};
                     console.log('Column mapping received:', smartsheetColumnMapping);
                     
+                    // Check for duplicate task numbers and warn user
+                    const taskNumberCount = {};
+                    data.data.forEach(task => {
+                        if (task.taskNumber) {
+                            const tn = String(task.taskNumber).trim();
+                            taskNumberCount[tn] = (taskNumberCount[tn] || 0) + 1;
+                        }
+                    });
+                    const duplicates = Object.entries(taskNumberCount).filter(([k, v]) => v > 1);
+                    if (duplicates.length > 0) {
+                        console.warn('⚠️ DUPLICATE TASK NUMBERS FOUND:', duplicates);
+                        const dupList = duplicates.map(([tn, count]) => `#${tn} (${count}x)`).join(', ');
+                        showToast(`⚠️ Warning: Duplicate task numbers found: ${dupList}. Please fix in Smartsheet.`, true);
+                    }
+                    
                     // Filter out empty rows and ensure proper data structure
                     processDataRaw = data.data
                         .filter(task => {
@@ -2776,6 +2803,9 @@
                                    task.deliverable && task.deliverable.toString().trim() !== '';
                         })
                         .map(task => {
+                            // Ensure taskNumber is stored as string (supports decimals like "1.1")
+                            task.taskNumber = String(task.taskNumber).trim();
+                            
                             // Log rowId for debugging
                             console.log(`Task #${task.taskNumber} has rowId: ${task.rowId}`);
                             
@@ -2834,15 +2864,20 @@
             const connections = [];
             const deliverableToTask = {};
             
+            // Build lookup map of deliverable -> task number
             tasks.forEach(task => {
                 if (task.deliverable) {
                     deliverableToTask[task.deliverable.trim()] = task.taskNumber;
                 }
             });
             
+            console.log('Deliverable to Task mapping:', Object.keys(deliverableToTask).length, 'entries');
+            
             tasks.forEach(task => {
                 if (task.dependencies) {
+                    console.log(`Task #${task.taskNumber} dependencies raw:`, JSON.stringify(task.dependencies));
                     const deps = task.dependencies.split('\n').filter(d => d.trim());
+                    console.log(`Task #${task.taskNumber} dependencies parsed:`, deps);
                     deps.forEach(dep => {
                         const depTrimmed = dep.trim();
                         const fromTaskNum = deliverableToTask[depTrimmed];
@@ -2853,11 +2888,14 @@
                                 fromDeliverable: depTrimmed,
                                 toDeliverable: task.deliverable
                             });
+                        } else if (!fromTaskNum && depTrimmed) {
+                            console.warn(`Dependency not found: "${depTrimmed}" for task #${task.taskNumber}`);
                         }
                     });
                 }
             });
             
+            console.log('Total dependency connections generated:', connections.length);
             return connections;
         }
         
@@ -2949,8 +2987,8 @@
         // Initialize Smartsheet config on load
         document.addEventListener('DOMContentLoaded', function() {
             loadSmartsheetConfig();
+            // Auto-connect if we have URL and sheet ID (from defaults or localStorage)
             if (smartsheetConfig.proxyUrl && smartsheetConfig.sheetId) {
-                // Auto-connect if previously configured
                 setTimeout(() => refreshFromSmartsheet(), 500);
             }
             setupAutoRefresh();
@@ -6827,7 +6865,7 @@
                         <td class="desc-cell">${descHtml}</td>
                         <td class="owner-cell">${ownerHtml}</td>
                         <td class="deps-cell">${depsHtml}</td>
-                        <td><button class="action-btn edit-btn" onclick="checkEditAuth('${task.taskNumber}')">✏️ Edit</button></td>
+                        <td><button class="action-btn edit-btn" onclick="checkEditAuth('${task.taskNumber}', ${task.rowId || 0})">✏️ Edit</button></td>
                     `;
                     
                     tbody.appendChild(row);
@@ -6987,14 +7025,15 @@
         // =====================
         // PIN AUTHENTICATION
         // =====================
-        function checkEditAuth(taskNumber) {
+        function checkEditAuth(taskNumber, rowId) {
             if (isEditAuthenticated) {
-                openEditModal(taskNumber);
+                openEditModal(taskNumber, rowId);
                 return;
             }
             
-            // Show PIN modal
+            // Show PIN modal - store both taskNumber and rowId
             document.getElementById('pinTaskNumber').value = taskNumber;
+            document.getElementById('pinTaskNumber').dataset.rowId = rowId || 0;
             document.getElementById('pinInput').value = '';
             document.getElementById('pinError').style.display = 'none';
             document.getElementById('pinModal').classList.add('active');
@@ -7004,13 +7043,14 @@
         function verifyPin() {
             const enteredPin = document.getElementById('pinInput').value;
             const taskNumber = document.getElementById('pinTaskNumber').value;
+            const rowId = parseInt(document.getElementById('pinTaskNumber').dataset.rowId) || 0;
             
             if (enteredPin === EDIT_PIN) {
                 isEditAuthenticated = true;
                 // Show Settings button when edit mode is enabled
                 document.getElementById('settingsBtn').style.display = 'flex';
                 closePinModal();
-                openEditModal(taskNumber);
+                openEditModal(taskNumber, rowId);
             } else {
                 document.getElementById('pinError').style.display = 'block';
                 document.getElementById('pinInput').value = '';
@@ -7557,11 +7597,30 @@
             return links.join('\n');
         }
         
-        function openEditModal(taskNumber) {
-            const task = processDataRaw.find(t => t.taskNumber === taskNumber);
-            if (!task) return;
+        function openEditModal(taskNumber, rowId) {
+            console.log('openEditModal called with taskNumber:', taskNumber, 'rowId:', rowId);
             
-            editingTaskNumber = taskNumber;
+            // Find task - prefer rowId if available (unique), fallback to taskNumber
+            let task;
+            if (rowId) {
+                task = processDataRaw.find(t => t.rowId === rowId);
+            }
+            if (!task) {
+                // Fallback to taskNumber comparison as strings
+                task = processDataRaw.find(t => String(t.taskNumber) === String(taskNumber));
+            }
+            
+            if (!task) {
+                console.error('Task not found for taskNumber:', taskNumber, 'rowId:', rowId);
+                console.log('Available tasks:', processDataRaw.map(t => ({tn: t.taskNumber, rid: t.rowId})));
+                return;
+            }
+            
+            console.log('Opening edit modal for task:', task.taskNumber, task.deliverable, 'rowId:', task.rowId);
+            
+            editingTaskNumber = task.taskNumber;
+            // Store rowId for save operation
+            window.editingRowId = task.rowId;
             
             // Populate category dropdown
             const categorySelect = document.getElementById('editCategory');
@@ -7655,8 +7714,18 @@
         async function saveTaskEdit() {
             if (!editingTaskNumber) return;
             
-            const taskIndex = processDataRaw.findIndex(t => t.taskNumber === editingTaskNumber);
-            if (taskIndex === -1) return;
+            // Find task by rowId if available, otherwise by taskNumber
+            let taskIndex;
+            if (window.editingRowId) {
+                taskIndex = processDataRaw.findIndex(t => t.rowId === window.editingRowId);
+            }
+            if (taskIndex === -1 || taskIndex === undefined) {
+                taskIndex = processDataRaw.findIndex(t => String(t.taskNumber) === String(editingTaskNumber));
+            }
+            if (taskIndex === -1) {
+                console.error('Task not found for saving');
+                return;
+            }
             
             try {
                 // Get description from rich editor
