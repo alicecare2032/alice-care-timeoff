@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Non-Medical Training | Alice Care</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --alice-orange: #F57600;
+      --alice-orange-dark: #E06900;
+      --alice-navy: #1A365C;
+      --alice-light-navy: #2D4A6F;
+      --alice-alice-blue: #F0F7FF;
+      --alice-white: #FFFFFF;
+      --alice-light-grey: #F5F5F5;
+      --alice-dark-grey: #666666;
+      --success-green: #10B981;
+      --error-red: #EF4444;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, var(--alice-alice-blue) 0%, #E8F4FD 50%, var(--alice-light-grey) 100%);
+      min-height: 100vh;
+      color: var(--alice-navy);
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, var(--alice-orange) 0%, var(--alice-orange-dark) 100%);
+      color: white;
+      padding: 1.25rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+      top: -100px;
+      right: 10%;
+    }
+
+    .header::after {
+      content: '';
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 50%;
+      bottom: -75px;
+      left: 5%;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .logo {
+      font-size: 1.75rem;
+      font-weight: 700;
+    }
+
+    .logo .alice { color: var(--alice-white); }
+    .logo .dot { color: var(--alice-navy); }
+    .logo .care { color: var(--alice-navy); font-weight: 400; }
+
+    .tagline {
+      font-size: 0.9rem;
+      opacity: 0.95;
+      margin-top: 0.25rem;
+    }
+
+    .user-badge {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      backdrop-filter: blur(10px);
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    /* Login Section */
+    .login-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+    }
+
+    .login-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(26, 54, 92, 0.12);
+      padding: 3rem;
+      width: 100%;
+      max-width: 480px;
+      text-align: center;
+    }
+
+    .login-card h1 {
+      color: var(--alice-navy);
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .login-card p {
+      color: var(--alice-dark-grey);
+      margin-bottom: 2rem;
+    }
+
+    .login-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--alice-orange) 0%, var(--alice-orange-dark) 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+    }
+
+    .login-icon svg {
+      width: 40px;
+      height: 40px;
+      fill: white;
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .error-message {
+      background: #FEF2F2;
+      border: 1px solid #FECACA;
+      border-left: 4px solid var(--error-red);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      color: #991B1B;
+      font-size: 0.9rem;
+    }
+
+    .support-info {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #E5E7EB;
+      font-size: 0.85rem;
+      color: var(--alice-dark-grey);
+    }
+
+    .support-info a {
+      color: var(--alice-orange);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .support-info a:hover {
+      text-decoration: underline;
+    }
+
+    /* Training Section */
+    .training-section {
+      display: none;
+    }
+
+    .progress-bar-container {
+      background: white;
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 8px rgba(26, 54, 92, 0.08);
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .progress-title {
+      font-weight: 600;
+      color: var(--alice-navy);
+    }
+
+    .progress-step {
+      font-size: 0.85rem;
+      color: var(--alice-dark-grey);
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: var(--alice-light-grey);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--alice-orange) 0%, var(--alice-orange-dark) 100%);
+      border-radius: 4px;
+      transition: width 0.5s ease;
+      width: 0%;
+    }
+
+    /* Video Section */
+    .video-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(26, 54, 92, 0.1);
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+
+    .video-header {
+      background: var(--alice-navy);
+      color: white;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .video-header svg {
+      width: 24px;
+      height: 24px;
+      fill: var(--alice-orange);
+    }
+
+    .video-header h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .video-container {
+      position: relative;
+      background: #000;
+    }
+
+    .video-container video {
+      width: 100%;
+      display: block;
+    }
+
+    .video-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .video-overlay:hover {
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    .video-overlay.hidden {
+      display: none;
+    }
+
+    .play-button {
+      width: 80px;
+      height: 80px;
+      background: var(--alice-orange);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .video-overlay:hover .play-button {
+      transform: scale(1.1);
+      box-shadow: 0 0 30px rgba(245, 118, 0, 0.5);
+    }
+
+    .play-button svg {
+      width: 32px;
+      height: 32px;
+      fill: white;
+      margin-left: 4px;
+    }
+
+    .video-footer {
+      padding: 1rem 1.5rem;
+      background: var(--alice-alice-blue);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .video-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #FCD34D;
+    }
+
+    .status-dot.completed {
+      background: var(--success-green);
+    }
+
+    /* Quiz Section */
+    .quiz-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(26, 54, 92, 0.1);
+      overflow: hidden;
+      display: none;
+    }
+
+    .quiz-card.visible {
+      display: block;
+      animation: slideUp 0.5s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .quiz-header {
+      background: var(--alice-navy);
+      color: white;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .quiz-header svg {
+      width: 24px;
+      height: 24px;
+      fill: var(--alice-orange);
+    }
+
+    .quiz-header h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .quiz-content {
+      padding: 2rem;
+    }
+
+    .quiz-intro {
+      background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%);
+      border-left: 4px solid var(--alice-orange);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .quiz-intro p {
+      color: var(--alice-navy);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .quiz-intro strong {
+      color: var(--alice-orange);
+    }
+
+    .question {
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid #E5E7EB;
+    }
+
+    .question:last-of-type {
+      border-bottom: none;
+      margin-bottom: 1rem;
+    }
+
+    .question-number {
+      display: inline-block;
+      background: var(--alice-orange);
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 28px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-right: 0.75rem;
+    }
+
+    .question-text {
+      display: inline;
+      font-weight: 500;
+      color: var(--alice-navy);
+      line-height: 1.6;
+    }
+
+    .question-type {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--alice-dark-grey);
+      margin-top: 0.5rem;
+      margin-left: 2.5rem;
+      font-style: italic;
+    }
+
+    .options {
+      margin-top: 1rem;
+      margin-left: 2.5rem;
+    }
+
+    .option {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border: 2px solid #E5E7EB;
+      border-radius: 10px;
+      margin-bottom: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .option:hover {
+      border-color: var(--alice-orange);
+      background: #FFF7ED;
+    }
+
+    .option.selected {
+      border-color: var(--alice-orange);
+      background: #FFF7ED;
+    }
+
+    .option.correct {
+      border-color: var(--success-green);
+      background: #ECFDF5;
+    }
+
+    .option.incorrect {
+      border-color: var(--error-red);
+      background: #FEF2F2;
+    }
+
+    .option input {
+      margin-top: 2px;
+      accent-color: var(--alice-orange);
+    }
+
+    .option-label {
+      flex: 1;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .feedback {
+      margin-top: 1rem;
+      margin-left: 2.5rem;
+      padding: 1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .feedback.show {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .feedback.correct {
+      background: #ECFDF5;
+      border-left: 4px solid var(--success-green);
+      color: #065F46;
+    }
+
+    .feedback.incorrect {
+      background: #FEF2F2;
+      border-left: 4px solid var(--error-red);
+      color: #991B1B;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 0.875rem 2rem;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--alice-orange) 0%, var(--alice-orange-dark) 100%);
+      color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(245, 118, 0, 0.35);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: var(--alice-navy);
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: var(--alice-light-navy);
+    }
+
+    .quiz-actions {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #E5E7EB;
+    }
+
+    /* Results Section */
+    .results-section {
+      display: none;
+    }
+
+    .results-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(26, 54, 92, 0.1);
+      padding: 3rem;
+      text-align: center;
+    }
+
+    .results-icon {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+    }
+
+    .results-icon.success {
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    }
+
+    .results-icon.fail {
+      background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+    }
+
+    .results-icon svg {
+      width: 50px;
+      height: 50px;
+      fill: white;
+    }
+
+    .results-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--alice-navy);
+      margin-bottom: 0.5rem;
+    }
+
+    .results-score {
+      font-size: 3rem;
+      font-weight: 700;
+      margin: 1rem 0;
+    }
+
+    .results-score.success {
+      color: var(--success-green);
+    }
+
+    .results-score.fail {
+      color: #F59E0B;
+    }
+
+    .results-message {
+      color: var(--alice-dark-grey);
+      font-size: 1rem;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .completion-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #ECFDF5;
+      color: #065F46;
+      padding: 0.75rem 1.5rem;
+      border-radius: 50px;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+
+    .completion-badge svg {
+      width: 20px;
+      height: 20px;
+      fill: var(--success-green);
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--alice-dark-grey);
+      font-size: 0.85rem;
+    }
+
+    .footer a {
+      color: var(--alice-orange);
+      text-decoration: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .header-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+      }
+
+      .login-card {
+        padding: 2rem 1.5rem;
+      }
+
+      .quiz-content {
+        padding: 1.5rem;
+      }
+
+      .options {
+        margin-left: 0;
+      }
+
+      .question-type {
+        margin-left: 0;
+      }
+
+      .feedback {
+        margin-left: 0;
+      }
+
+      .results-card {
+        padding: 2rem 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-content">
+      <div>
+        <div class="logo">
+          <span class="alice">alice</span><span class="dot">.</span><span class="care">care</span>
+        </div>
+        <div class="tagline">Trusted Support, When Needed</div>
+      </div>
+      <div class="user-badge" id="userBadge" style="display: none;">
+        <span id="userName"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Login Section -->
+    <div class="login-section" id="loginSection">
+      <div class="login-card">
+        <div class="login-icon" id="loginIcon">
+          <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        </div>
+        <h1>Non-Medical Training</h1>
+        <p>Verifying your access...</p>
+        
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+        
+        <div class="support-info">
+          <p>Having trouble accessing this page?</p>
+          <p>Contact <a href="mailto:hr@alicecare.com">hr@alicecare.com</a> or <a href="mailto:talent@alicecare.com">talent@alicecare.com</a></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Training Section -->
+    <div class="training-section" id="trainingSection">
+      <!-- Progress Bar -->
+      <div class="progress-bar-container">
+        <div class="progress-header">
+          <span class="progress-title">Your Progress</span>
+          <span class="progress-step" id="progressStep">Step 1 of 2: Watch Video</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+
+      <!-- Video Card -->
+      <div class="video-card" id="videoCard">
+        <div class="video-header">
+          <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+          <h2>Non-Medical Services Training Video</h2>
+        </div>
+        <div class="video-container">
+          <video id="trainingVideo" controls>
+            <source src="https://alicecare2032.github.io/alice-care-timeoff/nonmedicaltraining.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+          <div class="video-overlay" id="videoOverlay">
+            <div class="play-button">
+              <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <p>Click to start training</p>
+          </div>
+        </div>
+        <div class="video-footer">
+          <div class="video-status">
+            <span class="status-dot" id="videoStatusDot"></span>
+            <span id="videoStatusText">Not started</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quiz Card -->
+      <div class="quiz-card" id="quizCard">
+        <div class="quiz-header">
+          <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+          <h2>Knowledge Check</h2>
+        </div>
+        <div class="quiz-content">
+          <div class="quiz-intro">
+            <p><strong>Important:</strong> You must answer all questions correctly (100%) to complete this training. Take your time and review the video content if needed.</p>
+          </div>
+
+          <!-- Question 1 -->
+          <div class="question" data-question="1" data-type="single" data-answer="B">
+            <span class="question-number">1</span>
+            <span class="question-text">A caregiver can perform a medical task if the family signs a consent form.</span>
+            <span class="question-type">True or False</span>
+            <div class="options">
+              <label class="option">
+                <input type="radio" name="q1" value="A">
+                <span class="option-label">True</span>
+              </label>
+              <label class="option">
+                <input type="radio" name="q1" value="B">
+                <span class="option-label">False</span>
+              </label>
+            </div>
+            <div class="feedback" id="feedback1">
+              <strong>Correct!</strong> CDSS does not authorize medical services for Registered Home Care Aides and consent does not change that.
+            </div>
+          </div>
+
+          <!-- Question 2 -->
+          <div class="question" data-question="2" data-type="multiple" data-answer="A,B,D">
+            <span class="question-number">2</span>
+            <span class="question-text">Which actions fit CDSS rules when a client self-administers medication?</span>
+            <span class="question-type">Select all that apply</span>
+            <div class="options">
+              <label class="option">
+                <input type="checkbox" name="q2" value="A">
+                <span class="option-label">A. Remind the client to take medication</span>
+              </label>
+              <label class="option">
+                <input type="checkbox" name="q2" value="B">
+                <span class="option-label">B. Open the client's medication bottle or blister pack</span>
+              </label>
+              <label class="option">
+                <input type="checkbox" name="q2" value="C">
+                <span class="option-label">C. Give the client the medication and watch them swallow</span>
+              </label>
+              <label class="option">
+                <input type="checkbox" name="q2" value="D">
+                <span class="option-label">D. Remind the client to refill medication</span>
+              </label>
+            </div>
+            <div class="feedback" id="feedback2">
+              <strong>Correct!</strong> CDSS allows limited help that supports self-administration, not medication administration.
+            </div>
+          </div>
+
+          <!-- Question 3 -->
+          <div class="question" data-question="3" data-type="single" data-answer="B">
+            <span class="question-number">3</span>
+            <span class="question-text">Which task is medical and NOT allowed?</span>
+            <span class="question-type">Select one best answer</span>
+            <div class="options">
+              <label class="option">
+                <input type="radio" name="q3" value="A">
+                <span class="option-label">A. Meal planning and meal preparation</span>
+              </label>
+              <label class="option">
+                <input type="radio" name="q3" value="B">
+                <span class="option-label">B. Monitoring or recording blood pressure</span>
+              </label>
+            </div>
+            <div class="feedback" id="feedback3">
+              <strong>Correct!</strong> CDSS lists monitoring or recording blood pressure as a medical service.
+            </div>
+          </div>
+
+          <!-- Question 4 -->
+          <div class="question" data-question="4" data-type="single" data-answer="C">
+            <span class="question-number">4</span>
+            <span class="question-text">A client asks you to check their blood sugar. What do you do?</span>
+            <span class="question-type">Select one best answer</span>
+            <div class="options">
+              <label class="option">
+                <input type="radio" name="q4" value="A">
+                <span class="option-label">A. Do it if the client says it is okay</span>
+              </label>
+              <label class="option">
+                <input type="radio" name="q4" value="B">
+                <span class="option-label">B. Do it only if you have done it before</span>
+              </label>
+              <label class="option">
+                <input type="radio" name="q4" value="C">
+                <span class="option-label">C. Refuse, explain you provide nonmedical care only, then notify Alice Care</span>
+              </label>
+              <label class="option">
+                <input type="radio" name="q4" value="D">
+                <span class="option-label">D. Do it and document it later</span>
+              </label>
+            </div>
+            <div class="feedback" id="feedback4">
+              <strong>Correct!</strong> CDSS lists glucose readings as a medical service and does not authorize it for caregivers.
+            </div>
+          </div>
+
+          <!-- Question 5 -->
+          <div class="question" data-question="5" data-type="single" data-answer="B">
+            <span class="question-number">5</span>
+            <span class="question-text">A client asks for an insulin shot. What is the correct response?</span>
+            <span class="question-type">Select one best answer</span>
+            <div class="options">
+              <label class="option">
+                <input type="radio" name="q5" value="A">
+                <span class="option-label">A. Provide the shot if the client cannot do it</span>
+              </label>
+              <label class="option">
+                <input type="radio" name="q5" value="B">
+                <span class="option-label">B. Refuse and notify Alice Care immediately</span>
+              </label>
+              <label class="option">
+                <input type="radio" name="q5" value="C">
+                <span class="option-label">C. Provide the shot if the family asks</span>
+              </label>
+              <label class="option">
+                <input type="radio" name="q5" value="D">
+                <span class="option-label">D. Provide the shot if you have training</span>
+              </label>
+            </div>
+            <div class="feedback" id="feedback5">
+              <strong>Correct!</strong> CDSS lists diabetic insulin shots as medical services.
+            </div>
+          </div>
+
+          <!-- Question 6 -->
+          <div class="question" data-question="6" data-type="single" data-answer="B">
+            <span class="question-number">6</span>
+            <span class="question-text">What do you do first when asked to perform a medical task?</span>
+            <span class="question-type">Select one best answer</span>
+            <div class="options">
+              <label class="option">
+                <input type="radio" name="q6" value="A">
+                <span class="option-label">A. Call the family first</span>
+              </label>
+              <label class="option">
+                <input type="radio" name="q6" value="B">
+                <span class="option-label">B. Refuse clearly and state you provide nonmedical care only</span>
+              </label>
+              <label class="option">
+                <input type="radio" name="q6" value="C">
+                <span class="option-label">C. Finish the shift and report later</span>
+              </label>
+              <label class="option">
+                <input type="radio" name="q6" value="D">
+                <span class="option-label">D. Ask another caregiver to do it</span>
+              </label>
+            </div>
+            <div class="feedback" id="feedback6">
+              <strong>Correct!</strong> Your first step is a clear refusal and rule statement, then escalation to Alice Care.
+            </div>
+          </div>
+
+          <div class="quiz-actions">
+            <button class="btn btn-primary" id="submitQuizBtn" onclick="submitQuiz()">
+              Submit Answers
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="results-section" id="resultsSection">
+      <div class="results-card">
+        <div class="results-icon" id="resultsIcon">
+          <svg id="successIcon" viewBox="0 0 24 24" style="display: none;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+          <svg id="retryIcon" viewBox="0 0 24 24" style="display: none;"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+        </div>
+        <div class="completion-badge" id="completionBadge" style="display: none;">
+          <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+          Training Completed
+        </div>
+        <h2 class="results-title" id="resultsTitle">Your Results</h2>
+        <div class="results-score" id="resultsScore">0%</div>
+        <p class="results-message" id="resultsMessage"></p>
+        <button class="btn btn-primary" id="retryBtn" onclick="retryQuiz()" style="display: none;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+          Retry Quiz
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>© 2025 Alice Care. CDSS Licensed Home Care Organization #344700080</p>
+    <p>Questions? Contact <a href="mailto:hr@alicecare.com">hr@alicecare.com</a></p>
+  </div>
+
+  <script>
+    // Configuration - UPDATE THIS WITH YOUR DEPLOYED WEB APP URL
+    const CONFIG = {
+      webAppUrl: 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE'
+    };
+
+    // State
+    let employeeData = null;
+    let videoCompleted = false;
+    let quizAttempts = 0;
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      validateToken();
+      setupVideoPlayer();
+      setupQuizListeners();
+    });
+
+    // Token Validation
+    async function validateToken() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('t');
+
+      if (!token) {
+        showError('No access token provided. Please use the link sent to your email.');
+        return;
+      }
+
+      // Show loading state
+      document.getElementById('loginIcon').innerHTML = '<div class="loading-spinner"></div>';
+
+      try {
+        const response = await fetch(`${CONFIG.webAppUrl}?action=validate&token=${token}`);
+        const data = await response.json();
+
+        if (data.success) {
+          employeeData = data.employee;
+          showTrainingSection();
+          recordLogin();
+        } else {
+          showError(data.message || 'Invalid or expired token. Please contact HR for a new link.');
+        }
+      } catch (error) {
+        // For demo/testing without backend
+        console.log('Backend not configured, using demo mode');
+        employeeData = {
+          name: 'Demo User',
+          email: 'demo@alicecare.com',
+          employeeId: 'DEMO'
+        };
+        showTrainingSection();
+      }
+    }
+
+    function showError(message) {
+      document.getElementById('loginIcon').innerHTML = '<svg viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>';
+      document.getElementById('errorMessage').textContent = message;
+      document.getElementById('errorMessage').style.display = 'block';
+    }
+
+    function showTrainingSection() {
+      document.getElementById('loginSection').style.display = 'none';
+      document.getElementById('trainingSection').style.display = 'block';
+      document.getElementById('userBadge').style.display = 'block';
+      document.getElementById('userName').textContent = employeeData.name;
+      updateProgress(25);
+    }
+
+    // Record login timestamp
+    async function recordLogin() {
+      if (!employeeData) return;
+      
+      try {
+        await fetch(`${CONFIG.webAppUrl}?action=login&token=${new URLSearchParams(window.location.search).get('t')}`);
+      } catch (error) {
+        console.log('Could not record login');
+      }
+    }
+
+    // Video Player
+    function setupVideoPlayer() {
+      const video = document.getElementById('trainingVideo');
+      const overlay = document.getElementById('videoOverlay');
+      const statusDot = document.getElementById('videoStatusDot');
+      const statusText = document.getElementById('videoStatusText');
+
+      overlay.addEventListener('click', function() {
+        overlay.classList.add('hidden');
+        video.play();
+        statusText.textContent = 'In progress...';
+      });
+
+      video.addEventListener('play', function() {
+        statusText.textContent = 'In progress...';
+      });
+
+      video.addEventListener('pause', function() {
+        if (!videoCompleted) {
+          statusText.textContent = 'Paused';
+        }
+      });
+
+      video.addEventListener('ended', function() {
+        videoCompleted = true;
+        statusDot.classList.add('completed');
+        statusText.textContent = 'Completed ✓';
+        showQuiz();
+      });
+
+      // Also allow showing quiz if video is 90% watched
+      video.addEventListener('timeupdate', function() {
+        if (video.currentTime / video.duration >= 0.9 && !videoCompleted) {
+          videoCompleted = true;
+          statusDot.classList.add('completed');
+          statusText.textContent = 'Completed ✓';
+          showQuiz();
+        }
+      });
+    }
+
+    function showQuiz() {
+      document.getElementById('quizCard').classList.add('visible');
+      document.getElementById('progressStep').textContent = 'Step 2 of 2: Complete Quiz';
+      updateProgress(50);
+      
+      // Scroll to quiz
+      setTimeout(() => {
+        document.getElementById('quizCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 300);
+    }
+
+    // Quiz Logic
+    function setupQuizListeners() {
+      const options = document.querySelectorAll('.option');
+      options.forEach(option => {
+        option.addEventListener('click', function() {
+          const input = this.querySelector('input');
+          if (input.type === 'radio') {
+            // Deselect siblings
+            const siblings = this.closest('.options').querySelectorAll('.option');
+            siblings.forEach(s => s.classList.remove('selected'));
+          }
+          
+          input.checked = !input.checked || input.type === 'radio';
+          this.classList.toggle('selected', input.checked);
+        });
+      });
+    }
+
+    function submitQuiz() {
+      const questions = document.querySelectorAll('.question');
+      let correctCount = 0;
+      let allAnswered = true;
+
+      questions.forEach(question => {
+        const qNum = question.dataset.question;
+        const qType = question.dataset.type;
+        const correctAnswer = question.dataset.answer;
+        const feedback = document.getElementById(`feedback${qNum}`);
+        const options = question.querySelectorAll('.option');
+
+        let userAnswer = [];
+        
+        if (qType === 'single') {
+          const selected = question.querySelector(`input[name="q${qNum}"]:checked`);
+          if (selected) {
+            userAnswer = [selected.value];
+          }
+        } else {
+          const checked = question.querySelectorAll(`input[name="q${qNum}"]:checked`);
+          checked.forEach(c => userAnswer.push(c.value));
+        }
+
+        if (userAnswer.length === 0) {
+          allAnswered = false;
+          return;
+        }
+
+        const correctAnswers = correctAnswer.split(',').sort();
+        const userAnswersSorted = userAnswer.sort();
+        const isCorrect = JSON.stringify(correctAnswers) === JSON.stringify(userAnswersSorted);
+
+        // Show feedback
+        options.forEach(opt => {
+          const input = opt.querySelector('input');
+          opt.classList.remove('selected');
+          if (correctAnswers.includes(input.value)) {
+            opt.classList.add('correct');
+          } else if (userAnswer.includes(input.value)) {
+            opt.classList.add('incorrect');
+          }
+        });
+
+        if (isCorrect) {
+          correctCount++;
+          feedback.classList.add('correct');
+        } else {
+          feedback.classList.add('incorrect');
+          feedback.innerHTML = `<strong>Incorrect.</strong> ${feedback.innerHTML.replace('<strong>Correct!</strong> ', '')}`;
+        }
+        feedback.classList.add('show');
+      });
+
+      if (!allAnswered) {
+        alert('Please answer all questions before submitting.');
+        return;
+      }
+
+      quizAttempts++;
+      const score = Math.round((correctCount / questions.length) * 100);
+      showResults(score, correctCount, questions.length);
+    }
+
+    async function showResults(score, correct, total) {
+      document.getElementById('trainingSection').style.display = 'none';
+      document.getElementById('resultsSection').style.display = 'block';
+
+      const resultsIcon = document.getElementById('resultsIcon');
+      const resultsTitle = document.getElementById('resultsTitle');
+      const resultsScore = document.getElementById('resultsScore');
+      const resultsMessage = document.getElementById('resultsMessage');
+      const completionBadge = document.getElementById('completionBadge');
+      const retryBtn = document.getElementById('retryBtn');
+
+      resultsScore.textContent = `${score}%`;
+
+      if (score === 100) {
+        // Success
+        resultsIcon.classList.add('success');
+        document.getElementById('successIcon').style.display = 'block';
+        resultsScore.classList.add('success');
+        resultsTitle.textContent = 'Congratulations!';
+        resultsMessage.textContent = `You answered all ${total} questions correctly. Your training is now complete and has been recorded.`;
+        completionBadge.style.display = 'inline-flex';
+        updateProgress(100);
+
+        // Record completion
+        await recordCompletion(score);
+      } else {
+        // Need to retry
+        resultsIcon.classList.add('fail');
+        document.getElementById('retryIcon').style.display = 'block';
+        resultsScore.classList.add('fail');
+        resultsTitle.textContent = 'Almost There!';
+        resultsMessage.textContent = `You answered ${correct} out of ${total} questions correctly. You need 100% to complete this training. Please review the video and try again.`;
+        retryBtn.style.display = 'inline-flex';
+        updateProgress(50);
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function recordCompletion(score) {
+      if (!employeeData) return;
+      
+      try {
+        const token = new URLSearchParams(window.location.search).get('t');
+        await fetch(`${CONFIG.webAppUrl}?action=complete&token=${token}&score=${score}&attempts=${quizAttempts}`);
+      } catch (error) {
+        console.log('Could not record completion');
+      }
+    }
+
+    function retryQuiz() {
+      // Reset quiz
+      document.querySelectorAll('.option').forEach(opt => {
+        opt.classList.remove('selected', 'correct', 'incorrect');
+        opt.querySelector('input').checked = false;
+      });
+      document.querySelectorAll('.feedback').forEach(fb => {
+        fb.classList.remove('show', 'correct', 'incorrect');
+      });
+
+      // Reset results
+      document.getElementById('resultsIcon').classList.remove('success', 'fail');
+      document.getElementById('successIcon').style.display = 'none';
+      document.getElementById('retryIcon').style.display = 'none';
+      document.getElementById('resultsScore').classList.remove('success', 'fail');
+
+      // Show training section
+      document.getElementById('resultsSection').style.display = 'none';
+      document.getElementById('trainingSection').style.display = 'block';
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function updateProgress(percent) {
+      document.getElementById('progressFill').style.width = `${percent}%`;
+    }
+  </script>
+</body>
+</html>

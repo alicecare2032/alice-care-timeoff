@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Training Admin | Alice Care</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --alice-orange: #F57600;
+      --alice-orange-dark: #E06900;
+      --alice-navy: #1A365C;
+      --alice-light-navy: #2D4A6F;
+      --alice-alice-blue: #F0F7FF;
+      --alice-white: #FFFFFF;
+      --alice-light-grey: #F5F5F5;
+      --alice-dark-grey: #666666;
+      --success-green: #10B981;
+      --warning-yellow: #F59E0B;
+      --error-red: #EF4444;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--alice-light-grey);
+      min-height: 100vh;
+      color: var(--alice-navy);
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, var(--alice-navy) 0%, var(--alice-light-navy) 100%);
+      color: white;
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .logo .alice { color: var(--alice-orange); }
+    .logo .dot { color: var(--alice-white); }
+    .logo .care { color: var(--alice-white); font-weight: 400; }
+
+    .header-title {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      margin-top: 0.25rem;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+    }
+
+    .stat-card.total::before { background: var(--alice-navy); }
+    .stat-card.pending::before { background: var(--warning-yellow); }
+    .stat-card.inprogress::before { background: var(--alice-orange); }
+    .stat-card.completed::before { background: var(--success-green); }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--alice-dark-grey);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--alice-navy);
+    }
+
+    .stat-card.pending .stat-value { color: var(--warning-yellow); }
+    .stat-card.inprogress .stat-value { color: var(--alice-orange); }
+    .stat-card.completed .stat-value { color: var(--success-green); }
+
+    /* Card */
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid #E5E7EB;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--alice-navy);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-title svg {
+      width: 20px;
+      height: 20px;
+      fill: var(--alice-orange);
+    }
+
+    .card-body {
+      padding: 1.5rem;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 0.625rem 1.25rem;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .btn-primary {
+      background: var(--alice-orange);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--alice-orange-dark);
+    }
+
+    .btn-secondary {
+      background: var(--alice-navy);
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: var(--alice-light-navy);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--alice-navy);
+      color: var(--alice-navy);
+    }
+
+    .btn-outline:hover {
+      background: var(--alice-navy);
+      color: white;
+    }
+
+    .btn-success {
+      background: var(--success-green);
+      color: white;
+    }
+
+    .btn-sm {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--alice-navy);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid #E5E7EB;
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.95rem;
+      transition: border-color 0.2s ease;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--alice-orange);
+    }
+
+    .form-textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    /* Table */
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      background: var(--alice-alice-blue);
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--alice-navy);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 1rem;
+      border-bottom: 1px solid #E5E7EB;
+      font-size: 0.9rem;
+    }
+
+    tr:hover {
+      background: #FAFAFA;
+    }
+
+    /* Status Badge */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .status-badge .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .status-pending {
+      background: #FEF3C7;
+      color: #92400E;
+    }
+    .status-pending .dot { background: var(--warning-yellow); }
+
+    .status-inprogress {
+      background: #FFF7ED;
+      color: #C2410C;
+    }
+    .status-inprogress .dot { background: var(--alice-orange); }
+
+    .status-completed {
+      background: #ECFDF5;
+      color: #065F46;
+    }
+    .status-completed .dot { background: var(--success-green); }
+
+    /* Search & Filter */
+    .search-filter {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 250px;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      border: 2px solid #E5E7EB;
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9rem;
+    }
+
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--alice-orange);
+    }
+
+    .search-box svg {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      fill: var(--alice-dark-grey);
+    }
+
+    .filter-select {
+      padding: 0.75rem 1rem;
+      border: 2px solid #E5E7EB;
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9rem;
+      min-width: 150px;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #E5E7EB;
+      margin-bottom: 1.5rem;
+    }
+
+    .tab {
+      padding: 1rem 1.5rem;
+      font-weight: 500;
+      color: var(--alice-dark-grey);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s ease;
+    }
+
+    .tab:hover {
+      color: var(--alice-navy);
+    }
+
+    .tab.active {
+      color: var(--alice-orange);
+      border-bottom-color: var(--alice-orange);
+    }
+
+    /* Tab Content */
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Action Link */
+    .action-link {
+      color: var(--alice-orange);
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .action-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 2rem;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 12px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid #E5E7EB;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--alice-navy);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.5rem;
+      display: flex;
+      color: var(--alice-dark-grey);
+    }
+
+    .modal-close:hover {
+      color: var(--alice-navy);
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+    }
+
+    .modal-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid #E5E7EB;
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+    }
+
+    /* URL Display */
+    .url-display {
+      background: var(--alice-light-grey);
+      border: 1px solid #E5E7EB;
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: monospace;
+      font-size: 0.85rem;
+      word-break: break-all;
+      margin-bottom: 1rem;
+    }
+
+    /* Checkbox */
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #E5E7EB;
+    }
+
+    .checkbox-row:hover {
+      background: #FAFAFA;
+    }
+
+    .checkbox-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-right: 1rem;
+      accent-color: var(--alice-orange);
+    }
+
+    /* Alert */
+    .alert {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .alert svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .alert-success {
+      background: #ECFDF5;
+      color: #065F46;
+    }
+    .alert-success svg { fill: var(--success-green); }
+
+    .alert-info {
+      background: var(--alice-alice-blue);
+      color: var(--alice-navy);
+    }
+    .alert-info svg { fill: var(--alice-navy); }
+
+    /* Email Template */
+    .email-preview {
+      background: white;
+      border: 1px solid #E5E7EB;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .email-preview-header {
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #E5E7EB;
+    }
+
+    .email-preview-header p {
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .email-preview-header strong {
+      color: var(--alice-navy);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header-content {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .search-filter {
+        flex-direction: column;
+      }
+
+      .tabs {
+        overflow-x: auto;
+      }
+
+      .tab {
+        white-space: nowrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-content">
+      <div>
+        <div class="logo">
+          <span class="alice">alice</span><span class="dot">.</span><span class="care">care</span>
+        </div>
+        <div class="header-title">Training Administration</div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-primary" onclick="openSendEmailsModal()">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          Send Training Links
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card total">
+        <div class="stat-label">Total Employees</div>
+        <div class="stat-value" id="statTotal">0</div>
+      </div>
+      <div class="stat-card pending">
+        <div class="stat-label">Not Started</div>
+        <div class="stat-value" id="statPending">0</div>
+      </div>
+      <div class="stat-card inprogress">
+        <div class="stat-label">In Progress</div>
+        <div class="stat-value" id="statInProgress">0</div>
+      </div>
+      <div class="stat-card completed">
+        <div class="stat-label">Completed</div>
+        <div class="stat-value" id="statCompleted">0</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('employees')">Employees</div>
+      <div class="tab" onclick="switchTab('settings')">Settings</div>
+    </div>
+
+    <!-- Employees Tab -->
+    <div class="tab-content active" id="tab-employees">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            Employee Training Status
+          </div>
+          <div class="search-filter">
+            <div class="search-box">
+              <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+              <input type="text" id="searchInput" placeholder="Search by name or email..." onkeyup="filterTable()">
+            </div>
+            <select class="filter-select" id="statusFilter" onchange="filterTable()">
+              <option value="">All Status</option>
+              <option value="pending">Not Started</option>
+              <option value="inprogress">In Progress</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-container">
+            <table id="employeeTable">
+              <thead>
+                <tr>
+                  <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                  <th>Employee Name</th>
+                  <th>Email</th>
+                  <th>Employee ID</th>
+                  <th>Status</th>
+                  <th>Login Time</th>
+                  <th>Completion Time</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="employeeTableBody">
+                <!-- Populated by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Tab -->
+    <div class="tab-content" id="tab-settings">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+            Configuration
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label">Training Portal URL</label>
+            <input type="text" class="form-input" id="portalUrl" value="https://yourdomain.com/training.html" placeholder="https://yourdomain.com/training.html">
+            <small style="color: var(--alice-dark-grey); display: block; margin-top: 0.5rem;">This is where employees will access the training. Update this after deploying the training portal.</small>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Google Apps Script Web App URL</label>
+            <input type="text" class="form-input" id="webAppUrl" placeholder="https://script.google.com/macros/s/xxx/exec">
+            <small style="color: var(--alice-dark-grey); display: block; margin-top: 0.5rem;">After deploying the Apps Script, paste the Web App URL here.</small>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email Subject</label>
+            <input type="text" class="form-input" id="emailSubject" value="Action Required: Complete Your Non-Medical Training - Alice Care">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email Template</label>
+            <textarea class="form-textarea" id="emailTemplate">Dear {{NAME}},
+
+You are required to complete the Non-Medical Services Training for Alice Care.
+
+Please click the link below to access your training:
+{{TRAINING_LINK}}
+
+This training covers important CDSS guidelines for caregivers providing non-medical services.
+
+Important Notes:
+• Watch the complete training video
+• Pass the knowledge check with 100% score
+• Complete the training as soon as possible
+
+If you have any questions or issues accessing the training, please contact:
+• HR: hr@alicecare.com
+• Talent: talent@alicecare.com
+
+Thank you for your commitment to providing quality care.
+
+Best regards,
+Alice Care Team
+CDSS Licensed Home Care Organization #344700080</textarea>
+          </div>
+
+          <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Send Emails Modal -->
+  <div class="modal-overlay" id="sendEmailsModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Send Training Links</div>
+        <button class="modal-close" onclick="closeModal('sendEmailsModal')">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-info">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+          <div>
+            <strong>Select employees to send training links</strong>
+            <p style="margin-top: 0.25rem; font-size: 0.9rem;">Each employee will receive a unique link that doesn't require login.</p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Send to:</label>
+          <select class="form-select" id="sendToFilter" onchange="updateRecipientList()">
+            <option value="selected">Selected Employees</option>
+            <option value="pending">All Not Started</option>
+            <option value="all">All Employees</option>
+          </select>
+        </div>
+
+        <div id="recipientList" style="max-height: 300px; overflow-y: auto; border: 1px solid #E5E7EB; border-radius: 8px;">
+          <!-- Populated by JavaScript -->
+        </div>
+
+        <div style="margin-top: 1rem; padding: 1rem; background: var(--alice-light-grey); border-radius: 8px;">
+          <strong>Recipients: <span id="recipientCount">0</span></strong>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('sendEmailsModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="sendEmails()">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          Send Emails
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Link Modal -->
+  <div class="modal-overlay" id="viewLinkModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Training Link</div>
+        <button class="modal-close" onclick="closeModal('viewLinkModal')">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 1rem;"><strong id="linkEmployeeName"></strong></p>
+        <label class="form-label">Unique Training Link:</label>
+        <div class="url-display" id="employeeLink"></div>
+        <button class="btn btn-primary" onclick="copyLink()">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+          Copy Link
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Configuration
+    const CONFIG = {
+      webAppUrl: localStorage.getItem('webAppUrl') || '',
+      portalUrl: localStorage.getItem('portalUrl') || 'https://yourdomain.com/training.html'
+    };
+
+    // Sample data - In production, this comes from Google Sheets via Apps Script
+    let employees = [
+      { name: "Aguirre, Jazmin P", email: "jazminaguirre824@gmail.com", employeeId: "192", phone: "916) 919-6529", status: "pending", loginTime: null, completionTime: null, token: null },
+      { name: "Almirol, Rosita", email: "kapatidnarose@gmail.com", employeeId: "99", phone: "408-422-7050", status: "pending", loginTime: null, completionTime: null, token: null },
+      { name: "Anaya, Ivan", email: "anayaivan951@gmail.com", employeeId: "285", phone: "951-823-2386", status: "pending", loginTime: null, completionTime: null, token: null },
+      { name: "Bambino, Ayla R", email: "aylabambino@yahoo.com", employeeId: "172", phone: "279-258-9342", status: "pending", loginTime: null, completionTime: null, token: null },
+      { name: "Brown, Lori M", email: "cagedbird211@yahoo.com", employeeId: "213", phone: "916-740-9892", status: "pending", loginTime: null, completionTime: null, token: null },
+      { name: "Carlson, Sherry", email: "shirahannah78@gmail.com", employeeId: "191", phone: "916-698-4264", status: "pending", loginTime: null, completionTime: null, token: null },
+      { name: "Carr-Houston, Racheal", email: "raes300@gmail.com", employeeId: "256", phone: "916-304-2279", status: "pending", loginTime: null, completionTime: null, token: null },
+      { name: "Carter, Geoffrey", email: "gcarterofficial@gmail.com", employeeId: "224", phone: "916-579-3348", status: "pending", loginTime: null, completionTime: null, token: null },
+      { name: "Carter, India", email: "ilittleindia67@gmail.com", employeeId: "289", phone: "916-601-3464", status: "inprogress", loginTime: "2025-01-20 09:15 AM", completionTime: null, token: "abc123xyz" },
+      { name: "Castiblanco Esmanech, Sandra", email: "sandra_ca1@yahoo.com", employeeId: "2", phone: "916-494-1021", status: "completed", loginTime: "2025-01-19 02:30 PM", completionTime: "2025-01-19 03:15 PM", token: "def456uvw" },
+      { name: "Chan, Stacy", email: "stacychan@alicecare.com", employeeId: "240", phone: "916-230-6480", status: "completed", loginTime: "2025-01-18 10:00 AM", completionTime: "2025-01-18 10:45 AM", token: "ghi789rst" },
+      { name: "Chavez, Eva", email: "panthereyes6@hotmail.com", employeeId: "304", phone: "530-812-3211", status: "pending", loginTime: null, completionTime: null, token: null },
+      { name: "Cline, Virginia", email: "vcline63@gmail.com", employeeId: "293", phone: "916-230-9865", status: "pending", loginTime: null, completionTime: null, token: null },
+      { name: "Dupzyk, Stephanie", email: "stephanie@alice.care", employeeId: "A004", phone: "916-801-7476", status: "completed", loginTime: "2025-01-17 11:00 AM", completionTime: "2025-01-17 11:30 AM", token: "jkl012mno" },
+      { name: "Esmanech, Tommaso", email: "tom@alicecare.com", employeeId: "1", phone: "916-494-1021", status: "inprogress", loginTime: "2025-01-21 08:00 AM", completionTime: null, token: "pqr345stu" },
+    ];
+
+    let selectedEmployees = new Set();
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      loadSettings();
+      renderTable();
+      updateStats();
+    });
+
+    // Load settings from localStorage
+    function loadSettings() {
+      document.getElementById('portalUrl').value = CONFIG.portalUrl;
+      document.getElementById('webAppUrl').value = CONFIG.webAppUrl;
+      
+      const savedSubject = localStorage.getItem('emailSubject');
+      if (savedSubject) document.getElementById('emailSubject').value = savedSubject;
+      
+      const savedTemplate = localStorage.getItem('emailTemplate');
+      if (savedTemplate) document.getElementById('emailTemplate').value = savedTemplate;
+    }
+
+    // Save settings
+    function saveSettings() {
+      CONFIG.portalUrl = document.getElementById('portalUrl').value;
+      CONFIG.webAppUrl = document.getElementById('webAppUrl').value;
+      
+      localStorage.setItem('portalUrl', CONFIG.portalUrl);
+      localStorage.setItem('webAppUrl', CONFIG.webAppUrl);
+      localStorage.setItem('emailSubject', document.getElementById('emailSubject').value);
+      localStorage.setItem('emailTemplate', document.getElementById('emailTemplate').value);
+      
+      alert('Settings saved successfully!');
+    }
+
+    // Tab switching
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      
+      document.querySelector(`.tab:nth-child(${tabName === 'employees' ? 1 : 2})`).classList.add('active');
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+    }
+
+    // Render employee table
+    function renderTable() {
+      const tbody = document.getElementById('employeeTableBody');
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const statusFilter = document.getElementById('statusFilter').value;
+
+      const filtered = employees.filter(emp => {
+        const matchesSearch = emp.name.toLowerCase().includes(searchTerm) || 
+                             emp.email.toLowerCase().includes(searchTerm);
+        const matchesStatus = !statusFilter || emp.status === statusFilter;
+        return matchesSearch && matchesStatus;
+      });
+
+      tbody.innerHTML = filtered.map(emp => `
+        <tr>
+          <td><input type="checkbox" class="emp-checkbox" data-email="${emp.email}" ${selectedEmployees.has(emp.email) ? 'checked' : ''} onchange="toggleEmployee('${emp.email}')"></td>
+          <td><strong>${emp.name}</strong></td>
+          <td>${emp.email}</td>
+          <td>${emp.employeeId}</td>
+          <td>${getStatusBadge(emp.status)}</td>
+          <td>${emp.loginTime || '-'}</td>
+          <td>${emp.completionTime || '-'}</td>
+          <td>
+            <span class="action-link" onclick="viewLink('${emp.email}')">View Link</span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function getStatusBadge(status) {
+      const badges = {
+        pending: '<span class="status-badge status-pending"><span class="dot"></span>Not Started</span>',
+        inprogress: '<span class="status-badge status-inprogress"><span class="dot"></span>In Progress</span>',
+        completed: '<span class="status-badge status-completed"><span class="dot"></span>Completed</span>'
+      };
+      return badges[status] || badges.pending;
+    }
+
+    // Update statistics
+    function updateStats() {
+      const total = employees.length;
+      const pending = employees.filter(e => e.status === 'pending').length;
+      const inprogress = employees.filter(e => e.status === 'inprogress').length;
+      const completed = employees.filter(e => e.status === 'completed').length;
+
+      document.getElementById('statTotal').textContent = total;
+      document.getElementById('statPending').textContent = pending;
+      document.getElementById('statInProgress').textContent = inprogress;
+      document.getElementById('statCompleted').textContent = completed;
+    }
+
+    // Filter table
+    function filterTable() {
+      renderTable();
+    }
+
+    // Toggle employee selection
+    function toggleEmployee(email) {
+      if (selectedEmployees.has(email)) {
+        selectedEmployees.delete(email);
+      } else {
+        selectedEmployees.add(email);
+      }
+    }
+
+    // Toggle select all
+    function toggleSelectAll() {
+      const selectAll = document.getElementById('selectAll').checked;
+      const checkboxes = document.querySelectorAll('.emp-checkbox');
+      
+      checkboxes.forEach(cb => {
+        cb.checked = selectAll;
+        if (selectAll) {
+          selectedEmployees.add(cb.dataset.email);
+        } else {
+          selectedEmployees.delete(cb.dataset.email);
+        }
+      });
+    }
+
+    // Generate token
+    function generateToken() {
+      return Array.from(crypto.getRandomValues(new Uint8Array(16)))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+    }
+
+    // View employee link
+    function viewLink(email) {
+      const emp = employees.find(e => e.email === email);
+      if (!emp) return;
+
+      if (!emp.token) {
+        emp.token = generateToken();
+      }
+
+      const link = `${CONFIG.portalUrl}?t=${emp.token}`;
+      
+      document.getElementById('linkEmployeeName').textContent = emp.name;
+      document.getElementById('employeeLink').textContent = link;
+      document.getElementById('viewLinkModal').classList.add('show');
+    }
+
+    // Copy link to clipboard
+    function copyLink() {
+      const link = document.getElementById('employeeLink').textContent;
+      navigator.clipboard.writeText(link).then(() => {
+        alert('Link copied to clipboard!');
+      });
+    }
+
+    // Modal functions
+    function openSendEmailsModal() {
+      updateRecipientList();
+      document.getElementById('sendEmailsModal').classList.add('show');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('show');
+    }
+
+    // Update recipient list in modal
+    function updateRecipientList() {
+      const filter = document.getElementById('sendToFilter').value;
+      let recipients = [];
+
+      if (filter === 'selected') {
+        recipients = employees.filter(e => selectedEmployees.has(e.email));
+      } else if (filter === 'pending') {
+        recipients = employees.filter(e => e.status === 'pending');
+      } else {
+        recipients = employees;
+      }
+
+      const listHtml = recipients.map(emp => `
+        <div class="checkbox-row">
+          <input type="checkbox" id="send-${emp.employeeId}" checked data-email="${emp.email}">
+          <label for="send-${emp.employeeId}" style="flex: 1; cursor: pointer;">
+            <strong>${emp.name}</strong><br>
+            <small style="color: var(--alice-dark-grey);">${emp.email}</small>
+          </label>
+        </div>
+      `).join('');
+
+      document.getElementById('recipientList').innerHTML = listHtml || '<p style="padding: 1rem; color: var(--alice-dark-grey);">No recipients selected</p>';
+      document.getElementById('recipientCount').textContent = recipients.length;
+    }
+
+    // Send emails (simulated - in production this calls Apps Script)
+    async function sendEmails() {
+      const checkboxes = document.querySelectorAll('#recipientList input[type="checkbox"]:checked');
+      const recipients = Array.from(checkboxes).map(cb => cb.dataset.email);
+
+      if (recipients.length === 0) {
+        alert('Please select at least one recipient.');
+        return;
+      }
+
+      const subject = document.getElementById('emailSubject').value;
+      const template = document.getElementById('emailTemplate').value;
+
+      // Generate tokens for each recipient
+      recipients.forEach(email => {
+        const emp = employees.find(e => e.email === email);
+        if (emp && !emp.token) {
+          emp.token = generateToken();
+        }
+      });
+
+      if (CONFIG.webAppUrl) {
+        // In production, send via Apps Script
+        try {
+          const response = await fetch(CONFIG.webAppUrl, {
+            method: 'POST',
+            body: JSON.stringify({
+              action: 'sendEmails',
+              recipients: recipients.map(email => {
+                const emp = employees.find(e => e.email === email);
+                return {
+                  email: emp.email,
+                  name: emp.name,
+                  token: emp.token,
+                  link: `${CONFIG.portalUrl}?t=${emp.token}`
+                };
+              }),
+              subject: subject,
+              template: template
+            })
+          });
+          const result = await response.json();
+          if (result.success) {
+            alert(`Successfully sent ${recipients.length} email(s)!`);
+          } else {
+            alert('Error sending emails: ' + result.message);
+          }
+        } catch (error) {
+          alert('Error: ' + error.message);
+        }
+      } else {
+        // Demo mode - just show what would be sent
+        console.log('Would send emails to:', recipients);
+        console.log('Subject:', subject);
+        
+        recipients.forEach(email => {
+          const emp = employees.find(e => e.email === email);
+          const link = `${CONFIG.portalUrl}?t=${emp.token}`;
+          const personalizedEmail = template
+            .replace('{{NAME}}', emp.name.split(',')[1]?.trim() || emp.name)
+            .replace('{{TRAINING_LINK}}', link);
+          console.log('Email to', email, ':', personalizedEmail);
+        });
+
+        alert(`Demo Mode: Would send ${recipients.length} email(s).\n\nTo actually send emails, configure the Google Apps Script Web App URL in Settings.`);
+      }
+
+      closeModal('sendEmailsModal');
+      renderTable();
+    }
+
+    // Load data from backend (in production)
+    async function loadFromBackend() {
+      if (!CONFIG.webAppUrl) return;
+
+      try {
+        const response = await fetch(`${CONFIG.webAppUrl}?action=getEmployees`);
+        const data = await response.json();
+        if (data.success) {
+          employees = data.employees;
+          renderTable();
+          updateStats();
+        }
+      } catch (error) {
+        console.error('Error loading data:', error);
+      }
+    }
+  </script>
+</body>
+</html>
