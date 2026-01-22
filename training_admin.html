@@ -420,6 +420,19 @@
       text-decoration: underline;
     }
 
+    .action-link.paychex-action {
+      color: var(--alice-navy);
+      background: #E0F2FE;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+
+    .action-link.paychex-action:hover {
+      background: #BAE6FD;
+      text-decoration: none;
+    }
+
     /* Modal */
     .modal-overlay {
       position: fixed;
@@ -685,6 +698,7 @@
                   <th>Login Time</th>
                   <th>Video Watched</th>
                   <th>Quiz Completed</th>
+                  <th>Paychex Signed</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -846,7 +860,7 @@ CDSS Licensed Home Care Organization #344700080</textarea>
       // Show loading state
       document.getElementById('employeeTableBody').innerHTML = `
         <tr>
-          <td colspan="9" style="text-align: center; padding: 2rem; color: var(--alice-dark-grey);">
+          <td colspan="10" style="text-align: center; padding: 2rem; color: var(--alice-dark-grey);">
             <div style="display: inline-block; width: 24px; height: 24px; border: 3px solid #E5E7EB; border-top-color: var(--alice-orange); border-radius: 50%; animation: spin 1s linear infinite;"></div>
             <p style="margin-top: 1rem;">Loading employees from Google Sheet...</p>
           </td>
@@ -873,7 +887,7 @@ CDSS Licensed Home Care Organization #344700080</textarea>
     function showTableError(message) {
       document.getElementById('employeeTableBody').innerHTML = `
         <tr>
-          <td colspan="9" style="text-align: center; padding: 2rem;">
+          <td colspan="10" style="text-align: center; padding: 2rem;">
             <div style="color: var(--error-red); margin-bottom: 1rem;">
               <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
             </div>
@@ -945,6 +959,10 @@ CDSS Licensed Home Care Organization #344700080</textarea>
           <td>${emp.loginTime || '-'}</td>
           <td>${emp.videoWatchedTime || '-'}</td>
           <td>${emp.completionTime || '-'}</td>
+          <td>${emp.paychexSignedTime 
+            ? `<span class="status-badge status-completed"><span class="dot"></span>${emp.paychexSignedTime}</span>` 
+            : `<span class="action-link paychex-action" onclick="markPaychexSigned('${emp.email}')">Mark Signed</span>`
+          }</td>
           <td>
             ${emp.token 
               ? `<span class="action-link" onclick="viewLink('${emp.email}')">View Link</span>` 
@@ -1063,6 +1081,38 @@ CDSS Licensed Home Care Organization #344700080</textarea>
         }
       } catch (error) {
         alert('Error generating token: ' + error.message);
+      }
+    }
+
+    // Mark Paychex document as signed
+    async function markPaychexSigned(email) {
+      if (!confirm(`Mark Paychex acknowledgment as signed for this employee?`)) {
+        return;
+      }
+
+      try {
+        const response = await fetch(CONFIG.webAppUrl, {
+          method: 'POST',
+          body: JSON.stringify({ 
+            action: 'markPaychexSigned',
+            email: email
+          })
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+          // Update local data
+          const emp = employees.find(e => e.email === email);
+          if (emp) {
+            emp.paychexSignedTime = result.timestamp || new Date().toLocaleString();
+          }
+          renderTable();
+          alert('Paychex acknowledgment marked as signed!');
+        } else {
+          alert('Error: ' + (result.message || 'Unknown error'));
+        }
+      } catch (error) {
+        alert('Error: ' + error.message);
       }
     }
 
