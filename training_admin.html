@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Training Admin | Alice Care 1.0</title>
+  <title>Training Admin | Alice Care</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -314,6 +314,12 @@
       color: #C2410C;
     }
     .status-inprogress .dot { background: var(--alice-orange); }
+
+    .status-video {
+      background: #DBEAFE;
+      color: #1E40AF;
+    }
+    .status-video .dot { background: #3B82F6; }
 
     .status-completed {
       background: #ECFDF5;
@@ -660,7 +666,8 @@
             <select class="filter-select" id="statusFilter" onchange="filterTable()">
               <option value="">All Status</option>
               <option value="pending">Not Started</option>
-              <option value="inprogress">In Progress</option>
+              <option value="inprogress">Started</option>
+              <option value="video_complete">Video Done</option>
               <option value="completed">Completed</option>
             </select>
           </div>
@@ -676,7 +683,8 @@
                   <th>Employee ID</th>
                   <th>Status</th>
                   <th>Login Time</th>
-                  <th>Completion Time</th>
+                  <th>Video Watched</th>
+                  <th>Quiz Completed</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -838,7 +846,7 @@ CDSS Licensed Home Care Organization #344700080</textarea>
       // Show loading state
       document.getElementById('employeeTableBody').innerHTML = `
         <tr>
-          <td colspan="8" style="text-align: center; padding: 2rem; color: var(--alice-dark-grey);">
+          <td colspan="9" style="text-align: center; padding: 2rem; color: var(--alice-dark-grey);">
             <div style="display: inline-block; width: 24px; height: 24px; border: 3px solid #E5E7EB; border-top-color: var(--alice-orange); border-radius: 50%; animation: spin 1s linear infinite;"></div>
             <p style="margin-top: 1rem;">Loading employees from Google Sheet...</p>
           </td>
@@ -865,7 +873,7 @@ CDSS Licensed Home Care Organization #344700080</textarea>
     function showTableError(message) {
       document.getElementById('employeeTableBody').innerHTML = `
         <tr>
-          <td colspan="8" style="text-align: center; padding: 2rem;">
+          <td colspan="9" style="text-align: center; padding: 2rem;">
             <div style="color: var(--error-red); margin-bottom: 1rem;">
               <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
             </div>
@@ -935,6 +943,7 @@ CDSS Licensed Home Care Organization #344700080</textarea>
           <td>${emp.employeeId}</td>
           <td>${getStatusBadge(emp.status)}</td>
           <td>${emp.loginTime || '-'}</td>
+          <td>${emp.videoWatchedTime || '-'}</td>
           <td>${emp.completionTime || '-'}</td>
           <td>
             ${emp.token 
@@ -949,7 +958,8 @@ CDSS Licensed Home Care Organization #344700080</textarea>
     function getStatusBadge(status) {
       const badges = {
         pending: '<span class="status-badge status-pending"><span class="dot"></span>Not Started</span>',
-        inprogress: '<span class="status-badge status-inprogress"><span class="dot"></span>In Progress</span>',
+        inprogress: '<span class="status-badge status-inprogress"><span class="dot"></span>Started</span>',
+        video_complete: '<span class="status-badge status-video"><span class="dot"></span>Video Done</span>',
         completed: '<span class="status-badge status-completed"><span class="dot"></span>Completed</span>'
       };
       return badges[status] || badges.pending;
@@ -959,7 +969,7 @@ CDSS Licensed Home Care Organization #344700080</textarea>
     function updateStats() {
       const total = employees.length;
       const pending = employees.filter(e => e.status === 'pending').length;
-      const inprogress = employees.filter(e => e.status === 'inprogress').length;
+      const inprogress = employees.filter(e => e.status === 'inprogress' || e.status === 'video_complete').length;
       const completed = employees.filter(e => e.status === 'completed').length;
 
       document.getElementById('statTotal').textContent = total;
