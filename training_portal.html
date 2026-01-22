@@ -270,11 +270,19 @@
     .video-container {
       position: relative;
       background: #000;
+      padding-bottom: 56.25%; /* 16:9 aspect ratio */
+      height: 0;
+      overflow: hidden;
     }
 
-    .video-container video {
+    .video-container iframe,
+    .video-container #youtubePlayer {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
-      display: block;
+      height: 100%;
+      border: none;
     }
 
     .video-overlay {
@@ -771,11 +779,8 @@
           <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
           <h2>Non-Medical Services Training Video</h2>
         </div>
-        <div class="video-container">
-          <video id="trainingVideo" controls>
-            <source src="https://alicecare2032.github.io/alice-care-timeoff/nonmedicaltraining.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-          </video>
+        <div class="video-container" id="videoContainer">
+          <div id="youtubePlayer"></div>
           <div class="video-overlay" id="videoOverlay">
             <div class="play-button">
               <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -1001,8 +1006,20 @@
     let videoCompleted = false;
     let quizAttempts = 0;
 
+    // Make onYouTubeIframeAPIReady available globally (must be before API loads)
+    window.onYouTubeIframeAPIReady = function() {
+      // Wait for player container to exist
+      if (document.getElementById('youtubePlayer')) {
+        initYouTubePlayer();
+      } else {
+        // If DOM not ready, wait for it
+        document.addEventListener('DOMContentLoaded', initYouTubePlayer);
+      }
+    };
+
     // Initialize
     document.addEventListener('DOMContentLoaded', function() {
+      loadYouTubeAPI();
       validateToken();
       setupVideoPlayer();
       setupQuizListeners();
@@ -1069,45 +1086,99 @@
       }
     }
 
-    // Video Player
-    function setupVideoPlayer() {
-      const video = document.getElementById('trainingVideo');
-      const overlay = document.getElementById('videoOverlay');
+    // YouTube IFrame API
+    let player;
+    const YOUTUBE_VIDEO_ID = 'yS7vqoPc17Q';
+
+    // Load YouTube IFrame API
+    function loadYouTubeAPI() {
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    }
+
+    // Called automatically by YouTube API when ready
+    function initYouTubePlayer() {
+      player = new YT.Player('youtubePlayer', {
+        videoId: YOUTUBE_VIDEO_ID,
+        playerVars: {
+          'autoplay': 0,
+          'controls': 1,
+          'disablekb': 0,
+          'fs': 1,
+          'iv_load_policy': 3,      // Disable annotations
+          'modestbranding': 1,      // Minimal YouTube branding
+          'rel': 0,                 // Don't show unrelated videos at end
+          'showinfo': 0,            // Hide video title/uploader (deprecated but doesn't hurt)
+          'cc_load_policy': 0,      // Don't show captions by default
+          'origin': window.location.origin
+        },
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange
+        }
+      });
+    }
+
+    function onPlayerReady(event) {
+      // Player is ready
+      console.log('YouTube player ready');
+    }
+
+    function onPlayerStateChange(event) {
       const statusDot = document.getElementById('videoStatusDot');
       const statusText = document.getElementById('videoStatusText');
 
-      overlay.addEventListener('click', function() {
-        overlay.classList.add('hidden');
-        video.play();
-        statusText.textContent = 'In progress...';
-      });
+      switch(event.data) {
+        case YT.PlayerState.PLAYING:
+          document.getElementById('videoOverlay').classList.add('hidden');
+          statusText.textContent = 'In progress...';
+          break;
+        case YT.PlayerState.PAUSED:
+          if (!videoCompleted) {
+            statusText.textContent = 'Paused';
+          }
+          break;
+        case YT.PlayerState.ENDED:
+          if (!videoCompleted) {
+            videoCompleted = true;
+            statusDot.classList.add('completed');
+            statusText.textContent = 'Completed ✓';
+            showQuiz();
+          }
+          break;
+      }
+    }
 
-      video.addEventListener('play', function() {
-        statusText.textContent = 'In progress...';
-      });
-
-      video.addEventListener('pause', function() {
-        if (!videoCompleted) {
-          statusText.textContent = 'Paused';
-        }
-      });
-
-      video.addEventListener('ended', function() {
-        videoCompleted = true;
-        statusDot.classList.add('completed');
-        statusText.textContent = 'Completed ✓';
-        showQuiz();
-      });
-
-      // Also allow showing quiz if video is 90% watched
-      video.addEventListener('timeupdate', function() {
-        if (video.currentTime / video.duration >= 0.9 && !videoCompleted) {
+    // Check video progress periodically (for 90% completion)
+    function checkVideoProgress() {
+      if (player && player.getCurrentTime && player.getDuration && !videoCompleted) {
+        const currentTime = player.getCurrentTime();
+        const duration = player.getDuration();
+        
+        if (duration > 0 && currentTime / duration >= 0.9) {
           videoCompleted = true;
-          statusDot.classList.add('completed');
-          statusText.textContent = 'Completed ✓';
+          document.getElementById('videoStatusDot').classList.add('completed');
+          document.getElementById('videoStatusText').textContent = 'Completed ✓';
           showQuiz();
         }
+      }
+    }
+
+    // Video Player Setup
+    function setupVideoPlayer() {
+      const overlay = document.getElementById('videoOverlay');
+
+      overlay.addEventListener('click', function() {
+        if (player && player.playVideo) {
+          overlay.classList.add('hidden');
+          player.playVideo();
+        }
       });
+
+      // Check progress every 5 seconds
+      setInterval(checkVideoProgress, 5000);
     }
 
     function showQuiz() {
