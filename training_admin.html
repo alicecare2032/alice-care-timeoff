@@ -588,6 +588,10 @@
         white-space: nowrap;
       }
     }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
@@ -810,37 +814,67 @@ CDSS Licensed Home Care Organization #344700080</textarea>
   <script>
     // Configuration
     const CONFIG = {
-      webAppUrl: localStorage.getItem('webAppUrl') || 'https://script.google.com/macros/s/AKfycbzhvY-7VynuWwTNxgrvGA8obAO-DkegqHLcMmnRQVrRKyL4w04QVNmN6DHsFf53Bv3Q2g/exec',
+      webAppUrl: 'https://script.google.com/macros/s/AKfycbzhvY-7VynuWwTNxgrvGA8obAO-DkegqHLcMmnRQVrRKyL4w04QVNmN6DHsFf53Bv3Q2g/exec',
       portalUrl: localStorage.getItem('portalUrl') || 'https://alicecare2032.github.io/alice-care-timeoff/training_portal.html'
     };
 
-    // Sample data - In production, this comes from Google Sheets via Apps Script
-    let employees = [
-      { name: "Aguirre, Jazmin P", email: "jazminaguirre824@gmail.com", employeeId: "192", phone: "916) 919-6529", status: "pending", loginTime: null, completionTime: null, token: null },
-      { name: "Almirol, Rosita", email: "kapatidnarose@gmail.com", employeeId: "99", phone: "408-422-7050", status: "pending", loginTime: null, completionTime: null, token: null },
-      { name: "Anaya, Ivan", email: "anayaivan951@gmail.com", employeeId: "285", phone: "951-823-2386", status: "pending", loginTime: null, completionTime: null, token: null },
-      { name: "Bambino, Ayla R", email: "aylabambino@yahoo.com", employeeId: "172", phone: "279-258-9342", status: "pending", loginTime: null, completionTime: null, token: null },
-      { name: "Brown, Lori M", email: "cagedbird211@yahoo.com", employeeId: "213", phone: "916-740-9892", status: "pending", loginTime: null, completionTime: null, token: null },
-      { name: "Carlson, Sherry", email: "shirahannah78@gmail.com", employeeId: "191", phone: "916-698-4264", status: "pending", loginTime: null, completionTime: null, token: null },
-      { name: "Carr-Houston, Racheal", email: "raes300@gmail.com", employeeId: "256", phone: "916-304-2279", status: "pending", loginTime: null, completionTime: null, token: null },
-      { name: "Carter, Geoffrey", email: "gcarterofficial@gmail.com", employeeId: "224", phone: "916-579-3348", status: "pending", loginTime: null, completionTime: null, token: null },
-      { name: "Carter, India", email: "ilittleindia67@gmail.com", employeeId: "289", phone: "916-601-3464", status: "inprogress", loginTime: "2025-01-20 09:15 AM", completionTime: null, token: "abc123xyz" },
-      { name: "Castiblanco Esmanech, Sandra", email: "sandra_ca1@yahoo.com", employeeId: "2", phone: "916-494-1021", status: "completed", loginTime: "2025-01-19 02:30 PM", completionTime: "2025-01-19 03:15 PM", token: "def456uvw" },
-      { name: "Chan, Stacy", email: "stacychan@alicecare.com", employeeId: "240", phone: "916-230-6480", status: "completed", loginTime: "2025-01-18 10:00 AM", completionTime: "2025-01-18 10:45 AM", token: "ghi789rst" },
-      { name: "Chavez, Eva", email: "panthereyes6@hotmail.com", employeeId: "304", phone: "530-812-3211", status: "pending", loginTime: null, completionTime: null, token: null },
-      { name: "Cline, Virginia", email: "vcline63@gmail.com", employeeId: "293", phone: "916-230-9865", status: "pending", loginTime: null, completionTime: null, token: null },
-      { name: "Dupzyk, Stephanie", email: "stephanie@alice.care", employeeId: "A004", phone: "916-801-7476", status: "completed", loginTime: "2025-01-17 11:00 AM", completionTime: "2025-01-17 11:30 AM", token: "jkl012mno" },
-      { name: "Esmanech, Tommaso", email: "tom@alicecare.com", employeeId: "1", phone: "916-494-1021", status: "inprogress", loginTime: "2025-01-21 08:00 AM", completionTime: null, token: "pqr345stu" },
-    ];
+    // Employee data - loaded from Google Sheet
+    let employees = [];
 
     let selectedEmployees = new Set();
 
     // Initialize
     document.addEventListener('DOMContentLoaded', function() {
       loadSettings();
-      renderTable();
-      updateStats();
+      loadFromBackend();
     });
+
+    // Load data from Google Sheet backend
+    async function loadFromBackend() {
+      // Show loading state
+      document.getElementById('employeeTableBody').innerHTML = `
+        <tr>
+          <td colspan="8" style="text-align: center; padding: 2rem; color: var(--alice-dark-grey);">
+            <div style="display: inline-block; width: 24px; height: 24px; border: 3px solid #E5E7EB; border-top-color: var(--alice-orange); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+            <p style="margin-top: 1rem;">Loading employees from Google Sheet...</p>
+          </td>
+        </tr>
+      `;
+
+      try {
+        const response = await fetch(`${CONFIG.webAppUrl}?action=getEmployees`);
+        const data = await response.json();
+        
+        if (data.success) {
+          employees = data.employees;
+          renderTable();
+          updateStats();
+        } else {
+          showTableError('Failed to load data: ' + (data.message || 'Unknown error'));
+        }
+      } catch (error) {
+        console.error('Error loading data:', error);
+        showTableError('Could not connect to Google Sheet. Error: ' + error.message);
+      }
+    }
+
+    function showTableError(message) {
+      document.getElementById('employeeTableBody').innerHTML = `
+        <tr>
+          <td colspan="8" style="text-align: center; padding: 2rem;">
+            <div style="color: var(--error-red); margin-bottom: 1rem;">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            </div>
+            <p style="color: var(--alice-dark-grey);">${message}</p>
+            <button class="btn btn-primary" style="margin-top: 1rem;" onclick="loadFromBackend()">Retry</button>
+          </td>
+        </tr>
+      `;
+      document.getElementById('statTotal').textContent = '0';
+      document.getElementById('statPending').textContent = '0';
+      document.getElementById('statInProgress').textContent = '0';
+      document.getElementById('statCompleted').textContent = '0';
+    }
 
     // Load settings from localStorage
     function loadSettings() {
@@ -1093,23 +1127,6 @@ CDSS Licensed Home Care Organization #344700080</textarea>
 
       closeModal('sendEmailsModal');
       renderTable();
-    }
-
-    // Load data from backend (in production)
-    async function loadFromBackend() {
-      if (!CONFIG.webAppUrl) return;
-
-      try {
-        const response = await fetch(`${CONFIG.webAppUrl}?action=getEmployees`);
-        const data = await response.json();
-        if (data.success) {
-          employees = data.employees;
-          renderTable();
-          updateStats();
-        }
-      } catch (error) {
-        console.error('Error loading data:', error);
-      }
     }
   </script>
 </body>
