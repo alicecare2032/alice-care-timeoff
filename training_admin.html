@@ -693,13 +693,13 @@
         <div class="card-body">
           <div class="form-group">
             <label class="form-label">Training Portal URL</label>
-            <input type="text" class="form-input" id="portalUrl" value="https://yourdomain.com/training.html" placeholder="https://yourdomain.com/training.html">
+            <input type="text" class="form-input" id="portalUrl" value="https://alicecare2032.github.io/alice-care-timeoff/training_portal.html" placeholder="https://alicecare2032.github.io/alice-care-timeoff/training_portal.html">
             <small style="color: var(--alice-dark-grey); display: block; margin-top: 0.5rem;">This is where employees will access the training. Update this after deploying the training portal.</small>
           </div>
 
           <div class="form-group">
             <label class="form-label">Google Apps Script Web App URL</label>
-            <input type="text" class="form-input" id="webAppUrl" placeholder="https://script.google.com/macros/s/AKfycbzhvY-7VynuWwTNxgrvGA8obAO-DkegqHLcMmnRQVrRKyL4w04QVNmN6DHsFf53Bv3Q2g/exec">
+            <input type="text" class="form-input" id="webAppUrl" placeholder="https://script.google.com/macros/s/xxx/exec">
             <small style="color: var(--alice-dark-grey); display: block; margin-top: 0.5rem;">After deploying the Apps Script, paste the Web App URL here.</small>
           </div>
 
@@ -810,8 +810,8 @@ CDSS Licensed Home Care Organization #344700080</textarea>
   <script>
     // Configuration
     const CONFIG = {
-      webAppUrl: localStorage.getItem('webAppUrl') || '',
-      portalUrl: localStorage.getItem('portalUrl') || 'https://yourdomain.com/training.html'
+      webAppUrl: localStorage.getItem('webAppUrl') || 'https://script.google.com/macros/s/AKfycbzhvY-7VynuWwTNxgrvGA8obAO-DkegqHLcMmnRQVrRKyL4w04QVNmN6DHsFf53Bv3Q2g/exec',
+      portalUrl: localStorage.getItem('portalUrl') || 'https://alicecare2032.github.io/alice-care-timeoff/training_portal.html'
     };
 
     // Sample data - In production, this comes from Google Sheets via Apps Script
