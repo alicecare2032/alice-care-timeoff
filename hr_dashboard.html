@@ -1480,6 +1480,22 @@
                 return;
             }
             
+            // Add Paychex CSV format section at the bottom
+            textContent += '\n\n--- PAYCHEX IMPORT FORMAT ---\n';
+            textContent += 'employee number,SICK,Hours,,,,,\n';
+            
+            // Add sick entries in CSV format
+            for (var i = 0; i < sickData.length; i++) {
+                var data = sickData[i];
+                textContent += data.employeeId + ',SICK,' + data.totalApproved.toFixed(2) + ',,,,,\n';
+            }
+            
+            // Add vacation entries in CSV format
+            for (var i = 0; i < vacationData.length; i++) {
+                var data = vacationData[i];
+                textContent += data.employeeId + ',VACATION,' + data.totalApproved.toFixed(2) + ',,,,,\n';
+            }
+            
             // Generate filename with current date and time
             var now = new Date();
             var dateStr = now.getFullYear() + '-' + 
