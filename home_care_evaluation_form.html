@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>alice.care - Home Care Evaluation Form</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: #E5ECF3; min-height: 100vh; padding: 20px; color: #3D3D3D; }
+        .nav-bar { max-width: 1000px; margin: 0 auto 20px; background: white; padding: 15px 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(26, 54, 92, 0.1); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 10px; z-index: 100; }
+        .logo { font-size: 28px; font-weight: 700; }
+        .logo .alice { color: #F57600; font-weight: 700; }
+        .logo .dot { color: #F57600; font-weight: 700; margin: 0 -2px; }
+        .logo .care { color: #1A365C; font-weight: 400; }
+        .nav-actions { display: flex; gap: 10px; align-items: center; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(26, 54, 92, 0.15); overflow: hidden; }
+        .header { background: #1A365C; color: white; padding: 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .header-content h1 { font-size: 26px; font-weight: 600; margin-bottom: 8px; }
+        .header-content p { opacity: 0.9; font-size: 14px; }
+        .header-date { background: rgba(255,255,255,0.1); padding: 15px 20px; border-radius: 10px; }
+        .header-date label { font-size: 12px; opacity: 0.8; display: block; margin-bottom: 5px; }
+        .header-date input { background: white; border: none; padding: 10px 15px; border-radius: 6px; font-family: 'Poppins', sans-serif; font-size: 14px; color: #1A365C; }
+        .form-body { padding: 30px; }
+        .section { margin-bottom: 35px; border: 2px solid #E5ECF3; border-radius: 12px; overflow: hidden; }
+        .section-header { background: linear-gradient(135deg, #1A365C 0%, #2a4a7c 100%); color: white; padding: 15px 20px; font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        .section-header.orange { background: linear-gradient(135deg, #F57600 0%, #ff8c1a 100%); }
+        .section-content { padding: 25px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .form-grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .form-grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .form-grid-4 { grid-template-columns: repeat(4, 1fr); }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        .form-group.half-width { grid-column: span 2; }
+        .form-group label { font-size: 13px; color: #1A365C; font-weight: 500; margin-bottom: 6px; }
+        .form-group label.required::after { content: " *"; color: #F57600; }
+        .form-group input, .form-group select, .form-group textarea { padding: 12px 14px; border: 2px solid #D3D7DF; border-radius: 8px; font-size: 14px; font-family: 'Poppins', sans-serif; transition: all 0.3s; background: white; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #F57600; box-shadow: 0 0 0 3px rgba(245, 118, 0, 0.1); }
+        .form-group input:disabled, .form-group select:disabled, .form-group textarea:disabled { background: #f5f5f5; cursor: not-allowed; }
+        .form-group textarea { min-height: 80px; resize: vertical; }
+        .checkbox-group { display: flex; flex-wrap: wrap; gap: 15px; padding: 10px 0; }
+        .checkbox-item { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .checkbox-item input[type="checkbox"], .checkbox-item input[type="radio"] { width: 18px; height: 18px; accent-color: #F57600; cursor: pointer; }
+        .checkbox-item label { margin-bottom: 0; cursor: pointer; font-size: 14px; }
+        .subsection { margin-top: 25px; padding-top: 20px; border-top: 2px dashed #E5ECF3; }
+        .subsection-title { font-size: 14px; font-weight: 600; color: #1A365C; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .subsection-title::before { content: ""; display: inline-block; width: 4px; height: 16px; background: #F57600; border-radius: 2px; }
+        .care-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .care-table th { background: #1A365C; color: white; padding: 12px 10px; text-align: center; font-size: 12px; font-weight: 500; }
+        .care-table th:first-child { text-align: left; padding-left: 15px; }
+        .care-table td { padding: 10px; border-bottom: 1px solid #E5ECF3; text-align: center; font-size: 13px; }
+        .care-table td:first-child { text-align: left; padding-left: 15px; font-weight: 500; color: #1A365C; }
+        .care-table tr:hover { background: #fafafa; }
+        .care-table input[type="radio"], .care-table input[type="checkbox"] { width: 18px; height: 18px; accent-color: #F57600; }
+        .yes-no-group { display: flex; gap: 20px; align-items: center; }
+        .yes-no-group label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 14px; }
+        .inline-field { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .inline-field input { flex: 1; min-width: 150px; }
+        .contact-card { background: #f8fafc; border-radius: 10px; padding: 20px; border: 1px solid #E5ECF3; }
+        .contact-card-title { font-size: 14px; font-weight: 600; color: #F57600; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #F57600; }
+        .btn { padding: 12px 24px; border: none; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background: #F57600; color: white; }
+        .btn-primary:hover { background: #e06d00; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(245, 118, 0, 0.3); }
+        .btn-secondary { background: #1A365C; color: white; }
+        .btn-secondary:hover { background: #142947; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(26, 54, 92, 0.3); }
+        .btn-outline { background: transparent; color: #1A365C; border: 2px solid #1A365C; }
+        .btn-outline:hover { background: #1A365C; color: white; }
+        .btn-small { padding: 8px 16px; font-size: 12px; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+        .form-actions { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; padding: 30px; background: #f8fafc; border-top: 2px solid #E5ECF3; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .modal-overlay.show { display: flex; }
+        .modal { background: white; border-radius: 12px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .modal-header { background: #1A365C; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { font-size: 18px; font-weight: 600; }
+        .modal-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; opacity: 0.8; }
+        .modal-close:hover { opacity: 1; }
+        .modal-body { padding: 25px; }
+        .search-results { max-height: 300px; overflow-y: auto; margin-top: 15px; }
+        .search-result-item { padding: 15px; border: 2px solid #E5ECF3; border-radius: 8px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
+        .search-result-item:hover { border-color: #F57600; background: #fff9f0; }
+        .search-result-item h4 { color: #1A365C; font-size: 14px; margin-bottom: 5px; }
+        .search-result-item p { color: #666; font-size: 12px; }
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .status-badge.edit-mode { background: #FFF4E5; color: #F57600; }
+        .status-badge.view-mode { background: #e8f4ea; color: #2e7d32; }
+        .loading { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 20px; color: #1A365C; }
+        .spinner { width: 24px; height: 24px; border: 3px solid #E5ECF3; border-top-color: #F57600; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .toast { position: fixed; bottom: 30px; right: 30px; padding: 15px 25px; border-radius: 10px; color: white; font-weight: 500; box-shadow: 0 4px 20px rgba(0,0,0,0.2); transform: translateY(100px); opacity: 0; transition: all 0.3s; z-index: 2000; }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.success { background: #2e7d32; }
+        .toast.error { background: #c62828; }
+        .toast.info { background: #1A365C; }
+        .medications-table { width: 100%; border-collapse: collapse; }
+        .medications-table th { background: #1A365C; color: white; padding: 10px 8px; text-align: left; font-size: 11px; font-weight: 500; }
+        .medications-table td { padding: 8px; border-bottom: 1px solid #E5ECF3; }
+        .medications-table input, .medications-table textarea { width: 100%; padding: 8px; border: 1px solid #D3D7DF; border-radius: 4px; font-size: 12px; font-family: 'Poppins', sans-serif; }
+        .schedule-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+        .schedule-day { text-align: center; }
+        .schedule-day label { display: block; font-weight: 600; color: #1A365C; margin-bottom: 8px; font-size: 12px; }
+        .schedule-day input[type="checkbox"] { margin-bottom: 8px; }
+        .schedule-day input[type="time"] { width: 100%; padding: 6px; border: 1px solid #D3D7DF; border-radius: 4px; font-size: 11px; margin-bottom: 4px; }
+        .risk-level { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 15px; }
+        .risk-level-item { flex: 1; min-width: 200px; padding: 15px; border: 2px solid #E5ECF3; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .risk-level-item:hover { border-color: #F57600; }
+        .risk-level-item.selected { border-color: #F57600; background: #FFF4E5; }
+        .risk-level-item input { display: none; }
+        .risk-level-item .level-name { font-weight: 600; margin-bottom: 5px; }
+        .risk-level-item.low .level-name { color: #2e7d32; }
+        .risk-level-item.moderate .level-name { color: #F57600; }
+        .risk-level-item.high .level-name { color: #c62828; }
+        @media print { body { background: white; padding: 0; } .nav-bar, .form-actions, .btn { display: none !important; } .container { box-shadow: none; } .section { break-inside: avoid; } }
+        @media (max-width: 768px) { body { padding: 10px; } .nav-bar { flex-direction: column; gap: 15px; position: relative; top: 0; } .header { flex-direction: column; text-align: center; } .form-grid, .form-grid-2, .form-grid-3, .form-grid-4 { grid-template-columns: 1fr; } .form-group.half-width { grid-column: 1; } .schedule-grid { grid-template-columns: repeat(2, 1fr); } .btn { width: 100%; justify-content: center; } .nav-actions { width: 100%; flex-wrap: wrap; } .nav-actions .btn { flex: 1; min-width: 100px; } }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <div class="logo"><span class="alice">alice</span><span class="dot">.</span><span class="care">care</span></div>
+        <div class="nav-actions">
+            <span id="modeStatus" class="status-badge view-mode">View Mode</span>
+            <button class="btn btn-outline btn-small" onclick="openEditModal()">Edit</button>
+            <button class="btn btn-secondary btn-small" onclick="openSearchModal()">Search</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1>Home Care Evaluation Form</h1>
+                <p>Complete assessment for home care services</p>
+            </div>
+            <div class="header-date">
+                <label>Evaluation Date</label>
+                <input type="date" id="evaluationDate" disabled>
+            </div>
+        </div>
+
+        <form id="evaluationForm" class="form-body">
+            <!-- Client Personal Information -->
+            <div class="section">
+                <div class="section-header">Client Personal Information</div>
+                <div class="section-content">
+                    <div class="form-grid">
+                        <div class="form-group"><label class="required">First Name</label><input type="text" name="firstName" disabled></div>
+                        <div class="form-group"><label class="required">Last Name</label><input type="text" name="lastName" disabled></div>
+                        <div class="form-group"><label>Gender</label><select name="gender" disabled><option value="">Select...</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div>
+                        <div class="form-group"><label>Date of Birth</label><input type="date" name="dob" disabled></div>
+                        <div class="form-group"><label>Age</label><input type="number" name="age" disabled></div>
+                        <div class="form-group"><label>Marital Status</label><select name="maritalStatus" disabled><option value="">Select...</option><option value="Married">Married</option><option value="Single">Single</option><option value="Divorced">Divorced</option><option value="Widow">Widow</option></select></div>
+                        <div class="form-group"><label>House No / Apt / Unit</label><input type="text" name="unitNumber" disabled></div>
+                        <div class="form-group half-width"><label>Street Address</label><input type="text" name="streetAddress" disabled></div>
+                        <div class="form-group"><label>City</label><input type="text" name="city" disabled></div>
+                        <div class="form-group"><label>State</label><input type="text" name="state" value="CA" disabled></div>
+                        <div class="form-group"><label>Zip Code</label><input type="text" name="zipCode" disabled></div>
+                        <div class="form-group"><label>Phone</label><input type="tel" name="phone" disabled></div>
+                        <div class="form-group"><label>First Language</label><input type="text" name="firstLanguage" disabled></div>
+                        <div class="form-group"><label>2nd Language</label><input type="text" name="secondLanguage" disabled></div>
+                        <div class="form-group"><label>Height</label><input type="text" name="height" disabled></div>
+                        <div class="form-group"><label>Weight</label><input type="text" name="weight" disabled></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Authorized Contacts -->
+            <div class="section">
+                <div class="section-header orange">Authorized Person(s) in Charge of Care</div>
+                <div class="section-content">
+                    <div class="form-grid form-grid-2" style="gap: 25px;">
+                        <div class="contact-card">
+                            <div class="contact-card-title">Primary Contact</div>
+                            <div class="form-grid" style="gap: 15px;">
+                                <div class="form-group"><label>First Name</label><input type="text" name="primaryFirstName" disabled></div>
+                                <div class="form-group"><label>Last Name</label><input type="text" name="primaryLastName" disabled></div>
+                                <div class="form-group full-width"><label>Relation to Client</label><input type="text" name="primaryRelation" disabled></div>
+                                <div class="form-group full-width"><label>Full Address</label><input type="text" name="primaryAddress" disabled></div>
+                                <div class="form-group"><label>Cell Phone</label><input type="tel" name="primaryCellPhone" disabled></div>
+                                <div class="form-group"><label>Home Phone</label><input type="tel" name="primaryHomePhone" disabled></div>
+                                <div class="form-group"><label>Work Phone</label><input type="tel" name="primaryWorkPhone" disabled></div>
+                                <div class="form-group"><label>Email</label><input type="email" name="primaryEmail" disabled></div>
+                            </div>
+                        </div>
+                        <div class="contact-card">
+                            <div class="contact-card-title">Secondary Contact</div>
+                            <div class="form-grid" style="gap: 15px;">
+                                <div class="form-group"><label>First Name</label><input type="text" name="secondaryFirstName" disabled></div>
+                                <div class="form-group"><label>Last Name</label><input type="text" name="secondaryLastName" disabled></div>
+                                <div class="form-group full-width"><label>Relation to Client</label><input type="text" name="secondaryRelation" disabled></div>
+                                <div class="form-group full-width"><label>Location</label><input type="text" name="secondaryLocation" disabled></div>
+                                <div class="form-group"><label>Phone</label><input type="tel" name="secondaryPhone" disabled></div>
+                                <div class="form-group"><label>Email</label><input type="email" name="secondaryEmail" disabled></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Communication Details -->
+            <div class="section">
+                <div class="section-header">Communication Details</div>
+                <div class="section-content">
+                    <div class="form-group full-width">
+                        <label>Method(s) of Communication with Client</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item"><input type="checkbox" name="commPhone" disabled><span>Phone</span></label>
+                            <label class="checkbox-item"><input type="checkbox" name="commEmail" disabled><span>Email</span></label>
+                            <label class="checkbox-item"><input type="checkbox" name="commVideoChat" disabled><span>Video Chat</span></label>
+                        </div>
+                    </div>
+                    <div class="form-grid form-grid-2" style="margin-top: 20px;">
+                        <div class="form-group">
+                            <label>Access to a land line?</label>
+                            <div class="inline-field">
+                                <div class="yes-no-group"><label><input type="radio" name="hasLandline" value="Yes" disabled> Yes</label><label><input type="radio" name="hasLandline" value="No" disabled> No</label></div>
+                                <input type="tel" name="landlineNumber" placeholder="Telephone #" disabled>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Access to a cell phone?</label>
+                            <div class="inline-field">
+                                <div class="yes-no-group"><label><input type="radio" name="hasCellphone" value="Yes" disabled> Yes</label><label><input type="radio" name="hasCellphone" value="No" disabled> No</label></div>
+                                <input type="tel" name="cellNumber" placeholder="Cell #" disabled>
+                            </div>
+                        </div>
+                        <div class="form-group"><label>Does client own a computer?</label><div class="yes-no-group"><label><input type="radio" name="ownsComputer" value="Yes" disabled> Yes</label><label><input type="radio" name="ownsComputer" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Can client operate it?</label><div class="yes-no-group"><label><input type="radio" name="canOperateComputer" value="Yes" disabled> Yes</label><label><input type="radio" name="canOperateComputer" value="No" disabled> No</label></div></div>
+                        <div class="form-group">
+                            <label>Client knows how to access email?</label>
+                            <div class="inline-field">
+                                <div class="yes-no-group"><label><input type="radio" name="canAccessEmail" value="Yes" disabled> Yes</label><label><input type="radio" name="canAccessEmail" value="No" disabled> No</label></div>
+                                <input type="email" name="clientEmail" placeholder="Email Address" disabled>
+                            </div>
+                        </div>
+                        <div class="form-group"><label>Access to wireless internet?</label><div class="yes-no-group"><label><input type="radio" name="hasWifi" value="Yes" disabled> Yes</label><label><input type="radio" name="hasWifi" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Wireless Network Name</label><input type="text" name="wifiNetwork" disabled></div>
+                        <div class="form-group"><label>Wireless Password</label><input type="text" name="wifiPassword" disabled></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Current Living Situation -->
+            <div class="section">
+                <div class="section-header orange">Current Living Situation</div>
+                <div class="section-content">
+                    <div class="form-grid form-grid-2">
+                        <div class="form-group">
+                            <label>Current Living Arrangement</label>
+                            <div class="checkbox-group" style="flex-direction: column; align-items: flex-start;">
+                                <label class="checkbox-item"><input type="radio" name="livingArrangement" value="Lives at home alone" disabled><span>Lives at home alone</span></label>
+                                <label class="checkbox-item"><input type="radio" name="livingArrangement" value="Lives at home with family member/friend" disabled><span>Lives at home with family/friend</span></label>
+                                <label class="checkbox-item"><input type="radio" name="livingArrangement" value="Lives in private senior's residence" disabled><span>Private senior's residence</span></label>
+                                <label class="checkbox-item"><input type="radio" name="livingArrangement" value="Lives in public care facility" disabled><span>Public care facility</span></label>
+                                <label class="checkbox-item"><input type="radio" name="livingArrangement" value="Lives in hospital/Rehabilitation" disabled><span>Hospital/Rehabilitation</span></label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Current Level of Care Assistance</label>
+                            <div class="checkbox-group" style="flex-direction: column; align-items: flex-start;">
+                                <label class="checkbox-item"><input type="radio" name="careLevel" value="Autonomous" disabled><span>Autonomous</span></label>
+                                <label class="checkbox-item"><input type="radio" name="careLevel" value="Semi-autonomous" disabled><span>Semi-autonomous</span></label>
+                                <label class="checkbox-item"><input type="radio" name="careLevel" value="Assisted" disabled><span>Assisted</span></label>
+                                <label class="checkbox-item"><input type="radio" name="careLevel" value="Long term" disabled><span>Long term</span></label>
+                                <label class="checkbox-item"><input type="radio" name="careLevel" value="Memory Care (secure)" disabled><span>Memory Care (secure)</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Current Care Requirements -->
+            <div class="section">
+                <div class="section-header">Current Care Requirements</div>
+                <div class="section-content">
+                    <div class="subsection-title">Personal Care</div>
+                    <table class="care-table">
+                        <thead><tr><th>Activity</th><th>No Assistance</th><th>Some Assistance</th><th>Full Assistance</th></tr></thead>
+                        <tbody>
+                            <tr><td>Bathing/Showering</td><td><input type="radio" name="bathingAssist" value="None" disabled></td><td><input type="radio" name="bathingAssist" value="Some" disabled></td><td><input type="radio" name="bathingAssist" value="Full" disabled></td></tr>
+                            <tr><td>Toileting</td><td><input type="radio" name="toiletingAssist" value="None" disabled></td><td><input type="radio" name="toiletingAssist" value="Some" disabled></td><td><input type="radio" name="toiletingAssist" value="Full" disabled></td></tr>
+                            <tr><td>Dressing</td><td><input type="radio" name="dressingAssist" value="None" disabled></td><td><input type="radio" name="dressingAssist" value="Some" disabled></td><td><input type="radio" name="dressingAssist" value="Full" disabled></td></tr>
+                            <tr><td>Brushing Hair</td><td><input type="radio" name="hairAssist" value="None" disabled></td><td><input type="radio" name="hairAssist" value="Some" disabled></td><td><input type="radio" name="hairAssist" value="Full" disabled></td></tr>
+                            <tr><td>Trimming Fingernails</td><td><input type="radio" name="fingernailsAssist" value="None" disabled></td><td><input type="radio" name="fingernailsAssist" value="Some" disabled></td><td><input type="radio" name="fingernailsAssist" value="Full" disabled></td></tr>
+                            <tr><td>Trimming Toenails</td><td><input type="radio" name="toenailsAssist" value="None" disabled></td><td><input type="radio" name="toenailsAssist" value="Some" disabled></td><td><input type="radio" name="toenailsAssist" value="Full" disabled></td></tr>
+                            <tr><td>Shaving</td><td><input type="radio" name="shavingAssist" value="None" disabled></td><td><input type="radio" name="shavingAssist" value="Some" disabled></td><td><input type="radio" name="shavingAssist" value="Full" disabled></td></tr>
+                            <tr><td>Applying Cream</td><td><input type="radio" name="creamAssist" value="None" disabled></td><td><input type="radio" name="creamAssist" value="Some" disabled></td><td><input type="radio" name="creamAssist" value="Full" disabled></td></tr>
+                            <tr><td>Applying Make-up</td><td><input type="radio" name="makeupAssist" value="None" disabled></td><td><input type="radio" name="makeupAssist" value="Some" disabled></td><td><input type="radio" name="makeupAssist" value="Full" disabled></td></tr>
+                            <tr><td>Jewelry/Watch</td><td><input type="radio" name="jewelryAssist" value="None" disabled></td><td><input type="radio" name="jewelryAssist" value="Some" disabled></td><td><input type="radio" name="jewelryAssist" value="Full" disabled></td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="subsection"><div class="subsection-title">Meals</div>
+                    <table class="care-table">
+                        <thead><tr><th>Activity</th><th>No Assistance</th><th>Some Assistance</th><th>Full Assistance</th></tr></thead>
+                        <tbody>
+                            <tr><td>Cue to Eat</td><td><input type="radio" name="cueEatAssist" value="None" disabled></td><td><input type="radio" name="cueEatAssist" value="Some" disabled></td><td><input type="radio" name="cueEatAssist" value="Full" disabled></td></tr>
+                            <tr><td>Can Prepare Meals</td><td><input type="radio" name="prepareMealsAssist" value="None" disabled></td><td><input type="radio" name="prepareMealsAssist" value="Some" disabled></td><td><input type="radio" name="prepareMealsAssist" value="Full" disabled></td></tr>
+                            <tr><td>Can Prepare Snacks</td><td><input type="radio" name="prepareSnacksAssist" value="None" disabled></td><td><input type="radio" name="prepareSnacksAssist" value="Some" disabled></td><td><input type="radio" name="prepareSnacksAssist" value="Full" disabled></td></tr>
+                            <tr><td>Drink Liquids</td><td><input type="radio" name="drinkAssist" value="None" disabled></td><td><input type="radio" name="drinkAssist" value="Some" disabled></td><td><input type="radio" name="drinkAssist" value="Full" disabled></td></tr>
+                            <tr><td>Prepare Hot Drinks</td><td><input type="radio" name="hotDrinksAssist" value="None" disabled></td><td><input type="radio" name="hotDrinksAssist" value="Some" disabled></td><td><input type="radio" name="hotDrinksAssist" value="Full" disabled></td></tr>
+                            <tr><td>Set Table</td><td><input type="radio" name="setTableAssist" value="None" disabled></td><td><input type="radio" name="setTableAssist" value="Some" disabled></td><td><input type="radio" name="setTableAssist" value="Full" disabled></td></tr>
+                            <tr><td>Clean After Meal</td><td><input type="radio" name="cleanMealAssist" value="None" disabled></td><td><input type="radio" name="cleanMealAssist" value="Some" disabled></td><td><input type="radio" name="cleanMealAssist" value="Full" disabled></td></tr>
+                            <tr><td>Rotate Food</td><td><input type="radio" name="rotateFoodAssist" value="None" disabled></td><td><input type="radio" name="rotateFoodAssist" value="Some" disabled></td><td><input type="radio" name="rotateFoodAssist" value="Full" disabled></td></tr>
+                        </tbody>
+                    </table></div>
+
+                    <div class="subsection"><div class="subsection-title">Home Environment</div>
+                    <table class="care-table">
+                        <thead><tr><th>Activity</th><th>No Assistance</th><th>Some Assistance</th><th>Full Assistance</th></tr></thead>
+                        <tbody>
+                            <tr><td>Walking</td><td><input type="radio" name="walkingAssist" value="None" disabled></td><td><input type="radio" name="walkingAssist" value="Some" disabled></td><td><input type="radio" name="walkingAssist" value="Full" disabled></td></tr>
+                            <tr><td>Going Up Stairs</td><td><input type="radio" name="stairsAssist" value="None" disabled></td><td><input type="radio" name="stairsAssist" value="Some" disabled></td><td><input type="radio" name="stairsAssist" value="Full" disabled></td></tr>
+                            <tr><td>Getting In/Out of Chairs</td><td><input type="radio" name="chairsAssist" value="None" disabled></td><td><input type="radio" name="chairsAssist" value="Some" disabled></td><td><input type="radio" name="chairsAssist" value="Full" disabled></td></tr>
+                            <tr><td>Getting In/Out of Bed</td><td><input type="radio" name="bedAssist" value="None" disabled></td><td><input type="radio" name="bedAssist" value="Some" disabled></td><td><input type="radio" name="bedAssist" value="Full" disabled></td></tr>
+                            <tr><td>Easily Get to Bathroom</td><td><input type="radio" name="bathroomAccessAssist" value="None" disabled></td><td><input type="radio" name="bathroomAccessAssist" value="Some" disabled></td><td><input type="radio" name="bathroomAccessAssist" value="Full" disabled></td></tr>
+                            <tr><td>Go to Basement</td><td><input type="radio" name="basementAssist" value="None" disabled></td><td><input type="radio" name="basementAssist" value="Some" disabled></td><td><input type="radio" name="basementAssist" value="Full" disabled></td></tr>
+                            <tr><td>Answer the Door</td><td><input type="radio" name="doorAssist" value="None" disabled></td><td><input type="radio" name="doorAssist" value="Some" disabled></td><td><input type="radio" name="doorAssist" value="Full" disabled></td></tr>
+                            <tr><td>Answer the Phone</td><td><input type="radio" name="phoneAnswerAssist" value="None" disabled></td><td><input type="radio" name="phoneAnswerAssist" value="Some" disabled></td><td><input type="radio" name="phoneAnswerAssist" value="Full" disabled></td></tr>
+                            <tr><td>Operate Technology</td><td><input type="radio" name="techAssist" value="None" disabled></td><td><input type="radio" name="techAssist" value="Some" disabled></td><td><input type="radio" name="techAssist" value="Full" disabled></td></tr>
+                        </tbody>
+                    </table></div>
+
+                    <div class="subsection"><div class="subsection-title">Activity/Movement</div>
+                    <table class="care-table">
+                        <thead><tr><th>Activity</th><th>No Assistance</th><th>Some Assistance</th><th>Full Assistance</th></tr></thead>
+                        <tbody>
+                            <tr><td>Walk Indoors</td><td><input type="radio" name="walkIndoorsAssist" value="None" disabled></td><td><input type="radio" name="walkIndoorsAssist" value="Some" disabled></td><td><input type="radio" name="walkIndoorsAssist" value="Full" disabled></td></tr>
+                            <tr><td>Walk Outdoors</td><td><input type="radio" name="walkOutdoorsAssist" value="None" disabled></td><td><input type="radio" name="walkOutdoorsAssist" value="Some" disabled></td><td><input type="radio" name="walkOutdoorsAssist" value="Full" disabled></td></tr>
+                            <tr><td>Participate in Exercise</td><td><input type="radio" name="exerciseAssist" value="None" disabled></td><td><input type="radio" name="exerciseAssist" value="Some" disabled></td><td><input type="radio" name="exerciseAssist" value="Full" disabled></td></tr>
+                        </tbody>
+                    </table></div>
+
+                    <div class="subsection"><div class="subsection-title">Housekeeping</div>
+                    <table class="care-table">
+                        <thead><tr><th>Activity</th><th>No Assistance</th><th>Some Assistance</th><th>Full Assistance</th></tr></thead>
+                        <tbody>
+                            <tr><td>General Surface Cleaning</td><td><input type="radio" name="surfaceCleanAssist" value="None" disabled></td><td><input type="radio" name="surfaceCleanAssist" value="Some" disabled></td><td><input type="radio" name="surfaceCleanAssist" value="Full" disabled></td></tr>
+                            <tr><td>Cleaning Bathrooms</td><td><input type="radio" name="bathroomCleanAssist" value="None" disabled></td><td><input type="radio" name="bathroomCleanAssist" value="Some" disabled></td><td><input type="radio" name="bathroomCleanAssist" value="Full" disabled></td></tr>
+                            <tr><td>Laundry</td><td><input type="radio" name="laundryAssist" value="None" disabled></td><td><input type="radio" name="laundryAssist" value="Some" disabled></td><td><input type="radio" name="laundryAssist" value="Full" disabled></td></tr>
+                            <tr><td>Changing Sheets</td><td><input type="radio" name="sheetsAssist" value="None" disabled></td><td><input type="radio" name="sheetsAssist" value="Some" disabled></td><td><input type="radio" name="sheetsAssist" value="Full" disabled></td></tr>
+                            <tr><td>Garbage and Recycling</td><td><input type="radio" name="garbageAssist" value="None" disabled></td><td><input type="radio" name="garbageAssist" value="Some" disabled></td><td><input type="radio" name="garbageAssist" value="Full" disabled></td></tr>
+                            <tr><td>Garden/Yard Maintenance</td><td><input type="radio" name="yardAssist" value="None" disabled></td><td><input type="radio" name="yardAssist" value="Some" disabled></td><td><input type="radio" name="yardAssist" value="Full" disabled></td></tr>
+                            <tr><td>Organizing</td><td><input type="radio" name="organizingAssist" value="None" disabled></td><td><input type="radio" name="organizingAssist" value="Some" disabled></td><td><input type="radio" name="organizingAssist" value="Full" disabled></td></tr>
+                        </tbody>
+                    </table></div>
+
+                    <div class="subsection"><div class="subsection-title">Social Engagement</div>
+                    <table class="care-table">
+                        <thead><tr><th>Activity</th><th>No Assistance</th><th>Some Assistance</th><th>Full Assistance</th></tr></thead>
+                        <tbody>
+                            <tr><td>Willing to Participate</td><td><input type="radio" name="willingParticipateAssist" value="None" disabled></td><td><input type="radio" name="willingParticipateAssist" value="Some" disabled></td><td><input type="radio" name="willingParticipateAssist" value="Full" disabled></td></tr>
+                            <tr><td>Can Physically Participate</td><td><input type="radio" name="physicalParticipateAssist" value="None" disabled></td><td><input type="radio" name="physicalParticipateAssist" value="Some" disabled></td><td><input type="radio" name="physicalParticipateAssist" value="Full" disabled></td></tr>
+                            <tr><td>Can Mentally Engage</td><td><input type="radio" name="mentalEngageAssist" value="None" disabled></td><td><input type="radio" name="mentalEngageAssist" value="Some" disabled></td><td><input type="radio" name="mentalEngageAssist" value="Full" disabled></td></tr>
+                        </tbody>
+                    </table></div>
+                </div>
+            </div>
+            <!-- Hearing & Vision -->
+            <div class="section">
+                <div class="section-header orange">Hearing & Vision</div>
+                <div class="section-content">
+                    <div class="subsection-title">Hearing Loss</div>
+                    <table class="care-table">
+                        <thead><tr><th>Condition</th><th>Right</th><th>Left</th><th>Both</th></tr></thead>
+                        <tbody>
+                            <tr><td>Hearing Aid(s)</td><td><input type="checkbox" name="hearingAidRight" disabled></td><td><input type="checkbox" name="hearingAidLeft" disabled></td><td><input type="checkbox" name="hearingAidBoth" disabled></td></tr>
+                            <tr><td>Need Assistance Placing</td><td><input type="checkbox" name="hearingAssistRight" disabled></td><td><input type="checkbox" name="hearingAssistLeft" disabled></td><td><input type="checkbox" name="hearingAssistBoth" disabled></td></tr>
+                        </tbody>
+                    </table>
+                    <div class="subsection"><div class="subsection-title">Vision Loss</div>
+                    <table class="care-table">
+                        <thead><tr><th>Condition</th><th>Right</th><th>Left</th><th>Both</th></tr></thead>
+                        <tbody>
+                            <tr><td>Prescription Lens(es)</td><td><input type="checkbox" name="lensRight" disabled></td><td><input type="checkbox" name="lensLeft" disabled></td><td><input type="checkbox" name="lensBoth" disabled></td></tr>
+                            <tr><td>Completed Cataract Surgery</td><td><input type="checkbox" name="cataractRight" disabled></td><td><input type="checkbox" name="cataractLeft" disabled></td><td><input type="checkbox" name="cataractBoth" disabled></td></tr>
+                            <tr><td>Need Assistance Placing</td><td><input type="checkbox" name="visionAssistRight" disabled></td><td><input type="checkbox" name="visionAssistLeft" disabled></td><td><input type="checkbox" name="visionAssistBoth" disabled></td></tr>
+                        </tbody>
+                    </table></div>
+                </div>
+            </div>
+
+            <!-- Reminders & Mobility -->
+            <div class="section">
+                <div class="section-header">Reminders & Mobility</div>
+                <div class="section-content">
+                    <div class="form-grid form-grid-2">
+                        <div class="form-group">
+                            <label>Medication Reminders Required</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item"><input type="radio" name="medicationReminders" value="Yes" disabled><span>Yes</span></label>
+                                <label class="checkbox-item"><input type="radio" name="medicationReminders" value="No" disabled><span>No</span></label>
+                                <label class="checkbox-item"><input type="radio" name="medicationReminders" value="Sometimes" disabled><span>Sometimes</span></label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Appointment Reminders</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item"><input type="radio" name="appointmentReminders" value="Yes" disabled><span>Yes</span></label>
+                                <label class="checkbox-item"><input type="radio" name="appointmentReminders" value="No" disabled><span>No</span></label>
+                                <label class="checkbox-item"><input type="radio" name="appointmentReminders" value="Sometimes" disabled><span>Sometimes</span></label>
+                            </div>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Mobility</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item"><input type="checkbox" name="mobilityNoAssist" disabled><span>No Assistance</span></label>
+                                <label class="checkbox-item"><input type="checkbox" name="mobilityCane" disabled><span>Cane</span></label>
+                                <label class="checkbox-item"><input type="checkbox" name="mobilityWalker" disabled><span>Walker</span></label>
+                                <label class="checkbox-item"><input type="checkbox" name="mobilityWheelchair" disabled><span>Wheelchair</span></label>
+                                <label class="checkbox-item"><input type="checkbox" name="mobilityLift" disabled><span>Require Lift Equipment</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Current Home Environment -->
+            <div class="section">
+                <div class="section-header orange">Current Home Environment</div>
+                <div class="section-content">
+                    <div class="form-grid">
+                        <div class="form-group"><label>Any concerns in living environment?</label><div class="yes-no-group"><label><input type="radio" name="envConcerns" value="Yes" disabled> Yes</label><label><input type="radio" name="envConcerns" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>List Concerns</label><input type="text" name="envConcernsList" disabled></div>
+                        <div class="form-group"><label>Does client have pet(s)?</label><div class="yes-no-group"><label><input type="radio" name="hasPets" value="Yes" disabled> Yes</label><label><input type="radio" name="hasPets" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Assistance Required for Pets</label><input type="text" name="petAssistance" disabled></div>
+                        <div class="form-group"><label>Client has a special comfort place?</label><div class="yes-no-group"><label><input type="radio" name="hasComfortPlace" value="Yes" disabled> Yes</label><label><input type="radio" name="hasComfortPlace" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Specify Comfort Place</label><input type="text" name="comfortPlaceDetails" disabled></div>
+                        <div class="form-group"><label>Easy access to washroom?</label><div class="yes-no-group"><label><input type="radio" name="washroomAccess" value="Yes" disabled> Yes</label><label><input type="radio" name="washroomAccess" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Specify</label><input type="text" name="washroomAccessDetails" disabled></div>
+                        <div class="form-group"><label>Easy access to bath/shower?</label><div class="yes-no-group"><label><input type="radio" name="bathAccess" value="Yes" disabled> Yes</label><label><input type="radio" name="bathAccess" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Specify</label><input type="text" name="bathAccessDetails" disabled></div>
+                        <div class="form-group"><label>Stairs present in residence?</label><div class="yes-no-group"><label><input type="radio" name="hasStairs" value="Yes" disabled> Yes</label><label><input type="radio" name="hasStairs" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Floor Levels (Inside/Out)</label><input type="text" name="floorLevels" disabled></div>
+                        <div class="form-group"><label>Easy access to street level?</label><div class="yes-no-group"><label><input type="radio" name="streetAccess" value="Yes" disabled> Yes</label><label><input type="radio" name="streetAccess" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Specify</label><input type="text" name="streetAccessDetails" disabled></div>
+                    </div>
+                    <div class="form-group full-width" style="margin-top: 20px;"><label>Additional Comments</label><textarea name="homeEnvComments" rows="3" disabled></textarea></div>
+                </div>
+            </div>
+
+            <!-- Fall Risk Assessment -->
+            <div class="section">
+                <div class="section-header">Fall Risk Assessment</div>
+                <div class="section-content">
+                    <div class="form-grid form-grid-2">
+                        <div class="form-group"><label>One or more falls in last 6 months?</label><div class="yes-no-group"><label><input type="radio" name="hadFalls" value="Yes" disabled> Yes</label><label><input type="radio" name="hadFalls" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Client aware how fall(s) took place?</label><div class="yes-no-group"><label><input type="radio" name="awareFallCause" value="Yes" disabled> Yes</label><label><input type="radio" name="awareFallCause" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Client aware of physical limitations?</label><div class="yes-no-group"><label><input type="radio" name="awareLimitations" value="Yes" disabled> Yes</label><label><input type="radio" name="awareLimitations" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Client able/willing to ask for assistance?</label><div class="yes-no-group"><label><input type="radio" name="willingAskHelp" value="Yes" disabled> Yes</label><label><input type="radio" name="willingAskHelp" value="No" disabled> No</label></div></div>
+                    </div>
+                    <div class="form-grid" style="margin-top: 15px;">
+                        <div class="form-group full-width"><label>Information about recent fall</label><textarea name="recentFallInfo" rows="2" disabled></textarea></div>
+                        <div class="form-group full-width"><label>Safety interventions put in place</label><textarea name="fallInterventions" rows="2" disabled></textarea></div>
+                    </div>
+
+                    <div class="subsection"><div class="subsection-title">Medications Impact</div>
+                    <div class="form-grid form-grid-2">
+                        <div class="form-group"><label>Medications that may cause dizziness?</label><div class="yes-no-group"><label><input type="radio" name="medsDizziness" value="Yes" disabled> Yes</label><label><input type="radio" name="medsDizziness" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Recent changes in medication?</label><div class="yes-no-group"><label><input type="radio" name="recentMedChanges" value="Yes" disabled> Yes</label><label><input type="radio" name="recentMedChanges" value="No" disabled> No</label></div></div>
+                    </div></div>
+
+                    <div class="subsection"><div class="subsection-title">Vision Assessment</div>
+                    <div class="form-grid form-grid-2">
+                        <div class="form-group"><label>Accuracy of Depth Perception</label><select name="depthPerception" disabled><option value="">Select...</option><option value="Excellent">Excellent</option><option value="Good">Good</option><option value="OK">OK</option><option value="Poor">Poor</option></select></div>
+                        <div class="form-group"><label>Accuracy of Peripheral Vision</label><select name="peripheralVision" disabled><option value="">Select...</option><option value="Excellent">Excellent</option><option value="Good">Good</option><option value="OK">OK</option><option value="Poor">Poor</option></select></div>
+                        <div class="form-group"><label>Client aware of objects in environment?</label><div class="yes-no-group"><label><input type="radio" name="awareObjects" value="Yes" disabled> Yes</label><label><input type="radio" name="awareObjects" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Observation Level (1-10)</label><input type="number" name="observationLevel" min="1" max="10" disabled></div>
+                        <div class="form-group"><label>Do glasses need to be reviewed?</label><div class="yes-no-group"><label><input type="radio" name="glassesReview" value="Yes" disabled> Yes</label><label><input type="radio" name="glassesReview" value="No" disabled> No</label></div></div>
+                    </div></div>
+
+                    <div class="subsection"><div class="subsection-title">Hearing Assessment</div>
+                    <div class="form-grid form-grid-2">
+                        <div class="form-group"><label>Ability to hear conversations with ease?</label><div class="yes-no-group"><label><input type="radio" name="hearConversations" value="Yes" disabled> Yes</label><label><input type="radio" name="hearConversations" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Does client have hearing aids?</label><div class="yes-no-group"><label><input type="radio" name="hasHearingAids" value="Yes" disabled> Yes</label><label><input type="radio" name="hasHearingAids" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Has client seen an audiologist?</label><div class="yes-no-group"><label><input type="radio" name="seenAudiologist" value="Yes" disabled> Yes</label><label><input type="radio" name="seenAudiologist" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Client resistant to wearing hearing aids?</label><div class="yes-no-group"><label><input type="radio" name="resistantHearingAids" value="Yes" disabled> Yes</label><label><input type="radio" name="resistantHearingAids" value="No" disabled> No</label></div></div>
+                    </div></div>
+
+                    <div class="subsection"><div class="subsection-title">Mobility Assessment</div>
+                    <div class="form-grid form-grid-2">
+                        <div class="form-group"><label>Requires assistance when walking/transferring?</label><div class="yes-no-group"><label><input type="radio" name="needsWalkAssist" value="Yes" disabled> Yes</label><label><input type="radio" name="needsWalkAssist" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Are mobility aid(s) appropriate?</label><div class="yes-no-group"><label><input type="radio" name="mobilityAidAppropriate" value="Yes" disabled> Yes</label><label><input type="radio" name="mobilityAidAppropriate" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Is mobility aid(s) working properly?</label><div class="yes-no-group"><label><input type="radio" name="mobilityAidWorking" value="Yes" disabled> Yes</label><label><input type="radio" name="mobilityAidWorking" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Client able to operate mobility aid safely?</label><div class="yes-no-group"><label><input type="radio" name="canOperateMobilityAid" value="Yes" disabled> Yes</label><label><input type="radio" name="canOperateMobilityAid" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Can stand from sitting for 10 seconds?</label><div class="yes-no-group"><label><input type="radio" name="canStand10Sec" value="Yes" disabled> Yes</label><label><input type="radio" name="canStand10Sec" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Needs encouragement to walk/exercise?</label><div class="yes-no-group"><label><input type="radio" name="needsExerciseEncouragement" value="Yes" disabled> Yes</label><label><input type="radio" name="needsExerciseEncouragement" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Is client able to dress/undress?</label><div class="yes-no-group"><label><input type="radio" name="canDressUndress" value="Yes" disabled> Yes</label><label><input type="radio" name="canDressUndress" value="No" disabled> No</label></div></div>
+                    </div></div>
+
+                    <div class="subsection"><div class="subsection-title">Physical Environment</div>
+                    <div class="form-grid form-grid-2">
+                        <div class="form-group"><label>Can client get in/out of bed safely?</label><div class="yes-no-group"><label><input type="radio" name="safeBedAccess" value="Yes" disabled> Yes</label><label><input type="radio" name="safeBedAccess" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Are stairs present?</label><div class="yes-no-group"><label><input type="radio" name="stairsPresent" value="Yes" disabled> Yes</label><label><input type="radio" name="stairsPresent" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Do stairs have railings?</label><div class="yes-no-group"><label><input type="radio" name="stairsRailings" value="Yes" disabled> Yes</label><label><input type="radio" name="stairsRailings" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Does residence have rugs?</label><div class="yes-no-group"><label><input type="radio" name="hasRugs" value="Yes" disabled> Yes</label><label><input type="radio" name="hasRugs" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Are rooms well lit?</label><div class="yes-no-group"><label><input type="radio" name="roomsWellLit" value="Yes" disabled> Yes</label><label><input type="radio" name="roomsWellLit" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Is access to bathroom easy?</label><div class="yes-no-group"><label><input type="radio" name="easyBathroomAccess" value="Yes" disabled> Yes</label><label><input type="radio" name="easyBathroomAccess" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Is entrance from street accessible?</label><div class="yes-no-group"><label><input type="radio" name="streetLevelAccessible" value="Yes" disabled> Yes</label><label><input type="radio" name="streetLevelAccessible" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Pathway and entrance clear of clutter?</label><div class="yes-no-group"><label><input type="radio" name="entranceClear" value="Yes" disabled> Yes</label><label><input type="radio" name="entranceClear" value="No" disabled> No</label></div></div>
+                    </div></div>
+
+                    <div class="subsection"><div class="subsection-title">Behaviours</div>
+                    <div class="form-grid form-grid-2">
+                        <div class="form-group"><label>Is client easily agitated/frustrated?</label><div class="yes-no-group"><label><input type="radio" name="easilyAgitated" value="Yes" disabled> Yes</label><label><input type="radio" name="easilyAgitated" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Does client pace in residence?</label><div class="yes-no-group"><label><input type="radio" name="paces" value="Yes" disabled> Yes</label><label><input type="radio" name="paces" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Gets up at night without shoes/slippers?</label><div class="yes-no-group"><label><input type="radio" name="nightNoShoes" value="Yes" disabled> Yes</label><label><input type="radio" name="nightNoShoes" value="No" disabled> No</label></div></div>
+                    </div></div>
+
+                    <div class="subsection"><div class="subsection-title">Bladder/Bowel</div>
+                    <div class="form-grid form-grid-2">
+                        <div class="form-group"><label>Does client have incontinence issue?</label><div class="yes-no-group"><label><input type="radio" name="incontinence" value="Yes" disabled> Yes</label><label><input type="radio" name="incontinence" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Frequently needs to go to bathroom?</label><div class="yes-no-group"><label><input type="radio" name="frequentBathroom" value="Yes" disabled> Yes</label><label><input type="radio" name="frequentBathroom" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Can get on/off toilet safely?</label><div class="yes-no-group"><label><input type="radio" name="safeToiletAccess" value="Yes" disabled> Yes</label><label><input type="radio" name="safeToiletAccess" value="No" disabled> No</label></div></div>
+                    </div></div>
+
+                    <div class="subsection"><div class="subsection-title">Footwear</div>
+                    <div class="form-grid form-grid-2">
+                        <div class="form-group"><label>Does client have proper fitted shoes?</label><div class="yes-no-group"><label><input type="radio" name="properShoes" value="Yes" disabled> Yes</label><label><input type="radio" name="properShoes" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Are shoes easy to get on/off?</label><div class="yes-no-group"><label><input type="radio" name="easyShoes" value="Yes" disabled> Yes</label><label><input type="radio" name="easyShoes" value="No" disabled> No</label></div></div>
+                    </div></div>
+
+                    <div class="subsection"><div class="subsection-title">Fall Risk Level</div>
+                    <div class="risk-level">
+                        <label class="risk-level-item low" onclick="selectRiskLevel(this)"><input type="radio" name="fallRiskLevel" value="Low" disabled><div class="level-name">Low Risk</div><input type="text" name="lowInterventions" placeholder="Intervention strategies..." style="width: 100%; margin-top: 10px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;" disabled></label>
+                        <label class="risk-level-item moderate" onclick="selectRiskLevel(this)"><input type="radio" name="fallRiskLevel" value="Moderate" disabled><div class="level-name">Moderate Risk</div><input type="text" name="moderateInterventions" placeholder="Intervention strategies..." style="width: 100%; margin-top: 10px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;" disabled></label>
+                        <label class="risk-level-item high" onclick="selectRiskLevel(this)"><input type="radio" name="fallRiskLevel" value="High" disabled><div class="level-name">High Risk</div><input type="text" name="highInterventions" placeholder="Intervention strategies..." style="width: 100%; margin-top: 10px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;" disabled></label>
+                    </div></div>
+                </div>
+            </div>
+            <!-- Verbal Communication -->
+            <div class="section">
+                <div class="section-header orange">Verbal Communication</div>
+                <div class="section-content">
+                    <div class="form-group">
+                        <label>Communication Ability</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item"><input type="radio" name="communicationAbility" value="Has difficulty" disabled><span>Has Difficulty</span></label>
+                            <label class="checkbox-item"><input type="radio" name="communicationAbility" value="Some difficulty" disabled><span>Some Difficulty</span></label>
+                            <label class="checkbox-item"><input type="radio" name="communicationAbility" value="Good" disabled><span>Good</span></label>
+                            <label class="checkbox-item"><input type="radio" name="communicationAbility" value="Very good" disabled><span>Very Good</span></label>
+                        </div>
+                    </div>
+                    <div class="form-group full-width" style="margin-top: 15px;"><label>How does the client express thoughts, feelings, likes and dislikes?</label></div>
+                    <table class="care-table" style="margin-top: 15px;">
+                        <thead><tr><th>Expression Type</th><th>Likes</th><th>Dislikes</th></tr></thead>
+                        <tbody>
+                            <tr><td>Facial Expressions</td><td><input type="text" name="facialLikes" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;" disabled></td><td><input type="text" name="facialDislikes" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;" disabled></td></tr>
+                            <tr><td>Activity/Body Movement</td><td><input type="text" name="activityLikes" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;" disabled></td><td><input type="text" name="activityDislikes" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;" disabled></td></tr>
+                            <tr><td>Social Personality/Mood</td><td><input type="text" name="socialLikes" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;" disabled></td><td><input type="text" name="socialDislikes" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;" disabled></td></tr>
+                            <tr><td>Other</td><td><input type="text" name="otherLikes" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;" disabled></td><td><input type="text" name="otherDislikes" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;" disabled></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Chronic Physical Issues -->
+            <div class="section">
+                <div class="section-header">Chronic Physical Issues / Sensitivities</div>
+                <div class="section-content">
+                    <table class="medications-table">
+                        <thead><tr><th>#</th><th>Describe Pain/Sensitivity</th><th>Onset</th><th>How Expressed</th><th>Remedy</th></tr></thead>
+                        <tbody>
+                            <tr><td>1</td><td><input type="text" name="pain1_desc" disabled></td><td><input type="text" name="pain1_onset" disabled></td><td><input type="text" name="pain1_expressed" disabled></td><td><input type="text" name="pain1_remedy" disabled></td></tr>
+                            <tr><td>2</td><td><input type="text" name="pain2_desc" disabled></td><td><input type="text" name="pain2_onset" disabled></td><td><input type="text" name="pain2_expressed" disabled></td><td><input type="text" name="pain2_remedy" disabled></td></tr>
+                            <tr><td>3</td><td><input type="text" name="pain3_desc" disabled></td><td><input type="text" name="pain3_onset" disabled></td><td><input type="text" name="pain3_expressed" disabled></td><td><input type="text" name="pain3_remedy" disabled></td></tr>
+                            <tr><td>4</td><td><input type="text" name="pain4_desc" disabled></td><td><input type="text" name="pain4_onset" disabled></td><td><input type="text" name="pain4_expressed" disabled></td><td><input type="text" name="pain4_remedy" disabled></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Food & Drink Preferences -->
+            <div class="section">
+                <div class="section-header orange">Food & Drink Preferences</div>
+                <div class="section-content">
+                    <div class="form-grid form-grid-2">
+                        <div class="form-group"><label>Any food allergies?</label><div class="yes-no-group"><label><input type="radio" name="hasAllergies" value="Yes" disabled> Yes</label><label><input type="radio" name="hasAllergies" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>List Allergies</label><input type="text" name="allergiesList" disabled></div>
+                        <div class="form-group"><label>Any food restrictions?</label><div class="yes-no-group"><label><input type="radio" name="hasRestrictions" value="Yes" disabled> Yes</label><label><input type="radio" name="hasRestrictions" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>List Restrictions</label><input type="text" name="restrictionsList" disabled></div>
+                        <div class="form-group"><label>Food likes?</label><div class="yes-no-group"><label><input type="radio" name="hasFoodLikes" value="Yes" disabled> Yes</label><label><input type="radio" name="hasFoodLikes" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>List Food Likes</label><input type="text" name="foodLikesList" disabled></div>
+                        <div class="form-group"><label>Food dislikes?</label><div class="yes-no-group"><label><input type="radio" name="hasFoodDislikes" value="Yes" disabled> Yes</label><label><input type="radio" name="hasFoodDislikes" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>List Food Dislikes</label><input type="text" name="foodDislikesList" disabled></div>
+                        <div class="form-group"><label>Need thickening agent?</label><div class="yes-no-group"><label><input type="radio" name="needsThickener" value="Yes" disabled> Yes</label><label><input type="radio" name="needsThickener" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Type of Thickener</label><input type="text" name="thickenerType" disabled></div>
+                        <div class="form-group"><label>Is alcohol permitted?</label><div class="yes-no-group"><label><input type="radio" name="alcoholPermitted" value="Yes" disabled> Yes</label><label><input type="radio" name="alcoholPermitted" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>List Alcohol Restrictions</label><input type="text" name="alcoholRestrictions" disabled></div>
+                        <div class="form-group"><label>Dietitian recommendations?</label><div class="yes-no-group"><label><input type="radio" name="hasDietitianRecs" value="Yes" disabled> Yes</label><label><input type="radio" name="hasDietitianRecs" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>List Recommendations</label><input type="text" name="dietitianRecsList" disabled></div>
+                    </div>
+                    <div class="form-group full-width" style="margin-top: 15px;"><label>Additional Comments</label><textarea name="foodComments" rows="2" disabled></textarea></div>
+                </div>
+            </div>
+
+            <!-- Emergency Information -->
+            <div class="section">
+                <div class="section-header">Emergency Information</div>
+                <div class="section-content">
+                    <div class="form-grid form-grid-2">
+                        <div class="form-group"><label>Medical Card #</label><input type="text" name="medicalCard" disabled></div>
+                        <div class="form-group"><label>Medical Insurance #</label><input type="text" name="medicalInsurance" disabled></div>
+                    </div>
+                    <div class="subsection"><div class="subsection-title">Medical Contacts</div>
+                    <div class="form-grid form-grid-2">
+                        <div class="form-group"><label>First Name</label><input type="text" name="medContactFirstName" disabled></div>
+                        <div class="form-group"><label>Phone</label><input type="tel" name="medContactFirstPhone" disabled></div>
+                        <div class="form-group"><label>Last Name</label><input type="text" name="medContactLastName" disabled></div>
+                        <div class="form-group"><label>Phone</label><input type="tel" name="medContactLastPhone" disabled></div>
+                    </div></div>
+                    <div class="subsection"><div class="subsection-title">General Practitioner</div>
+                    <div class="form-grid form-grid-2">
+                        <div class="form-group"><label>GP Name</label><input type="text" name="gpName" disabled></div>
+                        <div class="form-group"><label>GP Address</label><input type="text" name="gpAddress" disabled></div>
+                    </div></div>
+                    <div class="subsection"><div class="subsection-title">Close By Neighbor</div>
+                    <div class="form-grid form-grid-2">
+                        <div class="form-group"><label>Name</label><input type="text" name="neighborName" disabled></div>
+                        <div class="form-group"><label>Phone</label><input type="tel" name="neighborPhone" disabled></div>
+                    </div></div>
+                    <div class="form-grid form-grid-2" style="margin-top: 20px;">
+                        <div class="form-group full-width"><label>List of All Allergies</label><textarea name="allAllergies" rows="2" disabled></textarea></div>
+                        <div class="form-group"><label>Does the client smoke?</label><div class="yes-no-group"><label><input type="radio" name="clientSmokes" value="Yes" disabled> Yes</label><label><input type="radio" name="clientSmokes" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>If so, how often?</label><input type="text" name="smokingFrequency" disabled></div>
+                        <div class="form-group"><label>End-of-life care directives in place?</label><div class="yes-no-group"><label><input type="radio" name="hasDirectives" value="Yes" disabled> Yes</label><label><input type="radio" name="hasDirectives" value="No" disabled> No</label></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Current Medical Status -->
+            <div class="section">
+                <div class="section-header orange">Current Medical Status</div>
+                <div class="section-content">
+                    <p style="font-size: 13px; color: #666; margin-bottom: 15px;">(Diagnosis made by a licensed medical professional)</p>
+                    <div class="checkbox-group" style="flex-wrap: wrap;">
+                        <label class="checkbox-item"><input type="checkbox" name="diagDementia" disabled><span>Dementia</span></label>
+                        <label class="checkbox-item"><input type="checkbox" name="diagStroke" disabled><span>Stroke</span></label>
+                        <label class="checkbox-item"><input type="checkbox" name="diagDiabetes" disabled><span>Diabetes</span></label>
+                        <label class="checkbox-item"><input type="checkbox" name="diagMacular" disabled><span>Macular Degeneration</span></label>
+                        <label class="checkbox-item"><input type="checkbox" name="diagCancer" disabled><span>Cancer</span></label>
+                        <label class="checkbox-item"><input type="checkbox" name="diagParkinsons" disabled><span>Parkinson's</span></label>
+                        <label class="checkbox-item"><input type="checkbox" name="diagMS" disabled><span>MS</span></label>
+                        <label class="checkbox-item"><input type="checkbox" name="diagHeart" disabled><span>Heart Disease</span></label>
+                        <label class="checkbox-item"><input type="checkbox" name="diagArthritis" disabled><span>Arthritis</span></label>
+                        <label class="checkbox-item"><input type="checkbox" name="diagOther" disabled><span>Other</span></label>
+                    </div>
+                    <div class="form-group full-width" style="margin-top: 15px;"><label>Details related to condition (triggers/comfort)</label><textarea name="medicalDetails" rows="3" disabled></textarea></div>
+                </div>
+            </div>
+
+            <!-- Medications -->
+            <div class="section">
+                <div class="section-header">Current List of Medications</div>
+                <div class="section-content">
+                    <div class="form-group" style="margin-bottom: 15px;"><label>Needs reminders to take medications?</label><div class="yes-no-group"><label><input type="radio" name="needsMedReminders" value="Yes" disabled> Yes</label><label><input type="radio" name="needsMedReminders" value="No" disabled> No</label></div></div>
+                    <table class="medications-table">
+                        <thead><tr><th>Medication</th><th>Purpose</th><th>Dose</th><th>Route</th><th>Admin By</th><th>Frequency</th></tr></thead>
+                        <tbody>
+                            <tr><td><input type="text" name="med1_name" disabled></td><td><input type="text" name="med1_purpose" disabled></td><td><input type="text" name="med1_dose" disabled></td><td><input type="text" name="med1_route" disabled></td><td><input type="text" name="med1_admin" disabled></td><td><input type="text" name="med1_freq" disabled></td></tr>
+                            <tr><td><input type="text" name="med2_name" disabled></td><td><input type="text" name="med2_purpose" disabled></td><td><input type="text" name="med2_dose" disabled></td><td><input type="text" name="med2_route" disabled></td><td><input type="text" name="med2_admin" disabled></td><td><input type="text" name="med2_freq" disabled></td></tr>
+                            <tr><td><input type="text" name="med3_name" disabled></td><td><input type="text" name="med3_purpose" disabled></td><td><input type="text" name="med3_dose" disabled></td><td><input type="text" name="med3_route" disabled></td><td><input type="text" name="med3_admin" disabled></td><td><input type="text" name="med3_freq" disabled></td></tr>
+                            <tr><td><input type="text" name="med4_name" disabled></td><td><input type="text" name="med4_purpose" disabled></td><td><input type="text" name="med4_dose" disabled></td><td><input type="text" name="med4_route" disabled></td><td><input type="text" name="med4_admin" disabled></td><td><input type="text" name="med4_freq" disabled></td></tr>
+                            <tr><td><input type="text" name="med5_name" disabled></td><td><input type="text" name="med5_purpose" disabled></td><td><input type="text" name="med5_dose" disabled></td><td><input type="text" name="med5_route" disabled></td><td><input type="text" name="med5_admin" disabled></td><td><input type="text" name="med5_freq" disabled></td></tr>
+                        </tbody>
+                    </table>
+                    <div class="subsection"><div class="subsection-title">List of Vitamins/Supplements</div>
+                    <table class="medications-table">
+                        <thead><tr><th>Vitamin/Supplement</th><th>Purpose</th><th># Per Day</th><th>Frequency</th></tr></thead>
+                        <tbody>
+                            <tr><td><input type="text" name="vit1_name" disabled></td><td><input type="text" name="vit1_purpose" disabled></td><td><input type="text" name="vit1_perday" disabled></td><td><input type="text" name="vit1_freq" disabled></td></tr>
+                            <tr><td><input type="text" name="vit2_name" disabled></td><td><input type="text" name="vit2_purpose" disabled></td><td><input type="text" name="vit2_perday" disabled></td><td><input type="text" name="vit2_freq" disabled></td></tr>
+                            <tr><td><input type="text" name="vit3_name" disabled></td><td><input type="text" name="vit3_purpose" disabled></td><td><input type="text" name="vit3_perday" disabled></td><td><input type="text" name="vit3_freq" disabled></td></tr>
+                        </tbody>
+                    </table></div>
+                </div>
+            </div>
+            <!-- Routine Weekly Activities -->
+            <div class="section">
+                <div class="section-header orange">Routine Weekly Activities</div>
+                <div class="section-content">
+                    <table class="medications-table">
+                        <thead><tr><th>Type of Activity</th><th>Day(s)</th><th>Time(s)</th><th>Location(s)</th></tr></thead>
+                        <tbody>
+                            <tr><td><input type="text" name="act1_type" disabled></td><td><input type="text" name="act1_days" disabled></td><td><input type="text" name="act1_times" disabled></td><td><input type="text" name="act1_location" disabled></td></tr>
+                            <tr><td><input type="text" name="act2_type" disabled></td><td><input type="text" name="act2_days" disabled></td><td><input type="text" name="act2_times" disabled></td><td><input type="text" name="act2_location" disabled></td></tr>
+                            <tr><td><input type="text" name="act3_type" disabled></td><td><input type="text" name="act3_days" disabled></td><td><input type="text" name="act3_times" disabled></td><td><input type="text" name="act3_location" disabled></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Client Transportation -->
+            <div class="section">
+                <div class="section-header">Client Transportation for Outings</div>
+                <div class="section-content">
+                    <div class="form-grid form-grid-2">
+                        <div class="form-group"><label>Client needs transportation by caregiver?</label><div class="yes-no-group"><label><input type="radio" name="needsCaregiverTransport" value="Yes" disabled> Yes</label><label><input type="radio" name="needsCaregiverTransport" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Caregiver(s) utilize company car?</label><div class="yes-no-group"><label><input type="radio" name="useCompanyCar" value="Yes" disabled> Yes</label><label><input type="radio" name="useCompanyCar" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Caregiver(s) utilize their own car?</label><div class="yes-no-group"><label><input type="radio" name="useOwnCar" value="Yes" disabled> Yes</label><label><input type="radio" name="useOwnCar" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Client currently drives own vehicle?</label><div class="yes-no-group"><label><input type="radio" name="clientDrives" value="Yes" disabled> Yes</label><label><input type="radio" name="clientDrives" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Client has driving restrictions?</label><div class="yes-no-group"><label><input type="radio" name="hasDrivingRestrictions" value="Yes" disabled> Yes</label><label><input type="radio" name="hasDrivingRestrictions" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Specify Driving Restrictions</label><input type="text" name="drivingRestrictions" disabled></div>
+                    </div>
+                    <div class="subsection"><div class="subsection-title">Client Vehicle Information</div>
+                    <div class="form-grid form-grid-4">
+                        <div class="form-group"><label>Model</label><input type="text" name="vehicleModel" disabled></div>
+                        <div class="form-group"><label>Year</label><input type="text" name="vehicleYear" disabled></div>
+                        <div class="form-group"><label>Plate Number</label><input type="text" name="vehiclePlate" disabled></div>
+                    </div></div>
+                    <div class="subsection"><div class="subsection-title">Client Vehicle Insurance</div>
+                    <div class="form-grid form-grid-4">
+                        <div class="form-group"><label>Company Name</label><input type="text" name="insuranceCompany" disabled></div>
+                        <div class="form-group"><label>Contact Info</label><input type="text" name="insuranceContact" disabled></div>
+                        <div class="form-group"><label>Policy Number</label><input type="text" name="insurancePolicy" disabled></div>
+                        <div class="form-group"><label>Expiry Date</label><input type="text" name="insuranceExpiry" placeholder="MM/YY" disabled></div>
+                    </div></div>
+                    <div class="form-grid form-grid-2" style="margin-top: 20px;">
+                        <div class="form-group"><label>Caregiver can drive client's vehicle?</label><div class="yes-no-group"><label><input type="radio" name="caregiverCanDrive" value="Yes" disabled> Yes</label><label><input type="radio" name="caregiverCanDrive" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Details</label><input type="text" name="caregiverDriveDetails" disabled></div>
+                        <div class="form-group"><label>Caregiver has access to spare key?</label><div class="yes-no-group"><label><input type="radio" name="hasSpareKey" value="Yes" disabled> Yes</label><label><input type="radio" name="hasSpareKey" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Specify Where</label><input type="text" name="spareKeyLocation" disabled></div>
+                        <div class="form-group"><label>Caregiver has parking at residence?</label><div class="yes-no-group"><label><input type="radio" name="caregiverParking" value="Yes" disabled> Yes</label><label><input type="radio" name="caregiverParking" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Specify Where</label><input type="text" name="parkingLocation" disabled></div>
+                        <div class="form-group full-width"><label>Parking permit needed?</label><input type="text" name="parkingPermitDetails" disabled></div>
+                        <div class="form-group"><label>Registered wheelchair parking permit?</label><div class="yes-no-group"><label><input type="radio" name="hasWheelchairPermit" value="Yes" disabled> Yes</label><label><input type="radio" name="hasWheelchairPermit" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Where is it kept?</label><input type="text" name="wheelchairPermitLocation" disabled></div>
+                        <div class="form-group"><label>Client has roadside assistance?</label><div class="yes-no-group"><label><input type="radio" name="hasRoadsideAssistance" value="Yes" disabled> Yes</label><label><input type="radio" name="hasRoadsideAssistance" value="No" disabled> No</label></div></div>
+                        <div class="form-group"><label>Company Name</label><input type="text" name="roadsideCompany" disabled></div>
+                    </div>
+                    <div class="form-group full-width" style="margin-top: 15px;"><label>Additional Notes</label><textarea name="transportNotes" rows="2" disabled></textarea></div>
+                </div>
+            </div>
+
+            <!-- Required Home Care Services -->
+            <div class="section">
+                <div class="section-header orange">Required Home Care Services</div>
+                <div class="section-content">
+                    <div class="checkbox-group" style="flex-wrap: wrap;">
+                        <label class="checkbox-item"><input type="checkbox" name="serviceRespite" disabled><span>Respite Care (Occasional)</span></label>
+                        <label class="checkbox-item"><input type="checkbox" name="serviceHourly" disabled><span>Hourly Routine Care</span></label>
+                        <label class="checkbox-item"><input type="checkbox" name="serviceOnCall" disabled><span>On Call Care (Respite)</span></label>
+                        <label class="checkbox-item"><input type="checkbox" name="serviceOvernight" disabled><span>Overnight Care</span></label>
+                        <label class="checkbox-item"><input type="checkbox" name="serviceLiveOut24" disabled><span>Live Out 24/7 Care</span></label>
+                        <label class="checkbox-item"><input type="checkbox" name="serviceLiveIn24" disabled><span>Live In 24/7 Care</span></label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Client Visit Schedule -->
+            <div class="section">
+                <div class="section-header">Client Visit Schedule</div>
+                <div class="section-content">
+                    <div class="schedule-grid">
+                        <div class="schedule-day"><label>Mon</label><input type="checkbox" name="scheduleMon" disabled><input type="time" name="scheduleMonTime1" disabled><input type="time" name="scheduleMonTime2" disabled></div>
+                        <div class="schedule-day"><label>Tue</label><input type="checkbox" name="scheduleTue" disabled><input type="time" name="scheduleTueTime1" disabled><input type="time" name="scheduleTueTime2" disabled></div>
+                        <div class="schedule-day"><label>Wed</label><input type="checkbox" name="scheduleWed" disabled><input type="time" name="scheduleWedTime1" disabled><input type="time" name="scheduleWedTime2" disabled></div>
+                        <div class="schedule-day"><label>Thu</label><input type="checkbox" name="scheduleThu" disabled><input type="time" name="scheduleThuTime1" disabled><input type="time" name="scheduleThuTime2" disabled></div>
+                        <div class="schedule-day"><label>Fri</label><input type="checkbox" name="scheduleFri" disabled><input type="time" name="scheduleFriTime1" disabled><input type="time" name="scheduleFriTime2" disabled></div>
+                        <div class="schedule-day"><label>Sat</label><input type="checkbox" name="scheduleSat" disabled><input type="time" name="scheduleSatTime1" disabled><input type="time" name="scheduleSatTime2" disabled></div>
+                        <div class="schedule-day"><label>Sun</label><input type="checkbox" name="scheduleSun" disabled><input type="time" name="scheduleSunTime1" disabled><input type="time" name="scheduleSunTime2" disabled></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Care Plan Review -->
+            <div class="section">
+                <div class="section-header orange">Care Plan Review</div>
+                <div class="section-content">
+                    <div class="form-grid form-grid-2">
+                        <div class="form-group">
+                            <label>Review care requirements every:</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item"><input type="radio" name="reviewFrequency" value="3 months" disabled><span>3 Months</span></label>
+                                <label class="checkbox-item"><input type="radio" name="reviewFrequency" value="6 months" disabled><span>6 Months</span></label>
+                                <label class="checkbox-item"><input type="radio" name="reviewFrequency" value="Yearly" disabled><span>Yearly</span></label>
+                            </div>
+                        </div>
+                        <div class="form-group"><label>Date of Next Review</label><input type="date" name="nextReviewDate" disabled></div>
+                    </div>
+                    <div class="form-group full-width" style="margin-top: 15px;"><label>Notes</label><textarea name="carePlanNotes" rows="4" disabled></textarea></div>
+                </div>
+            </div>
+
+            <input type="hidden" name="recordId" id="recordId">
+            <input type="hidden" name="submissionTimestamp" id="submissionTimestamp">
+        </form>
+
+        <div class="form-actions">
+            <button type="button" class="btn btn-primary" onclick="saveForm()" id="saveBtn" disabled>Save Form</button>
+            <button type="button" class="btn btn-secondary" onclick="generatePDF()">Generate PDF</button>
+            <button type="button" class="btn btn-outline" onclick="clearForm()">New Form</button>
+        </div>
+    </div>
+
+    <!-- Edit PIN Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="modal-header"><h3>Enter PIN to Edit</h3><button class="modal-close" onclick="closeEditModal()">&times;</button></div>
+            <div class="modal-body">
+                <div class="form-group"><label>PIN Code</label><input type="password" id="pinInput" placeholder="Enter PIN" maxlength="8"></div>
+                <button class="btn btn-primary" onclick="verifyPin()" style="width: 100%; margin-top: 15px;">Unlock Edit Mode</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Modal -->
+    <div class="modal-overlay" id="searchModal">
+        <div class="modal" style="max-width: 600px;">
+            <div class="modal-header"><h3>Search Previous Forms</h3><button class="modal-close" onclick="closeSearchModal()">&times;</button></div>
+            <div class="modal-body">
+                <div class="form-group"><label>Search by Client Name</label><div style="display: flex; gap: 10px;"><input type="text" id="searchInput" placeholder="Enter client name..." style="flex: 1;"><button class="btn btn-primary" onclick="searchForms()">Search</button></div></div>
+                <div id="searchLoading" class="loading" style="display: none;"><div class="spinner"></div><span>Searching...</span></div>
+                <div class="search-results" id="searchResults"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <script>
+        const SHEET_ID = '1JAKJMXHRiAcjqPLYMNtc9QYGosHpbKctJe_wRD9w7U4';
+        const EDIT_PIN = '19731972';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwRsoUMU-iiv18n1F04SUYa2BFlq32ZZHGLoP3QBtRFjMtFIWlEA2eN9qviTvUnCF2tyA/exec';
+        let isEditMode = false;
+        let allFormData = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setTodayDate();
+            loadFormData();
+        });
+
+        function setTodayDate() {
+            document.getElementById('evaluationDate').value = new Date().toISOString().split('T')[0];
+        }
+
+        function openEditModal() { document.getElementById('editModal').classList.add('show'); document.getElementById('pinInput').focus(); }
+        function closeEditModal() { document.getElementById('editModal').classList.remove('show'); document.getElementById('pinInput').value = ''; }
+
+        function verifyPin() {
+            if (document.getElementById('pinInput').value === EDIT_PIN) {
+                enableEditMode();
+                closeEditModal();
+                showToast('Edit mode enabled', 'success');
+            } else {
+                showToast('Incorrect PIN', 'error');
+            }
+        }
+
+        function enableEditMode() {
+            isEditMode = true;
+            const form = document.getElementById('evaluationForm');
+            form.querySelectorAll('input, select, textarea').forEach(input => input.disabled = false);
+            document.getElementById('evaluationDate').disabled = false;
+            document.getElementById('saveBtn').disabled = false;
+            document.getElementById('modeStatus').textContent = 'Edit Mode';
+            document.getElementById('modeStatus').className = 'status-badge edit-mode';
+        }
+
+        function disableEditMode() {
+            isEditMode = false;
+            const form = document.getElementById('evaluationForm');
+            form.querySelectorAll('input, select, textarea').forEach(input => input.disabled = true);
+            document.getElementById('saveBtn').disabled = true;
+            document.getElementById('modeStatus').textContent = 'View Mode';
+            document.getElementById('modeStatus').className = 'status-badge view-mode';
+        }
+
+        function openSearchModal() {
+            const pin = prompt('Enter PIN to access search:');
+            if (pin !== EDIT_PIN) { showToast('Incorrect PIN', 'error'); return; }
+            document.getElementById('searchModal').classList.add('show');
+            document.getElementById('searchInput').focus();
+        }
+        function closeSearchModal() { document.getElementById('searchModal').classList.remove('show'); document.getElementById('searchInput').value = ''; document.getElementById('searchResults').innerHTML = ''; }
+
+        async function searchForms() {
+            const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+            if (!searchTerm) { showToast('Please enter a search term', 'error'); return; }
+            document.getElementById('searchLoading').style.display = 'flex';
+            document.getElementById('searchResults').innerHTML = '';
+            try {
+                const results = allFormData.filter(form => {
+                    const fullName = ((form.firstName || '') + ' ' + (form.lastName || '')).toLowerCase();
+                    return fullName.includes(searchTerm);
+                });
+                displaySearchResults(results);
+            } catch (error) {
+                console.error('Search error:', error);
+                showToast('Search failed', 'error');
+            } finally {
+                document.getElementById('searchLoading').style.display = 'none';
+            }
+        }
+
+        function displaySearchResults(results) {
+            const container = document.getElementById('searchResults');
+            if (results.length === 0) { container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">No results found</p>'; return; }
+            container.innerHTML = results.map(form => '<div class="search-result-item" onclick="loadFormRecord(\'' + form.recordId + '\')"><h4>' + (form.firstName || '') + ' ' + (form.lastName || '') + '</h4><p>Date: ' + (form.evaluationDate || 'N/A') + ' | DOB: ' + (form.dob || 'N/A') + '</p><p>Address: ' + (form.city || '') + ', ' + (form.state || '') + '</p></div>').join('');
+        }
+
+        function loadFormRecord(recordId) {
+            const record = allFormData.find(form => form.recordId === recordId);
+            if (record) { populateForm(record); closeSearchModal(); showToast('Form loaded successfully', 'success'); }
+        }
+
+        function getFormData() {
+            const form = document.getElementById('evaluationForm');
+            const formData = new FormData(form);
+            const data = {};
+            for (let [key, value] of formData.entries()) { data[key] = value; }
+            form.querySelectorAll('input[type="checkbox"]').forEach(cb => { data[cb.name] = cb.checked; });
+            data.evaluationDate = document.getElementById('evaluationDate').value;
+            data.recordId = document.getElementById('recordId').value || generateRecordId();
+            data.submissionTimestamp = new Date().toISOString();
+            return data;
+        }
+
+        function generateRecordId() { return 'EVAL-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9); }
+
+        function populateForm(data) {
+            const form = document.getElementById('evaluationForm');
+            if (data.evaluationDate) document.getElementById('evaluationDate').value = data.evaluationDate;
+            document.getElementById('recordId').value = data.recordId || '';
+            Object.keys(data).forEach(key => {
+                const element = form.querySelector('[name="' + key + '"]');
+                if (element) {
+                    if (element.type === 'checkbox') { element.checked = data[key] === true || data[key] === 'true' || data[key] === 'on'; }
+                    else if (element.type === 'radio') { const radio = form.querySelector('[name="' + key + '"][value="' + data[key] + '"]'); if (radio) radio.checked = true; }
+                    else { element.value = data[key] || ''; }
+                }
+            });
+            updateRiskLevelVisual();
+        }
+
+        function updateRiskLevelVisual() {
+            document.querySelectorAll('.risk-level-item').forEach(item => {
+                const radio = item.querySelector('input[type="radio"]');
+                if (radio && radio.checked) item.classList.add('selected');
+                else item.classList.remove('selected');
+            });
+        }
+
+        function selectRiskLevel(element) {
+            if (!isEditMode) return;
+            document.querySelectorAll('.risk-level-item').forEach(item => item.classList.remove('selected'));
+            element.classList.add('selected');
+            element.querySelector('input[type="radio"]').checked = true;
+        }
+
+        async function saveForm() {
+            if (!isEditMode) { showToast('Please enable edit mode first', 'error'); return; }
+            const data = getFormData();
+            if (!data.firstName || !data.lastName) { showToast('Please fill in client first and last name', 'error'); return; }
+            showToast('Saving...', 'info');
+            try {
+                await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'save', sheetId: SHEET_ID, data: data }) });
+                saveToLocalStorage(data);
+                showToast('Form saved successfully!', 'success');
+                document.getElementById('recordId').value = data.recordId;
+            } catch (error) {
+                console.error('Save error:', error);
+                saveToLocalStorage(data);
+                showToast('Saved locally. Will sync when connection restored.', 'info');
+            }
+        }
+
+        function saveToLocalStorage(data) {
+            try {
+                let forms = JSON.parse(localStorage.getItem('homeCareEvaluations') || '[]');
+                const existingIndex = forms.findIndex(f => f.recordId === data.recordId);
+                if (existingIndex >= 0) forms[existingIndex] = data;
+                else forms.push(data);
+                localStorage.setItem('homeCareEvaluations', JSON.stringify(forms));
+                allFormData = forms;
+            } catch (e) { console.error('Local storage error:', e); }
+        }
+
+        function loadFormData() {
+            try {
+                const stored = localStorage.getItem('homeCareEvaluations');
+                if (stored) allFormData = JSON.parse(stored);
+            } catch (e) { console.error('Error loading local data:', e); allFormData = []; }
+        }
+
+        function clearForm() {
+            if (!confirm('Start a new form? Any unsaved changes will be lost.')) return;
+            document.getElementById('evaluationForm').reset();
+            document.getElementById('recordId').value = '';
+            setTodayDate();
+            document.querySelectorAll('.risk-level-item').forEach(item => item.classList.remove('selected'));
+            showToast('New form started', 'success');
+        }
+
+        function generatePDF() {
+            const data = getFormData();
+            if (!data.firstName || !data.lastName) { showToast('Please fill in client name before generating PDF', 'error'); return; }
+            showToast('Generating PDF...', 'info');
+            const element = document.querySelector('.container');
+            const clientName = (data.firstName + '_' + data.lastName).replace(/\s+/g, '_');
+            const date = data.evaluationDate || new Date().toISOString().split('T')[0];
+            const opt = { margin: [10, 10, 10, 10], filename: 'HomeCare_Evaluation_' + clientName + '_' + date + '.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, letterRendering: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }, pagebreak: { mode: ['avoid-all', 'css', 'legacy'] } };
+            html2pdf().set(opt).from(element).save().then(() => showToast('PDF generated successfully!', 'success')).catch(err => { console.error('PDF generation error:', err); showToast('Error generating PDF', 'error'); });
+        }
+
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type + ' show';
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        document.getElementById('pinInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') verifyPin(); });
+        document.getElementById('searchInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') searchForms(); });
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { closeEditModal(); closeSearchModal(); } });
+        document.querySelectorAll('.modal-overlay').forEach(overlay => { overlay.addEventListener('click', function(e) { if (e.target === this) { closeEditModal(); closeSearchModal(); } }); });
+    </script>
+</body>
+</html>
