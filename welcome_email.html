@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Welcome to alice.care</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Poppins', Arial, Helvetica, sans-serif;
+      background-color: #F0F7FF;
+      margin: 0;
+      padding: 0;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    .email-wrapper {
+      width: 100%;
+      background-color: #F0F7FF;
+      padding: 30px 15px;
+    }
+
+    .email-container {
+      max-width: 620px;
+      margin: 0 auto;
+      background-color: #FFFFFF;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(26, 54, 92, 0.08);
+    }
+
+    /* Compact Header */
+    .email-header {
+      background: linear-gradient(135deg, #F57600 0%, #E06900 100%);
+      padding: 22px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .email-header::before {
+      content: '';
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 50%;
+      top: -80px;
+      right: 6%;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 700;
+      position: relative;
+      z-index: 1;
+    }
+
+    .logo .alice { color: #FFFFFF; }
+    .logo .dot { color: #1A365C; }
+    .logo .care { color: #1A365C; font-weight: 700; }
+
+    .header-tagline {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 12px;
+      font-weight: 400;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Compact Intro */
+    .intro-section {
+      padding: 26px 40px;
+      border-bottom: 1px solid #E2E8F0;
+    }
+
+    .intro-section h1 {
+      font-size: 21px;
+      font-weight: 700;
+      color: #1A365C;
+      margin-bottom: 10px;
+    }
+
+    .intro-section h1 span { color: #F57600; }
+
+    .intro-section p {
+      font-size: 13.5px;
+      line-height: 1.65;
+      color: #2D4A6F;
+    }
+
+    /* Compact Service Highlights */
+    .highlights {
+      padding: 22px 40px;
+      display: flex;
+      gap: 10px;
+      border-bottom: 1px solid #E2E8F0;
+    }
+
+    .highlight-pill {
+      flex: 1;
+      background: #F0F7FF;
+      border-radius: 8px;
+      padding: 14px 10px;
+      text-align: center;
+    }
+
+    .highlight-pill .label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #1A365C;
+      line-height: 1.35;
+    }
+
+    /* CTA row */
+    .cta-row {
+      padding: 18px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid #E2E8F0;
+    }
+
+    .cta-text {
+      font-size: 13px;
+      color: #2D4A6F;
+      line-height: 1.5;
+    }
+
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #F57600 0%, #E06900 100%);
+      color: #FFFFFF !important;
+      text-decoration: none;
+      padding: 10px 24px;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: 'Poppins', Arial, sans-serif;
+      white-space: nowrap;
+    }
+
+    /* T&C Main Section */
+    .tc-section {
+      padding: 30px 40px 10px;
+    }
+
+    .tc-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .tc-header h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1A365C;
+    }
+
+    .tc-badge {
+      background: #1A365C;
+      color: #FFFFFF;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .tc-card {
+      background: #F0F7FF;
+      border-radius: 8px;
+      padding: 18px 22px;
+      margin-bottom: 12px;
+      border-left: 4px solid #F57600;
+    }
+
+    .tc-card h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1A365C;
+      margin-bottom: 6px;
+    }
+
+    .tc-card p {
+      font-size: 13px;
+      line-height: 1.6;
+      color: #2D4A6F;
+    }
+
+    .tc-card .highlight-value {
+      display: inline-block;
+      background: #1A365C;
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 4px;
+      margin-top: 8px;
+    }
+
+    /* Office Hours Card */
+    .office-hours-card {
+      background: #1A365C;
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-bottom: 12px;
+      color: #FFFFFF;
+    }
+
+    .office-hours-card h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #FFFFFF;
+      margin-bottom: 10px;
+    }
+
+    .hours-grid {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .hours-block {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      padding: 12px 14px;
+      text-align: center;
+    }
+
+    .hours-block .day-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #F57600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 4px;
+    }
+
+    .hours-block .time-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #FFFFFF;
+    }
+
+    .hours-block.closed {
+      opacity: 0.5;
+    }
+
+    .office-contact {
+      font-size: 12.5px;
+      line-height: 1.65;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .office-contact a {
+      color: #F57600;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .office-contact .app-note {
+      display: block;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* Non-Medical Services Scope */
+    .scope-section {
+      padding: 0 40px 10px;
+    }
+
+    .scope-card {
+      background: #F0F7FF;
+      border-radius: 10px;
+      padding: 22px 24px;
+      margin-bottom: 14px;
+      border: 1px solid #D6E4F0;
+    }
+
+    .scope-card h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1A365C;
+      margin-bottom: 4px;
+    }
+
+    .scope-card .scope-subtitle {
+      font-size: 11px;
+      color: #F57600;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 14px;
+    }
+
+    .service-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .service-tag {
+      display: inline-block;
+      font-size: 11.5px;
+      font-weight: 500;
+      padding: 5px 12px;
+      border-radius: 5px;
+      line-height: 1.3;
+    }
+
+    .service-tag.allowed {
+      background: #E6F4EA;
+      color: #1B7A3D;
+      border: 1px solid #B7DFC6;
+    }
+
+    .service-tag.not-allowed {
+      background: #FDECEA;
+      color: #B91C1C;
+      border: 1px solid #F5C6C6;
+    }
+
+    .scope-card .med-note {
+      margin-top: 14px;
+      font-size: 12px;
+      line-height: 1.55;
+      color: #2D4A6F;
+      padding: 12px 16px;
+      background: #FFFFFF;
+      border-radius: 6px;
+      border: 1px solid #D6E4F0;
+    }
+
+    .scope-card .med-note strong { color: #1A365C; }
+
+    /* Regulatory Note */
+    .reg-note {
+      background: #FFF7ED;
+      border: 1px solid #FDDCB0;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 0 40px 10px;
+      font-size: 12px;
+      line-height: 1.6;
+      color: #7C4A00;
+    }
+
+    .reg-note strong { color: #E06900; }
+
+    .reg-note a {
+      color: #1A365C;
+      font-weight: 600;
+      text-decoration: underline;
+    }
+
+    /* Agreement Note */
+    .agreement-note {
+      padding: 0 40px 28px;
+      font-size: 12px;
+      line-height: 1.6;
+      color: #666666;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    /* Quick Links */
+    .quick-links {
+      background: linear-gradient(135deg, #1A365C 0%, #2D4A6F 100%);
+      padding: 18px 40px;
+      text-align: center;
+    }
+
+    .quick-links-row {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .quick-link {
+      display: inline-block;
+      color: #FFFFFF !important;
+      text-decoration: none;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 7px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 6px;
+      font-family: 'Poppins', Arial, sans-serif;
+    }
+
+    .quick-link:hover { background: rgba(255, 255, 255, 0.1); }
+
+    /* Footer */
+    .email-footer {
+      background: #1A365C;
+      padding: 22px 40px;
+      text-align: center;
+      border-top: 3px solid #F57600;
+    }
+
+    .footer-logo {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .footer-logo .alice { color: #F57600; }
+    .footer-logo .dot { color: #FFFFFF; }
+    .footer-logo .care { color: #FFFFFF; font-weight: 400; }
+
+    .footer-address {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.55);
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .footer-unsubscribe {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    .footer-unsubscribe a { color: #F57600; text-decoration: underline; }
+
+    /* Responsive */
+    @media screen and (max-width: 480px) {
+      .email-header { padding: 18px 24px; flex-direction: column; text-align: center; gap: 4px; }
+      .intro-section { padding: 22px 24px; }
+      .intro-section h1 { font-size: 19px; }
+      .highlights { padding: 18px 24px; flex-wrap: wrap; }
+      .highlight-pill { flex: 1 1 45%; }
+      .cta-row { padding: 16px 24px; flex-direction: column; text-align: center; }
+      .tc-section { padding: 24px 24px 10px; }
+      .hours-grid { flex-direction: column; }
+      .scope-section { padding: 0 24px 10px; }
+      .reg-note { margin: 0 24px 10px; }
+      .agreement-note { padding: 0 24px 24px; }
+      .quick-links { padding: 16px 24px; }
+      .quick-link { padding: 7px 10px; font-size: 10px; }
+      .email-footer { padding: 20px 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="email-wrapper">
+    <div class="email-container">
+
+      <!-- Compact Header -->
+      <div class="email-header">
+        <div class="logo">
+          <span class="alice">alice</span><span class="dot">.</span><span class="care">care</span>
+        </div>
+        <div class="header-tagline">Safe · Affordable · Reliable</div>
+      </div>
+
+      <!-- Compact Intro -->
+      <div class="intro-section">
+        <h1>Welcome to <span>alice.care</span></h1>
+        <p>Alice.care revolutionizes home care with task-based services on an on-demand and scheduled basis. We offer Non-Medical Home Care Services when you need it.</p>
+      </div>
+
+      <!-- Service Highlight Pills -->
+      <div class="highlights">
+        <div class="highlight-pill">
+          <div class="label">On-Demand<br>Scheduling</div>
+        </div>
+        <div class="highlight-pill">
+          <div class="label">No Contracts<br>or Minimums</div>
+        </div>
+        <div class="highlight-pill">
+          <div class="label">Safe &amp;<br>Reliable</div>
+        </div>
+      </div>
+
+      <!-- CTA Row -->
+      <div class="cta-row">
+        <div class="cta-text">Download the app, create a profile, and schedule the tasks you need. Visit our FAQ for questions.</div>
+        <a href="https://alice.care/help/" class="cta-button">FAQ Page</a>
+      </div>
+
+      <!-- Terms & Conditions -->
+      <div class="tc-section">
+        <div class="tc-header">
+          <h2>Terms &amp; Conditions</h2>
+          <span class="tc-badge">Important</span>
+        </div>
+
+        <div class="tc-card">
+          <h4>Pricing &amp; Service Charges</h4>
+          <p>Alice.care reserves the right to establish, remove, and/or revise charges for any or all services obtained through the use of the services at any time in Alice.care's sole discretion. You only pay for the tasks you order through the platform.</p>
+        </div>
+
+        <div class="tc-card">
+          <h4>Cancellation Policy</h4>
+          <p>We enforce a <strong>48-hour cancellation policy</strong>. Schedule updates must also occur at least 48 hours before the scheduled service time; otherwise, the full-service charge will apply.</p>
+          <span class="highlight-value">48-Hour Notice Required for Cancellations &amp; Changes</span>
+        </div>
+
+        <div class="tc-card">
+          <h4>Holiday Rate</h4>
+          <p>Service rates increase to <strong>1.5 times</strong> the standard cost on all recognized holidays.</p>
+          <span class="highlight-value">1.5x Standard Rate on Holidays</span>
+        </div>
+
+        <div class="office-hours-card">
+          <h4>Office Hours &amp; Contact</h4>
+          <div class="hours-grid">
+            <div class="hours-block">
+              <div class="day-label">Monday to Saturday</div>
+              <div class="time-label">9:00 AM to 5:00 PM</div>
+            </div>
+            <div class="hours-block closed">
+              <div class="day-label">Sunday</div>
+              <div class="time-label">Closed</div>
+            </div>
+          </div>
+          <div class="office-contact">
+            Reach us by phone, text message, or voicemail at <a href="tel:+19162928820">(916) 292-8820</a>. Our team responds to all inquiries during business hours.
+            <span class="app-note">For scheduling convenience, use the <b>alice.care mobile app</b> during and outside office hours. Please note that last-minute requests will be assigned on a best-effort basis.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Non-Medical Services Scope -->
+      <div class="scope-section">
+        <div class="scope-card">
+          <h3>Non-Medical Home Care Services</h3>
+          <div class="scope-subtitle">CDSS Licensed Home Care Organization #344700080</div>
+
+          <p style="font-size: 12.5px; color: #2D4A6F; line-height: 1.6; margin-bottom: 14px;">
+            Alice.care provides <strong>non-medical home care services</strong> as defined by the California Department of Social Services (CDSS) under Health and Safety Code § 1796.12. Our Registered Home Care Aides assist clients who, because of advanced age or physical or mental disability, need support with the following:
+          </p>
+
+          <div class="service-grid">
+            <span class="service-tag allowed">Bathing</span>
+            <span class="service-tag allowed">Dressing</span>
+            <span class="service-tag allowed">Personal Hygiene &amp; Grooming</span>
+            <span class="service-tag allowed">Toileting &amp; Incontinence Care</span>
+            <span class="service-tag allowed">Feeding</span>
+            <span class="service-tag allowed">Meal Planning &amp; Preparation</span>
+            <span class="service-tag allowed">Housekeeping</span>
+            <span class="service-tag allowed">Laundry</span>
+            <span class="service-tag allowed">Transportation</span>
+            <span class="service-tag allowed">Shopping</span>
+            <span class="service-tag allowed">Companionship</span>
+            <span class="service-tag allowed">Ambulating</span>
+            <span class="service-tag allowed">Transferring</span>
+            <span class="service-tag allowed">Positioning</span>
+            <span class="service-tag allowed">Exercising</span>
+            <span class="service-tag allowed">Correspondence</span>
+            <span class="service-tag allowed">Telephone Calls</span>
+            <span class="service-tag allowed">Medication Reminders</span>
+          </div>
+
+          <div class="med-note">
+            <strong>Medication Assistance:</strong> Our aides may open medication bottles, canisters, or blister packs, remind clients to take prescribed medications, and remind clients to refill medications. Aides assist only with medications the client self-administers.
+          </div>
+        </div>
+
+        <div class="scope-card">
+          <h3>Services We Do Not Provide</h3>
+          <div class="scope-subtitle">Medical services require licensed healthcare professionals</div>
+
+          <p style="font-size: 12.5px; color: #2D4A6F; line-height: 1.6; margin-bottom: 14px;">
+            Registered Home Care Aides do not provide medical services. CDSS does not grant waivers or authorizations allowing Home Care Organizations to provide medical services. The following are examples of services our aides <strong>cannot</strong> perform:
+          </p>
+
+          <div class="service-grid">
+            <span class="service-tag not-allowed">Medication Administration</span>
+            <span class="service-tag not-allowed">Injections</span>
+            <span class="service-tag not-allowed">Blood Pressure Monitoring</span>
+            <span class="service-tag not-allowed">Vital Signs Recording</span>
+            <span class="service-tag not-allowed">Wound Care</span>
+            <span class="service-tag not-allowed">Catheter Care</span>
+            <span class="service-tag not-allowed">Medical Device Management</span>
+            <span class="service-tag not-allowed">Tube Feedings</span>
+          </div>
+
+          <div class="med-note">
+            <strong>Please Note:</strong> If your care needs include medical services, we recommend consulting with a licensed home health agency or your healthcare provider to arrange appropriate support.
+          </div>
+        </div>
+      </div>
+
+      <!-- Regulatory Reference -->
+      <div class="reg-note">
+        <strong>Regulatory Disclosure:</strong> Alice.care operates under CDSS License #344700080 in compliance with the Home Care Services Consumer Protection Act (AB 1217). For the full CDSS Home Care Services Fact Sheet, visit <a href="https://www.cdss.ca.gov/Portals/9/CCLD/CCCS/HCSB/Fact%20Sheet%20Home%20Care%20Services.pdf">cdss.ca.gov</a>. By using Alice.care services, you acknowledge and agree to these terms.
+      </div>
+
+      <!-- Agreement -->
+      <div class="agreement-note">
+        We encourage you to review the full Terms &amp; Conditions. Contact us with any questions.
+      </div>
+
+      <!-- Quick Links -->
+      <div class="quick-links">
+        <div class="quick-links-row">
+          <a href="https://www.cdss.ca.gov/Portals/9/CCLD/CCCS/HCSB/Fact%20Sheet%20Home%20Care%20Services.pdf" class="quick-link">Do's &amp; Don'ts</a>
+          <a href="tel:+19162928820" class="quick-link">Call Us</a>
+          <a href="https://alice.care/termsofuse/" class="quick-link">Full Terms &amp; Conditions</a>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="email-footer">
+        <div class="footer-logo">
+          <span class="alice">alice</span><span class="dot">.</span><span class="care">care</span>
+        </div>
+        <div class="footer-address">
+          8146 Greenback Lane, Suite #106<br>
+          Fair Oaks, California 95628, United States
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
