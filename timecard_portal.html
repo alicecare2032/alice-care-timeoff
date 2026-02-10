@@ -71,10 +71,14 @@
         .badge-updated { background: #D4F4E2; color: #2D7A53; }
         .badge-pending { background: #FFF4E5; color: #F57600; }
         .badge-none { background: #E5ECF3; color: #9CA3AF; }
+        .badge-submitted { background: #1A365C; color: white; }
+        .badge-approved { background: #D4F4E2; color: #2D7A53; }
         .btn-update { padding: 7px 14px; border: 2px solid #1A365C; border-radius: 6px; background: white; color: #1A365C; font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
         .btn-update:hover { background: #1A365C; color: white; }
         .btn-update.is-pending { border-color: #F57600; color: #F57600; }
         .btn-update.is-pending:hover { background: #F57600; color: white; }
+        .btn-update:disabled { background: #E5ECF3; color: #9CA3AF; border-color: #D3D7DF; cursor: not-allowed; opacity: 0.6; }
+        .btn-update:disabled:hover { background: #E5ECF3; color: #9CA3AF; }
 
         /* MODAL */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(26,54,92,0.6); backdrop-filter: blur(4px); z-index: 5000; display: flex; justify-content: center; align-items: flex-start; padding: 40px 20px; overflow-y: auto; }
@@ -235,6 +239,7 @@
         let currentSchedule = null;
         let pendingUpdates = {};
         let activeModalIdx = null;
+        let isSubmitted = false;
 
         function showLoading(text, subtext) {
             document.getElementById('loadingText').textContent = text || 'Processing...';
@@ -271,6 +276,7 @@
                 if (data.error) { alert('Error: ' + data.error); return; }
                 currentSchedule = data;
                 pendingUpdates = {};
+                isSubmitted = false;
                 if (data.entries && data.entries.length > 0) { displaySchedule(data); } else { document.getElementById('emptyState').classList.remove('hidden'); }
             };
 
@@ -318,7 +324,7 @@
                 totalWorkMins += workHours * 60; totalBreakMins += breakMins;
                 var dateStr = formatDate(entry.scheduleDate), dayName = getDayName(entry.scheduleDate);
                 var hasExistingUpdate = entry.updates && entry.updates.trim() !== '', hasPending = pendingUpdates.hasOwnProperty(i);
-                var rowClass = hasPending ? ' class="row-pending"' : (hasExistingUpdate ? ' class="row-updated"' : '');
+                var rowClass = isSubmitted ? ' class="row-updated"' : (hasPending ? ' class="row-pending"' : (hasExistingUpdate ? ' class="row-updated"' : ''));
 
                 html += '<tr' + rowClass + ' id="tableRow_' + i + '">';
                 html += '<td class="td-day">' + dayName + '<span class="date-sub">' + dateStr + '</span></td>';
@@ -327,11 +333,18 @@
                 html += '<td class="td-hours">' + workHours + '</td>';
                 html += '<td class="td-break">' + (breakMins > 0 ? breakMins + ' min' : '0') + '</td>';
                 html += '<td>';
-                if (hasPending) html += '<span class="badge badge-pending">Pending</span>';
-                else if (hasExistingUpdate) html += '<span class="badge badge-updated">Updated</span>';
-                else html += '<span class="badge badge-none">OK</span>';
+                if (isSubmitted || hasExistingUpdate) html += '<span class="badge badge-submitted">Submitted</span>';
+                else if (hasPending) html += '<span class="badge badge-pending">Pending</span>';
+                else html += '<span class="badge badge-approved">✓ Approved</span>';
                 html += '</td>';
-                html += '<td><button class="' + (hasPending ? 'btn-update is-pending' : 'btn-update') + '" onclick="openUpdateModal(' + i + ')">' + (hasPending ? '✏️ Edit' : '✏️ Update') + '</button></td>';
+
+                html += '<td>';
+                if (isSubmitted || hasExistingUpdate) {
+                    html += '<button class="btn-update" disabled>Submitted</button>';
+                } else {
+                    html += '<button class="' + (hasPending ? 'btn-update is-pending' : 'btn-update') + '" onclick="openUpdateModal(' + i + ')">' + (hasPending ? '✏️ Edit' : '✏️ Update') + '</button>';
+                }
+                html += '</td>';
                 html += '</tr>';
             }
 
@@ -341,9 +354,11 @@
             document.getElementById('totalBreaks').textContent = (totalBreakMins / 60).toFixed(1);
 
             var anyApproved = entries.some(function(e) { return e.approval && e.approval.trim() !== ''; });
+            var anyUpdates = entries.some(function(e) { return e.updates && e.updates.trim() !== ''; });
             var statusEl = document.getElementById('scheduleStatus');
-            if (anyApproved) { statusEl.textContent = 'Reviewed'; statusEl.style.color = '#62B790'; }
-            else { statusEl.textContent = 'Active'; statusEl.style.color = '#F57600'; }
+            if (isSubmitted || anyUpdates) { statusEl.textContent = 'Submitted'; statusEl.style.color = '#1A365C'; }
+            else if (anyApproved) { statusEl.textContent = 'Reviewed'; statusEl.style.color = '#62B790'; }
+            else { statusEl.textContent = 'Approved'; statusEl.style.color = '#62B790'; }
             updateSubmitButton();
         }
 
@@ -485,8 +500,19 @@
 
         function updateSubmitButton() {
             var count = Object.keys(pendingUpdates).length, btn = document.getElementById('submitBtn');
-            if (count > 0) { btn.disabled = false; btn.textContent = 'Submit ' + count + ' Update' + (count > 1 ? 's' : ''); document.getElementById('approvalTitle').textContent = 'Ready to Submit?'; document.getElementById('approvalText').textContent = 'You have ' + count + ' update' + (count > 1 ? 's' : '') + ' ready to send for supervisor review.'; }
-            else { btn.disabled = true; btn.textContent = 'Submit All Updates'; document.getElementById('approvalTitle').textContent = 'No Updates Pending'; document.getElementById('approvalText').textContent = 'Click "Update" on any row above to make corrections.'; }
+            if (isSubmitted) {
+                btn.disabled = true; btn.textContent = '✓ Submitted';
+                document.getElementById('approvalTitle').textContent = 'Timecard Submitted';
+                document.getElementById('approvalText').textContent = 'All updates have been submitted for supervisor review. You will receive a notification once approved.';
+            } else if (count > 0) {
+                btn.disabled = false; btn.textContent = 'Submit ' + count + ' Update' + (count > 1 ? 's' : '');
+                document.getElementById('approvalTitle').textContent = 'Ready to Submit?';
+                document.getElementById('approvalText').textContent = 'You have ' + count + ' update' + (count > 1 ? 's' : '') + ' ready to send for supervisor review.';
+            } else {
+                btn.disabled = true; btn.textContent = 'Submit All Updates';
+                document.getElementById('approvalTitle').textContent = 'No Updates Pending';
+                document.getElementById('approvalText').textContent = 'Click "Update" on any row above to make corrections.';
+            }
         }
 
         function submitAllUpdates() {
@@ -502,8 +528,8 @@
             for (var key in pendingUpdates) { if (pendingUpdates.hasOwnProperty(key)) { var u = pendingUpdates[key]; updates.push({ rowIndex: u.rowIndex, scheduleDate: u.scheduleDate, newTimeCard: u.timeCard, comment: u.comment, hours: u.hours }); } }
 
             fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'submitOncallUpdates', employeeId: employeeId, lastName: lastName, week: weekNumber, year: year, updates: updates, submittedAt: new Date().toISOString() }) })
-            .then(function() { hideLoading(); alert('Updates submitted successfully! Your supervisor will review the changes.'); pendingUpdates = {}; loadSchedule(); })
-            .catch(function() { hideLoading(); alert('Updates submitted successfully! Your supervisor will review the changes.'); pendingUpdates = {}; loadSchedule(); });
+            .then(function() { hideLoading(); alert('Updates submitted successfully! Your supervisor will review the changes.'); isSubmitted = true; pendingUpdates = {}; displaySchedule(currentSchedule); })
+            .catch(function() { hideLoading(); alert('Updates submitted successfully! Your supervisor will review the changes.'); isSubmitted = true; pendingUpdates = {}; displaySchedule(currentSchedule); });
         }
 
         function formatDate(dateStr) { if (!dateStr) return ''; return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }); }
