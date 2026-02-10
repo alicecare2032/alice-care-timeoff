@@ -335,7 +335,7 @@
                 html += '<td>';
                 if (isSubmitted || hasExistingUpdate) html += '<span class="badge badge-submitted">Submitted</span>';
                 else if (hasPending) html += '<span class="badge badge-pending">Pending</span>';
-                else html += '<span class="badge badge-approved">✓ Approved</span>';
+                else html += '<span class="badge badge-pending">Pending</span>';
                 html += '</td>';
 
                 html += '<td>';
@@ -358,7 +358,7 @@
             var statusEl = document.getElementById('scheduleStatus');
             if (isSubmitted || anyUpdates) { statusEl.textContent = 'Submitted'; statusEl.style.color = '#1A365C'; }
             else if (anyApproved) { statusEl.textContent = 'Reviewed'; statusEl.style.color = '#62B790'; }
-            else { statusEl.textContent = 'Approved'; statusEl.style.color = '#62B790'; }
+            else { statusEl.textContent = 'Pending'; statusEl.style.color = '#F57600'; }
             updateSubmitButton();
         }
 
