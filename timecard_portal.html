@@ -527,7 +527,11 @@
             var updates = [];
             for (var key in pendingUpdates) { if (pendingUpdates.hasOwnProperty(key)) { var u = pendingUpdates[key]; updates.push({ rowIndex: u.rowIndex, scheduleDate: u.scheduleDate, newTimeCard: u.timeCard, comment: u.comment, hours: u.hours }); } }
 
-            fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'submitOncallUpdates', employeeId: employeeId, lastName: lastName, week: weekNumber, year: year, updates: updates, submittedAt: new Date().toISOString() }) })
+            // Send all row indices so backend can mark unchanged rows as Submitted
+            var allRowIndices = [];
+            for (var r = 0; r < currentSchedule.entries.length; r++) { allRowIndices.push(currentSchedule.entries[r].rowIndex); }
+
+            fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'submitOncallUpdates', employeeId: employeeId, lastName: lastName, week: weekNumber, year: year, updates: updates, allRowIndices: allRowIndices, submittedAt: new Date().toISOString() }) })
             .then(function() { hideLoading(); alert('Updates submitted successfully! Your supervisor will review the changes.'); isSubmitted = true; pendingUpdates = {}; displaySchedule(currentSchedule); })
             .catch(function() { hideLoading(); alert('Updates submitted successfully! Your supervisor will review the changes.'); isSubmitted = true; pendingUpdates = {}; displaySchedule(currentSchedule); });
         }
