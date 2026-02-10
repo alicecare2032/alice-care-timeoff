@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>alice.care Timecard Review v2.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: #E5ECF3; min-height: 100vh; padding: 20px; }
+        .nav-bar { max-width: 1200px; margin: 0 auto 20px; background: white; padding: 15px 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(26,54,92,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 28px; font-weight: 700; }
+        .logo .alice { color: #F57600; font-weight: 700; }
+        .logo .dot { color: #F57600; font-weight: 700; margin: 0 -2px; }
+        .logo .care { color: #1A365C; font-weight: 400; }
+        .portal-badge { background: #1A365C; color: white; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; letter-spacing: 0.5px; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(26,54,92,0.15); overflow: hidden; }
+        .header { background: #1A365C; color: white; padding: 30px; }
+        .header h1 { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+        .lookup-section { padding: 30px; background: #E5ECF3; border-bottom: 2px solid #D3D7DF; }
+        .lookup-title { font-size: 18px; color: #1A365C; font-weight: 600; margin-bottom: 20px; }
+        .lookup-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { font-size: 13px; color: #1A365C; font-weight: 500; margin-bottom: 6px; }
+        .required { color: #FF7475; }
+        input[type="text"], input[type="number"], input[type="time"], select, textarea { padding: 12px 14px; border: 2px solid #D3D7DF; border-radius: 8px; font-size: 16px; font-family: 'Poppins', sans-serif; transition: all 0.3s; background: white; -webkit-appearance: none; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #F57600; box-shadow: 0 0 0 3px rgba(245,118,0,0.1); }
+        textarea { resize: vertical; min-height: 60px; }
+        .btn { padding: 14px 28px; border: none; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 16px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary { background: #F57600; color: white; }
+        .btn-primary:hover { background: #e06d00; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(245,118,0,0.3); }
+        .btn-primary:disabled { background: #D3D7DF; cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-success { background: #62B790; color: white; }
+        .btn-success:hover { background: #52a780; transform: translateY(-2px); }
+        .btn-success:disabled { background: #D3D7DF; cursor: not-allowed; transform: none; }
+        .btn-secondary { background: #E5ECF3; color: #1A365C; border: 2px solid #D3D7DF; }
+        .btn-secondary:hover { background: #D3D7DF; }
+        .btn-sm { padding: 8px 14px; font-size: 13px; }
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; padding: 20px 30px; background: #E5ECF3; }
+        .stat-card { background: white; padding: 20px; border-radius: 8px; border-left: 4px solid #F57600; }
+        .stat-card h3 { font-size: 12px; color: #3D3D3D; margin-bottom: 8px; font-weight: 500; text-transform: uppercase; }
+        .stat-card .number { font-size: 28px; color: #1A365C; font-weight: 700; }
+        .stat-card .number.small { font-size: 16px; }
+        .report-section { padding: 30px; }
+        .notice-box { background: #FFF4E5; border-left: 4px solid #F57600; padding: 15px 20px; border-radius: 8px; margin-bottom: 25px; }
+        .notice-box p { color: #3D3D3D; font-size: 13px; line-height: 1.6; }
+        .notice-box.info { background: #E8F4FD; border-left-color: #1A365C; }
+
+        /* TABLE */
+        .timecard-table-wrap { overflow-x: auto; margin-bottom: 25px; border-radius: 10px; border: 2px solid #E5ECF3; }
+        .timecard-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .timecard-table thead th { background: #1A365C; color: white; padding: 14px 16px; text-align: left; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+        .timecard-table thead th:first-child { border-radius: 8px 0 0 0; }
+        .timecard-table thead th:last-child { border-radius: 0 8px 0 0; text-align: center; }
+        .timecard-table tbody tr { border-bottom: 1px solid #E5ECF3; transition: all 0.2s; }
+        .timecard-table tbody tr:hover { background: #F8FAFC; }
+        .timecard-table tbody tr.row-pending { background: #FFFBF5; border-left: 3px solid #F57600; }
+        .timecard-table tbody tr.row-updated { background: #F0FAF5; border-left: 3px solid #62B790; }
+        .timecard-table tbody td { padding: 14px 16px; color: #3D3D3D; vertical-align: middle; }
+        .timecard-table tbody td:last-child { text-align: center; }
+        .td-day { font-weight: 600; color: #1A365C; white-space: nowrap; }
+        .td-day .date-sub { font-weight: 400; font-size: 12px; color: #9CA3AF; display: block; }
+        .td-timecard { font-family: 'Courier New', monospace; font-size: 13px; color: #1A365C; font-weight: 500; }
+        .td-hours { font-weight: 700; color: #1A365C; font-size: 16px; }
+        .td-break { color: #F57600; font-weight: 500; font-size: 13px; }
+        .mini-timeline { height: 8px; background: #E5ECF3; border-radius: 4px; overflow: hidden; min-width: 120px; position: relative; margin-top: 4px; }
+        .mini-timeline .seg-work { position: absolute; top: 0; height: 100%; background: #1A365C; border-radius: 2px; }
+        .mini-timeline .seg-break { position: absolute; top: 0; height: 100%; background: #F57600; opacity: 0.35; border-radius: 2px; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+        .badge-updated { background: #D4F4E2; color: #2D7A53; }
+        .badge-pending { background: #FFF4E5; color: #F57600; }
+        .badge-none { background: #E5ECF3; color: #9CA3AF; }
+        .btn-update { padding: 7px 14px; border: 2px solid #1A365C; border-radius: 6px; background: white; color: #1A365C; font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        .btn-update:hover { background: #1A365C; color: white; }
+        .btn-update.is-pending { border-color: #F57600; color: #F57600; }
+        .btn-update.is-pending:hover { background: #F57600; color: white; }
+
+        /* MODAL */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(26,54,92,0.6); backdrop-filter: blur(4px); z-index: 5000; display: flex; justify-content: center; align-items: flex-start; padding: 40px 20px; overflow-y: auto; }
+        .modal-box { background: white; border-radius: 16px; width: 100%; max-width: 640px; box-shadow: 0 20px 60px rgba(26,54,92,0.3); animation: modalSlideIn 0.25s ease-out; }
+        @keyframes modalSlideIn { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 24px 28px; background: #1A365C; color: white; border-radius: 16px 16px 0 0; }
+        .modal-header h2 { font-size: 20px; font-weight: 600; }
+        .modal-header .modal-subtitle { font-size: 13px; opacity: 0.8; margin-top: 2px; }
+        .modal-close { background: rgba(255,255,255,0.2); border: none; color: white; width: 36px; height: 36px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; margin-left: 16px; }
+        .modal-close:hover { background: rgba(255,255,255,0.35); }
+        .modal-body { padding: 24px 28px; }
+        .modal-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .modal-info-item { padding: 10px 12px; background: #F8FAFC; border-radius: 8px; }
+        .modal-info-item .label { font-size: 10px; color: #9CA3AF; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+        .modal-info-item .value { font-size: 14px; color: #1A365C; font-weight: 600; margin-top: 2px; }
+        .modal-timeline-bar { position: relative; height: 32px; background: #F1F5F9; border-radius: 6px; overflow: hidden; }
+        .modal-timeline-bar .tl-seg { position: absolute; top: 4px; height: 24px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: white; min-width: 2px; overflow: hidden; white-space: nowrap; }
+        .tl-seg.work { background: #1A365C; }
+        .tl-seg.break { background: #F57600; opacity: 0.4; }
+        .tl-times { display: flex; justify-content: space-between; font-size: 10px; color: #9CA3AF; margin-top: 4px; padding: 0 2px; }
+        .current-periods { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+        .current-periods .cp-tag { display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px; background: #1A365C; color: white; border-radius: 6px; font-size: 12px; font-weight: 500; }
+        .current-periods .cp-break { display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px; background: #FFF4E5; color: #F57600; border-radius: 6px; font-size: 11px; font-weight: 500; }
+        .existing-update-box { background: #E8F4FD; border-left: 4px solid #1A365C; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; color: #3D3D3D; line-height: 1.6; }
+        .modal-divider { height: 2px; background: #E5ECF3; margin: 20px 0; }
+        .section-label { font-size: 11px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+        .period-inputs { margin-bottom: 12px; }
+        .period-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding: 10px 12px; background: #F8FAFC; border-radius: 8px; border: 1px solid #E5ECF3; }
+        .period-row .period-label { font-size: 12px; font-weight: 600; color: #1A365C; min-width: 65px; }
+        .period-row input[type="time"] { padding: 8px 10px; font-size: 14px; border: 2px solid #D3D7DF; border-radius: 6px; font-family: 'Poppins', sans-serif; width: 120px; background: white; }
+        .period-row input[type="time"]:focus { outline: none; border-color: #F57600; box-shadow: 0 0 0 3px rgba(245,118,0,0.1); }
+        .period-row .period-dash { color: #9CA3AF; font-weight: 600; font-size: 18px; }
+        .period-row .remove-period { padding: 6px 10px; background: none; border: 1px solid #D3D7DF; border-radius: 6px; cursor: pointer; font-size: 14px; color: #FF7475; transition: all 0.2s; font-family: 'Poppins', sans-serif; margin-left: auto; }
+        .period-row .remove-period:hover { background: #FF7475; color: white; border-color: #FF7475; }
+        .add-period-btn { padding: 8px 14px; background: none; border: 2px dashed #D3D7DF; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; color: #1A365C; font-family: 'Poppins', sans-serif; transition: all 0.2s; width: 100%; text-align: center; }
+        .add-period-btn:hover { border-color: #F57600; color: #F57600; background: #FFF4E5; }
+        .update-comment { width: 100%; padding: 10px 14px; border: 2px solid #D3D7DF; border-radius: 8px; font-size: 14px; font-family: 'Poppins', sans-serif; resize: vertical; min-height: 70px; margin-top: 8px; }
+        .update-comment:focus { outline: none; border-color: #F57600; box-shadow: 0 0 0 3px rgba(245,118,0,0.1); }
+        .update-preview { margin-top: 12px; padding: 10px 14px; background: #FFF4E5; border-radius: 8px; font-size: 12px; color: #3D3D3D; }
+        .update-preview .preview-label { font-weight: 600; color: #F57600; margin-bottom: 4px; }
+        .update-preview code { font-family: monospace; background: white; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+        .modal-footer { display: flex; gap: 10px; padding: 20px 28px; border-top: 2px solid #E5ECF3; justify-content: flex-end; }
+        .modal-footer .btn { min-width: 120px; }
+        .approval-section { background: #E5ECF3; padding: 25px; border-radius: 8px; margin-top: 30px; text-align: center; }
+        .approval-section h3 { font-size: 18px; color: #1A365C; margin-bottom: 15px; }
+        .approval-section p { font-size: 13px; color: #3D3D3D; margin-bottom: 20px; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #3D3D3D; }
+        .empty-state h3 { font-size: 20px; color: #1A365C; margin-bottom: 10px; }
+        .empty-state p { font-size: 14px; opacity: 0.8; }
+        .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(26,54,92,0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .spinner { width: 50px; height: 50px; border: 5px solid rgba(255,255,255,0.3); border-top: 5px solid #F57600; border-radius: 50%; animation: spin 1s linear infinite; }
+        .loading-overlay .loading-text { color: white; font-size: 16px; margin-top: 16px; font-weight: 500; }
+        .loading-overlay .loading-subtext { color: rgba(255,255,255,0.7); font-size: 13px; margin-top: 8px; }
+        .hidden { display: none !important; }
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .nav-bar { padding: 12px 15px; margin-bottom: 15px; }
+            .logo { font-size: 20px; }
+            .header { padding: 20px 15px; }
+            .header h1 { font-size: 22px; }
+            .lookup-section { padding: 20px 15px; }
+            .lookup-grid { grid-template-columns: 1fr; gap: 12px; }
+            .stats-row { grid-template-columns: 1fr 1fr; padding: 15px; gap: 12px; }
+            .report-section { padding: 20px 15px; }
+            .btn { width: 100%; padding: 14px 20px; }
+            .timecard-table { font-size: 13px; }
+            .timecard-table thead th { padding: 10px 12px; font-size: 11px; }
+            .timecard-table tbody td { padding: 10px 12px; }
+            .modal-overlay { padding: 20px 10px; }
+            .modal-header { padding: 20px; }
+            .modal-body { padding: 20px; }
+            .modal-footer { padding: 16px 20px; }
+            .modal-info-grid { grid-template-columns: 1fr; }
+            .period-row { flex-wrap: wrap; }
+            .period-row input[type="time"] { width: 100px; }
+            .modal-footer .btn { min-width: auto; flex: 1; }
+        }
+        @media (max-width: 480px) { .header h1 { font-size: 18px; } .stat-card .number { font-size: 22px; } }
+    </style>
+</head>
+<body>
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loadingText">Processing...</div>
+        <div class="loading-subtext" id="loadingSubtext">Please wait</div>
+    </div>
+
+    <div id="modalOverlay" class="modal-overlay hidden" onclick="closeModalOutside(event)">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div>
+                    <h2 id="modalTitle">Update Timecard</h2>
+                    <div class="modal-subtitle" id="modalSubtitle"></div>
+                </div>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer" id="modalFooter">
+                <button class="btn btn-secondary btn-sm" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary btn-sm" id="modalSaveBtn" onclick="saveUpdateFromModal()">Save Update</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-bar">
+        <div class="logo"><span class="alice">alice</span><span class="dot">.</span><span class="care">care</span></div>
+        <div class="portal-badge">TIMECARD REVIEW</div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>Timecard Review Portal</h1>
+            <p>Review and update your weekly schedule and time entries</p>
+        </div>
+
+        <div class="lookup-section">
+            <div class="lookup-title">Find Your Schedule</div>
+            <div class="lookup-grid">
+                <div class="form-group"><label>Employee ID <span class="required">*</span></label><input type="text" id="employeeId" placeholder="Enter Employee ID" inputmode="numeric"></div>
+                <div class="form-group"><label>Last Name <span class="required">*</span></label><input type="text" id="lastName" placeholder="Enter Last Name"></div>
+                <div class="form-group"><label>Week Number <span class="required">*</span></label><input type="number" id="weekNumber" placeholder="1 to 53" min="1" max="53"></div>
+                <div class="form-group"><label>Year <span class="required">*</span></label><input type="number" id="year" placeholder="2026" min="2024" max="2030"></div>
+            </div>
+            <button class="btn btn-primary" onclick="loadSchedule()">Load My Schedule</button>
+        </div>
+
+        <div id="statsSection" class="stats-row hidden">
+            <div class="stat-card"><h3>Days Worked</h3><div class="number" id="totalDays">0</div></div>
+            <div class="stat-card"><h3>Total Hours</h3><div class="number" id="totalHours">0.0</div></div>
+            <div class="stat-card"><h3>Break Hours</h3><div class="number" id="totalBreaks">0.0</div></div>
+            <div class="stat-card"><h3>Status</h3><div class="number small" id="scheduleStatus">Pending</div></div>
+        </div>
+
+        <div id="reportSection" class="report-section hidden">
+            <div class="notice-box">
+                <p><strong>How to update:</strong> Click the <strong>Update</strong> button on any row to open the correction form. Add or remove work periods, provide a reason, then save. When finished, click <strong>Submit All Updates</strong> at the bottom.</p>
+            </div>
+            <div id="scheduleTableWrap"></div>
+            <div class="approval-section" id="approvalSection">
+                <h3 id="approvalTitle">No Updates Pending</h3>
+                <p id="approvalText">Click "Update" on any row above to make corrections.</p>
+                <button class="btn btn-success" onclick="submitAllUpdates()" id="submitBtn" disabled>Submit All Updates</button>
+            </div>
+        </div>
+
+        <div id="emptyState" class="empty-state hidden">
+            <h3>No Schedule Found</h3>
+            <p>No time entries found for the specified week. Please verify your Employee ID, Last Name, Week Number, and Year.</p>
+        </div>
+
+        <div id="loadingState" class="loading hidden" style="text-align:center;padding:40px;"><p>Loading your schedule...</p></div>
+    </div>
+
+    <script>
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyoge_hluInEjc7ovFBnxttmqxY4GgXi-wTKdDeHzNUk3-jhMGAnwn9oYt2219A2FVU/exec';
+
+        let currentSchedule = null;
+        let pendingUpdates = {};
+        let activeModalIdx = null;
+
+        function showLoading(text, subtext) {
+            document.getElementById('loadingText').textContent = text || 'Processing...';
+            document.getElementById('loadingSubtext').textContent = subtext || 'Please wait';
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function loadSchedule() {
+            var employeeId = document.getElementById('employeeId').value.trim();
+            var lastName = document.getElementById('lastName').value.trim();
+            var weekNumber = document.getElementById('weekNumber').value.trim();
+            var year = document.getElementById('year').value.trim();
+            if (!employeeId || !lastName || !weekNumber || !year) { alert('Please fill in all required fields.'); return; }
+
+            showLoading('Loading Schedule...', 'Week ' + weekNumber + ' of ' + year);
+            document.getElementById('loadingState').classList.remove('hidden');
+            document.getElementById('statsSection').classList.add('hidden');
+            document.getElementById('reportSection').classList.add('hidden');
+            document.getElementById('emptyState').classList.add('hidden');
+
+            var callbackName = 'scheduleCallback_' + Date.now();
+            window[callbackName] = function(data) {
+                delete window[callbackName];
+                var scriptEl = document.getElementById('schedule_jsonp');
+                if (scriptEl) scriptEl.remove();
+                hideLoading();
+                document.getElementById('loadingState').classList.add('hidden');
+                if (data.error) { alert('Error: ' + data.error); return; }
+                currentSchedule = data;
+                pendingUpdates = {};
+                if (data.entries && data.entries.length > 0) { displaySchedule(data); } else { document.getElementById('emptyState').classList.remove('hidden'); }
+            };
+
+            var script = document.createElement('script');
+            script.id = 'schedule_jsonp';
+            script.type = 'text/javascript';
+            script.src = GOOGLE_SCRIPT_URL + '?action=getOncallSchedule&employeeId=' + encodeURIComponent(employeeId) + '&lastName=' + encodeURIComponent(lastName) + '&week=' + encodeURIComponent(weekNumber) + '&year=' + encodeURIComponent(year) + '&callback=' + callbackName;
+            script.onerror = function() { delete window[callbackName]; hideLoading(); document.getElementById('loadingState').classList.add('hidden'); alert('Failed to load schedule. Please try again.'); };
+            document.body.appendChild(script);
+        }
+
+        // Parse
+        function parseTimeCard(timeCardStr) {
+            if (!timeCardStr || typeof timeCardStr !== 'string') return { periods: [], breaks: [] };
+            var periods = [], breaks = [], segments = timeCardStr.split(','), allTimes = [];
+            for (var i = 0; i < segments.length; i++) {
+                var seg = segments[i].trim(); if (!seg) continue;
+                var parts = seg.split('-');
+                if (parts.length === 2) allTimes.push({ start: parts[0].trim(), end: parts[1].trim() });
+                else if (parts.length === 3) { allTimes.push({ start: parts[0].trim(), end: parts[1].trim() }); allTimes.push({ start: parts[1].trim(), end: parts[2].trim() }); }
+                else if (parts.length === 1 && allTimes.length > 0) allTimes[allTimes.length - 1].end = parts[0].trim();
+            }
+            for (var j = 0; j < allTimes.length; j++) { periods.push(allTimes[j]); if (j < allTimes.length - 1) breaks.push({ start: allTimes[j].end, end: allTimes[j + 1].start }); }
+            return { periods: periods, breaks: breaks };
+        }
+
+        function formatTimeCardString(periods) { var p = []; for (var i = 0; i < periods.length; i++) { if (periods[i].start && periods[i].end) p.push(periods[i].start + '-' + periods[i].end); } return p.join(','); }
+        function timeToMinutes(ts) { if (!ts) return 0; var p = ts.split(':'); return parseInt(p[0],10)*60 + parseInt(p[1],10); }
+        function calculateHours(periods) { var t = 0; for (var i = 0; i < periods.length; i++) { var s = timeToMinutes(periods[i].start), e = timeToMinutes(periods[i].end); if (e > s) t += (e - s); } return (t/60).toFixed(1); }
+        function calculateBreakMins(breaks) { var t = 0; for (var i = 0; i < breaks.length; i++) { var s = timeToMinutes(breaks[i].start), e = timeToMinutes(breaks[i].end); if (e > s) t += (e - s); } return t; }
+
+        // Display as Table
+        function displaySchedule(data) {
+            document.getElementById('statsSection').classList.remove('hidden');
+            document.getElementById('reportSection').classList.remove('hidden');
+            var entries = data.entries, totalWorkMins = 0, totalBreakMins = 0;
+            entries.sort(function(a, b) { return new Date(a.scheduleDate) - new Date(b.scheduleDate); });
+            document.getElementById('totalDays').textContent = entries.length;
+
+            var html = '<div class="timecard-table-wrap"><table class="timecard-table"><thead><tr><th>Day</th><th>Scheduled</th><th>Time Card</th><th>Hours</th><th>Break</th><th>Status</th><th>Action</th></tr></thead><tbody>';
+
+            for (var i = 0; i < entries.length; i++) {
+                var entry = entries[i], parsed = parseTimeCard(entry.timeCard);
+                var workHours = parseFloat(calculateHours(parsed.periods)), breakMins = calculateBreakMins(parsed.breaks);
+                totalWorkMins += workHours * 60; totalBreakMins += breakMins;
+                var dateStr = formatDate(entry.scheduleDate), dayName = getDayName(entry.scheduleDate);
+                var hasExistingUpdate = entry.updates && entry.updates.trim() !== '', hasPending = pendingUpdates.hasOwnProperty(i);
+                var rowClass = hasPending ? ' class="row-pending"' : (hasExistingUpdate ? ' class="row-updated"' : '');
+
+                html += '<tr' + rowClass + ' id="tableRow_' + i + '">';
+                html += '<td class="td-day">' + dayName + '<span class="date-sub">' + dateStr + '</span></td>';
+                html += '<td>' + formatTimeAmPm(entry.startTime) + ' to ' + formatTimeAmPm(entry.endTime) + '</td>';
+                html += '<td><div class="td-timecard">' + escapeHtml(entry.timeCard || 'N/A') + '</div>' + buildMiniTimeline(entry, parsed) + '</td>';
+                html += '<td class="td-hours">' + workHours + '</td>';
+                html += '<td class="td-break">' + (breakMins > 0 ? breakMins + ' min' : '0') + '</td>';
+                html += '<td>';
+                if (hasPending) html += '<span class="badge badge-pending">Pending</span>';
+                else if (hasExistingUpdate) html += '<span class="badge badge-updated">Updated</span>';
+                else html += '<span class="badge badge-none">OK</span>';
+                html += '</td>';
+                html += '<td><button class="' + (hasPending ? 'btn-update is-pending' : 'btn-update') + '" onclick="openUpdateModal(' + i + ')">' + (hasPending ? '✏️ Edit' : '✏️ Update') + '</button></td>';
+                html += '</tr>';
+            }
+
+            html += '</tbody></table></div>';
+            document.getElementById('scheduleTableWrap').innerHTML = html;
+            document.getElementById('totalHours').textContent = (totalWorkMins / 60).toFixed(1);
+            document.getElementById('totalBreaks').textContent = (totalBreakMins / 60).toFixed(1);
+
+            var anyApproved = entries.some(function(e) { return e.approval && e.approval.trim() !== ''; });
+            var statusEl = document.getElementById('scheduleStatus');
+            if (anyApproved) { statusEl.textContent = 'Reviewed'; statusEl.style.color = '#62B790'; }
+            else { statusEl.textContent = 'Active'; statusEl.style.color = '#F57600'; }
+            updateSubmitButton();
+        }
+
+        function buildMiniTimeline(entry, parsed) {
+            if (!parsed.periods.length) return '';
+            var startTime = entry.startTime || '06:00', endTime = entry.endTime || '19:00';
+            if (parsed.periods.length > 0) {
+                if (timeToMinutes(parsed.periods[0].start) < timeToMinutes(startTime)) startTime = parsed.periods[0].start;
+                if (timeToMinutes(parsed.periods[parsed.periods.length-1].end) > timeToMinutes(endTime)) endTime = parsed.periods[parsed.periods.length-1].end;
+            }
+            var rS = timeToMinutes(startTime)-15, rE = timeToMinutes(endTime)+15, tR = rE - rS;
+            if (tR <= 0) return '';
+            var html = '<div class="mini-timeline">';
+            for (var p = 0; p < parsed.periods.length; p++) { var pS = timeToMinutes(parsed.periods[p].start), pE = timeToMinutes(parsed.periods[p].end); html += '<div class="seg-work" style="left:'+((pS-rS)/tR*100)+'%;width:'+((pE-pS)/tR*100)+'%"></div>'; }
+            for (var b = 0; b < parsed.breaks.length; b++) { var bS = timeToMinutes(parsed.breaks[b].start), bE = timeToMinutes(parsed.breaks[b].end); html += '<div class="seg-break" style="left:'+((bS-rS)/tR*100)+'%;width:'+((bE-bS)/tR*100)+'%"></div>'; }
+            html += '</div>'; return html;
+        }
+
+        // Modal
+        function openUpdateModal(idx) {
+            activeModalIdx = idx;
+            var entry = currentSchedule.entries[idx], parsed = parseTimeCard(entry.timeCard);
+            var workHours = calculateHours(parsed.periods), breakMins = calculateBreakMins(parsed.breaks);
+            var dateStr = formatDate(entry.scheduleDate), dayName = getDayName(entry.scheduleDate);
+            var hasExistingUpdate = entry.updates && entry.updates.trim() !== '', hasApproval = entry.approval && entry.approval.trim() !== '';
+
+            document.getElementById('modalTitle').textContent = dayName + ', ' + dateStr;
+            document.getElementById('modalSubtitle').textContent = workHours + ' hrs worked' + (breakMins > 0 ? ' · ' + breakMins + ' min break' : '');
+
+            var body = '<div class="modal-info-grid">';
+            body += '<div class="modal-info-item"><div class="label">Scheduled Start</div><div class="value">' + formatTimeAmPm(entry.startTime) + '</div></div>';
+            body += '<div class="modal-info-item"><div class="label">Scheduled End</div><div class="value">' + formatTimeAmPm(entry.endTime) + '</div></div>';
+            body += '<div class="modal-info-item"><div class="label">Actual Clock In</div><div class="value">' + (entry.start || 'N/A') + '</div></div>';
+            body += '<div class="modal-info-item"><div class="label">Actual Clock Out</div><div class="value">' + (entry.end || 'N/A') + '</div></div>';
+            body += '</div>';
+
+            // Timeline
+            if (parsed.periods.length) {
+                var st = entry.startTime || '06:00', et = entry.endTime || '19:00';
+                if (timeToMinutes(parsed.periods[0].start) < timeToMinutes(st)) st = parsed.periods[0].start;
+                if (timeToMinutes(parsed.periods[parsed.periods.length-1].end) > timeToMinutes(et)) et = parsed.periods[parsed.periods.length-1].end;
+                var rS = timeToMinutes(st)-15, rE = timeToMinutes(et)+15, tR = rE - rS;
+                if (tR > 0) {
+                    body += '<div style="margin-bottom:16px;"><div class="section-label">Visual Timeline</div><div class="modal-timeline-bar">';
+                    for (var p = 0; p < parsed.periods.length; p++) { var pS = timeToMinutes(parsed.periods[p].start), pE = timeToMinutes(parsed.periods[p].end), l = (pS-rS)/tR*100, w = (pE-pS)/tR*100; body += '<div class="tl-seg work" style="left:'+l+'%;width:'+w+'%">'+(w>10?parsed.periods[p].start:'')+'</div>'; }
+                    for (var br = 0; br < parsed.breaks.length; br++) { var bS = timeToMinutes(parsed.breaks[br].start), bE = timeToMinutes(parsed.breaks[br].end); body += '<div class="tl-seg break" style="left:'+((bS-rS)/tR*100)+'%;width:'+((bE-bS)/tR*100)+'%"></div>'; }
+                    body += '</div><div class="tl-times"><span>'+st+'</span><span>'+et+'</span></div></div>';
+                }
+            }
+
+            // Current periods
+            body += '<div class="section-label">Current Work Periods</div><div class="current-periods">';
+            for (var cp = 0; cp < parsed.periods.length; cp++) body += '<span class="cp-tag">Period ' + (cp+1) + ': ' + parsed.periods[cp].start + ' to ' + parsed.periods[cp].end + '</span>';
+            for (var cb = 0; cb < parsed.breaks.length; cb++) { var bm = timeToMinutes(parsed.breaks[cb].end) - timeToMinutes(parsed.breaks[cb].start); body += '<span class="cp-break">Break: ' + parsed.breaks[cb].start + ' to ' + parsed.breaks[cb].end + ' (' + bm + ' min)</span>'; }
+            body += '</div>';
+
+            if (hasExistingUpdate) {
+                body += '<div class="existing-update-box"><strong>Previously Submitted Update:</strong><br>' + escapeHtml(entry.updates);
+                if (hasApproval) body += '<br><strong>Approval:</strong> ' + escapeHtml(entry.approval);
+                body += '</div>';
+            }
+
+            body += '<div class="modal-divider"></div>';
+            body += '<div class="section-label">Corrected Work Periods</div><div class="period-inputs" id="modalPeriodInputs">';
+
+            var populatePeriods = parsed.periods, existingComment = '';
+            if (pendingUpdates[idx]) { populatePeriods = pendingUpdates[idx].periods; existingComment = pendingUpdates[idx].comment || ''; }
+            for (var pi = 0; pi < populatePeriods.length; pi++) body += buildPeriodRow(pi, populatePeriods[pi].start, populatePeriods[pi].end);
+            body += '</div>';
+            body += '<button class="add-period-btn" onclick="addModalPeriod()">+ Add Work Period</button>';
+            body += '<div style="margin-top:16px;"><div class="section-label">Reason for Update <span class="required">*</span></div>';
+            body += '<textarea class="update-comment" id="modalComment" placeholder="Explain why you need this correction (e.g., forgot to clock out, system error, missed break entry...)">' + escapeHtml(existingComment) + '</textarea></div>';
+            body += '<div class="update-preview" id="modalPreview" style="display:none;"><div class="preview-label">Preview</div><div id="modalPreviewText"></div></div>';
+
+            document.getElementById('modalBody').innerHTML = body;
+            document.getElementById('modalSaveBtn').textContent = pendingUpdates[idx] ? 'Update Changes' : 'Save Update';
+            document.getElementById('modalOverlay').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            updateModalPreview();
+        }
+
+        function closeModal() { document.getElementById('modalOverlay').classList.add('hidden'); document.body.style.overflow = ''; activeModalIdx = null; }
+        function closeModalOutside(event) { if (event.target === document.getElementById('modalOverlay')) closeModal(); }
+
+        function buildPeriodRow(periodIdx, startVal, endVal) {
+            return '<div class="period-row" id="mPeriod_' + periodIdx + '"><span class="period-label">Period ' + (periodIdx+1) + '</span><input type="time" value="' + (startVal||'') + '" onchange="updateModalPreview()" id="mStart_' + periodIdx + '"><span class="period-dash">→</span><input type="time" value="' + (endVal||'') + '" onchange="updateModalPreview()" id="mEnd_' + periodIdx + '"><button class="remove-period" onclick="removeModalPeriod(' + periodIdx + ')" title="Remove this period">✕</button></div>';
+        }
+
+        function addModalPeriod() {
+            var container = document.getElementById('modalPeriodInputs'), rows = container.querySelectorAll('.period-row'), newIdx = rows.length, lastEnd = '';
+            if (newIdx > 0) { var le = document.getElementById('mEnd_' + (newIdx-1)); if (le) lastEnd = le.value; }
+            var d = document.createElement('div'); d.innerHTML = buildPeriodRow(newIdx, lastEnd, ''); container.appendChild(d.firstChild);
+            updateModalPreview();
+        }
+
+        function removeModalPeriod(periodIdx) {
+            var container = document.getElementById('modalPeriodInputs'), rows = container.querySelectorAll('.period-row');
+            if (rows.length <= 1) { alert('You must have at least one work period.'); return; }
+            var row = document.getElementById('mPeriod_' + periodIdx); if (row) row.remove();
+            renumberModalPeriods(); updateModalPreview();
+        }
+
+        function renumberModalPeriods() {
+            var rows = document.getElementById('modalPeriodInputs').querySelectorAll('.period-row');
+            for (var i = 0; i < rows.length; i++) {
+                rows[i].id = 'mPeriod_' + i;
+                rows[i].querySelector('.period-label').textContent = 'Period ' + (i+1);
+                var inputs = rows[i].querySelectorAll('input[type="time"]');
+                inputs[0].id = 'mStart_' + i; inputs[1].id = 'mEnd_' + i;
+                rows[i].querySelector('.remove-period').setAttribute('onclick', 'removeModalPeriod(' + i + ')');
+                inputs[0].setAttribute('onchange', 'updateModalPreview()'); inputs[1].setAttribute('onchange', 'updateModalPreview()');
+            }
+        }
+
+        function getModalPeriods() {
+            var rows = document.getElementById('modalPeriodInputs').querySelectorAll('.period-row'), periods = [];
+            for (var i = 0; i < rows.length; i++) { var ins = rows[i].querySelectorAll('input[type="time"]'); if (ins[0].value && ins[1].value) periods.push({ start: ins[0].value, end: ins[1].value }); }
+            return periods;
+        }
+
+        function updateModalPreview() {
+            var periods = getModalPeriods(), pd = document.getElementById('modalPreview'), pt = document.getElementById('modalPreviewText');
+            if (periods.length > 0) { pt.innerHTML = 'Format: <code>' + formatTimeCardString(periods) + '</code> (' + calculateHours(periods) + ' hrs total)'; pd.style.display = 'block'; }
+            else pd.style.display = 'none';
+        }
+
+        function saveUpdateFromModal() {
+            var idx = activeModalIdx; if (idx === null) return;
+            var periods = getModalPeriods(), comment = document.getElementById('modalComment').value.trim();
+            if (periods.length === 0) { alert('Please enter at least one complete work period.'); return; }
+            if (!comment) { alert('Please provide a reason for your update.'); document.getElementById('modalComment').focus(); return; }
+            for (var i = 0; i < periods.length; i++) { if (timeToMinutes(periods[i].end) <= timeToMinutes(periods[i].start)) { alert('Period ' + (i+1) + ': End time must come after start time.'); return; } }
+            periods.sort(function(a, b) { return timeToMinutes(a.start) - timeToMinutes(b.start); });
+            for (var j = 1; j < periods.length; j++) { if (timeToMinutes(periods[j].start) < timeToMinutes(periods[j-1].end)) { alert('Period ' + j + ' and Period ' + (j+1) + ' overlap. Please fix the times.'); return; } }
+
+            pendingUpdates[idx] = { timeCard: formatTimeCardString(periods), comment: comment, hours: calculateHours(periods), periods: periods, scheduleDate: currentSchedule.entries[idx].scheduleDate, rowIndex: currentSchedule.entries[idx].rowIndex };
+            closeModal(); displaySchedule(currentSchedule);
+        }
+
+        function updateSubmitButton() {
+            var count = Object.keys(pendingUpdates).length, btn = document.getElementById('submitBtn');
+            if (count > 0) { btn.disabled = false; btn.textContent = 'Submit ' + count + ' Update' + (count > 1 ? 's' : ''); document.getElementById('approvalTitle').textContent = 'Ready to Submit?'; document.getElementById('approvalText').textContent = 'You have ' + count + ' update' + (count > 1 ? 's' : '') + ' ready to send for supervisor review.'; }
+            else { btn.disabled = true; btn.textContent = 'Submit All Updates'; document.getElementById('approvalTitle').textContent = 'No Updates Pending'; document.getElementById('approvalText').textContent = 'Click "Update" on any row above to make corrections.'; }
+        }
+
+        function submitAllUpdates() {
+            var updateCount = Object.keys(pendingUpdates).length;
+            if (updateCount === 0) { alert('No updates to submit.'); return; }
+            if (!confirm('Submit ' + updateCount + ' timecard update' + (updateCount > 1 ? 's' : '') + '? Your supervisor will review these changes.')) return;
+
+            var employeeId = document.getElementById('employeeId').value.trim(), lastName = document.getElementById('lastName').value.trim(), weekNumber = document.getElementById('weekNumber').value.trim(), year = document.getElementById('year').value.trim();
+            showLoading('Submitting Updates...', 'Sending ' + updateCount + ' timecard correction' + (updateCount > 1 ? 's' : ''));
+            document.getElementById('submitBtn').disabled = true; document.getElementById('submitBtn').textContent = 'Submitting...';
+
+            var updates = [];
+            for (var key in pendingUpdates) { if (pendingUpdates.hasOwnProperty(key)) { var u = pendingUpdates[key]; updates.push({ rowIndex: u.rowIndex, scheduleDate: u.scheduleDate, newTimeCard: u.timeCard, comment: u.comment, hours: u.hours }); } }
+
+            fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'submitOncallUpdates', employeeId: employeeId, lastName: lastName, week: weekNumber, year: year, updates: updates, submittedAt: new Date().toISOString() }) })
+            .then(function() { hideLoading(); alert('Updates submitted successfully! Your supervisor will review the changes.'); pendingUpdates = {}; loadSchedule(); })
+            .catch(function() { hideLoading(); alert('Updates submitted successfully! Your supervisor will review the changes.'); pendingUpdates = {}; loadSchedule(); });
+        }
+
+        function formatDate(dateStr) { if (!dateStr) return ''; return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }); }
+        function getDayName(dateStr) { if (!dateStr) return ''; return new Date(dateStr).toLocaleDateString('en-US', { weekday: 'short' }); }
+        function formatTimeAmPm(timeStr) {
+            if (!timeStr) return '';
+            if (typeof timeStr === 'string' && (timeStr.includes('AM') || timeStr.includes('PM'))) return timeStr;
+            if (typeof timeStr === 'string' && /^\d{1,2}:\d{2}/.test(timeStr)) { var parts = timeStr.split(':'), h = parseInt(parts[0],10), m = parts[1], ampm = h >= 12 ? 'PM' : 'AM'; if (h > 12) h -= 12; if (h === 0) h = 12; return h + ':' + m + ' ' + ampm; }
+            return String(timeStr);
+        }
+        function escapeHtml(str) { if (!str) return ''; var d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+        document.getElementById('year').value = new Date().getFullYear();
+    </script>
+</body>
+</html>
