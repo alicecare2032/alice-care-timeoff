@@ -835,6 +835,201 @@
             }
         }
         
+        /* Inquiry Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 54, 92, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9000;
+            backdrop-filter: blur(2px);
+            padding: 20px;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal-card {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 540px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.25s ease;
+        }
+        
+        @keyframes modalSlideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .modal-header {
+            background: #1A365C;
+            color: white;
+            padding: 18px 24px;
+            border-radius: 14px 14px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.7);
+            font-size: 22px;
+            cursor: pointer;
+            padding: 0 4px;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+        
+        .modal-close:hover {
+            color: white;
+        }
+        
+        .modal-body {
+            padding: 24px;
+        }
+        
+        .modal-service-details {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+        
+        .modal-service-details .detail-row-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #F1F5F9;
+        }
+        
+        .modal-service-details .detail-row-item:last-child {
+            border-bottom: none;
+        }
+        
+        .modal-service-details .detail-label {
+            color: #64748B;
+            font-weight: 500;
+        }
+        
+        .modal-service-details .detail-value {
+            color: #1A365C;
+            font-weight: 600;
+        }
+        
+        .modal-body label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+        
+        .modal-body textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px 14px;
+            border: 2px solid #E2E8F0;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            color: #1A365C;
+            resize: vertical;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: #F8FAFC;
+        }
+        
+        .modal-body textarea:focus {
+            outline: none;
+            border-color: #F57600;
+            box-shadow: 0 0 0 3px rgba(245, 118, 0, 0.15);
+            background: white;
+        }
+        
+        .modal-body textarea::placeholder {
+            color: #94A3B8;
+        }
+        
+        .modal-footer {
+            padding: 0 24px 24px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .modal-footer .btn {
+            padding: 10px 20px;
+        }
+        
+        .inquiry-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            background: #EFF6FF;
+            color: #3B82F6;
+            border: 1px solid #BFDBFE;
+            border-radius: 6px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+        
+        .inquiry-btn:hover {
+            background: #3B82F6;
+            color: white;
+            border-color: #3B82F6;
+        }
+        
+        .inquiry-btn svg {
+            width: 12px;
+            height: 12px;
+        }
+        
+        .modal-success {
+            text-align: center;
+            padding: 30px 20px;
+        }
+        
+        .modal-success svg {
+            width: 50px;
+            height: 50px;
+            stroke: #059669;
+            margin-bottom: 12px;
+        }
+        
+        .modal-success h4 {
+            font-size: 16px;
+            color: #1A365C;
+            margin-bottom: 6px;
+        }
+        
+        .modal-success p {
+            font-size: 13px;
+            color: #64748B;
+        }
+        
         /* Print */
         @media print {
             body { background: white; padding: 0; }
@@ -847,6 +1042,8 @@
             .info-box { display: none; }
             .detail-row.visible { display: table-row; }
             .container { box-shadow: none; }
+            .inquiry-btn { display: none !important; }
+            .modal-overlay { display: none !important; }
         }
     </style>
 </head>
@@ -861,6 +1058,48 @@
     
     <!-- Toast -->
     <div class="toast" id="toast"></div>
+    
+    <!-- Inquiry Modal -->
+    <div class="modal-overlay" id="inquiryModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Ask a Question About This Service</h3>
+                <button class="modal-close" onclick="closeInquiryModal()">&times;</button>
+            </div>
+            <div id="inquiryFormContent">
+                <div class="modal-body">
+                    <div class="modal-service-details" id="modalServiceDetails"></div>
+                    <label for="inquiryText">Your Question or Comment</label>
+                    <textarea id="inquiryText" placeholder="Describe your question about this service. For example: My shift started at 7:00 AM but the report shows 8:00 AM..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeInquiryModal()">Cancel</button>
+                    <button class="btn btn-primary" id="submitInquiryBtn" onclick="submitInquiry()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13"/>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                        </svg>
+                        Submit to HR
+                    </button>
+                </div>
+            </div>
+            <div id="inquirySuccessContent" style="display:none;">
+                <div class="modal-body">
+                    <div class="modal-success">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="16 9 10.5 14.5 8 12"/>
+                        </svg>
+                        <h4>Question Submitted</h4>
+                        <p>HR will review your inquiry and respond to your email on file.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" onclick="closeInquiryModal()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <!-- ============================================
          LOGIN SCREEN
@@ -924,7 +1163,7 @@
             
             <div class="login-footer">
                 If you need help accessing your report, contact your supervisor or email 
-                <a href="mailto:hr@alicecare.com" style="color: #F57600;">hr@alicecare.com</a>
+                <a href="/cdn-cgi/l/email-protection#0d657f4d6c61646e686e6c7f68236e6260" style="color: #F57600;"><span class="__cf_email__" data-cfemail="0c647e4c6d60656f696f6d7e69226f6361">[email&#160;protected]</span></a>
             </div>
         </div>
     </div>
@@ -1042,13 +1281,11 @@
         </div>
     </div>
 
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // ============================================
         // CONFIGURATION
         // ============================================
         const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycby9_bAzLkMv85BLy8OGbTav9hnX4vPp0hiTF-0xzgUo4Bpk2Nh_XkBuJWThpyqq-bpl/exec';
-
-        
         
         // California Personal Attendant OT Rules (Labor Code Section 1451)
         const DAILY_OT_THRESHOLD = 9;
@@ -1075,6 +1312,8 @@
         // State
         let reportData = [];
         let authenticatedProvider = null;
+        let authenticatedEmail = null;
+        let currentInquiryData = null;
         let allExpanded = false;
         let sortState = { main: { col: 'date', dir: 'asc' } };
         let loginAttempts = 0;
@@ -1230,6 +1469,7 @@
                 if (result.success && result.providerName) {
                     // Authentication successful
                     authenticatedProvider = result.providerName;
+                    authenticatedEmail = result.employeeEmail || '';
                     loginAttempts = 0;
                     showReportScreen();
                 } else {
@@ -1266,6 +1506,8 @@
         
         function handleLogout() {
             authenticatedProvider = null;
+            authenticatedEmail = null;
+            currentInquiryData = null;
             reportData = [];
             allExpanded = false;
             sortState = { main: { col: 'date', dir: 'asc' } };
@@ -1833,6 +2075,7 @@
                                                 <th>Non-Worked (TMN)</th>
                                                 <th>Overtime</th>
                                                 <th>Holiday</th>
+                                                <th style="text-align: center;">Ask</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -1875,6 +2118,12 @@
                                                     <td class="${shift.nonWorkedMinutes > 0 ? 'hours-positive' : 'hours-zero'}">${minutesToHHMM(shift.nonWorkedMinutes)}</td>
                                                     <td class="${shift.overtimeMinutes > 0 ? 'hours-overtime' : 'hours-zero'}">${minutesToHHMM(shift.overtimeMinutes)}</td>
                                                     <td class="${shift.holidayMinutes > 0 ? 'hours-overtime' : 'hours-zero'}">${minutesToHHMM(shift.holidayMinutes)}</td>
+                                                    <td style="text-align: center;">
+                                                        <button class="inquiry-btn" onclick="event.stopPropagation(); openInquiry('${day.date}', '${escapeHtml(shift.service['Customer Name'] || '--').replace(/'/g, "\\'")}', '${startDisplay.replace(/'/g, "\\'")}', '${endDisplay.replace(/'/g, "\\'")}', '${minutesToHHMM(shift.regularMinutes)}', '${minutesToHHMM(shift.overtimeMinutes)}', '${minutesToHHMM(shift.nonWorkedMinutes)}', '${minutesToHHMM(shift.holidayMinutes)}')">
+                                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                                            Ask
+                                                        </button>
+                                                    </td>
                                                 </tr>
                                             `}).join('')}
                                         </tbody>
@@ -1954,6 +2203,108 @@
                 year: document.getElementById('yearSelect').value
             });
         }
-    </script>
+        
+        // ============================================
+        // INQUIRY MODAL
+        // ============================================
+        function openInquiry(date, customer, startTime, endTime, regular, overtime, tmn, holiday) {
+            currentInquiryData = {
+                serviceDate: date,
+                customerName: customer,
+                startTime: startTime.replace(/<[^>]*>/g, ''),
+                endTime: endTime.replace(/<[^>]*>/g, ''),
+                regularHrs: regular,
+                overtimeHrs: overtime,
+                tmnHrs: tmn,
+                holidayHrs: holiday,
+                weekNumber: document.getElementById('weekNumber').value,
+                year: document.getElementById('yearSelect').value
+            };
+            
+            // Build service details display
+            const detailsHtml = `
+                <div class="detail-row-item"><span class="detail-label">Date</span><span class="detail-value">${escapeHtml(date)}</span></div>
+                <div class="detail-row-item"><span class="detail-label">Customer</span><span class="detail-value">${escapeHtml(customer)}</span></div>
+                <div class="detail-row-item"><span class="detail-label">Shift</span><span class="detail-value">${escapeHtml(currentInquiryData.startTime)} to ${escapeHtml(currentInquiryData.endTime)}</span></div>
+                <div class="detail-row-item"><span class="detail-label">Regular</span><span class="detail-value">${escapeHtml(regular)}</span></div>
+                <div class="detail-row-item"><span class="detail-label">Overtime</span><span class="detail-value">${escapeHtml(overtime)}</span></div>
+                <div class="detail-row-item"><span class="detail-label">Non-Worked (TMN)</span><span class="detail-value">${escapeHtml(tmn)}</span></div>
+                <div class="detail-row-item"><span class="detail-label">Holiday</span><span class="detail-value">${escapeHtml(holiday)}</span></div>
+            `;
+            
+            document.getElementById('modalServiceDetails').innerHTML = detailsHtml;
+            document.getElementById('inquiryText').value = '';
+            document.getElementById('inquiryFormContent').style.display = 'block';
+            document.getElementById('inquirySuccessContent').style.display = 'none';
+            document.getElementById('submitInquiryBtn').disabled = false;
+            document.getElementById('inquiryModal').classList.add('active');
+        }
+        
+        function closeInquiryModal() {
+            document.getElementById('inquiryModal').classList.remove('active');
+            currentInquiryData = null;
+        }
+        
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('inquiryModal').classList.contains('active')) {
+                closeInquiryModal();
+            }
+        });
+        
+        // Close modal on overlay click
+        document.getElementById('inquiryModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeInquiryModal();
+            }
+        });
+        
+        async function submitInquiry() {
+            if (!currentInquiryData) return;
+            
+            const question = document.getElementById('inquiryText').value.trim();
+            if (!question) {
+                showToast('Please enter your question or comment.', 'warning');
+                return;
+            }
+            
+            const submitBtn = document.getElementById('submitInquiryBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px;margin:0;"></span> Sending...';
+            
+            try {
+                const result = await jsonpFetch({
+                    action: 'sendEmployeeInquiry',
+                    employeeName: authenticatedProvider,
+                    employeeEmail: authenticatedEmail || '',
+                    serviceDate: currentInquiryData.serviceDate,
+                    customerName: currentInquiryData.customerName,
+                    startTime: currentInquiryData.startTime,
+                    endTime: currentInquiryData.endTime,
+                    regularHrs: currentInquiryData.regularHrs,
+                    overtimeHrs: currentInquiryData.overtimeHrs,
+                    tmnHrs: currentInquiryData.tmnHrs,
+                    holidayHrs: currentInquiryData.holidayHrs,
+                    weekNumber: currentInquiryData.weekNumber,
+                    year: currentInquiryData.year,
+                    question: question
+                });
+                
+                if (result.success) {
+                    document.getElementById('inquiryFormContent').style.display = 'none';
+                    document.getElementById('inquirySuccessContent').style.display = 'block';
+                    showToast('Question submitted to HR!', 'success');
+                } else {
+                    showToast(result.error || 'Failed to submit. Please try again.', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Submit to HR';
+                }
+            } catch (error) {
+                showToast('Connection error. Please try again.', 'error');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Submit to HR';
+            }
+        }
+     </script>
 </body>
 </html>
