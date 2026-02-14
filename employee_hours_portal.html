@@ -1160,7 +1160,7 @@
             
             <div class="login-footer">
                 If you need help accessing your report, contact your supervisor or email 
-                <a href="/cdn-cgi/l/email-protection#0d657f4d6c61646e686e6c7f68236e6260" style="color: #F57600;"><span class="__cf_email__" data-cfemail="0c647e4c6d60656f696f6d7e69226f6361">[email&#160;protected]</span></a>
+                <a href="mailto:hr@alicecare.com" style="color: #F57600;">hr@alicecare.com</a>
             </div>
         </div>
     </div>
@@ -1188,6 +1188,11 @@
             <!-- Toolbar -->
             <div class="toolbar">
                 <div class="filter-controls">
+                    <div class="filter-group">
+                        <label>Pick a Date</label>
+                        <input type="date" id="datePicker" style="width: 160px;" onchange="dateToWeek()">
+                    </div>
+                    <div style="display: flex; align-items: center; color: #94A3B8; font-size: 12px; font-weight: 500; padding-top: 18px;">or</div>
                     <div class="filter-group">
                         <label>Week #</label>
                         <input type="number" id="weekNumber" min="1" max="53" placeholder="1-53" style="width: 80px;">
@@ -1269,14 +1274,14 @@
                             <line x1="3" y1="10" x2="21" y2="10"/>
                         </svg>
                         <h3>Select a Pay Week</h3>
-                        <p>Choose a week number and year above, then click "View Report" to see your hours breakdown.</p>
+                        <p>Pick a date or enter a week number above, then click "View Report" to see your hours breakdown.</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    <script>
         // ============================================
         // CONFIGURATION
         // ============================================
@@ -1686,10 +1691,46 @@
                 yearSelect.innerHTML += `<option value="${y}">${y}</option>`;
             }
             
+            // Set date picker to today and derive week from it
             const now = new Date();
-            const start = new Date(now.getFullYear(), 0, 1);
-            const currentWeek = Math.ceil((now - start) / (7 * 24 * 60 * 60 * 1000));
-            document.getElementById('weekNumber').value = currentWeek;
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            document.getElementById('datePicker').value = `${yyyy}-${mm}-${dd}`;
+            dateToWeek();
+        }
+        
+        // Convert a selected date to ISO week number and update the fields
+        function dateToWeek() {
+            const dateVal = document.getElementById('datePicker').value;
+            if (!dateVal) return;
+            
+            const parts = dateVal.split('-');
+            const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]), 12, 0, 0);
+            
+            // ISO week number calculation
+            const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            const dayNum = d.getDay() || 7;
+            d.setDate(d.getDate() + 4 - dayNum);
+            const yearStart = new Date(d.getFullYear(), 0, 1);
+            const weekNum = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            const weekYear = d.getFullYear();
+            
+            document.getElementById('weekNumber').value = weekNum;
+            
+            // Set the year dropdown
+            const yearSelect = document.getElementById('yearSelect');
+            for (let i = 0; i < yearSelect.options.length; i++) {
+                if (parseInt(yearSelect.options[i].value) === weekYear) {
+                    yearSelect.selectedIndex = i;
+                    break;
+                }
+            }
+        }
+        
+        // Clear date picker when user manually types a week number
+        function clearDatePicker() {
+            document.getElementById('datePicker').value = '';
         }
         
         // ============================================
