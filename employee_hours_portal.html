@@ -2083,11 +2083,12 @@
                 yearSelect.innerHTML += `<option value="${y}">${y}</option>`;
             }
             
-            // Set date picker to today and derive week from it
+            // Set date picker to last week (current week not yet uploaded)
             const now = new Date();
-            const yyyy = now.getFullYear();
-            const mm = String(now.getMonth() + 1).padStart(2, '0');
-            const dd = String(now.getDate()).padStart(2, '0');
+            const lastWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            const yyyy = lastWeek.getFullYear();
+            const mm = String(lastWeek.getMonth() + 1).padStart(2, '0');
+            const dd = String(lastWeek.getDate()).padStart(2, '0');
             document.getElementById('datePicker').value = `${yyyy}-${mm}-${dd}`;
             dateToWeek();
         }
