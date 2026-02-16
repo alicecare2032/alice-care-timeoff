@@ -24,7 +24,7 @@
         .form-group { display: flex; flex-direction: column; }
         .form-group label { font-size: 13px; color: #1A365C; font-weight: 500; margin-bottom: 6px; }
         .required { color: #FF7475; }
-        input[type="text"], input[type="number"], input[type="time"], select, textarea { padding: 12px 14px; border: 2px solid #D3D7DF; border-radius: 8px; font-size: 16px; font-family: 'Poppins', sans-serif; transition: all 0.3s; background: white; -webkit-appearance: none; }
+        input[type="text"], input[type="number"], select, textarea { padding: 12px 14px; border: 2px solid #D3D7DF; border-radius: 8px; font-size: 16px; font-family: 'Poppins', sans-serif; transition: all 0.3s; background: white; -webkit-appearance: none; }
         input:focus, select:focus, textarea:focus { outline: none; border-color: #F57600; box-shadow: 0 0 0 3px rgba(245,118,0,0.1); }
         textarea { resize: vertical; min-height: 60px; }
         .btn { padding: 14px 28px; border: none; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 16px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
@@ -48,10 +48,10 @@
         .notice-box.info { background: #E8F4FD; border-left-color: #1A365C; }
 
         /* TIME FORMAT TOGGLE */
-        .time-format-toggle { display: inline-flex; align-items: center; background: #E5ECF3; border-radius: 8px; padding: 3px; gap: 0; margin-left: 16px; vertical-align: middle; }
-        .time-format-toggle .tf-btn { padding: 5px 12px; border: none; border-radius: 6px; font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; background: transparent; color: #9CA3AF; }
-        .time-format-toggle .tf-btn.active { background: #1A365C; color: white; box-shadow: 0 2px 6px rgba(26,54,92,0.2); }
-        .time-format-toggle .tf-btn:hover:not(.active) { color: #1A365C; }
+        .time-format-toggle { display: inline-flex; align-items: center; background: rgba(255,255,255,0.15); border-radius: 8px; padding: 3px; gap: 0; }
+        .time-format-toggle .tf-btn { padding: 5px 12px; border: none; border-radius: 6px; font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; background: transparent; color: rgba(255,255,255,0.6); }
+        .time-format-toggle .tf-btn.active { background: #F57600; color: white; box-shadow: 0 2px 6px rgba(245,118,0,0.3); }
+        .time-format-toggle .tf-btn:hover:not(.active) { color: white; }
 
         /* TABLE */
         .timecard-table-wrap { overflow-x: auto; margin-bottom: 25px; border-radius: 10px; border: 2px solid #E5ECF3; }
@@ -112,15 +112,21 @@
         .modal-divider { height: 2px; background: #E5ECF3; margin: 20px 0; }
         .section-label { font-size: 11px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
         .period-inputs { margin-bottom: 12px; }
-        .period-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding: 10px 12px; background: #F8FAFC; border-radius: 8px; border: 1px solid #E5ECF3; }
+        .period-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding: 10px 12px; background: #F8FAFC; border-radius: 8px; border: 1px solid #E5ECF3; flex-wrap: wrap; }
         .period-row .period-label { font-size: 12px; font-weight: 600; color: #1A365C; min-width: 65px; }
-        .period-row input[type="time"] { padding: 8px 10px; font-size: 14px; border: 2px solid #D3D7DF; border-radius: 6px; font-family: 'Poppins', sans-serif; width: 120px; background: white; }
-        .period-row input[type="time"]:focus { outline: none; border-color: #F57600; box-shadow: 0 0 0 3px rgba(245,118,0,0.1); }
         .period-row .period-dash { color: #9CA3AF; font-weight: 600; font-size: 18px; }
         .period-row .remove-period { padding: 6px 10px; background: none; border: 1px solid #D3D7DF; border-radius: 6px; cursor: pointer; font-size: 14px; color: #FF7475; transition: all 0.2s; font-family: 'Poppins', sans-serif; margin-left: auto; }
         .period-row .remove-period:hover { background: #FF7475; color: white; border-color: #FF7475; }
         .add-period-btn { padding: 8px 14px; background: none; border: 2px dashed #D3D7DF; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; color: #1A365C; font-family: 'Poppins', sans-serif; transition: all 0.2s; width: 100%; text-align: center; }
         .add-period-btn:hover { border-color: #F57600; color: #F57600; background: #FFF4E5; }
+
+        /* CUSTOM TIME PICKER */
+        .time-picker { display: inline-flex; align-items: center; gap: 2px; }
+        .time-picker select { padding: 8px 4px; font-size: 14px; border: 2px solid #D3D7DF; border-radius: 6px; font-family: 'Poppins', sans-serif; background: white; color: #1A365C; font-weight: 500; cursor: pointer; -webkit-appearance: none; -moz-appearance: none; appearance: none; text-align: center; min-width: 54px; }
+        .time-picker select:focus { outline: none; border-color: #F57600; box-shadow: 0 0 0 3px rgba(245,118,0,0.1); }
+        .time-picker .tp-colon { font-weight: 700; color: #1A365C; font-size: 16px; margin: 0 1px; }
+        .time-picker .tp-ampm select { min-width: 56px; font-size: 12px; font-weight: 600; background: #E5ECF3; border-color: #D3D7DF; color: #1A365C; margin-left: 2px; }
+
         .update-comment { width: 100%; padding: 10px 14px; border: 2px solid #D3D7DF; border-radius: 8px; font-size: 14px; font-family: 'Poppins', sans-serif; resize: vertical; min-height: 70px; margin-top: 8px; }
         .update-comment:focus { outline: none; border-color: #F57600; box-shadow: 0 0 0 3px rgba(245,118,0,0.1); }
         .update-preview { margin-top: 12px; padding: 10px 14px; background: #FFF4E5; border-radius: 8px; font-size: 12px; color: #3D3D3D; }
@@ -163,8 +169,7 @@
             .modal-body { padding: 20px; }
             .modal-footer { padding: 16px 20px; }
             .modal-info-grid { grid-template-columns: 1fr; }
-            .period-row { flex-wrap: wrap; }
-            .period-row input[type="time"] { width: 100px; }
+            .period-row .time-picker select { min-width: 46px; padding: 8px 2px; font-size: 13px; }
             .modal-footer .btn { min-width: auto; flex: 1; }
         }
         @media (max-width: 480px) { .header h1 { font-size: 18px; } .stat-card .number { font-size: 22px; } }
@@ -261,7 +266,7 @@
         let pendingUpdates = {};
         let activeModalIdx = null;
         let isSubmitted = false;
-        let timeFormat = '12h'; // default to 12-hour
+        let timeFormat = '12h';
 
         function setTimeFormat(fmt) {
             timeFormat = fmt;
@@ -317,7 +322,7 @@
             document.body.appendChild(script);
         }
 
-        // Parse
+        /* ── Parsing ── */
         function parseTimeCard(timeCardStr) {
             if (!timeCardStr || typeof timeCardStr !== 'string') return { periods: [], breaks: [] };
             var periods = [], breaks = [], segments = timeCardStr.split(','), allTimes = [];
@@ -337,60 +342,183 @@
         function calculateHours(periods) { var t = 0; for (var i = 0; i < periods.length; i++) { var s = timeToMinutes(periods[i].start), e = timeToMinutes(periods[i].end); if (e > s) t += (e - s); } return (t/60).toFixed(1); }
         function calculateBreakMins(breaks) { var t = 0; for (var i = 0; i < breaks.length; i++) { var s = timeToMinutes(breaks[i].start), e = timeToMinutes(breaks[i].end); if (e > s) t += (e - s); } return t; }
 
-        // Format time based on selected format
-        function formatTimeDisplay(timeStr) {
+        /* ── Time Display Formatting ── */
+        function to24h(timeStr) {
             if (!timeStr) return '';
-            // Normalize: if already has AM/PM, parse it first to 24h
-            var h, m;
             if (typeof timeStr === 'string' && (timeStr.includes('AM') || timeStr.includes('PM'))) {
-                var clean = timeStr.replace(/\s+/g, ' ').trim();
-                var match = clean.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+                var match = timeStr.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
                 if (match) {
-                    h = parseInt(match[1], 10);
-                    m = match[2];
-                    var ampm = match[3].toUpperCase();
-                    if (ampm === 'PM' && h < 12) h += 12;
-                    if (ampm === 'AM' && h === 12) h = 0;
-                } else {
-                    return String(timeStr);
+                    var h = parseInt(match[1], 10), m = match[2], ap = match[3].toUpperCase();
+                    if (ap === 'PM' && h < 12) h += 12;
+                    if (ap === 'AM' && h === 12) h = 0;
+                    return String(h).padStart(2, '0') + ':' + m;
                 }
-            } else if (typeof timeStr === 'string' && /^\d{1,2}:\d{2}/.test(timeStr)) {
-                var parts = timeStr.split(':');
-                h = parseInt(parts[0], 10);
-                m = parts[1];
-            } else {
-                return String(timeStr);
             }
-
-            if (timeFormat === '24h') {
-                return String(h).padStart(2, '0') + ':' + m;
-            } else {
-                var suffix = h >= 12 ? 'PM' : 'AM';
-                var h12 = h > 12 ? h - 12 : h;
-                if (h12 === 0) h12 = 12;
-                return h12 + ':' + m + ' ' + suffix;
-            }
+            if (/^\d{1,2}:\d{2}$/.test(timeStr)) return timeStr.length < 5 ? '0' + timeStr : timeStr;
+            return timeStr;
         }
 
-        // Format timecard string for display (respects 12h/24h)
+        function formatTimeDisplay(timeStr) {
+            if (!timeStr) return '';
+            var t24 = to24h(timeStr);
+            if (!t24 || !/^\d{2}:\d{2}$/.test(t24)) return String(timeStr);
+            var h = parseInt(t24.substring(0,2), 10), m = t24.substring(3,5);
+            if (timeFormat === '24h') return String(h).padStart(2,'0') + ':' + m;
+            var suffix = h >= 12 ? 'PM' : 'AM', h12 = h > 12 ? h - 12 : h;
+            if (h12 === 0) h12 = 12;
+            return h12 + ':' + m + ' ' + suffix;
+        }
+
         function formatTimeCardDisplay(timeCardStr) {
             if (!timeCardStr || typeof timeCardStr !== 'string') return 'N/A';
-            var segments = timeCardStr.split(',');
-            var formatted = [];
+            var segments = timeCardStr.split(','), formatted = [];
             for (var i = 0; i < segments.length; i++) {
-                var seg = segments[i].trim();
-                if (!seg) continue;
-                var parts = seg.split('-');
-                var fParts = [];
-                for (var j = 0; j < parts.length; j++) {
-                    fParts.push(formatTimeDisplay(parts[j].trim()));
-                }
+                var seg = segments[i].trim(); if (!seg) continue;
+                var parts = seg.split('-'), fParts = [];
+                for (var j = 0; j < parts.length; j++) fParts.push(formatTimeDisplay(parts[j].trim()));
                 formatted.push(fParts.join(' to '));
             }
             return formatted.join(', ');
         }
 
-        // Display as Table
+        /* ── Custom Time Picker Builder ── */
+        function buildHourOptions(selectedH) {
+            var html = '<option value="">--</option>';
+            if (timeFormat === '12h') {
+                for (var h = 1; h <= 12; h++) {
+                    html += '<option value="' + h + '"' + (h === selectedH ? ' selected' : '') + '>' + h + '</option>';
+                }
+            } else {
+                for (var h = 0; h <= 23; h++) {
+                    html += '<option value="' + h + '"' + (h === selectedH ? ' selected' : '') + '>' + String(h).padStart(2,'0') + '</option>';
+                }
+            }
+            return html;
+        }
+
+        function buildMinuteOptions(selectedM) {
+            var html = '<option value="">--</option>';
+            var added = {};
+            for (var m = 0; m <= 59; m += 5) {
+                html += '<option value="' + m + '"' + (m === selectedM ? ' selected' : '') + '>' + String(m).padStart(2,'0') + '</option>';
+                added[m] = true;
+            }
+            if (selectedM !== null && selectedM !== undefined && selectedM >= 0 && !added[selectedM]) {
+                html += '<option value="' + selectedM + '" selected>' + String(selectedM).padStart(2,'0') + '</option>';
+            }
+            return html;
+        }
+
+        function buildAmPmOptions(sel) {
+            return '<option value="AM"' + (sel === 'AM' ? ' selected' : '') + '>AM</option><option value="PM"' + (sel === 'PM' ? ' selected' : '') + '>PM</option>';
+        }
+
+        function timeToPicker(time24) {
+            if (!time24) return { h: null, m: null, ampm: 'AM' };
+            var t = to24h(time24);
+            if (!t || !/^\d{2}:\d{2}$/.test(t)) return { h: null, m: null, ampm: 'AM' };
+            var h24 = parseInt(t.substring(0,2), 10), min = parseInt(t.substring(3,5), 10);
+            if (timeFormat === '12h') {
+                var ampm = h24 >= 12 ? 'PM' : 'AM';
+                var h12 = h24 > 12 ? h24 - 12 : h24;
+                if (h12 === 0) h12 = 12;
+                return { h: h12, m: min, ampm: ampm };
+            }
+            return { h: h24, m: min, ampm: 'AM' };
+        }
+
+        function readPickerValue(prefix, idx) {
+            var hSel = document.getElementById(prefix + 'H_' + idx);
+            var mSel = document.getElementById(prefix + 'M_' + idx);
+            if (!hSel || !mSel || hSel.value === '' || mSel.value === '') return '';
+            var h = parseInt(hSel.value, 10), m = parseInt(mSel.value, 10);
+            if (timeFormat === '12h') {
+                var apSel = document.getElementById(prefix + 'AP_' + idx);
+                var ap = apSel ? apSel.value : 'AM';
+                if (ap === 'PM' && h < 12) h += 12;
+                if (ap === 'AM' && h === 12) h = 0;
+            }
+            return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+        }
+
+        function buildTimePicker(prefix, idx, time24) {
+            var vals = timeToPicker(time24);
+            var html = '<div class="time-picker">';
+            html += '<select id="' + prefix + 'H_' + idx + '" onchange="updateModalPreview()">' + buildHourOptions(vals.h) + '</select>';
+            html += '<span class="tp-colon">:</span>';
+            html += '<select id="' + prefix + 'M_' + idx + '" onchange="updateModalPreview()">' + buildMinuteOptions(vals.m) + '</select>';
+            if (timeFormat === '12h') {
+                html += '<span class="tp-ampm"><select id="' + prefix + 'AP_' + idx + '" onchange="updateModalPreview()">' + buildAmPmOptions(vals.ampm) + '</select></span>';
+            }
+            html += '</div>';
+            return html;
+        }
+
+        /* ── Period Row ── */
+        function buildPeriodRow(periodIdx, startVal, endVal) {
+            var html = '<div class="period-row" id="mPeriod_' + periodIdx + '">';
+            html += '<span class="period-label">Period ' + (periodIdx + 1) + '</span>';
+            html += buildTimePicker('mStart', periodIdx, startVal);
+            html += '<span class="period-dash">→</span>';
+            html += buildTimePicker('mEnd', periodIdx, endVal);
+            html += '<button class="remove-period" onclick="removeModalPeriod(' + periodIdx + ')" title="Remove this period">✕</button>';
+            html += '</div>';
+            return html;
+        }
+
+        function addModalPeriod() {
+            var container = document.getElementById('modalPeriodInputs'), rows = container.querySelectorAll('.period-row'), newIdx = rows.length;
+            var lastEnd = '';
+            if (newIdx > 0) lastEnd = readPickerValue('mEnd', newIdx - 1);
+            var d = document.createElement('div'); d.innerHTML = buildPeriodRow(newIdx, lastEnd, '');
+            container.appendChild(d.firstChild);
+            updateModalPreview();
+        }
+
+        function removeModalPeriod(periodIdx) {
+            var container = document.getElementById('modalPeriodInputs'), rows = container.querySelectorAll('.period-row');
+            if (rows.length <= 1) { alert('You must have at least one work period.'); return; }
+            var row = document.getElementById('mPeriod_' + periodIdx); if (row) row.remove();
+            renumberModalPeriods(); updateModalPreview();
+        }
+
+        function renumberModalPeriods() {
+            var container = document.getElementById('modalPeriodInputs');
+            var rows = container.querySelectorAll('.period-row');
+            var values = [];
+            for (var i = 0; i < rows.length; i++) {
+                var oldIdx = parseInt(rows[i].id.replace('mPeriod_', ''), 10);
+                values.push({ start: readPickerValue('mStart', oldIdx), end: readPickerValue('mEnd', oldIdx) });
+            }
+            container.innerHTML = '';
+            for (var j = 0; j < values.length; j++) {
+                var d = document.createElement('div');
+                d.innerHTML = buildPeriodRow(j, values[j].start, values[j].end);
+                container.appendChild(d.firstChild);
+            }
+        }
+
+        function getModalPeriods() {
+            var rows = document.getElementById('modalPeriodInputs').querySelectorAll('.period-row'), periods = [];
+            for (var i = 0; i < rows.length; i++) {
+                var idx = parseInt(rows[i].id.replace('mPeriod_', ''), 10);
+                var s = readPickerValue('mStart', idx), e = readPickerValue('mEnd', idx);
+                if (s && e) periods.push({ start: s, end: e });
+            }
+            return periods;
+        }
+
+        function updateModalPreview() {
+            var periods = getModalPeriods(), pd = document.getElementById('modalPreview'), pt = document.getElementById('modalPreviewText');
+            if (periods.length > 0) {
+                var displayParts = [];
+                for (var i = 0; i < periods.length; i++) displayParts.push(formatTimeDisplay(periods[i].start) + ' to ' + formatTimeDisplay(periods[i].end));
+                pt.innerHTML = displayParts.join(', ') + ' <strong>(' + calculateHours(periods) + ' hrs total)</strong>';
+                pd.style.display = 'block';
+            } else { pd.style.display = 'none'; }
+        }
+
+        /* ── Display Table ── */
         function displaySchedule(data) {
             document.getElementById('statsSection').classList.remove('hidden');
             document.getElementById('reportSection').classList.remove('hidden');
@@ -419,15 +547,13 @@
                 else if (hasPending) html += '<span class="badge badge-pending">Updated</span>';
                 else html += '<span class="badge badge-pending">Pending</span>';
                 html += '</td>';
-
                 html += '<td>';
                 if (isSubmitted || hasExistingUpdate) {
                     html += '<button class="btn-update" disabled>Submitted</button>';
                 } else {
                     html += '<button class="' + (hasPending ? 'btn-update is-pending' : 'btn-update') + '" onclick="openUpdateModal(' + i + ')">' + (hasPending ? '✏️ Edit' : '✏️ Update') + '</button>';
                 }
-                html += '</td>';
-                html += '</tr>';
+                html += '</td></tr>';
             }
 
             html += '</tbody></table></div>';
@@ -459,7 +585,7 @@
             html += '</div>'; return html;
         }
 
-        // Modal
+        /* ── Modal ── */
         function openUpdateModal(idx) {
             activeModalIdx = idx;
             var entry = currentSchedule.entries[idx], parsed = parseTimeCard(entry.timeCard);
@@ -477,7 +603,6 @@
             body += '<div class="modal-info-item"><div class="label">Actual Clock Out</div><div class="value">' + (entry.end ? formatTimeDisplay(entry.end) : 'N/A') + '</div></div>';
             body += '</div>';
 
-            // Timeline
             if (parsed.periods.length) {
                 var st = entry.startTime || '06:00', et = entry.endTime || '19:00';
                 if (timeToMinutes(parsed.periods[0].start) < timeToMinutes(st)) st = parsed.periods[0].start;
@@ -491,7 +616,6 @@
                 }
             }
 
-            // Current periods
             body += '<div class="section-label">Current Work Periods</div><div class="current-periods">';
             for (var cp = 0; cp < parsed.periods.length; cp++) body += '<span class="cp-tag">Period ' + (cp+1) + ': ' + formatTimeDisplay(parsed.periods[cp].start) + ' to ' + formatTimeDisplay(parsed.periods[cp].end) + '</span>';
             for (var cb = 0; cb < parsed.breaks.length; cb++) { var bm = timeToMinutes(parsed.breaks[cb].end) - timeToMinutes(parsed.breaks[cb].start); body += '<span class="cp-break">Break: ' + formatTimeDisplay(parsed.breaks[cb].start) + ' to ' + formatTimeDisplay(parsed.breaks[cb].end) + ' (' + bm + ' min)</span>'; }
@@ -525,54 +649,6 @@
         function closeModal() { document.getElementById('modalOverlay').classList.add('hidden'); document.body.style.overflow = ''; activeModalIdx = null; }
         function closeModalOutside(event) { if (event.target === document.getElementById('modalOverlay')) closeModal(); }
 
-        function buildPeriodRow(periodIdx, startVal, endVal) {
-            return '<div class="period-row" id="mPeriod_' + periodIdx + '"><span class="period-label">Period ' + (periodIdx+1) + '</span><input type="time" value="' + (startVal||'') + '" onchange="updateModalPreview()" id="mStart_' + periodIdx + '"><span class="period-dash">→</span><input type="time" value="' + (endVal||'') + '" onchange="updateModalPreview()" id="mEnd_' + periodIdx + '"><button class="remove-period" onclick="removeModalPeriod(' + periodIdx + ')" title="Remove this period">✕</button></div>';
-        }
-
-        function addModalPeriod() {
-            var container = document.getElementById('modalPeriodInputs'), rows = container.querySelectorAll('.period-row'), newIdx = rows.length, lastEnd = '';
-            if (newIdx > 0) { var le = document.getElementById('mEnd_' + (newIdx-1)); if (le) lastEnd = le.value; }
-            var d = document.createElement('div'); d.innerHTML = buildPeriodRow(newIdx, lastEnd, ''); container.appendChild(d.firstChild);
-            updateModalPreview();
-        }
-
-        function removeModalPeriod(periodIdx) {
-            var container = document.getElementById('modalPeriodInputs'), rows = container.querySelectorAll('.period-row');
-            if (rows.length <= 1) { alert('You must have at least one work period.'); return; }
-            var row = document.getElementById('mPeriod_' + periodIdx); if (row) row.remove();
-            renumberModalPeriods(); updateModalPreview();
-        }
-
-        function renumberModalPeriods() {
-            var rows = document.getElementById('modalPeriodInputs').querySelectorAll('.period-row');
-            for (var i = 0; i < rows.length; i++) {
-                rows[i].id = 'mPeriod_' + i;
-                rows[i].querySelector('.period-label').textContent = 'Period ' + (i+1);
-                var inputs = rows[i].querySelectorAll('input[type="time"]');
-                inputs[0].id = 'mStart_' + i; inputs[1].id = 'mEnd_' + i;
-                rows[i].querySelector('.remove-period').setAttribute('onclick', 'removeModalPeriod(' + i + ')');
-                inputs[0].setAttribute('onchange', 'updateModalPreview()'); inputs[1].setAttribute('onchange', 'updateModalPreview()');
-            }
-        }
-
-        function getModalPeriods() {
-            var rows = document.getElementById('modalPeriodInputs').querySelectorAll('.period-row'), periods = [];
-            for (var i = 0; i < rows.length; i++) { var ins = rows[i].querySelectorAll('input[type="time"]'); if (ins[0].value && ins[1].value) periods.push({ start: ins[0].value, end: ins[1].value }); }
-            return periods;
-        }
-
-        function updateModalPreview() {
-            var periods = getModalPeriods(), pd = document.getElementById('modalPreview'), pt = document.getElementById('modalPreviewText');
-            if (periods.length > 0) {
-                var displayPeriods = [];
-                for (var i = 0; i < periods.length; i++) displayPeriods.push(formatTimeDisplay(periods[i].start) + ' to ' + formatTimeDisplay(periods[i].end));
-                pt.innerHTML = 'Format: <code>' + formatTimeCardString(periods) + '</code> (' + calculateHours(periods) + ' hrs total)';
-                pd.style.display = 'block';
-            } else {
-                pd.style.display = 'none';
-            }
-        }
-
         function saveUpdateFromModal() {
             var idx = activeModalIdx; if (idx === null) return;
             var periods = getModalPeriods(), comment = document.getElementById('modalComment').value.trim();
@@ -597,14 +673,12 @@
                 document.getElementById('approvalTitle').textContent = 'Timecard Submitted';
                 document.getElementById('approvalText').textContent = 'All entries have been submitted for supervisor review. You will receive a notification once approved.';
             } else if (count > 0) {
-                // Has pending edits: show both buttons
                 confirmBtn.disabled = false; confirmBtn.textContent = '✓ Confirm & Submit All';
                 submitBtn.style.display = 'inline-flex'; submitBtn.disabled = false;
                 submitBtn.textContent = 'Submit ' + count + ' Update' + (count > 1 ? 's' : '');
                 document.getElementById('approvalTitle').textContent = 'Ready to Submit';
                 document.getElementById('approvalText').textContent = 'You have ' + count + ' update' + (count > 1 ? 's' : '') + '. Use "Confirm & Submit All" to approve everything, or "Submit Updates" to send only your corrections.';
             } else {
-                // No edits: show confirm button only
                 confirmBtn.disabled = false; confirmBtn.textContent = '✓ Confirm & Submit All';
                 submitBtn.style.display = 'none';
                 document.getElementById('approvalTitle').textContent = 'Review Your Timecard';
@@ -612,7 +686,6 @@
             }
         }
 
-        // Submit with corrections only
         function submitAllUpdates() {
             var updateCount = Object.keys(pendingUpdates).length;
             if (updateCount === 0) { alert('No updates to submit. Use "Confirm & Submit All" to approve your timecard as is.'); return; }
@@ -620,7 +693,6 @@
             executeSubmit(true);
         }
 
-        // Confirm and submit all (no edits needed)
         function submitConfirmAll() {
             var updateCount = Object.keys(pendingUpdates).length;
             var msg = updateCount > 0
@@ -640,7 +712,6 @@
             var updates = [];
             for (var key in pendingUpdates) { if (pendingUpdates.hasOwnProperty(key)) { var u = pendingUpdates[key]; updates.push({ rowIndex: u.rowIndex, scheduleDate: u.scheduleDate, newTimeCard: u.timeCard, comment: u.comment, hours: u.hours }); } }
 
-            // Send all row indices so backend can mark unchanged rows as Submitted
             var allRowIndices = [];
             for (var r = 0; r < currentSchedule.entries.length; r++) { allRowIndices.push(currentSchedule.entries[r].rowIndex); }
 
