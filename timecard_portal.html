@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>alice.care Timecard Review v2.0</title>
+    <title>alice.care Timecard Review v2.1</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -46,6 +46,12 @@
         .notice-box { background: #FFF4E5; border-left: 4px solid #F57600; padding: 15px 20px; border-radius: 8px; margin-bottom: 25px; }
         .notice-box p { color: #3D3D3D; font-size: 13px; line-height: 1.6; }
         .notice-box.info { background: #E8F4FD; border-left-color: #1A365C; }
+
+        /* TIME FORMAT TOGGLE */
+        .time-format-toggle { display: inline-flex; align-items: center; background: #E5ECF3; border-radius: 8px; padding: 3px; gap: 0; margin-left: 16px; vertical-align: middle; }
+        .time-format-toggle .tf-btn { padding: 5px 12px; border: none; border-radius: 6px; font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; background: transparent; color: #9CA3AF; }
+        .time-format-toggle .tf-btn.active { background: #1A365C; color: white; box-shadow: 0 2px 6px rgba(26,54,92,0.2); }
+        .time-format-toggle .tf-btn:hover:not(.active) { color: #1A365C; }
 
         /* TABLE */
         .timecard-table-wrap { overflow-x: auto; margin-bottom: 25px; border-radius: 10px; border: 2px solid #E5ECF3; }
@@ -125,6 +131,7 @@
         .approval-section { background: #E5ECF3; padding: 25px; border-radius: 8px; margin-top: 30px; text-align: center; }
         .approval-section h3 { font-size: 18px; color: #1A365C; margin-bottom: 15px; }
         .approval-section p { font-size: 13px; color: #3D3D3D; margin-bottom: 20px; }
+        .submit-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
         .empty-state { text-align: center; padding: 60px 20px; color: #3D3D3D; }
         .empty-state h3 { font-size: 20px; color: #1A365C; margin-bottom: 10px; }
         .empty-state p { font-size: 14px; opacity: 0.8; }
@@ -136,15 +143,18 @@
         .hidden { display: none !important; }
         @media (max-width: 768px) {
             body { padding: 10px; }
-            .nav-bar { padding: 12px 15px; margin-bottom: 15px; }
+            .nav-bar { padding: 12px 15px; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
             .logo { font-size: 20px; }
             .header { padding: 20px 15px; }
             .header h1 { font-size: 22px; }
+            .header-row { flex-direction: column; align-items: flex-start !important; gap: 10px; }
             .lookup-section { padding: 20px 15px; }
             .lookup-grid { grid-template-columns: 1fr; gap: 12px; }
             .stats-row { grid-template-columns: 1fr 1fr; padding: 15px; gap: 12px; }
             .report-section { padding: 20px 15px; }
             .btn { width: 100%; padding: 14px 20px; }
+            .submit-buttons { flex-direction: column; align-items: center; }
+            .submit-buttons .btn { width: 100%; max-width: 320px; }
             .timecard-table { font-size: 13px; }
             .timecard-table thead th { padding: 10px 12px; font-size: 11px; }
             .timecard-table tbody td { padding: 10px 12px; }
@@ -191,8 +201,16 @@
 
     <div class="container">
         <div class="header">
-            <h1>Timecard Review Portal</h1>
-            <p>Review and update your weekly schedule and time entries</p>
+            <div class="header-row" style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <h1>Timecard Review Portal</h1>
+                    <p>Review and update your weekly schedule and time entries</p>
+                </div>
+                <div class="time-format-toggle" id="timeFormatToggle">
+                    <button class="tf-btn active" id="tfBtn12" onclick="setTimeFormat('12h')">12H</button>
+                    <button class="tf-btn" id="tfBtn24" onclick="setTimeFormat('24h')">24H</button>
+                </div>
+            </div>
         </div>
 
         <div class="lookup-section">
@@ -215,13 +233,16 @@
 
         <div id="reportSection" class="report-section hidden">
             <div class="notice-box">
-                <p><strong>How to update:</strong> Click the <strong>Update</strong> button on any row to open the correction form. Add or remove work periods, provide a reason, then save. When finished, click <strong>Submit All Updates</strong> at the bottom.</p>
+                <p><strong>How to use:</strong> Review your timecard entries below. If everything looks correct, click <strong>Confirm &amp; Submit All</strong> to approve your timecard as is. To make corrections, click <strong>Update</strong> on any row, then click <strong>Submit Updates</strong> when finished.</p>
             </div>
             <div id="scheduleTableWrap"></div>
             <div class="approval-section" id="approvalSection">
-                <h3 id="approvalTitle">No Updates Pending</h3>
-                <p id="approvalText">Click "Update" on any row above to make corrections.</p>
-                <button class="btn btn-success" onclick="submitAllUpdates()" id="submitBtn" disabled>Submit All Updates</button>
+                <h3 id="approvalTitle">Review Your Timecard</h3>
+                <p id="approvalText">Confirm your timecard or make corrections before submitting.</p>
+                <div class="submit-buttons">
+                    <button class="btn btn-success" onclick="submitConfirmAll()" id="confirmBtn">✓ Confirm &amp; Submit All</button>
+                    <button class="btn btn-primary" onclick="submitAllUpdates()" id="submitBtn" style="display:none;">Submit Updates</button>
+                </div>
             </div>
         </div>
 
@@ -240,6 +261,14 @@
         let pendingUpdates = {};
         let activeModalIdx = null;
         let isSubmitted = false;
+        let timeFormat = '12h'; // default to 12-hour
+
+        function setTimeFormat(fmt) {
+            timeFormat = fmt;
+            document.getElementById('tfBtn12').classList.toggle('active', fmt === '12h');
+            document.getElementById('tfBtn24').classList.toggle('active', fmt === '24h');
+            if (currentSchedule) displaySchedule(currentSchedule);
+        }
 
         function showLoading(text, subtext) {
             document.getElementById('loadingText').textContent = text || 'Processing...';
@@ -308,6 +337,59 @@
         function calculateHours(periods) { var t = 0; for (var i = 0; i < periods.length; i++) { var s = timeToMinutes(periods[i].start), e = timeToMinutes(periods[i].end); if (e > s) t += (e - s); } return (t/60).toFixed(1); }
         function calculateBreakMins(breaks) { var t = 0; for (var i = 0; i < breaks.length; i++) { var s = timeToMinutes(breaks[i].start), e = timeToMinutes(breaks[i].end); if (e > s) t += (e - s); } return t; }
 
+        // Format time based on selected format
+        function formatTimeDisplay(timeStr) {
+            if (!timeStr) return '';
+            // Normalize: if already has AM/PM, parse it first to 24h
+            var h, m;
+            if (typeof timeStr === 'string' && (timeStr.includes('AM') || timeStr.includes('PM'))) {
+                var clean = timeStr.replace(/\s+/g, ' ').trim();
+                var match = clean.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+                if (match) {
+                    h = parseInt(match[1], 10);
+                    m = match[2];
+                    var ampm = match[3].toUpperCase();
+                    if (ampm === 'PM' && h < 12) h += 12;
+                    if (ampm === 'AM' && h === 12) h = 0;
+                } else {
+                    return String(timeStr);
+                }
+            } else if (typeof timeStr === 'string' && /^\d{1,2}:\d{2}/.test(timeStr)) {
+                var parts = timeStr.split(':');
+                h = parseInt(parts[0], 10);
+                m = parts[1];
+            } else {
+                return String(timeStr);
+            }
+
+            if (timeFormat === '24h') {
+                return String(h).padStart(2, '0') + ':' + m;
+            } else {
+                var suffix = h >= 12 ? 'PM' : 'AM';
+                var h12 = h > 12 ? h - 12 : h;
+                if (h12 === 0) h12 = 12;
+                return h12 + ':' + m + ' ' + suffix;
+            }
+        }
+
+        // Format timecard string for display (respects 12h/24h)
+        function formatTimeCardDisplay(timeCardStr) {
+            if (!timeCardStr || typeof timeCardStr !== 'string') return 'N/A';
+            var segments = timeCardStr.split(',');
+            var formatted = [];
+            for (var i = 0; i < segments.length; i++) {
+                var seg = segments[i].trim();
+                if (!seg) continue;
+                var parts = seg.split('-');
+                var fParts = [];
+                for (var j = 0; j < parts.length; j++) {
+                    fParts.push(formatTimeDisplay(parts[j].trim()));
+                }
+                formatted.push(fParts.join(' to '));
+            }
+            return formatted.join(', ');
+        }
+
         // Display as Table
         function displaySchedule(data) {
             document.getElementById('statsSection').classList.remove('hidden');
@@ -328,13 +410,13 @@
 
                 html += '<tr' + rowClass + ' id="tableRow_' + i + '">';
                 html += '<td class="td-day">' + dayName + '<span class="date-sub">' + dateStr + '</span></td>';
-                html += '<td>' + formatTimeAmPm(entry.startTime) + ' to ' + formatTimeAmPm(entry.endTime) + '</td>';
-                html += '<td><div class="td-timecard">' + escapeHtml(entry.timeCard || 'N/A') + '</div>' + buildMiniTimeline(entry, parsed) + '</td>';
+                html += '<td>' + formatTimeDisplay(entry.startTime) + ' to ' + formatTimeDisplay(entry.endTime) + '</td>';
+                html += '<td><div class="td-timecard">' + escapeHtml(formatTimeCardDisplay(entry.timeCard)) + '</div>' + buildMiniTimeline(entry, parsed) + '</td>';
                 html += '<td class="td-hours">' + workHours + '</td>';
                 html += '<td class="td-break">' + (breakMins > 0 ? breakMins + ' min' : '0') + '</td>';
                 html += '<td>';
                 if (isSubmitted || hasExistingUpdate) html += '<span class="badge badge-submitted">Submitted</span>';
-                else if (hasPending) html += '<span class="badge badge-pending">Pending</span>';
+                else if (hasPending) html += '<span class="badge badge-pending">Updated</span>';
                 else html += '<span class="badge badge-pending">Pending</span>';
                 html += '</td>';
 
@@ -389,10 +471,10 @@
             document.getElementById('modalSubtitle').textContent = workHours + ' hrs worked' + (breakMins > 0 ? ' · ' + breakMins + ' min break' : '');
 
             var body = '<div class="modal-info-grid">';
-            body += '<div class="modal-info-item"><div class="label">Scheduled Start</div><div class="value">' + formatTimeAmPm(entry.startTime) + '</div></div>';
-            body += '<div class="modal-info-item"><div class="label">Scheduled End</div><div class="value">' + formatTimeAmPm(entry.endTime) + '</div></div>';
-            body += '<div class="modal-info-item"><div class="label">Actual Clock In</div><div class="value">' + (entry.start || 'N/A') + '</div></div>';
-            body += '<div class="modal-info-item"><div class="label">Actual Clock Out</div><div class="value">' + (entry.end || 'N/A') + '</div></div>';
+            body += '<div class="modal-info-item"><div class="label">Scheduled Start</div><div class="value">' + formatTimeDisplay(entry.startTime) + '</div></div>';
+            body += '<div class="modal-info-item"><div class="label">Scheduled End</div><div class="value">' + formatTimeDisplay(entry.endTime) + '</div></div>';
+            body += '<div class="modal-info-item"><div class="label">Actual Clock In</div><div class="value">' + (entry.start ? formatTimeDisplay(entry.start) : 'N/A') + '</div></div>';
+            body += '<div class="modal-info-item"><div class="label">Actual Clock Out</div><div class="value">' + (entry.end ? formatTimeDisplay(entry.end) : 'N/A') + '</div></div>';
             body += '</div>';
 
             // Timeline
@@ -403,16 +485,16 @@
                 var rS = timeToMinutes(st)-15, rE = timeToMinutes(et)+15, tR = rE - rS;
                 if (tR > 0) {
                     body += '<div style="margin-bottom:16px;"><div class="section-label">Visual Timeline</div><div class="modal-timeline-bar">';
-                    for (var p = 0; p < parsed.periods.length; p++) { var pS = timeToMinutes(parsed.periods[p].start), pE = timeToMinutes(parsed.periods[p].end), l = (pS-rS)/tR*100, w = (pE-pS)/tR*100; body += '<div class="tl-seg work" style="left:'+l+'%;width:'+w+'%">'+(w>10?parsed.periods[p].start:'')+'</div>'; }
+                    for (var p = 0; p < parsed.periods.length; p++) { var pS = timeToMinutes(parsed.periods[p].start), pE = timeToMinutes(parsed.periods[p].end), l = (pS-rS)/tR*100, w = (pE-pS)/tR*100; body += '<div class="tl-seg work" style="left:'+l+'%;width:'+w+'%">'+(w>10?formatTimeDisplay(parsed.periods[p].start):'')+'</div>'; }
                     for (var br = 0; br < parsed.breaks.length; br++) { var bS = timeToMinutes(parsed.breaks[br].start), bE = timeToMinutes(parsed.breaks[br].end); body += '<div class="tl-seg break" style="left:'+((bS-rS)/tR*100)+'%;width:'+((bE-bS)/tR*100)+'%"></div>'; }
-                    body += '</div><div class="tl-times"><span>'+st+'</span><span>'+et+'</span></div></div>';
+                    body += '</div><div class="tl-times"><span>'+formatTimeDisplay(st)+'</span><span>'+formatTimeDisplay(et)+'</span></div></div>';
                 }
             }
 
             // Current periods
             body += '<div class="section-label">Current Work Periods</div><div class="current-periods">';
-            for (var cp = 0; cp < parsed.periods.length; cp++) body += '<span class="cp-tag">Period ' + (cp+1) + ': ' + parsed.periods[cp].start + ' to ' + parsed.periods[cp].end + '</span>';
-            for (var cb = 0; cb < parsed.breaks.length; cb++) { var bm = timeToMinutes(parsed.breaks[cb].end) - timeToMinutes(parsed.breaks[cb].start); body += '<span class="cp-break">Break: ' + parsed.breaks[cb].start + ' to ' + parsed.breaks[cb].end + ' (' + bm + ' min)</span>'; }
+            for (var cp = 0; cp < parsed.periods.length; cp++) body += '<span class="cp-tag">Period ' + (cp+1) + ': ' + formatTimeDisplay(parsed.periods[cp].start) + ' to ' + formatTimeDisplay(parsed.periods[cp].end) + '</span>';
+            for (var cb = 0; cb < parsed.breaks.length; cb++) { var bm = timeToMinutes(parsed.breaks[cb].end) - timeToMinutes(parsed.breaks[cb].start); body += '<span class="cp-break">Break: ' + formatTimeDisplay(parsed.breaks[cb].start) + ' to ' + formatTimeDisplay(parsed.breaks[cb].end) + ' (' + bm + ' min)</span>'; }
             body += '</div>';
 
             if (hasExistingUpdate) {
@@ -481,8 +563,14 @@
 
         function updateModalPreview() {
             var periods = getModalPeriods(), pd = document.getElementById('modalPreview'), pt = document.getElementById('modalPreviewText');
-            if (periods.length > 0) { pt.innerHTML = 'Format: <code>' + formatTimeCardString(periods) + '</code> (' + calculateHours(periods) + ' hrs total)'; pd.style.display = 'block'; }
-            else pd.style.display = 'none';
+            if (periods.length > 0) {
+                var displayPeriods = [];
+                for (var i = 0; i < periods.length; i++) displayPeriods.push(formatTimeDisplay(periods[i].start) + ' to ' + formatTimeDisplay(periods[i].end));
+                pt.innerHTML = 'Format: <code>' + formatTimeCardString(periods) + '</code> (' + calculateHours(periods) + ' hrs total)';
+                pd.style.display = 'block';
+            } else {
+                pd.style.display = 'none';
+            }
         }
 
         function saveUpdateFromModal() {
@@ -499,30 +587,55 @@
         }
 
         function updateSubmitButton() {
-            var count = Object.keys(pendingUpdates).length, btn = document.getElementById('submitBtn');
+            var count = Object.keys(pendingUpdates).length;
+            var confirmBtn = document.getElementById('confirmBtn');
+            var submitBtn = document.getElementById('submitBtn');
+
             if (isSubmitted) {
-                btn.disabled = true; btn.textContent = '✓ Submitted';
+                confirmBtn.disabled = true; confirmBtn.textContent = '✓ Submitted';
+                submitBtn.style.display = 'none';
                 document.getElementById('approvalTitle').textContent = 'Timecard Submitted';
-                document.getElementById('approvalText').textContent = 'All updates have been submitted for supervisor review. You will receive a notification once approved.';
+                document.getElementById('approvalText').textContent = 'All entries have been submitted for supervisor review. You will receive a notification once approved.';
             } else if (count > 0) {
-                btn.disabled = false; btn.textContent = 'Submit ' + count + ' Update' + (count > 1 ? 's' : '');
-                document.getElementById('approvalTitle').textContent = 'Ready to Submit?';
-                document.getElementById('approvalText').textContent = 'You have ' + count + ' update' + (count > 1 ? 's' : '') + ' ready to send for supervisor review.';
+                // Has pending edits: show both buttons
+                confirmBtn.disabled = false; confirmBtn.textContent = '✓ Confirm & Submit All';
+                submitBtn.style.display = 'inline-flex'; submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit ' + count + ' Update' + (count > 1 ? 's' : '');
+                document.getElementById('approvalTitle').textContent = 'Ready to Submit';
+                document.getElementById('approvalText').textContent = 'You have ' + count + ' update' + (count > 1 ? 's' : '') + '. Use "Confirm & Submit All" to approve everything, or "Submit Updates" to send only your corrections.';
             } else {
-                btn.disabled = true; btn.textContent = 'Submit All Updates';
-                document.getElementById('approvalTitle').textContent = 'No Updates Pending';
-                document.getElementById('approvalText').textContent = 'Click "Update" on any row above to make corrections.';
+                // No edits: show confirm button only
+                confirmBtn.disabled = false; confirmBtn.textContent = '✓ Confirm & Submit All';
+                submitBtn.style.display = 'none';
+                document.getElementById('approvalTitle').textContent = 'Review Your Timecard';
+                document.getElementById('approvalText').textContent = 'Everything looks correct? Click "Confirm & Submit All" to approve your timecard. Or click "Update" on any row to make corrections.';
             }
         }
 
+        // Submit with corrections only
         function submitAllUpdates() {
             var updateCount = Object.keys(pendingUpdates).length;
-            if (updateCount === 0) { alert('No updates to submit.'); return; }
+            if (updateCount === 0) { alert('No updates to submit. Use "Confirm & Submit All" to approve your timecard as is.'); return; }
             if (!confirm('Submit ' + updateCount + ' timecard update' + (updateCount > 1 ? 's' : '') + '? Your supervisor will review these changes.')) return;
+            executeSubmit(true);
+        }
 
+        // Confirm and submit all (no edits needed)
+        function submitConfirmAll() {
+            var updateCount = Object.keys(pendingUpdates).length;
+            var msg = updateCount > 0
+                ? 'Submit your timecard with ' + updateCount + ' correction' + (updateCount > 1 ? 's' : '') + '? Your supervisor will review the submission.'
+                : 'Confirm and submit your timecard as is? Your supervisor will review the submission.';
+            if (!confirm(msg)) return;
+            executeSubmit(false);
+        }
+
+        function executeSubmit(updatesOnly) {
             var employeeId = document.getElementById('employeeId').value.trim(), lastName = document.getElementById('lastName').value.trim(), weekNumber = document.getElementById('weekNumber').value.trim(), year = document.getElementById('year').value.trim();
-            showLoading('Submitting Updates...', 'Sending ' + updateCount + ' timecard correction' + (updateCount > 1 ? 's' : ''));
-            document.getElementById('submitBtn').disabled = true; document.getElementById('submitBtn').textContent = 'Submitting...';
+            var updateCount = Object.keys(pendingUpdates).length;
+            showLoading('Submitting...', updateCount > 0 ? 'Sending ' + updateCount + ' correction' + (updateCount > 1 ? 's' : '') : 'Confirming your timecard');
+            document.getElementById('confirmBtn').disabled = true;
+            document.getElementById('submitBtn').disabled = true;
 
             var updates = [];
             for (var key in pendingUpdates) { if (pendingUpdates.hasOwnProperty(key)) { var u = pendingUpdates[key]; updates.push({ rowIndex: u.rowIndex, scheduleDate: u.scheduleDate, newTimeCard: u.timeCard, comment: u.comment, hours: u.hours }); } }
@@ -531,19 +644,13 @@
             var allRowIndices = [];
             for (var r = 0; r < currentSchedule.entries.length; r++) { allRowIndices.push(currentSchedule.entries[r].rowIndex); }
 
-            fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'submitOncallUpdates', employeeId: employeeId, lastName: lastName, week: weekNumber, year: year, updates: updates, allRowIndices: allRowIndices, submittedAt: new Date().toISOString() }) })
-            .then(function() { hideLoading(); alert('Updates submitted successfully! Your supervisor will review the changes.'); isSubmitted = true; pendingUpdates = {}; displaySchedule(currentSchedule); })
-            .catch(function() { hideLoading(); alert('Updates submitted successfully! Your supervisor will review the changes.'); isSubmitted = true; pendingUpdates = {}; displaySchedule(currentSchedule); });
+            fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'submitOncallUpdates', employeeId: employeeId, lastName: lastName, week: weekNumber, year: year, updates: updates, allRowIndices: allRowIndices, submittedAt: new Date().toISOString(), confirmAll: !updatesOnly }) })
+            .then(function() { hideLoading(); alert('Timecard submitted successfully! Your supervisor will review the submission.'); isSubmitted = true; pendingUpdates = {}; displaySchedule(currentSchedule); })
+            .catch(function() { hideLoading(); alert('Timecard submitted successfully! Your supervisor will review the submission.'); isSubmitted = true; pendingUpdates = {}; displaySchedule(currentSchedule); });
         }
 
         function formatDate(dateStr) { if (!dateStr) return ''; return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }); }
         function getDayName(dateStr) { if (!dateStr) return ''; return new Date(dateStr).toLocaleDateString('en-US', { weekday: 'short' }); }
-        function formatTimeAmPm(timeStr) {
-            if (!timeStr) return '';
-            if (typeof timeStr === 'string' && (timeStr.includes('AM') || timeStr.includes('PM'))) return timeStr;
-            if (typeof timeStr === 'string' && /^\d{1,2}:\d{2}/.test(timeStr)) { var parts = timeStr.split(':'), h = parseInt(parts[0],10), m = parts[1], ampm = h >= 12 ? 'PM' : 'AM'; if (h > 12) h -= 12; if (h === 0) h = 12; return h + ':' + m + ' ' + ampm; }
-            return String(timeStr);
-        }
         function escapeHtml(str) { if (!str) return ''; var d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
         document.getElementById('year').value = new Date().getFullYear();
     </script>
