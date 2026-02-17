@@ -238,15 +238,14 @@
 
         <div id="reportSection" class="report-section hidden">
             <div class="notice-box">
-                <p><strong>How to use:</strong> Review your timecard entries below. If everything looks correct, click <strong>Confirm &amp; Submit All</strong> to approve your timecard as is. To make corrections, click <strong>Update</strong> on any row, then click <strong>Submit Updates</strong> when finished.</p>
+                <p><strong>How to use:</strong> Review your timecard entries below. If everything looks correct, click <strong>Submit Timecard</strong> to approve as is. To make corrections first, click <strong>Update</strong> on any row, then click <strong>Submit Timecard</strong> when finished.</p>
             </div>
             <div id="scheduleTableWrap"></div>
             <div class="approval-section" id="approvalSection">
                 <h3 id="approvalTitle">Review Your Timecard</h3>
                 <p id="approvalText">Confirm your timecard or make corrections before submitting.</p>
                 <div class="submit-buttons">
-                    <button class="btn btn-success" onclick="submitConfirmAll()" id="confirmBtn">✓ Confirm &amp; Submit All</button>
-                    <button class="btn btn-primary" onclick="submitAllUpdates()" id="submitBtn" style="display:none;">Submit Updates</button>
+                    <button class="btn btn-success" onclick="submitTimecard()" id="submitBtn">✓ Submit Timecard</button>
                 </div>
             </div>
         </div>
@@ -664,49 +663,34 @@
 
         function updateSubmitButton() {
             var count = Object.keys(pendingUpdates).length;
-            var confirmBtn = document.getElementById('confirmBtn');
             var submitBtn = document.getElementById('submitBtn');
 
             if (isSubmitted) {
-                confirmBtn.disabled = true; confirmBtn.textContent = '✓ Submitted';
-                submitBtn.style.display = 'none';
+                submitBtn.disabled = true; submitBtn.textContent = '✓ Submitted';
                 document.getElementById('approvalTitle').textContent = 'Timecard Submitted';
                 document.getElementById('approvalText').textContent = 'All entries have been submitted for supervisor review. You will receive a notification once approved.';
             } else if (count > 0) {
-                confirmBtn.disabled = false; confirmBtn.textContent = '✓ Confirm & Submit All';
-                submitBtn.style.display = 'inline-flex'; submitBtn.disabled = false;
-                submitBtn.textContent = 'Submit ' + count + ' Update' + (count > 1 ? 's' : '');
+                submitBtn.disabled = false;
+                submitBtn.textContent = '✓ Submit Timecard (' + count + ' correction' + (count > 1 ? 's' : '') + ')';
                 document.getElementById('approvalTitle').textContent = 'Ready to Submit';
-                document.getElementById('approvalText').textContent = 'You have ' + count + ' update' + (count > 1 ? 's' : '') + '. Use "Confirm & Submit All" to approve everything, or "Submit Updates" to send only your corrections.';
+                document.getElementById('approvalText').textContent = 'You have ' + count + ' correction' + (count > 1 ? 's' : '') + ' ready. Click "Submit Timecard" to send everything for supervisor review.';
             } else {
-                confirmBtn.disabled = false; confirmBtn.textContent = '✓ Confirm & Submit All';
-                submitBtn.style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.textContent = '✓ Submit Timecard';
                 document.getElementById('approvalTitle').textContent = 'Review Your Timecard';
-                document.getElementById('approvalText').textContent = 'Everything looks correct? Click "Confirm & Submit All" to approve your timecard. Or click "Update" on any row to make corrections.';
+                document.getElementById('approvalText').textContent = 'Everything looks correct? Click "Submit Timecard" to approve and send for supervisor review. Or click "Update" on any row to make corrections first.';
             }
         }
 
-        function submitAllUpdates() {
-            var updateCount = Object.keys(pendingUpdates).length;
-            if (updateCount === 0) { alert('No updates to submit. Use "Confirm & Submit All" to approve your timecard as is.'); return; }
-            if (!confirm('Submit ' + updateCount + ' timecard update' + (updateCount > 1 ? 's' : '') + '? Your supervisor will review these changes.')) return;
-            executeSubmit(true);
-        }
-
-        function submitConfirmAll() {
+        function submitTimecard() {
             var updateCount = Object.keys(pendingUpdates).length;
             var msg = updateCount > 0
                 ? 'Submit your timecard with ' + updateCount + ' correction' + (updateCount > 1 ? 's' : '') + '? Your supervisor will review the submission.'
                 : 'Confirm and submit your timecard as is? Your supervisor will review the submission.';
             if (!confirm(msg)) return;
-            executeSubmit(false);
-        }
 
-        function executeSubmit(updatesOnly) {
             var employeeId = document.getElementById('employeeId').value.trim(), lastName = document.getElementById('lastName').value.trim(), weekNumber = document.getElementById('weekNumber').value.trim(), year = document.getElementById('year').value.trim();
-            var updateCount = Object.keys(pendingUpdates).length;
             showLoading('Submitting...', updateCount > 0 ? 'Sending ' + updateCount + ' correction' + (updateCount > 1 ? 's' : '') : 'Confirming your timecard');
-            document.getElementById('confirmBtn').disabled = true;
             document.getElementById('submitBtn').disabled = true;
 
             var updates = [];
@@ -715,7 +699,7 @@
             var allRowIndices = [];
             for (var r = 0; r < currentSchedule.entries.length; r++) { allRowIndices.push(currentSchedule.entries[r].rowIndex); }
 
-            fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'submitOncallUpdates', employeeId: employeeId, lastName: lastName, week: weekNumber, year: year, updates: updates, allRowIndices: allRowIndices, submittedAt: new Date().toISOString(), confirmAll: !updatesOnly }) })
+            fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'submitOncallUpdates', employeeId: employeeId, lastName: lastName, week: weekNumber, year: year, updates: updates, allRowIndices: allRowIndices, submittedAt: new Date().toISOString(), confirmAll: true }) })
             .then(function() { hideLoading(); alert('Timecard submitted successfully! Your supervisor will review the submission.'); isSubmitted = true; pendingUpdates = {}; displaySchedule(currentSchedule); })
             .catch(function() { hideLoading(); alert('Timecard submitted successfully! Your supervisor will review the submission.'); isSubmitted = true; pendingUpdates = {}; displaySchedule(currentSchedule); });
         }
