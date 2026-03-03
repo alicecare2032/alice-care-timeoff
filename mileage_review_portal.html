@@ -1005,14 +1005,14 @@
             </div>
             <div class="modal-body">
                 <div class="current-rate-display">
-                    <div class="rate-value" id="modalCurrentRate">$0.70</div>
+                    <div class="rate-value" id="modalCurrentRate">$0.725</div>
                     <div class="rate-label">Current Rate per Mile</div>
                 </div>
                 
                 <div class="rate-input-group">
                     <label>New Rate:</label>
                     <span class="rate-input-prefix">$</span>
-                    <input type="number" id="newRateInput" step="0.01" min="0" max="5" placeholder="0.70">
+                    <input type="number" id="newRateInput" step="0.01" min="0" max="5" placeholder="0.725">
                     <span style="color: #6B7280; font-size: 13px;">per mile</span>
                 </div>
                 
@@ -1040,7 +1040,7 @@
         </div>
         <div class="rate-display">
             <span>Mileage Rate:</span>
-            <span class="rate-badge" id="navRateBadge">$0.70/mi</span>
+            <span class="rate-badge" id="navRateBadge">$0.725/mi</span>
             <button class="rate-edit-btn" onclick="openRateModal()">✏️ Edit</button>
         </div>
     </div>
@@ -1152,7 +1152,7 @@
                         <div class="export-content-inner">
                             <div class="notice-box" style="margin-bottom: 15px;">
                                 <p><strong>Format:</strong> Each data line will be formatted as: EMPLOYEE_ID,MLE,AMOUNT,,,,,</p>
-                                <p><strong>Rate:</strong> $0.70 per mile (federal reimbursement rate)</p>
+                                <p><strong>Rate:</strong> $0.725 per mile (federal reimbursement rate)</p>
                                 <p><strong>Sections:</strong> File includes ON-CALL SUBMITTED, MANUAL MILEAGE, and PENDING sections</p>
                                 <p><strong>Includes:</strong> Both on-call mileage reports AND manual mileage entries</p>
                             </div>
@@ -1177,7 +1177,7 @@
         const RATE_REVIEW_KEY = 'aliceCare_lastRateReview';
         
         // Default rate - will be overridden by localStorage if available
-        let REIMBURSEMENT_RATE = 0.70;
+        let REIMBURSEMENT_RATE = 0.725;
         
         function initializeRateSettings() {
             // Load saved rate from localStorage
@@ -1608,7 +1608,7 @@
                         </td>
                         <td class="text-right">${emp.serviceCount}</td>
                         <td class="text-right">${emp.totalReimbursableMiles.toFixed(1)} mi</td>
-                        <td class="text-right">$${emp.reimbursementAmount.toFixed(2)}</td>
+                        <td class="text-right">$${(emp.totalReimbursableMiles * REIMBURSEMENT_RATE).toFixed(2)}</td>
                     </tr>
                     <tr class="detail-row" id="detail_${index}">
                         <td colspan="7" class="detail-cell">
@@ -1871,7 +1871,7 @@
                     if (emp.isSubmitted) {
                         onCallSubmitted++;
                         onCallMiles += emp.totalReimbursableMiles;
-                        onCallAmount += emp.reimbursementAmount;
+                        onCallAmount += emp.totalReimbursableMiles * REIMBURSEMENT_RATE;
                     }
                 });
             }
@@ -1983,7 +1983,7 @@
                 
                 sortedSubmitted.forEach(emp => {
                     const employeeId = emp.employeeId.padStart(4, '0');
-                    const amount = emp.reimbursementAmount.toFixed(2);
+                    const amount = (emp.totalReimbursableMiles * REIMBURSEMENT_RATE).toFixed(2);
                     text += `${employeeId},MLE,${amount},,,,,\n`;
                 });
                 
@@ -2019,7 +2019,7 @@
                 
                 sortedNotSubmitted.forEach(emp => {
                     const employeeId = emp.employeeId.padStart(4, '0');
-                    const amount = emp.reimbursementAmount.toFixed(2);
+                    const amount = (emp.totalReimbursableMiles * REIMBURSEMENT_RATE).toFixed(2);
                     text += `${employeeId},MLE,${amount},,,,,\n`;
                 });
                 
@@ -2032,7 +2032,7 @@
             let totalOnCallAmount = 0;
             let totalManualAmount = 0;
             
-            submitted.forEach(emp => totalOnCallAmount += emp.reimbursementAmount);
+            submitted.forEach(emp => totalOnCallAmount += emp.totalReimbursableMiles * REIMBURSEMENT_RATE);
             manualByEmployee.forEach(emp => totalManualAmount += emp.totalMiles * REIMBURSEMENT_RATE);
 
             // Footer
