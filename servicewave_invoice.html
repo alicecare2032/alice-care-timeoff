@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ServiceWave Invoice Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:    #0d1117;
+    --paper:  #f5f3ee;
+    --cream:  #ede9e0;
+    --accent: #1a7a5e;
+    --accent2:#0f5c47;
+    --muted:  #7a7570;
+    --border: #ccc8be;
+    --green:  #0f5c47;
+    --red:    #8b1a1a;
+    --line:   1px solid var(--border);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* ---- LAYOUT ---- */
+  .app-shell {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    grid-template-rows: auto 1fr;
+    min-height: 100vh;
+  }
+
+  /* TOP HEADER */
+  .app-header {
+    grid-column: 1 / -1;
+    background: var(--accent2);
+    color: #fff;
+    padding: 18px 36px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border-bottom: 3px solid var(--accent);
+  }
+  .app-header .logo-mark {
+    display: flex;
+    align-items: center;
+  }
+  .app-header .title-group h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .app-header .title-group p {
+    font-size: 0.72rem;
+    opacity: 0.65;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .app-header .badge {
+    margin-left: auto;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 4px;
+    padding: 6px 14px;
+    font-size: 0.7rem;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #7dedd4;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: #edf7f4;
+    border-right: var(--line);
+    padding: 24px 22px;
+    overflow-y: auto;
+    height: calc(100vh - 65px);
+    position: sticky;
+    top: 0;
+  }
+
+  .sidebar-section {
+    margin-bottom: 26px;
+  }
+  .sidebar-section-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: var(--line);
+  }
+
+  label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  input[type="text"],
+  input[type="number"],
+  input[type="date"],
+  input[type="month"],
+  select,
+  textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: var(--line);
+    background: #fff;
+    border-radius: 4px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    color: var(--ink);
+    margin-bottom: 10px;
+    transition: border-color 0.2s;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  input[type="number"] { font-family: 'DM Mono', monospace; }
+
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  /* USER COUNTS */
+  .user-block {
+    background: #fff;
+    border: var(--line);
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 8px;
+  }
+  .user-block-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .user-block-header .type-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  .user-block-header .rate-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    background: #edf7f4;
+    border: var(--line);
+    border-radius: 3px;
+    padding: 2px 7px;
+    color: var(--accent);
+  }
+  .user-block input[type="number"] {
+    margin-bottom: 0;
+  }
+  .user-block .note {
+    font-size: 0.68rem;
+    color: var(--muted);
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  /* ADDONS */
+  .addon-list { list-style: none; }
+  .addon-item {
+    display: grid;
+    grid-template-columns: 1fr 90px 28px;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .addon-item input { margin-bottom: 0; }
+  .btn-remove {
+    background: none;
+    border: none;
+    color: var(--red);
+    cursor: pointer;
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 4px;
+    border-radius: 3px;
+    transition: background 0.15s;
+  }
+  .btn-remove:hover { background: rgba(139,26,26,0.08); }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border: none;
+    border-radius: 4px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: var(--accent2);
+    color: #fff;
+    width: 100%;
+    justify-content: center;
+    padding: 11px;
+    font-size: 0.85rem;
+  }
+  .btn-primary:hover { background: #0a3d2e; }
+  .btn-secondary {
+    background: #1a7a5e;
+    color: #fff;
+    width: 100%;
+    justify-content: center;
+    margin-top: 8px;
+  }
+  .btn-secondary:hover { background: #0f5c47; }
+  .btn-ghost {
+    background: transparent;
+    border: var(--line);
+    color: var(--ink);
+    font-size: 0.75rem;
+    padding: 6px 12px;
+  }
+  .btn-ghost:hover { background: var(--cream); }
+  .btn-danger {
+    background: var(--red);
+    color: #fff;
+    width: 100%;
+    justify-content: center;
+    margin-top: 8px;
+    font-size: 0.75rem;
+  }
+
+  /* MAIN AREA */
+  .main {
+    padding: 32px 40px;
+    overflow-y: auto;
+  }
+
+  /* INVOICE PREVIEW */
+  .invoice-preview {
+    background: #fff;
+    border: var(--line);
+    border-radius: 6px;
+    max-width: 860px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    position: relative;
+    overflow: hidden;
+  }
+  .invoice-preview::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #0f5c47, #1fc49a);
+  }
+
+  .inv-head {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 20px;
+    padding: 36px 40px 24px;
+    border-bottom: var(--line);
+  }
+  .inv-head .sw-logo {
+    display: flex;
+    align-items: flex-start;
+  }
+  .inv-head .sw-logo span { color: #1a7a5e; }
+  .inv-head .sw-address {
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-top: 4px;
+  }
+  .inv-head .inv-meta {
+    text-align: right;
+  }
+  .inv-head .inv-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.5px;
+  }
+  .inv-head .inv-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 2px;
+  }
+  .inv-head .inv-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .inv-head .inv-status {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: #d4f5ec;
+    color: #0f5c47;
+    border: 1px solid #7ddec8;
+  }
+
+  .inv-parties {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border-bottom: var(--line);
+  }
+  .inv-party {
+    padding: 20px 40px;
+  }
+  .inv-party:first-child { border-right: var(--line); }
+  .inv-party .party-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .inv-party .party-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 3px;
+  }
+  .inv-party .party-detail {
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* CONTRACT CONTEXT BAR */
+  .inv-context {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    background: var(--cream);
+    border-bottom: var(--line);
+    padding: 14px 40px;
+    gap: 0;
+  }
+  .ctx-item { text-align: center; }
+  .ctx-item:not(:last-child) { border-right: var(--line); }
+  .ctx-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 3px;
+  }
+  .ctx-value {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .ctx-value.highlight { color: #1a7a5e; }
+  .ctx-value.warn { color: var(--red); }
+
+  /* LINE ITEMS */
+  .inv-items { padding: 0 40px; }
+  .items-header {
+    display: grid;
+    grid-template-columns: 3fr 1fr 1fr 1fr;
+    padding: 10px 0;
+    border-bottom: 2px solid var(--ink);
+    margin-top: 24px;
+  }
+  .items-header span {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .items-header span:not(:first-child) { text-align: right; }
+
+  .line-item {
+    display: grid;
+    grid-template-columns: 3fr 1fr 1fr 1fr;
+    padding: 11px 0;
+    border-bottom: var(--line);
+    align-items: center;
+  }
+  .line-item.section-header {
+    background: var(--cream);
+    margin: 0 -40px;
+    padding: 7px 40px;
+    grid-template-columns: 1fr;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: none;
+    border-top: var(--line);
+    margin-top: 4px;
+  }
+  .line-item .desc { font-size: 0.85rem; }
+  .line-item .desc small {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+  .line-item .qty, .line-item .rate, .line-item .amount {
+    text-align: right;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.82rem;
+  }
+  .line-item .amount { font-weight: 500; }
+  .line-item.free .amount { color: var(--green); }
+  .line-item.waived { opacity: 0.45; text-decoration: line-through; }
+
+  /* TOTALS */
+  .inv-totals {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding: 20px 40px;
+    border-top: var(--line);
+    margin-top: 4px;
+  }
+  .total-row {
+    display: grid;
+    grid-template-columns: 200px 120px;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+  .total-row .t-label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-align: right;
+  }
+  .total-row .t-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.82rem;
+    text-align: right;
+  }
+  .total-row.grand {
+    border-top: 2px solid var(--ink);
+    padding-top: 10px;
+    margin-top: 4px;
+  }
+  .total-row.grand .t-label {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .total-row.grand .t-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .total-row.late-fee .t-value { color: var(--red); }
+
+  /* NOTES */
+  .inv-notes {
+    padding: 20px 40px;
+    border-top: var(--line);
+    background: var(--cream);
+  }
+  .inv-notes .notes-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .inv-notes p {
+    font-size: 0.76rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* INV FOOTER */
+  .inv-footer {
+    padding: 16px 40px;
+    border-top: var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .inv-footer .due-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+  }
+  .inv-footer .due-date strong { color: var(--accent2); }
+  .inv-footer .contract-ref {
+    font-size: 0.68rem;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ACTION BAR */
+  .action-bar {
+    margin-top: 20px;
+    max-width: 860px;
+    display: flex;
+    gap: 10px;
+  }
+  .action-bar .btn { width: auto; padding: 10px 22px; }
+
+  /* CONTRACT INFO BOX */
+  .info-box {
+    background: rgba(26,58,92,0.06);
+    border: 1px solid rgba(26,58,92,0.15);
+    border-radius: 4px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    font-size: 0.72rem;
+    color: var(--accent2);
+    line-height: 1.6;
+  }
+  .info-box strong { font-weight: 700; }
+
+  /* LATE FEE TOGGLE */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .toggle-row label {
+    margin: 0;
+    text-transform: none;
+    font-size: 0.8rem;
+    color: var(--ink);
+    font-weight: 400;
+    letter-spacing: 0;
+    cursor: pointer;
+  }
+  input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--accent2);
+  }
+
+  @media print {
+    .sidebar, .app-header, .action-bar { display: none !important; }
+    .app-shell { display: block; }
+    .main { padding: 0; }
+    .invoice-preview { box-shadow: none; border: none; }
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- TOP HEADER -->
+  <header class="app-header">
+    <div class="logo-mark"><img src="data:image/png;base64,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" alt="ServiceWave" style="height:44px;width:auto;display:block;"></div>
+    <div class="title-group">
+      <h1>ServiceWave Invoice Generator</h1>
+      <p>SaaS License Agreement &mdash; Europediatria Srl / Service Wave LLC</p>
+    </div>
+    <div class="badge">Contract Effective: 12 Jul 2024</div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <!-- INVOICE META -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Invoice Details</div>
+      <label>Invoice Number</label>
+      <input type="text" id="inv_number" value="SW-2025-001" oninput="render()">
+      <label>Billing Month</label>
+      <input type="month" id="billing_month" value="2025-09" oninput="onBillingMonthChange()">
+      <label>Invoice Date</label>
+      <input type="date" id="inv_date" oninput="render()">
+    </div>
+
+    <!-- CLIENT -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Client Info</div>
+      <label>Client Name</label>
+      <input type="text" id="client_name" value="Europediatria Srl" oninput="render()">
+      <label>Client Address</label>
+      <textarea id="client_address" rows="3" oninput="render()">Via Scrimiari 26/A
+37129 Verona, Italia</textarea>
+      <label>Contact Email</label>
+      <input type="text" id="client_email" value="pt@europediatria.com" oninput="render()">
+    </div>
+
+    <!-- USER COUNTS -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">User Counts (This Month)</div>
+
+      <div class="info-box">
+        <strong>Contract rates:</strong><br>
+        Admin: €10.00/user (first 5 free)<br>
+        Employee: €1.00/user (months 1&ndash;24 only)<br>
+        Patient/Client: €0.25/user (months 1&ndash;24 only)
+      </div>
+
+      <div class="user-block">
+        <div class="user-block-header">
+          <span class="type-name">Admin Users</span>
+          <span class="rate-tag">€10.00 / user</span>
+        </div>
+        <input type="number" id="count_admin" value="5" min="0" oninput="render()">
+        <div class="note">First 5 included in maintenance fee</div>
+      </div>
+
+      <div class="user-block">
+        <div class="user-block-header">
+          <span class="type-name">Doctor / Employee Users</span>
+          <span class="rate-tag">€1.00 / user</span>
+        </div>
+        <input type="number" id="count_employee" value="12" min="0" oninput="render()">
+        <div class="note" id="employee_note">Charged for first 24 months</div>
+      </div>
+
+      <div class="user-block">
+        <div class="user-block-header">
+          <span class="type-name">Patient / Client Users</span>
+          <span class="rate-tag">€0.25 / user</span>
+        </div>
+        <input type="number" id="count_patient" value="48" min="0" oninput="render()">
+        <div class="note" id="patient_note">Charged for first 24 months</div>
+      </div>
+    </div>
+
+    <!-- ADD-ON SERVICES -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Add-On Services</div>
+      <ul class="addon-list" id="addon_list"></ul>
+      <div style="display:grid;grid-template-columns:1fr 1fr 28px;gap:6px;align-items:center;">
+        <input type="text" id="new_addon_desc" placeholder="Description" style="margin-bottom:0">
+        <input type="number" id="new_addon_amt" placeholder="€ Amount" step="0.01" style="margin-bottom:0;font-family:'DM Mono',monospace;">
+        <button class="btn-ghost btn" onclick="addAddon()" style="padding:6px;justify-content:center;">+</button>
+      </div>
+      <div style="margin-top:8px;font-size:0.7rem;color:var(--muted)">
+        Change requests bill at €80.00/hr &bull; 3rd-party tools: cost + 20%
+      </div>
+    </div>
+
+    <!-- LATE FEE -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Late Payment</div>
+      <div class="toggle-row">
+        <input type="checkbox" id="late_fee_toggle" onchange="render()">
+        <label for="late_fee_toggle">Apply 10%/month late fee</label>
+      </div>
+      <label>Overdue Amount (€)</label>
+      <input type="number" id="late_fee_base" value="0" step="0.01" oninput="render()" placeholder="Past due amount">
+      <div style="font-size:0.7rem;color:var(--muted)">Per Art. 3: 10% monthly on unpaid balance after 30-day grace period.</div>
+    </div>
+
+    <!-- NOTES -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Invoice Notes</div>
+      <textarea id="inv_notes" rows="3" placeholder="Optional notes..." oninput="render()">Payment due within 30 days of invoice receipt. Wire transfer per Allegato C banking details.</textarea>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Actions</div>
+      <button class="btn btn-primary" onclick="window.print()">&#128438; Print / Save PDF</button>
+      <button class="btn btn-secondary" onclick="exportToCSV()">&#128196; Export CSV (Google Sheets)</button>
+      <button class="btn btn-ghost" style="width:100%;margin-top:8px;justify-content:center;" onclick="openGoogleSheets()">&#128279; Open Google Sheets Log</button>
+    </div>
+
+  </aside>
+
+  <!-- MAIN PREVIEW -->
+  <main class="main">
+    <div id="invoice_preview" class="invoice-preview"></div>
+
+    <div class="action-bar">
+      <button class="btn btn-primary" onclick="window.print()">&#128438; Print Invoice</button>
+      <button class="btn btn-secondary" onclick="exportToCSV()">&#128196; Export to CSV</button>
+      <button class="btn btn-ghost" onclick="copyInvoiceJSON()">&#128203; Copy JSON</button>
+    </div>
+  </main>
+
+</div>
+
+<script>
+// =====================================
+// CONTRACT CONSTANTS (from agreement)
+// =====================================
+const CONTRACT = {
+  productionStart:  new Date(2025, 8, 1),   // Sept 1, 2025
+  effectiveDate:    '12 Jul 2024',
+  licenseYears:     3,
+
+  // Maintenance (Art. 3 - Licenza d'uso)
+  maintenanceAnnual:     5257.00,
+  maintenanceMonthly:    447.90,
+  maintenanceFreeYear1:  true,
+  maintenanceInstallments: 11,
+
+  // Per-user rates
+  adminRatePerUser:       10.00,
+  adminFreeUnits:         5,
+  employeeRatePerUser:    1.00,
+  patientRatePerUser:     0.25,
+  perUserFreeAfterMonths: 24,
+
+  // Additional
+  changeRequestHourly:   80.00,
+  thirdPartyMarkup:      1.20,
+  lateFeeMonthlyRate:    0.10,  // 10% per month
+  paymentDueDays:        30,
+
+  // Data migration (if needed)
+  dataMigrationFlat:     1500.00,
+};
+
+// Internal state
+let addons = [];
+let addonCounter = 0;
+
+// =====================================
+// HELPER FUNCTIONS
+// =====================================
+function getContractMonth(billingMonth) {
+  // Returns 1-based month number since production start
+  const [yr, mo] = billingMonth.split('-').map(Number);
+  const billingDate = new Date(yr, mo - 1, 1);
+  const diff = (billingDate.getFullYear() - CONTRACT.productionStart.getFullYear()) * 12
+             + (billingDate.getMonth() - CONTRACT.productionStart.getMonth()) + 1;
+  return diff;
+}
+
+function isMaintenanceFree(contractMonth) {
+  return contractMonth <= 12;
+}
+
+function isPerUserChargeable(contractMonth) {
+  return contractMonth <= CONTRACT.perUserFreeAfterMonths;
+}
+
+function isMaintenancePayable(contractMonth) {
+  // Maintenance starts month 13 (year 2)
+  if (contractMonth < 13) return false;
+  // Paid in 11 installments per year (months 13-23 for year 2, etc.)
+  const yearOffset = contractMonth - 13;
+  const installmentInYear = yearOffset % 12;
+  return installmentInYear < CONTRACT.maintenanceInstallments;
+}
+
+function fmtEuro(val) {
+  return '€' + Math.abs(val).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+}
+
+function formatBillingPeriod(billingMonth) {
+  const [yr, mo] = billingMonth.split('-').map(Number);
+  const d = new Date(yr, mo - 1, 1);
+  return d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+}
+
+function getDueDate(invDate) {
+  if (!invDate) return '';
+  const d = new Date(invDate + 'T00:00:00');
+  d.setDate(d.getDate() + CONTRACT.paymentDueDays);
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+}
+
+// =====================================
+// ADD-ON MANAGEMENT
+// =====================================
+function addAddon() {
+  const desc = document.getElementById('new_addon_desc').value.trim();
+  const amt  = parseFloat(document.getElementById('new_addon_amt').value) || 0;
+  if (!desc) return;
+  addons.push({ id: addonCounter++, desc, amt });
+  document.getElementById('new_addon_desc').value = '';
+  document.getElementById('new_addon_amt').value  = '';
+  renderAddonList();
+  render();
+}
+
+function removeAddon(id) {
+  addons = addons.filter(a => a.id !== id);
+  renderAddonList();
+  render();
+}
+
+function renderAddonList() {
+  const ul = document.getElementById('addon_list');
+  ul.innerHTML = addons.map(a => `
+    <li class="addon-item">
+      <span style="font-size:0.8rem">${a.desc}</span>
+      <span style="font-family:'DM Mono',monospace;font-size:0.8rem;text-align:right">${fmtEuro(a.amt)}</span>
+      <button class="btn-remove" onclick="removeAddon(${a.id})">&#215;</button>
+    </li>
+  `).join('');
+}
+
+// =====================================
+// BILLING CALCULATION
+// =====================================
+function calculate() {
+  const billingMonth  = document.getElementById('billing_month').value;
+  const contractMonth = getContractMonth(billingMonth);
+  const countAdmin    = parseInt(document.getElementById('count_admin').value)    || 0;
+  const countEmployee = parseInt(document.getElementById('count_employee').value) || 0;
+  const countPatient  = parseInt(document.getElementById('count_patient').value)  || 0;
+
+  // Maintenance
+  const maintChargeable = isMaintenancePayable(contractMonth);
+  const maintAmount     = maintChargeable ? CONTRACT.maintenanceMonthly : 0;
+
+  // Admin users (first 5 free)
+  const billableAdmin  = Math.max(0, countAdmin - CONTRACT.adminFreeUnits);
+  const adminAmount    = billableAdmin * CONTRACT.adminRatePerUser;
+
+  // Employees / Doctors
+  const chargePerUser  = isPerUserChargeable(contractMonth);
+  const empAmount      = chargePerUser ? countEmployee * CONTRACT.employeeRatePerUser : 0;
+
+  // Patients / Clients
+  const patAmount      = chargePerUser ? countPatient  * CONTRACT.patientRatePerUser  : 0;
+
+  // Add-ons
+  const addonTotal     = addons.reduce((s, a) => s + a.amt, 0);
+
+  // Late fee
+  const lateToggle     = document.getElementById('late_fee_toggle').checked;
+  const lateBase       = parseFloat(document.getElementById('late_fee_base').value) || 0;
+  const lateFeeAmount  = (lateToggle && lateBase > 0) ? lateBase * CONTRACT.lateFeeMonthlyRate : 0;
+
+  const subtotal = maintAmount + adminAmount + empAmount + patAmount + addonTotal;
+  const grandTotal = subtotal + lateFeeAmount;
+
+  return {
+    billingMonth, contractMonth,
+    maintChargeable, maintAmount,
+    countAdmin, billableAdmin, adminAmount,
+    countEmployee, empAmount, chargePerUser,
+    countPatient, patAmount,
+    addons, addonTotal,
+    lateToggle, lateBase, lateFeeAmount,
+    subtotal, grandTotal,
+  };
+}
+
+// =====================================
+// RENDER INVOICE
+// =====================================
+function render() {
+  const inv_number     = document.getElementById('inv_number').value;
+  const inv_date       = document.getElementById('inv_date').value;
+  const billing_month  = document.getElementById('billing_month').value;
+  const client_name    = document.getElementById('client_name').value;
+  const client_address = document.getElementById('client_address').value;
+  const client_email   = document.getElementById('client_email').value;
+  const inv_notes      = document.getElementById('inv_notes').value;
+
+  const c = calculate();
+
+  // Update employee/patient notes in sidebar
+  document.getElementById('employee_note').textContent = c.chargePerUser
+    ? `Charged through month 24 (month ${c.contractMonth} now)`
+    : `Free after month 24 (currently month ${c.contractMonth})`;
+  document.getElementById('patient_note').textContent = c.chargePerUser
+    ? `Charged through month 24 (month ${c.contractMonth} now)`
+    : `Free after month 24 (currently month ${c.contractMonth})`;
+
+  // Contract year label
+  const contractYear = c.contractMonth <= 12 ? 'Year 1' : c.contractMonth <= 24 ? 'Year 2' : 'Year 3';
+
+  // Build line items HTML
+  let lineItemsHTML = '';
+
+  // --- MAINTENANCE ---
+  lineItemsHTML += `<div class="line-item section-header">Platform Maintenance &amp; License</div>`;
+
+  if (!c.maintChargeable) {
+    lineItemsHTML += `
+      <div class="line-item free">
+        <div class="desc">Annual Maintenance Fee (Monthly Installment)
+          <small>Year 1 maintenance waived per Art. 3 &mdash; No charge</small>
+        </div>
+        <div class="qty">1</div>
+        <div class="rate">${fmtEuro(CONTRACT.maintenanceMonthly)}</div>
+        <div class="amount" style="color:var(--green)">WAIVED</div>
+      </div>`;
+  } else {
+    lineItemsHTML += `
+      <div class="line-item">
+        <div class="desc">Annual Maintenance &mdash; Monthly Installment
+          <small>Art. 3: ${fmtEuro(CONTRACT.maintenanceAnnual)}/yr, 11 monthly installments of ${fmtEuro(CONTRACT.maintenanceMonthly)}</small>
+        </div>
+        <div class="qty">1</div>
+        <div class="rate">${fmtEuro(CONTRACT.maintenanceMonthly)}</div>
+        <div class="amount">${fmtEuro(c.maintAmount)}</div>
+      </div>`;
+  }
+
+  // --- ADMIN USERS ---
+  lineItemsHTML += `<div class="line-item section-header">User Licensing &mdash; Pay-Per-Use</div>`;
+
+  lineItemsHTML += `
+    <div class="line-item${c.billableAdmin === 0 ? ' free' : ''}">
+      <div class="desc">Administrator Users
+        <small>Total: ${c.countAdmin} users &bull; First 5 included in maintenance fee &bull; Billable: ${c.billableAdmin}</small>
+      </div>
+      <div class="qty">${c.billableAdmin}</div>
+      <div class="rate">${fmtEuro(CONTRACT.adminRatePerUser)}</div>
+      <div class="amount">${c.billableAdmin === 0 ? '<span style="color:var(--green)">Included</span>' : fmtEuro(c.adminAmount)}</div>
+    </div>`;
+
+  lineItemsHTML += `
+    <div class="line-item${!c.chargePerUser ? ' free' : ''}">
+      <div class="desc">Doctor / Employee Users
+        <small>${c.chargePerUser ? `Charged through month 24 &bull; ${c.countEmployee} users @ ${fmtEuro(CONTRACT.employeeRatePerUser)}/user` : `Free after 24 months &mdash; No charge (month ${c.contractMonth})`}</small>
+      </div>
+      <div class="qty">${c.countEmployee}</div>
+      <div class="rate">${c.chargePerUser ? fmtEuro(CONTRACT.employeeRatePerUser) : '&mdash;'}</div>
+      <div class="amount">${!c.chargePerUser ? '<span style="color:var(--green)">FREE</span>' : fmtEuro(c.empAmount)}</div>
+    </div>`;
+
+  lineItemsHTML += `
+    <div class="line-item${!c.chargePerUser ? ' free' : ''}">
+      <div class="desc">Patient / Client Users
+        <small>${c.chargePerUser ? `Charged through month 24 &bull; ${c.countPatient} patients @ ${fmtEuro(CONTRACT.patientRatePerUser)}/user` : `Free after 24 months &mdash; No charge (month ${c.contractMonth})`}</small>
+      </div>
+      <div class="qty">${c.countPatient}</div>
+      <div class="rate">${c.chargePerUser ? fmtEuro(CONTRACT.patientRatePerUser) : '&mdash;'}</div>
+      <div class="amount">${!c.chargePerUser ? '<span style="color:var(--green)">FREE</span>' : fmtEuro(c.patAmount)}</div>
+    </div>`;
+
+  // --- ADD-ONS ---
+  if (c.addons.length > 0) {
+    lineItemsHTML += `<div class="line-item section-header">Add-On &amp; Professional Services</div>`;
+    c.addons.forEach(a => {
+      lineItemsHTML += `
+        <div class="line-item">
+          <div class="desc">${a.desc}</div>
+          <div class="qty">1</div>
+          <div class="rate">${fmtEuro(a.amt)}</div>
+          <div class="amount">${fmtEuro(a.amt)}</div>
+        </div>`;
+    });
+  }
+
+  // --- LATE FEE ---
+  if (c.lateToggle && c.lateFeeAmount > 0) {
+    lineItemsHTML += `<div class="line-item section-header">Late Payment Charges</div>`;
+    lineItemsHTML += `
+      <div class="line-item">
+        <div class="desc">Late Payment Interest (10%/month)
+          <small>Art. 3: Applied to overdue balance of ${fmtEuro(c.lateBase)} after 30-day grace period</small>
+        </div>
+        <div class="qty">1</div>
+        <div class="rate">10.00%</div>
+        <div class="amount" style="color:var(--red)">${fmtEuro(c.lateFeeAmount)}</div>
+      </div>`;
+  }
+
+  // Build totals
+  let totalsHTML = `
+    <div class="total-row">
+      <span class="t-label">License Fees Subtotal</span>
+      <span class="t-value">${fmtEuro(c.maintAmount + c.adminAmount + c.empAmount + c.patAmount)}</span>
+    </div>`;
+
+  if (c.addonTotal > 0) {
+    totalsHTML += `
+      <div class="total-row">
+        <span class="t-label">Add-On Services</span>
+        <span class="t-value">${fmtEuro(c.addonTotal)}</span>
+      </div>`;
+  }
+  if (c.lateFeeAmount > 0) {
+    totalsHTML += `
+      <div class="total-row late-fee">
+        <span class="t-label">Late Payment Fee</span>
+        <span class="t-value">${fmtEuro(c.lateFeeAmount)}</span>
+      </div>`;
+  }
+  totalsHTML += `
+    <div class="total-row grand">
+      <span class="t-label">Total Due (EUR)</span>
+      <span class="t-value">${fmtEuro(c.grandTotal)}</span>
+    </div>`;
+
+  // License expiry estimate
+  const expiryDate = new Date(CONTRACT.productionStart);
+  expiryDate.setFullYear(expiryDate.getFullYear() + CONTRACT.licenseYears);
+  const expiryStr  = expiryDate.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+
+  // Full invoice HTML
+  document.getElementById('invoice_preview').innerHTML = `
+    <div class="inv-head">
+      <div>
+        <div class="sw-logo"><img src="data:image/png;base64,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" alt="ServiceWave" style="height:52px;width:auto;display:block;margin-bottom:6px;"></div>
+        <div class="sw-address">5098 Foothills Blvd Ste 3495<br>Roseville, CA 95747<br>servicewave.io</div>
+      </div>
+      <div class="inv-meta">
+        <div class="inv-label">Invoice</div>
+        <div class="inv-number">${inv_number || 'SW-0000'}</div>
+        <div class="inv-date">${formatDate(inv_date) || '&mdash;'}</div>
+        <span class="inv-status">Active License</span>
+      </div>
+    </div>
+
+    <div class="inv-parties">
+      <div class="inv-party">
+        <div class="party-label">Service Provider</div>
+        <div class="party-name">Service Wave LLC</div>
+        <div class="party-detail">5098 Foothills Blvd Ste 3495<br>Roseville, CA 95747<br>tom@alice.care</div>
+      </div>
+      <div class="inv-party">
+        <div class="party-label">Bill To</div>
+        <div class="party-name">${client_name || 'Client'}</div>
+        <div class="party-detail">${(client_address || '').replace(/\n/g, '<br>')}${client_email ? '<br>' + client_email : ''}</div>
+      </div>
+    </div>
+
+    <div class="inv-context">
+      <div class="ctx-item">
+        <div class="ctx-label">Billing Period</div>
+        <div class="ctx-value">${formatBillingPeriod(billing_month)}</div>
+      </div>
+      <div class="ctx-item">
+        <div class="ctx-label">Contract Month</div>
+        <div class="ctx-value highlight">${contractYear} &mdash; Month ${c.contractMonth}</div>
+      </div>
+      <div class="ctx-item">
+        <div class="ctx-label">User Fees</div>
+        <div class="ctx-value ${!c.chargePerUser ? 'highlight' : ''}">${c.chargePerUser ? 'Active' : 'Free (Post Month 24)'}</div>
+      </div>
+      <div class="ctx-item">
+        <div class="ctx-label">License Expires</div>
+        <div class="ctx-value">${expiryStr}</div>
+      </div>
+    </div>
+
+    <div class="inv-items">
+      <div class="items-header">
+        <span>Description</span>
+        <span>Qty</span>
+        <span>Unit Rate</span>
+        <span>Amount</span>
+      </div>
+      ${lineItemsHTML}
+    </div>
+
+    <div class="inv-totals">
+      ${totalsHTML}
+    </div>
+
+    <div class="inv-notes">
+      <div class="notes-label">Terms &amp; Notes</div>
+      <p>${inv_notes || ''}</p>
+    </div>
+
+    <div class="inv-footer">
+      <div class="due-date">Payment Due: <strong>${inv_date ? getDueDate(inv_date) : '30 days from receipt'}</strong></div>
+      <div class="contract-ref">Contract Ref: DocuSign #36D0FBDC &bull; Effective 12 Jul 2024</div>
+    </div>
+  `;
+}
+
+// =====================================
+// BILLING MONTH CHANGE
+// =====================================
+function onBillingMonthChange() {
+  // Auto-set invoice date to 1st of billing month
+  const bm = document.getElementById('billing_month').value;
+  document.getElementById('inv_date').value = bm + '-01';
+  render();
+}
+
+// =====================================
+// EXPORT CSV
+// =====================================
+function exportToCSV() {
+  const c = calculate();
+  const inv_number    = document.getElementById('inv_number').value;
+  const billing_month = document.getElementById('billing_month').value;
+  const client_name   = document.getElementById('client_name').value;
+  const inv_date      = document.getElementById('inv_date').value;
+
+  const rows = [
+    ['Invoice Number', 'Billing Month', 'Invoice Date', 'Client', 'Contract Month',
+     'Maintenance (EUR)', 'Admin Users', 'Admin Billable', 'Admin Amount (EUR)',
+     'Employee Users', 'Employee Amount (EUR)', 'Patient Users', 'Patient Amount (EUR)',
+     'AddOns (EUR)', 'Late Fee (EUR)', 'Subtotal (EUR)', 'Grand Total (EUR)'],
+    [
+      inv_number,
+      billing_month,
+      inv_date,
+      client_name,
+      c.contractMonth,
+      c.maintAmount.toFixed(2),
+      c.countAdmin,
+      c.billableAdmin,
+      c.adminAmount.toFixed(2),
+      c.countEmployee,
+      c.empAmount.toFixed(2),
+      c.countPatient,
+      c.patAmount.toFixed(2),
+      c.addonTotal.toFixed(2),
+      c.lateFeeAmount.toFixed(2),
+      c.subtotal.toFixed(2),
+      c.grandTotal.toFixed(2),
+    ]
+  ];
+
+  // Add addon detail rows
+  c.addons.forEach(a => {
+    rows.push(['', '', '', '', 'ADDON', '', '', '', '', '', '', '', '', a.desc, a.amt.toFixed(2), '', '']);
+  });
+
+  const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `ServiceWave_Invoice_${inv_number}_${billing_month}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// =====================================
+// GOOGLE SHEETS LOG LINK
+// =====================================
+function openGoogleSheets() {
+  // Opens a new Google Sheets document for manual logging
+  // In production, replace SPREADSHEET_ID with your actual Sheet ID
+  const sheetUrl = 'https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit';
+  window.open(sheetUrl, '_blank');
+}
+
+// =====================================
+// COPY JSON
+// =====================================
+function copyInvoiceJSON() {
+  const c = calculate();
+  const data = {
+    invoice_number:  document.getElementById('inv_number').value,
+    billing_month:   document.getElementById('billing_month').value,
+    invoice_date:    document.getElementById('inv_date').value,
+    client:          document.getElementById('client_name').value,
+    contract_month:  c.contractMonth,
+    line_items: {
+      maintenance:     c.maintAmount,
+      admin_users:     { count: c.countAdmin, billable: c.billableAdmin, total: c.adminAmount },
+      employee_users:  { count: c.countEmployee, chargeable: c.chargePerUser, total: c.empAmount },
+      patient_users:   { count: c.countPatient,  chargeable: c.chargePerUser, total: c.patAmount },
+      addons:          c.addons,
+      late_fee:        c.lateFeeAmount,
+    },
+    subtotal:    c.subtotal,
+    grand_total: c.grandTotal,
+    currency:    'EUR',
+  };
+  navigator.clipboard.writeText(JSON.stringify(data, null, 2))
+    .then(() => alert('Invoice JSON copied to clipboard!'));
+}
+
+// =====================================
+// INIT
+// =====================================
+function init() {
+  // Set today as default invoice date
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('inv_date').value = today;
+  render();
+}
+
+init();
+</script>
+</body>
+</html>
