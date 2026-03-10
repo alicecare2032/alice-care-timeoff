@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Light Housekeeping Guidelines | Alice Care</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Poppins', Arial, Helvetica, sans-serif;
+      background-color: #F0F7FF;
+      margin: 0;
+      padding: 0;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    .email-wrapper {
+      width: 100%;
+      background-color: #F0F7FF;
+      padding: 30px 15px;
+    }
+
+    .email-container {
+      max-width: 620px;
+      margin: 0 auto;
+      background-color: #FFFFFF;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(26, 54, 92, 0.08);
+    }
+
+    /* Compact Header */
+    .email-header {
+      background: linear-gradient(135deg, #F57600 0%, #E06900 100%);
+      padding: 22px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .email-header::before {
+      content: '';
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 50%;
+      top: -80px;
+      right: 6%;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 700;
+      position: relative;
+      z-index: 1;
+    }
+
+    .logo .alice { color: #FFFFFF; }
+    .logo .care { color: #1A365C; font-weight: 400; }
+
+    .header-tagline {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 12px;
+      font-weight: 400;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Intro Section */
+    .intro-section {
+      padding: 28px 40px;
+      border-bottom: 1px solid #E2E8F0;
+    }
+
+    .intro-section h1 {
+      font-size: 21px;
+      font-weight: 700;
+      color: #1A365C;
+      margin-bottom: 10px;
+    }
+
+    .intro-section h1 span { color: #F57600; }
+
+    .intro-section p {
+      font-size: 13.5px;
+      line-height: 1.7;
+      color: #2D4A6F;
+    }
+
+    /* Definition Cards */
+    .definitions {
+      padding: 28px 40px;
+      border-bottom: 1px solid #E2E8F0;
+    }
+
+    .definitions h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1A365C;
+      margin-bottom: 16px;
+    }
+
+    .def-row {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 0;
+    }
+
+    .def-card {
+      flex: 1;
+      border-radius: 8px;
+      padding: 18px 20px;
+    }
+
+    .def-card.included {
+      background: #E6F4EA;
+      border: 1px solid #B7DFC6;
+    }
+
+    .def-card.excluded {
+      background: #FDECEA;
+      border: 1px solid #F5C6C6;
+    }
+
+    .def-card h4 {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .def-card.included h4 { color: #1B7A3D; }
+    .def-card.excluded h4 { color: #B91C1C; }
+
+    .def-card p {
+      font-size: 12px;
+      line-height: 1.55;
+      color: #2D4A6F;
+    }
+
+    /* Do's and Don'ts Table */
+    .dosdonts-section {
+      padding: 28px 40px;
+    }
+
+    .dosdonts-section h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1A365C;
+      margin-bottom: 6px;
+    }
+
+    .dosdonts-subtitle {
+      font-size: 12px;
+      color: #666666;
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+
+    .dd-row {
+      display: flex;
+      gap: 0;
+      margin-bottom: 2px;
+    }
+
+    .dd-row:first-of-type .dd-cell {
+      border-radius: 6px 6px 0 0;
+    }
+
+    .dd-row:last-of-type .dd-cell {
+      border-radius: 0 0 6px 6px;
+      margin-bottom: 0;
+    }
+
+    .dd-cell {
+      flex: 1;
+      padding: 12px 16px;
+      font-size: 12px;
+      line-height: 1.55;
+      color: #2D4A6F;
+    }
+
+    .dd-cell.do-cell {
+      background: #F0FAF3;
+      border-left: 3px solid #10B981;
+      margin-right: 1px;
+    }
+
+    .dd-cell.dont-cell {
+      background: #FEF5F4;
+      border-left: 3px solid #EF4444;
+    }
+
+    /* Column Headers */
+    .dd-header {
+      display: flex;
+      gap: 0;
+      margin-bottom: 2px;
+    }
+
+    .dd-header-cell {
+      flex: 1;
+      padding: 10px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-radius: 6px 6px 0 0;
+    }
+
+    .dd-header-cell.do-header {
+      background: #10B981;
+      color: #FFFFFF;
+      margin-right: 1px;
+    }
+
+    .dd-header-cell.dont-header {
+      background: #EF4444;
+      color: #FFFFFF;
+    }
+
+    /* Scope Reminder */
+    .scope-reminder {
+      background: #F0F7FF;
+      border-radius: 8px;
+      padding: 18px 22px;
+      margin: 20px 40px 0;
+      border-left: 4px solid #F57600;
+    }
+
+    .scope-reminder h4 {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1A365C;
+      margin-bottom: 6px;
+    }
+
+    .scope-reminder p {
+      font-size: 12.5px;
+      line-height: 1.6;
+      color: #2D4A6F;
+    }
+
+    /* Regulatory Note */
+    .reg-note {
+      background: #FFF7ED;
+      border: 1px solid #FDDCB0;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 16px 40px 0;
+      font-size: 12px;
+      line-height: 1.6;
+      color: #7C4A00;
+    }
+
+    .reg-note strong { color: #E06900; }
+
+    .reg-note a {
+      color: #1A365C;
+      font-weight: 600;
+      text-decoration: underline;
+    }
+
+    /* Contact Row */
+    .contact-row {
+      padding: 24px 40px;
+      text-align: center;
+      font-size: 13px;
+      color: #2D4A6F;
+      line-height: 1.6;
+    }
+
+    .contact-row a {
+      color: #F57600;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    /* Quick Links */
+    .quick-links {
+      background: linear-gradient(135deg, #1A365C 0%, #2D4A6F 100%);
+      padding: 18px 40px;
+      text-align: center;
+    }
+
+    .quick-links-row {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .quick-link {
+      display: inline-block;
+      color: #FFFFFF !important;
+      text-decoration: none;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 7px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 6px;
+      font-family: 'Poppins', Arial, sans-serif;
+    }
+
+    .quick-link:hover { background: rgba(255, 255, 255, 0.1); }
+
+    /* Footer */
+    .email-footer {
+      background: #1A365C;
+      padding: 22px 40px;
+      text-align: center;
+      border-top: 3px solid #F57600;
+    }
+
+    .footer-logo {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .footer-logo .alice { color: #F57600; }
+    .footer-logo .care { color: #FFFFFF; font-weight: 400; }
+
+    .footer-address {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.55);
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .footer-unsubscribe {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    .footer-unsubscribe a { color: #F57600; text-decoration: underline; }
+
+    /* Responsive */
+    @media screen and (max-width: 480px) {
+      .email-header { padding: 18px 24px; flex-direction: column; text-align: center; gap: 4px; }
+      .intro-section { padding: 22px 24px; }
+      .intro-section h1 { font-size: 19px; }
+      .definitions { padding: 22px 24px; }
+      .def-row { flex-direction: column; }
+      .dosdonts-section { padding: 22px 24px; }
+      .dd-row { flex-direction: column; gap: 2px; }
+      .dd-header { flex-direction: column; gap: 2px; }
+      .dd-header-cell { border-radius: 6px; }
+      .dd-header-cell.do-header { margin-right: 0; }
+      .dd-cell.do-cell { margin-right: 0; }
+      .scope-reminder { margin: 16px 24px 0; }
+      .reg-note { margin: 12px 24px 0; }
+      .contact-row { padding: 20px 24px; }
+      .quick-links { padding: 16px 24px; }
+      .quick-link { padding: 7px 10px; font-size: 10px; }
+      .email-footer { padding: 20px 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="email-wrapper">
+    <div class="email-container">
+
+      <!-- Header -->
+      <div class="email-header">
+        <div class="logo">
+          <span class="alice">alice.</span><span class="care">care</span>
+        </div>
+        <div class="header-tagline">Safe · Affordable · Reliable</div>
+      </div>
+
+      <!-- Intro -->
+      <div class="intro-section">
+        <h1>Light Housekeeping: <span>What to Expect</span></h1>
+        <p>At Alice Care, we want to provide clarity on what our caregivers can and cannot do when it comes to housekeeping tasks. Our services include <strong>tidy-up support</strong> that keeps your immediate living spaces safe and clean. This differs from full <strong>housekeeping or deep cleaning services</strong>, which fall outside the caregiver role. Our caregivers follow these guidelines to deliver consistent, safe, and effective non-medical home care within the scope of their responsibilities.</p>
+      </div>
+
+      <!-- Tidy-Up vs Housekeeping Definitions -->
+      <div class="definitions">
+        <h2>Understanding the Difference</h2>
+        <div class="def-row">
+          <div class="def-card included">
+            <h4>Tidy-Up Services (Included)</h4>
+            <p>Basic household support that maintains a safe, clean, and orderly environment for the client. Tasks connect directly to the care plan and focus on the client's immediate living areas, personal items, and daily comfort.</p>
+          </div>
+          <div class="def-card excluded">
+            <h4>Housekeeping Services (Not Included)</h4>
+            <p>Deep cleaning, heavy labor, repairs, full-household cleaning, or tasks that extend beyond the client's personal care needs. These services require a dedicated housekeeping or cleaning professional.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Do's and Don'ts -->
+      <div class="dosdonts-section">
+        <h2>Caregiver Do's &amp; Don'ts</h2>
+        <div class="dosdonts-subtitle">The following guidelines define the tasks our caregivers will and will not perform during their visits.</div>
+
+        <!-- Column Headers -->
+        <div class="dd-header">
+          <div class="dd-header-cell do-header">Caregivers Will</div>
+          <div class="dd-header-cell dont-header">Caregivers Will Not</div>
+        </div>
+
+        <div class="dd-row">
+          <div class="dd-cell do-cell">Keep the client's immediate living areas safe, tidy, and organized.</div>
+          <div class="dd-cell dont-cell">Provide deep cleaning or maid service.</div>
+        </div>
+
+        <div class="dd-row">
+          <div class="dd-cell do-cell">Wash dishes used during the shift or after meal preparation.</div>
+          <div class="dd-cell dont-cell">Scrub entire kitchens, clean ovens, or perform heavy appliance cleaning unless specifically approved as basic cleanup.</div>
+        </div>
+
+        <div class="dd-row">
+          <div class="dd-cell do-cell">Wipe counters, tables, and surfaces used during caregiving activities.</div>
+          <div class="dd-cell dont-cell">Use strong chemicals or hazardous cleaning products without office or family instruction.</div>
+        </div>
+
+        <div class="dd-row">
+          <div class="dd-cell do-cell">Sweep or vacuum light traffic areas used by the client for safety and cleanliness.</div>
+          <div class="dd-cell dont-cell">Move heavy furniture or large objects.</div>
+        </div>
+
+        <div class="dd-row">
+          <div class="dd-cell do-cell">Mop small spills and lightly clean floors when needed for safety.</div>
+          <div class="dd-cell dont-cell">Wax floors, shampoo carpets, or perform restorative floor care.</div>
+        </div>
+
+        <div class="dd-row">
+          <div class="dd-cell do-cell">Make the bed and straighten the client's room.</div>
+          <div class="dd-cell dont-cell">Rearrange the household or organize rooms unrelated to the client's care.</div>
+        </div>
+
+        <div class="dd-row">
+          <div class="dd-cell do-cell">Change bed linens when needed.</div>
+          <div class="dd-cell dont-cell">Handle excessive household laundry for the whole family.</div>
+        </div>
+
+        <div class="dd-row">
+          <div class="dd-cell do-cell">Do the client's personal laundry, towels, and bedding as assigned.</div>
+          <div class="dd-cell dont-cell">Wash laundry for guests, relatives, or other household members unless authorized.</div>
+        </div>
+
+        <div class="dd-row">
+          <div class="dd-cell do-cell">Take out kitchen trash and regular household trash used during the shift.</div>
+          <div class="dd-cell dont-cell">Handle hazardous waste, biohazard cleanup, or unsafe materials.</div>
+        </div>
+
+        <div class="dd-row">
+          <div class="dd-cell do-cell">Put away groceries and keep food storage areas orderly.</div>
+          <div class="dd-cell dont-cell">Perform major pantry cleanouts or non-care-related household projects.</div>
+        </div>
+
+        <div class="dd-row">
+          <div class="dd-cell do-cell">Throw away spoiled food when instructed and keep commonly used areas sanitary.</div>
+          <div class="dd-cell dont-cell">Discard valuables, personal papers, or belongings without permission.</div>
+        </div>
+
+        <div class="dd-row">
+          <div class="dd-cell do-cell">Tidy clutter that creates fall risk in areas used by the client.</div>
+          <div class="dd-cell dont-cell">Clean rooms or spaces not connected to the client's care needs unless assigned.</div>
+        </div>
+
+        <div class="dd-row">
+          <div class="dd-cell do-cell">Clean the bathroom lightly after assisting the client, such as wiping surfaces and keeping it safe.</div>
+          <div class="dd-cell dont-cell">Perform intensive bathroom scrubbing, mold removal, or maintenance work.</div>
+        </div>
+
+        <div class="dd-row">
+          <div class="dd-cell do-cell">Report unsafe home conditions, broken equipment, infestations, or sanitation concerns to the office or family.</div>
+          <div class="dd-cell dont-cell">Perform repairs, maintenance, pest control, or unsafe cleanup.</div>
+        </div>
+
+        <div class="dd-row">
+          <div class="dd-cell do-cell">Follow the care plan and complete only the housekeeping tasks connected to non-medical home care.</div>
+          <div class="dd-cell dont-cell">Perform tasks outside the care plan or outside the non-medical scope.</div>
+        </div>
+      </div>
+
+      <!-- Scope Reminder -->
+      <div class="scope-reminder">
+        <h4>Caregiver Scope of Role</h4>
+        <p>Alice Care caregivers follow strict guidelines and work only within the limits of their assigned role. They will not exceed the scope of non-medical home care services as defined by the care plan and CDSS regulations. If you need housekeeping beyond what our caregivers provide, we recommend contacting a professional cleaning service.</p>
+      </div>
+
+      <!-- Regulatory Note -->
+      <div class="reg-note">
+        <strong>Regulatory Disclosure:</strong> Alice Care operates under CDSS License #344700080 in compliance with the Home Care Services Consumer Protection Act (AB 1217). Light housekeeping tasks fall within the non-medical services authorized for Registered Home Care Aides. For more information, view the <a href="https://www.cdss.ca.gov/Portals/9/CCLD/CCCS/HCSB/Fact%20Sheet%20Home%20Care%20Services.pdf">CDSS Home Care Services Fact Sheet</a>.
+      </div>
+
+      <!-- Contact -->
+      <div class="contact-row">
+        Questions about your care plan or services? Reach us by phone, text, or voicemail at <a href="tel:+19162928820">(916) 292-8820</a><br>Monday to Saturday, 9:00 AM to 5:00 PM
+      </div>
+
+      <!-- Quick Links -->
+      <div class="quick-links">
+        <div class="quick-links-row">
+          <a href="https://www.alicecare.com" class="quick-link">Caregiving Essentials</a>
+          <a href="https://www.alicecare.com" class="quick-link">Do's &amp; Don'ts</a>
+          <a href="https://alice.care/help/" class="quick-link">FAQ</a>
+          <a href="https://alice.care/termsofuse/" class="quick-link">Terms &amp; Conditions</a>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="email-footer">
+        <div class="footer-logo">
+          <span class="alice">alice.</span><span class="care">care</span>
+        </div>
+        <div class="footer-address">
+          8146 Greenback Lane, Suite #106<br>
+          Fair Oaks, California 95628, United States
+        </div>
+        <div class="footer-unsubscribe">
+          No longer interested in receiving emails? <a href="#">Click here to unsubscribe</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
