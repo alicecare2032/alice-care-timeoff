@@ -1151,7 +1151,7 @@ Write your email content here..."></div>
             <div class="modal-header"><h2>Add Alias</h2><button class="modal-close" onclick="closeModal('aliasModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
             <div class="modal-body">
                 <div class="form-group"><label>Name *</label><input type="text" id="aliasName" placeholder="HR Department"></div>
-                <div class="form-group"><label>Email *</label><input type="email" id="aliasEmail" placeholder="hr@alice.care"></div>
+                <div class="form-group"><label>Email *</label><input type="email" id="aliasEmail" placeholder="info@alice.care"></div>
             </div>
             <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('aliasModal')">Cancel</button><button class="btn btn-primary" onclick="saveAlias()">Save</button></div>
         </div>
@@ -1449,7 +1449,7 @@ Write your email content here..."></div>
                 console.log('Raw API result:', result);
                 if (!result.success) throw new Error(result.error);
                 
-                clients = result.data.clients || [];
+                clients = result.data.clients || result.data.employees || [];
                 templates = result.data.templates || [];
                 emailLogs = result.data.emailLogs || [];
                 aliases = result.data.aliases || [];
@@ -1796,7 +1796,7 @@ Write your email content here..."></div>
             const subjEl = document.getElementById('previewSubject');
             const bodyEl = document.getElementById('previewBody');
             
-            fromEl.textContent = settings.defaultAlias || 'hr@alice.care';
+            fromEl.textContent = settings.defaultAlias || 'info@alice.care';
             
             if (testMode) {
                 toEl.textContent = (document.getElementById('testEmailAddress').value || 'test@example.com') + ' (Test)';
@@ -1870,7 +1870,7 @@ Write your email content here..."></div>
                     subject: '[TEST] ' + replaceVars(selectedTemplate.subject || ''),
                     body: replaceVars(selectedTemplate.body || ''),
                     variables: { ...variableValues },
-                    sentFrom: settings.defaultAlias || 'hr@alice.care'
+                    sentFrom: settings.defaultAlias || 'info@alice.care'
                 };
                 
                 const result = await apiCall(data, 'POST');
@@ -1914,7 +1914,7 @@ Write your email content here..."></div>
                             last_name: emp.lastName,
                             case_manager: emp.caseManager || ''
                         },
-                        sentFrom: settings.defaultAlias || 'hr@alice.care'
+                        sentFrom: settings.defaultAlias || 'info@alice.care'
                     };
                     
                     const result = await apiCall(data, 'POST');
