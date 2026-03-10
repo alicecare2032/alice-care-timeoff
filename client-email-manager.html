@@ -111,14 +111,14 @@
         .hca-sync-info.stale svg { color: #F57600; }
         
         /* Employee Card with Checkbox */
-        .employee-card { background: white; border: 2px solid #E5ECF3; border-radius: 12px; padding: 15px; margin-bottom: 10px; transition: all 0.3s; cursor: pointer; user-select: none; }
-        .employee-card:hover { border-color: #F57600; background: #FFFAF5; }
-        .employee-card.selected { border-color: #F57600; box-shadow: 0 4px 12px rgba(245, 118, 0, 0.2); background: #FFF8F0; }
-        .employee-card-inner { display: flex; align-items: center; gap: 12px; }
+        .client-card { background: white; border: 2px solid #E5ECF3; border-radius: 12px; padding: 15px; margin-bottom: 10px; transition: all 0.3s; cursor: pointer; user-select: none; }
+        .client-card:hover { border-color: #F57600; background: #FFFAF5; }
+        .client-card.selected { border-color: #F57600; box-shadow: 0 4px 12px rgba(245, 118, 0, 0.2); background: #FFF8F0; }
+        .client-card-inner { display: flex; align-items: center; gap: 12px; }
         .employee-checkbox { width: 24px; height: 24px; border: 2px solid #ccc; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; background: white; }
-        .employee-card.selected .employee-checkbox { background: #F57600; border-color: #F57600; }
+        .client-card.selected .employee-checkbox { background: #F57600; border-color: #F57600; }
         .employee-checkbox svg { width: 16px; height: 16px; color: white; display: none; }
-        .employee-card.selected .employee-checkbox svg { display: block; }
+        .client-card.selected .employee-checkbox svg { display: block; }
         .employee-avatar { width: 44px; height: 44px; background: #1A365C; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 16px; flex-shrink: 0; }
         .employee-details { flex: 1; min-width: 0; }
         .employee-details h3 { font-size: 15px; color: #1A365C; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -460,9 +460,9 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                 Templates
             </button>
-            <button class="tab-btn" data-tab="employees">
+            <button class="tab-btn" data-tab="clients">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-                Employees
+                Clients
             </button>
             <button class="tab-btn" data-tab="logs">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
@@ -499,23 +499,23 @@
                     <div>
                         <h3 class="section-title">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                            Select Employees
+                            Select Clients
                         </h3>
                         
                         <div class="search-box">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-                            <input type="text" id="employeeSearch" placeholder="Search by name, email, department...">
+                            <input type="text" id="clientSearch" placeholder="Search by name or email...">
                         </div>
                         
                         <div class="selection-controls">
                             <div class="select-actions">
-                                <button class="btn btn-small btn-outline" onclick="selectAllEmployees()">Select All</button>
-                                <button class="btn btn-small btn-outline" onclick="clearEmployeeSelection()">Clear</button>
+                                <button class="btn btn-small btn-outline" onclick="selectAllClients()">Select All</button>
+                                <button class="btn btn-small btn-outline" onclick="clearClientSelection()">Clear</button>
                             </div>
                             <div class="selected-count">Selected: <span id="selectedCount">0</span></div>
                         </div>
                         
-                        <div id="employeeList" class="scrollable-list"></div>
+                        <div id="clientList" class="scrollable-list"></div>
                         
                         <h3 class="section-title" style="margin-top: 25px;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -593,7 +593,7 @@
                                         <div class="preview-meta-row"><span class="preview-meta-label">From:</span><span class="preview-meta-value" id="previewFrom"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="71190331101d1812145f12100314">[email&#160;protected]</a></span></div>
                                         <div class="preview-meta-row"><span class="preview-meta-label">Subject:</span><span class="preview-meta-value" id="previewSubject">Select a template</span></div>
                                     </div>
-                                    <div class="email-preview-body" id="previewBody">Select employee(s) and a template to preview the email.</div>
+                                    <div class="email-preview-body" id="previewBody">Select client(s) and a template to preview the email.</div>
                                     <div class="email-preview-footer">
                                         <div class="footer-company">
                                             <strong>alice.care</strong><br>
@@ -644,104 +644,42 @@
                 <div id="templatesGrid"></div>
             </div>
             
-            <!-- Employees Tab -->
-            <div class="tab-content" id="tab-employees">
+            <!-- Clients Tab -->
+            <div class="tab-content" id="tab-clients">
                 <div class="card-header" style="margin-bottom: 20px;">
-                    <h3 class="section-title" style="margin: 0;">Employee Directory</h3>
+                    <h3 class="section-title" style="margin: 0;">Client Directory</h3>
                     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                        <div class="hca-sync-info" id="hcaSyncInfo" style="display: none;">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span id="hcaSyncStatus">HCA synced</span>
-                        </div>
-                        <button class="btn btn-outline btn-small" onclick="syncHCAData()">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>
-                            Sync HCA
-                        </button>
-                        <button class="btn btn-primary" onclick="openEmployeeModal()">
+                        <button class="btn btn-primary" onclick="openClientModal()">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                            Add Employee
+                            Add Client
                         </button>
                     </div>
                 </div>
                 <div class="stats-row">
-                    <div class="stat-card"><div class="stat-value" id="statTotal">0</div><div class="stat-label">Total Employees</div></div>
+                    <div class="stat-card"><div class="stat-value" id="statTotal">0</div><div class="stat-label">Total Clients</div></div>
                     <div class="stat-card warning"><div class="stat-value" id="statWarnings">0</div><div class="stat-label">With Warnings</div></div>
                     <div class="stat-card danger"><div class="stat-value" id="statFinal">0</div><div class="stat-label">Final Warning</div></div>
                     <div class="stat-card"><div class="stat-value" id="statEmails">0</div><div class="stat-label">Emails (30d)</div></div>
                 </div>
                 <div class="search-box">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-                    <input type="text" id="employeeDirectorySearch" placeholder="Search by name, email, department...">
+                    <input type="text" id="clientDirectorySearch" placeholder="Search by name, email, case manager, insurance...">
                 </div>
                 <div class="employee-filters">
                     <div class="filter-group">
-                        <label>Position</label>
-                        <select id="filterPosition" onchange="renderEmployeeDirectory()">
-                            <option value="">All Positions</option>
-                            <option value="HCA" selected>HCA Only</option>
-                            <option value="other">Non-HCA Only</option>
+                        <label>Status</label>
+                        <select id="filterStatus" onchange="renderClientDirectory()">
+                            <option value="">All Clients</option>
+                            <option value="active">Active</option>
+                            <option value="terminated">Inactive</option>
                         </select>
                     </div>
-                    <div class="filter-group">
-                        <label>HCA Sync Status</label>
-                        <select id="filterMismatch" onchange="renderEmployeeDirectory()">
-                            <option value="">All Employees</option>
-                            <option value="mismatch">⚠ Not in HCA Tracker</option>
-                            <option value="matched">✓ Matched in HCA</option>
-                            <option value="hca-only">📋 In HCA Only (not here)</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>HCA Expiration</label>
-                        <select id="filterHCA" onchange="renderEmployeeDirectory()">
-                            <option value="">All Statuses</option>
-                            <option value="overdue">🔴 Overdue</option>
-                            <option value="urgent">🟠 Urgent</option>
-                            <option value="warning">🟡 Warning</option>
-                            <option value="ok">🟢 OK</option>
-                            <option value="na">N/A</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>TB Test Due</label>
-                        <select id="filterTB" onchange="renderEmployeeDirectory()">
-                            <option value="">All Statuses</option>
-                            <option value="overdue">🔴 Overdue</option>
-                            <option value="urgent">🟠 Urgent</option>
-                            <option value="warning">🟡 Warning</option>
-                            <option value="ok">🟢 OK</option>
-                            <option value="xray">✓ X-Ray</option>
-                            <option value="na">N/A</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Training Due</label>
-                        <select id="filterTraining" onchange="renderEmployeeDirectory()">
-                            <option value="">All Statuses</option>
-                            <option value="overdue">🔴 Overdue</option>
-                            <option value="urgent">🟠 Urgent</option>
-                            <option value="warning">🟡 Warning</option>
-                            <option value="ok">🟢 OK</option>
-                            <option value="na">N/A</option>
-                        </select>
-                    </div>
-                    <button class="btn btn-small btn-outline clear-filters" onclick="clearEmployeeFilters()">Clear Filters</button>
-                </div>
-                <!-- HCA Only Alert -->
-                <div class="hca-only-alert" id="hcaOnlyAlert" style="display: none;">
-                    <div class="hca-only-header">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                        <span><strong id="hcaOnlyCount">0</strong> employees in HCA Tracker not in this list</span>
-                        <button class="btn btn-small btn-outline" onclick="toggleHCAOnlyDetails()">Show Details</button>
-                    </div>
-                    <div class="hca-only-details" id="hcaOnlyDetails" style="display: none;">
-                        <div class="hca-only-list" id="hcaOnlyList"></div>
-                    </div>
+                    <button class="btn btn-small btn-outline clear-filters" onclick="clearClientFilters()">Clear Filters</button>
                 </div>
                 <div class="table-container" style="overflow-x: auto;">
                     <table class="data-table">
-                        <thead><tr><th>Employee</th><th>Position</th><th>Warning Level</th><th>HCA Expiration</th><th>TB Date Taken</th><th>Training Taken</th><th>Actions</th></tr></thead>
-                        <tbody id="employeeTableBody"></tbody>
+                        <thead><tr><th>Client</th><th>Case Manager</th><th>Insurance Company</th><th>Policy Number</th><th>Warning Level</th><th>Actions</th></tr></thead>
+                        <tbody id="clientTableBody"></tbody>
                     </table>
                 </div>
             </div>
@@ -767,9 +705,9 @@
                                 <input type="text" id="logSearchInput" placeholder="Search by name or email..." oninput="renderLogs()">
                             </div>
                             <div class="log-filter-group">
-                                <label>Department</label>
+                                <label>Case Manager</label>
                                 <select id="logDepartmentFilter" onchange="renderLogs()">
-                                    <option value="">All Departments</option>
+                                    <option value="">All Case Managers</option>
                                 </select>
                             </div>
                         </div>
@@ -810,7 +748,7 @@
                 
                 <div style="overflow-x: auto;">
                     <table class="data-table">
-                        <thead><tr><th>Date/Time</th><th>Employee</th><th>Department</th><th>Template</th><th>Subject</th><th>Actions</th></tr></thead>
+                        <thead><tr><th>Date/Time</th><th>Client</th><th>Case Manager</th><th>Template</th><th>Subject</th><th>Actions</th></tr></thead>
                         <tbody id="logsTableBody"></tbody>
                     </table>
                 </div>
@@ -889,7 +827,7 @@
                     
                     <div class="automation-info">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                        <p>Automated emails are sent daily to <strong>active employees only</strong>. The "days before due" settings also control the <strong>color warning thresholds</strong> in the Employee Directory table. <strong>TB, Training, and HCA reminders are sent only to employees with "HCA" in their position.</strong> You must run the automation manually or set up a daily trigger in Google Apps Script.</p>
+                        <p>Automated emails are sent daily to <strong>active clients only</strong>. Configure triggers and templates below. You must run the automation manually or set up a daily trigger in Google Apps Script.</p>
                     </div>
                     
                     <div class="automation-triggers">
@@ -931,7 +869,7 @@
                             </div>
                         </div>
                         
-                        <!-- TB Test Reminder -->
+                        <!-- Service Renewal Reminder -->
                         <div class="trigger-item">
                             <div class="trigger-toggle">
                                 <div class="toggle-switch" id="triggerTBReminder" onclick="toggleAutomation('tbReminder')"></div>
@@ -939,9 +877,9 @@
                             <div class="trigger-content">
                                 <div class="trigger-name">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                                    TB Test Reminder
+                                    Service Renewal Reminder
                                 </div>
-                                <div class="trigger-description">Remind employee when TB test is due - <strong style="color: #F57600;">HCA positions only</strong> (excludes X-Ray)</div>
+                                <div class="trigger-description">Reminder for service renewal or follow-up</div>
                             </div>
                             <div class="trigger-template">
                                 <select id="templateTBReminder" onchange="saveAutomationSettings()">
@@ -954,7 +892,7 @@
                             </div>
                         </div>
                         
-                        <!-- Training Reminder -->
+                        <!-- Annual Review Reminder -->
                         <div class="trigger-item">
                             <div class="trigger-toggle">
                                 <div class="toggle-switch" id="triggerTrainingReminder" onclick="toggleAutomation('trainingReminder')"></div>
@@ -962,9 +900,9 @@
                             <div class="trigger-content">
                                 <div class="trigger-name">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-                                    Training Reminder
+                                    Annual Review Reminder
                                 </div>
-                                <div class="trigger-description">Remind employee when annual training is due - <strong style="color: #F57600;">HCA positions only</strong></div>
+                                <div class="trigger-description">Reminder for annual review or care plan update</div>
                             </div>
                             <div class="trigger-template">
                                 <select id="templateTrainingReminder" onchange="saveAutomationSettings()">
@@ -977,7 +915,7 @@
                             </div>
                         </div>
                         
-                        <!-- HCA Certification Reminder -->
+                        <!-- Authorization Renewal Reminder -->
                         <div class="trigger-item">
                             <div class="trigger-toggle">
                                 <div class="toggle-switch" id="triggerHCAReminder" onclick="toggleAutomation('hcaReminder')"></div>
@@ -985,9 +923,9 @@
                             <div class="trigger-content">
                                 <div class="trigger-name">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                    HCA Certification Reminder
+                                    Authorization Renewal Reminder
                                 </div>
-                                <div class="trigger-description">Remind employee when HCA certification renewal is approaching - <strong style="color: #F57600;">HCA positions only</strong></div>
+                                <div class="trigger-description">Reminder for authorization or insurance renewal</div>
                             </div>
                             <div class="trigger-template">
                                 <select id="templateHCAReminder" onchange="saveAutomationSettings()">
@@ -1020,12 +958,12 @@
         </div>
     </div>
     
-    <!-- Employee Modal -->
-    <div class="modal" id="employeeModal">
+    <!-- Client Modal -->
+    <div class="modal" id="clientModal">
         <div class="modal-content modal-large">
-            <div class="modal-header"><h2 id="employeeModalTitle">Add Employee</h2><button class="modal-close" onclick="closeModal('employeeModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+            <div class="modal-header"><h2 id="clientModalTitle">Add Client</h2><button class="modal-close" onclick="closeModal('clientModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
             <div class="modal-body">
-                <input type="hidden" id="editEmployeeId">
+                <input type="hidden" id="editClientId">
                 
                 <h4 class="modal-section-title">Basic Information</h4>
                 <div class="form-row">
@@ -1037,54 +975,35 @@
                     <div class="form-group"><label>Status</label>
                         <select id="empStatus">
                             <option value="active">Active</option>
-                            <option value="terminated">Terminated</option>
+                            <option value="terminated">Inactive</option>
                         </select>
                     </div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label>Department</label><input type="text" id="empDepartment" placeholder="Caregiving"></div>
-                    <div class="form-group"><label>Position</label><input type="text" id="empPosition" placeholder="Caregiver"></div>
+                    <div class="form-group"><label>Phone</label><input type="text" id="empPhone" placeholder="(916) 555-0000"></div>
+                    <div class="form-group"><label>Case Manager</label><input type="text" id="empCaseManager" placeholder="Jane Smith"></div>
                 </div>
-                <div class="form-group"><label>Supervisor Name</label><input type="text" id="empSupervisor" placeholder="Jane Smith"></div>
+                <div class="form-group"><label>Address</label><input type="text" id="empAddress" placeholder="123 Main St, Fair Oaks, CA 95628"></div>
                 
-                <h4 class="modal-section-title">Important Dates</h4>
+                <h4 class="modal-section-title">Insurance &amp; Coverage</h4>
+                <div class="form-row">
+                    <div class="form-group"><label>Insurance Company</label><input type="text" id="empInsuranceCompany" placeholder="Blue Shield of California"></div>
+                    <div class="form-group"><label>Policy Number</label><input type="text" id="empPolicyNumber" placeholder="BSC-123456"></div>
+                </div>
+                
+                <h4 class="modal-section-title">Dates</h4>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Hire Date</label>
-                        <input type="date" id="empHireDate">
+                        <label>Start Date</label>
+                        <input type="date" id="empStartDate">
                     </div>
                     <div class="form-group">
                         <label>Birth Date</label>
                         <input type="date" id="empBirthDate">
                     </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>TB Test Date</label>
-                        <input type="date" id="empTBDate">
-                        <div class="checkbox-row" style="margin-top: 8px;">
-                            <input type="checkbox" id="empTBXray" style="width: auto; margin-right: 8px;">
-                            <label for="empTBXray" style="font-weight: 400; font-size: 13px; color: #666; margin: 0; cursor: pointer;">X-Ray (no renewal required)</label>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Training Date</label>
-                        <input type="date" id="empTrainingDate">
-                        <span class="field-hint">Last training completion</span>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>HCA Expiration Date</label>
-                        <div id="empHCAExpiration" class="readonly-field" style="padding: 10px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 6px; color: #555; min-height: 20px; font-size: 14px;">
-                            <span class="hca-exp-value">—</span>
-                        </div>
-                        <span class="field-hint">Read-only from HCA Tracker (sync to update)</span>
-                    </div>
-                    <div class="form-group"></div>
-                </div>
             </div>
-            <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('employeeModal')">Cancel</button><button class="btn btn-primary" onclick="saveEmployee()">Save</button></div>
+            <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('clientModal')">Cancel</button><button class="btn btn-primary" onclick="saveClient()">Save</button></div>
         </div>
     </div>
     
@@ -1107,10 +1026,14 @@
                     </div>
                     <div class="variable-chips">
                         <div class="variable-chip-group">
-                            <span class="chip-group-label">Employee</span>
+                            <span class="chip-group-label">Client</span>
                             <button type="button" class="variable-chip" onclick="insertVariable('first_name')">{{first_name}}</button>
                             <button type="button" class="variable-chip" onclick="insertVariable('last_name')">{{last_name}}</button>
-                            <button type="button" class="variable-chip" onclick="insertVariable('supervisor_name')">{{supervisor_name}}</button>
+                            <button type="button" class="variable-chip" onclick="insertVariable('case_manager')">{{case_manager}}</button>
+                            <button type="button" class="variable-chip" onclick="insertVariable('insurance_company')">{{insurance_company}}</button>
+                            <button type="button" class="variable-chip" onclick="insertVariable('policy_number')">{{policy_number}}</button>
+                            <button type="button" class="variable-chip" onclick="insertVariable('phone')">{{phone}}</button>
+                            <button type="button" class="variable-chip" onclick="insertVariable('address')">{{address}}</button>
                         </div>
                         <div class="variable-chip-group">
                             <span class="chip-group-label">Dates</span>
@@ -1133,20 +1056,12 @@
                             <button type="button" class="variable-chip" onclick="insertVariable('new_schedule')">{{new_schedule}}</button>
                         </div>
                         <div class="variable-chip-group">
-                            <span class="chip-group-label">Training</span>
-                            <button type="button" class="variable-chip" onclick="insertVariable('training_name')">{{training_name}}</button>
-                            <button type="button" class="variable-chip" onclick="insertVariable('training_duration')">{{training_duration}}</button>
-                            <button type="button" class="variable-chip" onclick="insertVariable('training_link')">{{training_link}}</button>
+                            <span class="chip-group-label">Service</span>
+                            <button type="button" class="variable-chip" onclick="insertVariable('start_date')">{{start_date}}</button>
+                            <button type="button" class="variable-chip" onclick="insertVariable('service_type')">{{service_type}}</button>
+                            <button type="button" class="variable-chip" onclick="insertVariable('hours_per_week')">{{hours_per_week}}</button>
                         </div>
-                        <div class="variable-chip-group">
-                            <span class="chip-group-label">Compliance (Auto-filled)</span>
-                            <button type="button" class="variable-chip auto-var" onclick="insertVariable('hca_expiration_date')" title="Read-only from HCA Tracker (sync required)">{{hca_expiration_date}}</button>
-                            <button type="button" class="variable-chip auto-var" onclick="insertVariable('days_until_hca_expiration')" title="Days until HCA expiration (from HCA Tracker)">{{days_until_hca_expiration}}</button>
-                            <button type="button" class="variable-chip auto-var" onclick="insertVariable('tb_due_date')" title="Auto-calculated: TB date + 2 years">{{tb_due_date}}</button>
-                            <button type="button" class="variable-chip auto-var" onclick="insertVariable('days_until_tb_due')" title="Auto-calculated days remaining">{{days_until_tb_due}}</button>
-                            <button type="button" class="variable-chip auto-var" onclick="insertVariable('training_due_date')" title="Auto-calculated: Training date + 1 year">{{training_due_date}}</button>
-                            <button type="button" class="variable-chip auto-var" onclick="insertVariable('days_until_training_due')" title="Auto-calculated days remaining">{{days_until_training_due}}</button>
-                        </div>
+
                         <div class="variable-chip-group">
                             <span class="chip-group-label">Custom</span>
                             <input type="text" id="customVariableName" placeholder="custom_var" class="custom-variable-input">
@@ -1257,22 +1172,18 @@ Write your email content here..."></div>
         // ============================================
         const STORAGE_KEY = 'alicecare_webapp_url';
         let WEB_APP_URL = '';
-        let employees = [];
+        let clients = [];
         let templates = [];
         let emailLogs = [];
         let aliases = [];
         let settings = {};
-        let selectedEmployeeIds = new Set();
+        let selectedClientIds = new Set();
         let selectedTemplate = null;
         let variableValues = {};
         let testMode = false;
         let viewingLogId = null;
         
-        // HCA Tracker Integration
-        const HCA_TRACKER_SHEET_ID = '1m5Pr9aYo314GJ-rPX9wVha-wClXMXwaHOBks0ZU4Amg';
-        const HCA_TRACKER_URL = 'https://alicecare2032.github.io/alice-care-timeoff/hca-tracker-dashboard.html';
-        let hcaTrackerData = []; // Stores { firstName, lastName, expirationDate } from HCA Tracker
-        let hcaLastSync = null;
+        // Client data
         
         // ============================================
         // HELPERS
@@ -1305,14 +1216,14 @@ Write your email content here..."></div>
         
         function getEmployeeWarningLevel(empId) {
             const id = String(empId);
-            const logs = emailLogs.filter(l => String(l.employeeId) === id && parseInt(l.warningLevel) > 0);
+            const logs = emailLogs.filter(l => String(l.clientId) === id && parseInt(l.warningLevel) > 0);
             if (logs.length === 0) return 0;
             return Math.max(...logs.map(l => parseInt(l.warningLevel) || 0));
         }
         
         function getLastEmailDate(empId) {
             const id = String(empId);
-            const logs = emailLogs.filter(l => String(l.employeeId) === id).sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt));
+            const logs = emailLogs.filter(l => String(l.clientId) === id).sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt));
             return logs.length > 0 ? logs[0].sentAt : null;
         }
         
@@ -1457,18 +1368,18 @@ Write your email content here..."></div>
             });
             
             // Search inputs with debounce
-            const empSearch = document.getElementById('employeeSearch');
-            const empDirSearch = document.getElementById('employeeDirectorySearch');
+            const empSearch = document.getElementById('clientSearch');
+            const empDirSearch = document.getElementById('clientDirectorySearch');
             let searchTimeout;
             
             empSearch.addEventListener('input', () => {
                 clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => renderEmployeeList(), 150);
+                searchTimeout = setTimeout(() => renderClientList(), 150);
             });
             
             empDirSearch.addEventListener('input', () => {
                 clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => renderEmployeeDirectory(), 150);
+                searchTimeout = setTimeout(() => renderClientDirectory(), 150);
             });
         }
         
@@ -1538,18 +1449,18 @@ Write your email content here..."></div>
                 console.log('Raw API result:', result);
                 if (!result.success) throw new Error(result.error);
                 
-                employees = result.data.employees || [];
+                clients = result.data.clients || [];
                 templates = result.data.templates || [];
                 emailLogs = result.data.emailLogs || [];
                 aliases = result.data.aliases || [];
                 settings = result.data.settings || {};
                 
-                console.log('Loaded employees:', employees);
-                console.log('First employee structure:', employees[0]);
+                console.log('Loaded clients:', clients);
+                console.log('First client structure:', clients[0]);
                 console.log('Loaded templates:', templates.length);
                 console.log('Loaded logs:', emailLogs.length);
                 
-                renderEmployeeList();
+                renderClientList();
                 renderTemplateList();
                 updatePreview();
                 loadAutomationSettings();
@@ -1572,9 +1483,9 @@ Write your email content here..."></div>
             document.getElementById('tab-' + tabName).classList.add('active');
             document.querySelector(`.tab-btn[data-tab="${tabName}"]`).classList.add('active');
             
-            if (tabName === 'compose') { renderEmployeeList(); renderTemplateList(); }
+            if (tabName === 'compose') { renderClientList(); renderTemplateList(); }
             else if (tabName === 'templates') renderTemplatesGrid();
-            else if (tabName === 'employees') { renderEmployeeDirectory(); updateStats(); }
+            else if (tabName === 'clients') { renderClientDirectory(); updateStats(); }
             else if (tabName === 'logs') { populateLogFilters(); renderLogs(); }
             else if (tabName === 'settings') { renderAliases(); renderAutomationUI(); }
         }
@@ -1582,37 +1493,37 @@ Write your email content here..."></div>
         // ============================================
         // COMPOSE - EMPLOYEES
         // ============================================
-        function renderEmployeeList() {
-            const container = document.getElementById('employeeList');
-            const search = (document.getElementById('employeeSearch')?.value || '').toLowerCase().trim();
+        function renderClientList() {
+            const container = document.getElementById('clientList');
+            const search = (document.getElementById('clientSearch')?.value || '').toLowerCase().trim();
             
-            let filtered = employees;
+            let filtered = clients;
             if (search) {
-                filtered = employees.filter(e => {
+                filtered = clients.filter(e => {
                     const name = getFullName(e).toLowerCase();
                     const email = (e.email || '').toLowerCase();
-                    const dept = (e.department || '').toLowerCase();
-                    return name.includes(search) || email.includes(search) || dept.includes(search);
+                    const cm = (e.caseManager || '').toLowerCase();
+                    return name.includes(search) || email.includes(search) || cm.includes(search);
                 });
             }
             
             if (filtered.length === 0) {
-                container.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><h3>${employees.length ? 'No Results' : 'No Employees'}</h3><p>${employees.length ? 'Try different search' : 'Add employees first'}</p></div>`;
+                container.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><h3>${clients.length ? 'No Results' : 'No Clients'}</h3><p>${clients.length ? 'Try different search' : 'Add clients first'}</p></div>`;
                 updateSelectedCount();
                 return;
             }
             
             container.innerHTML = filtered.map(emp => {
                 const empIdStr = String(emp.id);
-                const isSelected = selectedEmployeeIds.has(empIdStr);
+                const isSelected = selectedClientIds.has(empIdStr);
                 const level = getEmployeeWarningLevel(emp.id);
                 const badge = level > 0 ? `<span class="badge badge-warning-${Math.min(level, 3)} employee-badge">${level >= 4 ? 'Final' : 'L' + level}</span>` : '';
                 
-                return `<div class="employee-card ${isSelected ? 'selected' : ''}" data-id="${empIdStr}">
-                    <div class="employee-card-inner">
-                        <div class="employee-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-                        <div class="employee-avatar">${getInitials(emp)}</div>
-                        <div class="employee-details">
+                return `<div class="client-card ${isSelected ? 'selected' : ''}" data-id="${empIdStr}">
+                    <div class="client-card-inner">
+                        <div class="client-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                        <div class="client-avatar">${getInitials(emp)}</div>
+                        <div class="client-details">
                             <h3>${escapeHtml(getFullName(emp))}</h3>
                             <p>${escapeHtml(emp.email || 'No email')}</p>
                         </div>
@@ -1622,32 +1533,32 @@ Write your email content here..."></div>
             }).join('');
             
             // Add click handlers
-            container.querySelectorAll('.employee-card').forEach(card => {
-                card.addEventListener('click', () => toggleEmployee(card.dataset.id));
+            container.querySelectorAll('.client-card').forEach(card => {
+                card.addEventListener('click', () => toggleClient(card.dataset.id));
             });
             
             updateSelectedCount();
         }
         
-        function toggleEmployee(empId) {
+        function toggleClient(empId) {
             const id = String(empId);
-            if (selectedEmployeeIds.has(id)) {
-                selectedEmployeeIds.delete(id);
+            if (selectedClientIds.has(id)) {
+                selectedClientIds.delete(id);
             } else {
-                selectedEmployeeIds.add(id);
+                selectedClientIds.add(id);
             }
-            renderEmployeeList();
+            renderClientList();
             updateRecipientsDisplay();
             updatePreview();
             checkCanSend();
             
             // Update variables for single selection
-            if (selectedEmployeeIds.size === 1) {
-                const emp = employees.find(e => String(e.id) === [...selectedEmployeeIds][0]);
+            if (selectedClientIds.size === 1) {
+                const emp = clients.find(e => String(e.id) === [...selectedClientIds][0]);
                 if (emp) {
                     variableValues['first_name'] = emp.firstName || '';
                     variableValues['last_name'] = emp.lastName || '';
-                    variableValues['supervisor_name'] = emp.supervisor || '';
+                    variableValues['case_manager'] = emp.caseManager || '';
                     
                     // Auto-calculate compliance dates
                     populateComplianceDates(emp);
@@ -1711,40 +1622,40 @@ Write your email content here..."></div>
             return (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear();
         }
         
-        function selectAllEmployees() {
-            const search = (document.getElementById('employeeSearch')?.value || '').toLowerCase().trim();
-            let filtered = employees;
+        function selectAllClients() {
+            const search = (document.getElementById('clientSearch')?.value || '').toLowerCase().trim();
+            let filtered = clients;
             if (search) {
-                filtered = employees.filter(e => {
+                filtered = clients.filter(e => {
                     const name = getFullName(e).toLowerCase();
                     return name.includes(search) || (e.email || '').toLowerCase().includes(search) || (e.department || '').toLowerCase().includes(search);
                 });
             }
-            filtered.forEach(e => selectedEmployeeIds.add(String(e.id)));
-            renderEmployeeList();
+            filtered.forEach(e => selectedClientIds.add(String(e.id)));
+            renderClientList();
             updateRecipientsDisplay();
             updatePreview();
             checkCanSend();
         }
         
-        function clearEmployeeSelection() {
-            selectedEmployeeIds.clear();
-            renderEmployeeList();
+        function clearClientSelection() {
+            selectedClientIds.clear();
+            renderClientList();
             updateRecipientsDisplay();
             updatePreview();
             checkCanSend();
         }
         
         function removeRecipient(empId) {
-            selectedEmployeeIds.delete(String(empId));
-            renderEmployeeList();
+            selectedClientIds.delete(String(empId));
+            renderClientList();
             updateRecipientsDisplay();
             updatePreview();
             checkCanSend();
         }
         
         function updateSelectedCount() {
-            document.getElementById('selectedCount').textContent = selectedEmployeeIds.size;
+            document.getElementById('selectedCount').textContent = selectedClientIds.size;
         }
         
         function updateRecipientsDisplay() {
@@ -1752,15 +1663,15 @@ Write your email content here..."></div>
             const list = document.getElementById('recipientsList');
             const count = document.getElementById('recipientCount');
             
-            if (selectedEmployeeIds.size === 0) {
+            if (selectedClientIds.size === 0) {
                 display.style.display = 'none';
                 return;
             }
             
             display.style.display = 'block';
-            count.textContent = selectedEmployeeIds.size;
+            count.textContent = selectedClientIds.size;
             
-            const selected = employees.filter(e => selectedEmployeeIds.has(String(e.id)));
+            const selected = clients.filter(e => selectedClientIds.has(String(e.id)));
             list.innerHTML = selected.map(emp => 
                 `<div class="recipient-tag">${escapeHtml(getFullName(emp))}<span class="remove-recipient" onclick="event.stopPropagation(); removeRecipient('${emp.id}')">×</span></div>`
             ).join('');
@@ -1818,19 +1729,19 @@ Write your email content here..."></div>
             
             // Set defaults
             variableValues['date'] = variableValues['date'] || new Date().toLocaleDateString();
-            if (selectedEmployeeIds.size === 1) {
-                const emp = employees.find(e => String(e.id) === [...selectedEmployeeIds][0]);
+            if (selectedClientIds.size === 1) {
+                const emp = clients.find(e => String(e.id) === [...selectedClientIds][0]);
                 if (emp) {
                     variableValues['first_name'] = emp.firstName || '';
                     variableValues['last_name'] = emp.lastName || '';
-                    variableValues['supervisor_name'] = emp.supervisor || '';
+                    variableValues['case_manager'] = emp.caseManager || '';
                 }
             }
             
             panel.style.display = 'block';
             inputs.innerHTML = vars.map(v => {
                 const val = variableValues[v] || '';
-                const isAuto = (v === 'first_name' || v === 'last_name') && selectedEmployeeIds.size > 1;
+                const isAuto = (v === 'first_name' || v === 'last_name') && selectedClientIds.size > 1;
                 return `<div class="variable-input">
                     <label>{{${v}}}</label>
                     <input type="text" value="${escapeHtml(val)}" ${isAuto ? 'disabled placeholder="Auto per employee"' : ''} oninput="updateVariable('${v}', this.value)">
@@ -1847,7 +1758,7 @@ Write your email content here..."></div>
             if (empOverride) {
                 vars['first_name'] = empOverride.firstName || '';
                 vars['last_name'] = empOverride.lastName || '';
-                vars['supervisor_name'] = empOverride.supervisor || vars['supervisor_name'] || '';
+                vars['case_manager'] = empOverride.caseManager || vars['case_manager'] || '';
                 
                 // Calculate compliance dates for this specific employee
                 const today = new Date();
@@ -1871,28 +1782,7 @@ Write your email content here..."></div>
                 }
                 
                 // TB Due Date
-                if (empOverride.tbDate) {
-                    const tbDueDate = new Date(empOverride.tbDate);
-                    tbDueDate.setFullYear(tbDueDate.getFullYear() + 2);
-                    vars['tb_due_date'] = formatDateForDisplay(tbDueDate);
-                    const daysUntilTB = Math.ceil((tbDueDate - today) / (1000 * 60 * 60 * 24));
-                    vars['days_until_tb_due'] = daysUntilTB > 0 ? daysUntilTB + ' days' : (daysUntilTB === 0 ? 'Today' : Math.abs(daysUntilTB) + ' days overdue');
-                } else {
-                    vars['tb_due_date'] = 'N/A';
-                    vars['days_until_tb_due'] = 'N/A';
-                }
-                
-                // Training Due Date
-                if (empOverride.trainingDate) {
-                    const trainingDueDate = new Date(empOverride.trainingDate);
-                    trainingDueDate.setFullYear(trainingDueDate.getFullYear() + 1);
-                    vars['training_due_date'] = formatDateForDisplay(trainingDueDate);
-                    const daysUntilTraining = Math.ceil((trainingDueDate - today) / (1000 * 60 * 60 * 24));
-                    vars['days_until_training_due'] = daysUntilTraining > 0 ? daysUntilTraining + ' days' : (daysUntilTraining === 0 ? 'Today' : Math.abs(daysUntilTraining) + ' days overdue');
-                } else {
-                    vars['training_due_date'] = 'N/A';
-                    vars['days_until_training_due'] = 'N/A';
-                }
+
             }
             
             return text.replace(/\{\{(\w+)\}\}/g, (match, v) => {
@@ -1910,41 +1800,41 @@ Write your email content here..."></div>
             
             if (testMode) {
                 toEl.textContent = (document.getElementById('testEmailAddress').value || 'test@example.com') + ' (Test)';
-            } else if (selectedEmployeeIds.size === 0) {
+            } else if (selectedClientIds.size === 0) {
                 toEl.textContent = 'Select employee(s)';
-            } else if (selectedEmployeeIds.size === 1) {
-                const emp = employees.find(e => String(e.id) === [...selectedEmployeeIds][0]);
+            } else if (selectedClientIds.size === 1) {
+                const emp = clients.find(e => String(e.id) === [...selectedClientIds][0]);
                 toEl.textContent = emp ? emp.email : 'Unknown';
             } else {
-                toEl.textContent = selectedEmployeeIds.size + ' employees';
+                toEl.textContent = selectedClientIds.size + ' clients';
             }
             
             if (selectedTemplate) {
-                const emp = selectedEmployeeIds.size === 1 ? employees.find(e => String(e.id) === [...selectedEmployeeIds][0]) : null;
+                const emp = selectedClientIds.size === 1 ? clients.find(e => String(e.id) === [...selectedClientIds][0]) : null;
                 subjEl.textContent = replaceVars(selectedTemplate.subject || '', emp);
                 // Render HTML content in preview
                 bodyEl.innerHTML = replaceVars(selectedTemplate.body || '', emp);
             } else {
                 subjEl.textContent = 'Select a template';
-                bodyEl.innerHTML = 'Select employee(s) and a template to preview the email.';
+                bodyEl.innerHTML = 'Select client(s) and a template to preview the email.';
             }
         }
         
         function checkCanSend() {
-            const can = selectedEmployeeIds.size > 0 && selectedTemplate;
+            const can = selectedClientIds.size > 0 && selectedTemplate;
             document.getElementById('sendBtn').disabled = !can;
-            document.getElementById('sendBtnText').textContent = selectedEmployeeIds.size > 1 ? `Send to ${selectedEmployeeIds.size} Employees` : 'Send Email';
+            document.getElementById('sendBtnText').textContent = selectedClientIds.size > 1 ? `Send to ${selectedClientIds.size} Clients` : 'Send Email';
         }
         
         function resetCompose() {
-            selectedEmployeeIds.clear();
+            selectedClientIds.clear();
             selectedTemplate = null;
             variableValues = {};
-            document.getElementById('employeeSearch').value = '';
+            document.getElementById('clientSearch').value = '';
             document.getElementById('templateCategory').value = '';
             document.getElementById('variablesPanel').style.display = 'none';
             document.getElementById('recipientsDisplay').style.display = 'none';
-            renderEmployeeList();
+            renderClientList();
             renderTemplateList();
             updatePreview();
             checkCanSend();
@@ -1970,9 +1860,9 @@ Write your email content here..."></div>
             try {
                 const data = {
                     action: 'sendEmail',
-                    employeeId: 'TEST',
-                    employeeName: 'Test User',
-                    employeeEmail: testEmail,
+                    clientId: 'TEST',
+                    clientName: 'Test User',
+                    clientEmail: testEmail,
                     templateId: selectedTemplate.id,
                     templateName: '[TEST] ' + selectedTemplate.name,
                     templateCategory: selectedTemplate.category,
@@ -1994,10 +1884,10 @@ Write your email content here..."></div>
         }
         
         async function sendEmails() {
-            if (selectedEmployeeIds.size === 0 || !selectedTemplate) return;
+            if (selectedClientIds.size === 0 || !selectedTemplate) return;
             
-            const selected = employees.filter(e => selectedEmployeeIds.has(String(e.id)));
-            if (selected.length > 1 && !confirm(`Send to ${selected.length} employees?`)) return;
+            const selected = clients.filter(e => selectedClientIds.has(String(e.id)));
+            if (selected.length > 1 && !confirm(`Send to ${selected.length} clients?`)) return;
             
             showLoading(true, 'Sending...', `0 of ${selected.length}`);
             let sent = 0, failed = 0;
@@ -2016,13 +1906,13 @@ Write your email content here..."></div>
                     // Send minimal data - server will look up template body
                     const data = {
                         action: 'sendEmailByTemplate',
-                        employeeId: emp.id,
+                        clientId: emp.id,
                         templateId: selectedTemplate.id,
                         variables: { 
                             ...variableValues, 
                             first_name: emp.firstName, 
                             last_name: emp.lastName,
-                            supervisor_name: emp.supervisor || ''
+                            case_manager: emp.caseManager || ''
                         },
                         sentFrom: settings.defaultAlias || 'hr@alice.care'
                     };
@@ -2030,9 +1920,9 @@ Write your email content here..."></div>
                     const result = await apiCall(data, 'POST');
                     if (result.success) {
                         emailLogs.unshift({ 
-                            employeeId: emp.id,
-                            employeeName: getFullName(emp),
-                            employeeEmail: emp.email,
+                            clientId: emp.id,
+                            clientName: getFullName(emp),
+                            clientEmail: emp.email,
                             templateId: selectedTemplate.id,
                             templateName: selectedTemplate.name,
                             templateCategory: selectedTemplate.category,
@@ -2495,451 +2385,99 @@ Write your email content here..."></div>
             </div>`;
         }
         
-        function renderEmployeeDirectory() {
-            const container = document.getElementById('employeeTableBody');
-            const search = (document.getElementById('employeeDirectorySearch')?.value || '').toLowerCase().trim();
+        function renderClientDirectory() {
+            const container = document.getElementById('clientTableBody');
+            const search = (document.getElementById('clientDirectorySearch')?.value || '').toLowerCase().trim();
+            const filterStatus = document.getElementById('filterStatus')?.value || '';
             
-            // Get filter values
-            const filterPosition = document.getElementById('filterPosition')?.value || '';
-            const filterMismatch = document.getElementById('filterMismatch')?.value || '';
-            const filterHCA = document.getElementById('filterHCA')?.value || '';
-            const filterTB = document.getElementById('filterTB')?.value || '';
-            const filterTraining = document.getElementById('filterTraining')?.value || '';
+            let filtered = clients;
             
-            // Get warning day thresholds from automation settings (with safe defaults if not yet loaded)
-            const autoSettings = typeof automationSettings !== 'undefined' ? automationSettings : {};
-            const hcaDays = autoSettings.hcaReminder?.daysBefore || 60;
-            const tbDays = autoSettings.tbReminder?.daysBefore || 30;
-            const trainingDays = autoSettings.trainingReminder?.daysBefore || 30;
-            
-            // Helper to get HCA status for an employee - ONLY from HCA Tracker
-            function getEmployeeHCAStatus(emp) {
-                const hcaMatch = findHCATrackerMatch(emp.firstName, emp.lastName);
-                if (hcaMatch && hcaMatch.expirationDate) {
-                    return getHCADateStatus(hcaMatch.expirationDate, hcaDays);
-                }
-                return { status: 'na' };
-            }
-            
-            // Helper to get HCA date status (for direct expiration date)
-            function getHCADateStatus(expirationDateStr, warningDays) {
-                if (!expirationDateStr) return { status: 'na' };
-                try {
-                    const expDate = new Date(expirationDateStr);
-                    if (isNaN(expDate.getTime())) return { status: 'na' };
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-                    expDate.setHours(0, 0, 0, 0);
-                    const daysLeft = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
-                    let status = 'ok';
-                    if (daysLeft < 0) status = 'overdue';
-                    else if (daysLeft <= Math.floor(warningDays / 2)) status = 'urgent';
-                    else if (daysLeft <= warningDays) status = 'warning';
-                    return { status, daysLeft };
-                } catch (e) {
-                    return { status: 'na' };
-                }
-            }
-            
-            let filtered = employees;
-            
-            // Apply text search filter
             if (search) {
                 filtered = filtered.filter(e => {
                     const name = getFullName(e).toLowerCase();
-                    return name.includes(search) || (e.email || '').toLowerCase().includes(search) || (e.department || '').toLowerCase().includes(search);
+                    const email = (e.email || '').toLowerCase();
+                    const cm = (e.caseManager || '').toLowerCase();
+                    const ins = (e.insuranceCompany || '').toLowerCase();
+                    return name.includes(search) || email.includes(search) || cm.includes(search) || ins.includes(search);
                 });
             }
             
-            // Apply position filter
-            if (filterPosition) {
-                filtered = filtered.filter(e => {
-                    const position = (e.position || '').toLowerCase();
-                    if (filterPosition === 'HCA') {
-                        return position.includes('hca') || position.includes('home care aide');
-                    } else if (filterPosition === 'other') {
-                        return !position.includes('hca') && !position.includes('home care aide');
-                    }
-                    return true;
-                });
-            }
-            
-            // Apply mismatch filter
-            if (filterMismatch && hcaTrackerData.length > 0) {
-                if (filterMismatch === 'hca-only') {
-                    // For HCA-only, clear the table and show alert
-                    const hcaOnly = getHCAOnlyEmployees();
-                    if (hcaOnly.length > 0) {
-                        container.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;">
-                            <div style="color: #0C5460;">
-                                <strong>${hcaOnly.length} employee${hcaOnly.length > 1 ? 's' : ''}</strong> found in HCA Tracker but not in Email Manager.<br>
-                                <span style="font-size: 13px;">See the blue alert above for details.</span>
-                            </div>
-                        </td></tr>`;
-                        updateHCAOnlyAlert();
-                        // Show the details automatically
-                        document.getElementById('hcaOnlyDetails').style.display = 'block';
-                        const btn = document.querySelector('#hcaOnlyAlert button');
-                        if (btn) btn.textContent = 'Hide Details';
-                        return;
-                    } else {
-                        container.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;">All HCA Tracker employees are in this list</td></tr>`;
-                        return;
-                    }
-                }
-                filtered = filtered.filter(e => {
-                    const hasMatch = !!findHCATrackerMatch(e.firstName, e.lastName);
-                    if (filterMismatch === 'mismatch') return !hasMatch;
-                    if (filterMismatch === 'matched') return hasMatch;
-                    return true;
-                });
-            }
-            
-            // Apply HCA status filter
-            if (filterHCA) {
-                filtered = filtered.filter(e => {
-                    const hcaStatus = getEmployeeHCAStatus(e);
-                    return hcaStatus.status === filterHCA;
-                });
-            }
-            
-            // Apply TB status filter
-            if (filterTB) {
-                filtered = filtered.filter(e => {
-                    // Handle X-Ray filter
-                    if (filterTB === 'xray') {
-                        return e.tbXray === true || e.tbXray === 'true';
-                    }
-                    // If employee has X-Ray, they don't match other TB statuses
-                    if (e.tbXray === true || e.tbXray === 'true') {
-                        return false;
-                    }
-                    const tbStatus = getDateStatus(e.tbDate, 2, tbDays);
-                    return tbStatus.status === filterTB;
-                });
-            }
-            
-            // Apply Training status filter
-            if (filterTraining) {
-                filtered = filtered.filter(e => {
-                    const trainingStatus = getDateStatus(e.trainingDate, 1, trainingDays);
-                    return trainingStatus.status === filterTraining;
-                });
+            if (filterStatus) {
+                filtered = filtered.filter(e => (e.status || 'active') === filterStatus);
             }
             
             if (filtered.length === 0) {
-                const hasFilters = search || filterPosition || filterMismatch || filterHCA || filterTB || filterTraining;
-                container.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;">${employees.length ? (hasFilters ? 'No employees match filters' : 'No results') : 'No employees yet'}</td></tr>`;
+                const msg = clients.length ? 'No clients match the current filters' : 'No clients yet. Click Add Client to get started.';
+                container.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 40px; color: #666;">${msg}</td></tr>`;
                 return;
             }
             
             container.innerHTML = filtered.map(emp => {
                 const level = getEmployeeWarningLevel(emp.id);
-                let badge = '<span class="badge badge-success">Clear</span>';
-                if (level === 1) badge = '<span class="badge badge-warning-1">Level 1</span>';
-                else if (level === 2) badge = '<span class="badge badge-warning-2">Level 2</span>';
-                else if (level === 3) badge = '<span class="badge badge-warning-3">Level 3</span>';
-                else if (level >= 4) badge = '<span class="badge badge-final">Final</span>';
+                const badge = level > 0 
+                    ? `<span class="badge badge-warning-${Math.min(level, 3)}">${level >= 4 ? 'Final' : 'L' + level}</span>` 
+                    : '<span class="badge badge-success">None</span>';
                 
-                // Look up HCA data from HCA Tracker
-                const hcaMatch = findHCATrackerMatch(emp.firstName, emp.lastName);
-                const hasHCASync = hcaTrackerData.length > 0;
-                const hcaMismatch = hasHCASync && !hcaMatch;
-                
-                // HCA Expiration - ONLY from HCA Tracker (read-only, no fallback calculation)
-                let hcaCell;
-                if (hcaMatch && hcaMatch.expirationDate) {
-                    // HCA Tracker provides expiration date directly
-                    hcaCell = renderHCADateCell(hcaMatch.expirationDate, hcaDays);
-                } else {
-                    hcaCell = hasHCASync ? '<span class="date-status na" title="Not found in HCA Tracker">N/A</span>' : '<span class="date-status na" title="Sync HCA Tracker to see expiration">Sync HCA</span>';
-                }
-                
-                // TB: Shows date taken, warns when approaching 2-year renewal (unless X-Ray)
-                let tbCell;
-                if (emp.tbXray === true || emp.tbXray === 'true') {
-                    // X-Ray - always valid, no renewal required
-                    tbCell = `<div class="date-cell">
-                        <span class="date-status ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>X-Ray</span>
-                    </div>`;
-                } else {
-                    tbCell = renderDateCell(emp.tbDate, 2, tbDays, false, true);
-                }
-                
-                // Training: Shows last training, warns when approaching 1-year renewal
-                const trainingCell = renderDateCell(emp.trainingDate, 1, trainingDays, false, true);
-                
-                // Row class for mismatch highlighting
-                const rowClass = hcaMismatch ? 'hca-mismatch' : '';
-                const nameClass = hcaMismatch ? 'employee-name' : '';
-                const mismatchTitle = hcaMismatch ? 'title="Not found in HCA Tracker - verify name spelling"' : '';
-                
-                return `<tr class="${rowClass}">
-                    <td><div style="display: flex; align-items: center; gap: 10px;">
-                        <div class="employee-avatar" style="width: 36px; height: 36px; font-size: 14px;">${getInitials(emp)}</div>
-                        <div><div style="font-weight: 600;" class="${nameClass}" ${mismatchTitle}>${escapeHtml(getFullName(emp))}</div><div style="font-size: 12px; color: #666;">${escapeHtml(emp.email || '')}</div></div>
-                    </div></td>
-                    <td>${escapeHtml(emp.position || 'N/A')}</td>
+                return `<tr>
+                    <td>
+                        <div style="font-weight: 600;">${escapeHtml(getFullName(emp))}</div>
+                        <div style="font-size: 12px; color: #666;">${escapeHtml(emp.email || '')}</div>
+                    </td>
+                    <td>${escapeHtml(emp.caseManager || 'N/A')}</td>
+                    <td>${escapeHtml(emp.insuranceCompany || 'N/A')}</td>
+                    <td>${escapeHtml(emp.policyNumber || 'N/A')}</td>
                     <td>${badge}</td>
-                    <td>${hcaCell}</td>
-                    <td>${tbCell}</td>
-                    <td>${trainingCell}</td>
-                    <td><div class="action-buttons">
-                        <button class="btn btn-small btn-outline" onclick="editEmployee('${emp.id}')">Edit</button>
-                        <button class="btn btn-small btn-danger" onclick="deleteEmployee('${emp.id}')">Delete</button>
-                    </div></td>
+                    <td>
+                        <button class="btn btn-small btn-outline" onclick="editClient('${emp.id}')">Edit</button>
+                        <button class="btn btn-small btn-danger" onclick="deleteClient('${emp.id}')">Delete</button>
+                    </td>
                 </tr>`;
             }).join('');
-            
-            // Update HCA sync status indicator
-            updateHCASyncStatus();
-            
-            // Update HCA Only alert
-            updateHCAOnlyAlert();
         }
         
-        // Helper: Normalize string for matching (removes accents, special chars, extra spaces)
-        function normalizeForMatch(str) {
-            if (!str) return '';
-            return str
-                .normalize('NFD')                          // Decompose accents (é -> e + ´)
-                .replace(/[\u0300-\u036f]/g, '')          // Remove accent marks
-                .replace(/[^\w\s]/g, '')                   // Remove non-word chars except spaces
-                .replace(/\s+/g, ' ')                      // Collapse multiple spaces
-                .toLowerCase()
-                .trim();
-        }
-        
-        // Helper: Find matching HCA Tracker entry by name (with fuzzy matching)
-        function findHCATrackerMatch(firstName, lastName) {
-            if (!hcaTrackerData.length) return null;
-            
-            const empFirst = normalizeForMatch(firstName);
-            const empLast = normalizeForMatch(lastName);
-            
-            return hcaTrackerData.find(hca => {
-                const hcaFirst = normalizeForMatch(hca.firstName);
-                const hcaLast = normalizeForMatch(hca.lastName);
-                return hcaFirst === empFirst && hcaLast === empLast;
-            });
-        }
-        
-        // Helper: Render HCA date cell with direct expiration date (from HCA Tracker)
-        function renderHCADateCell(expirationDateStr, warningDays) {
-            if (!expirationDateStr) return '<span class="date-status na">N/A</span>';
-            
-            try {
-                const expDate = new Date(expirationDateStr);
-                if (isNaN(expDate.getTime())) return '<span class="date-status na">Invalid</span>';
-                
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                expDate.setHours(0, 0, 0, 0);
-                
-                const daysLeft = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
-                
-                let status = 'ok';
-                if (daysLeft < 0) {
-                    status = 'overdue';
-                } else if (daysLeft <= Math.floor(warningDays / 2)) {
-                    status = 'urgent';
-                } else if (daysLeft <= warningDays) {
-                    status = 'warning';
-                }
-                
-                const label = daysLeft < 0 ? `${Math.abs(daysLeft)}d overdue` : 
-                              daysLeft === 0 ? 'Due today' :
-                              daysLeft <= warningDays ? `${daysLeft}d left` : '';
-                
-                const icon = getStatusIcon(status);
-                const displayDate = formatDateShort(expDate);
-                const labelHtml = label ? `<div class="date-sub">${label}</div>` : '';
-                
-                return `<div class="date-cell">
-                    <a href="${HCA_TRACKER_URL}" target="_blank" class="hca-link date-status ${status}" title="Click to open HCA Tracker">${icon}${displayDate}</a>
-                    ${labelHtml}
-                </div>`;
-            } catch (e) {
-                return '<span class="date-status na">Error</span>';
-            }
-        }
-        
-        // Update HCA sync status indicator
-        function updateHCASyncStatus() {
-            const infoEl = document.getElementById('hcaSyncInfo');
-            const statusEl = document.getElementById('hcaSyncStatus');
-            
-            if (!infoEl || !statusEl) return;
-            
-            if (hcaTrackerData.length > 0 && hcaLastSync) {
-                infoEl.style.display = 'flex';
-                const mismatchCount = countHCAMismatches();
-                if (mismatchCount > 0) {
-                    statusEl.textContent = `${mismatchCount} name mismatch${mismatchCount > 1 ? 'es' : ''}`;
-                    infoEl.classList.add('stale');
-                } else {
-                    statusEl.textContent = `HCA synced (${hcaTrackerData.length})`;
-                    infoEl.classList.remove('stale');
-                }
-            } else {
-                infoEl.style.display = 'none';
-            }
-        }
-        
-        // Clear all employee directory filters (reset to defaults)
-        function clearEmployeeFilters() {
-            document.getElementById('employeeDirectorySearch').value = '';
-            document.getElementById('filterPosition').value = 'HCA'; // Default to HCA
-            document.getElementById('filterMismatch').value = '';
-            document.getElementById('filterHCA').value = '';
-            document.getElementById('filterTB').value = '';
-            document.getElementById('filterTraining').value = '';
-            renderEmployeeDirectory();
-        }
-        
-        // Count employees not found in HCA Tracker
-        function countHCAMismatches() {
-            if (!hcaTrackerData.length) return 0;
-            return employees.filter(emp => !findHCATrackerMatch(emp.firstName, emp.lastName)).length;
-        }
-        
-        // Get HCA Tracker entries not found in Email Manager
-        function getHCAOnlyEmployees() {
-            if (!hcaTrackerData.length) return [];
-            return hcaTrackerData.filter(hca => {
-                const hcaFirst = normalizeForMatch(hca.firstName);
-                const hcaLast = normalizeForMatch(hca.lastName);
-                return !employees.find(emp => {
-                    const empFirst = normalizeForMatch(emp.firstName);
-                    const empLast = normalizeForMatch(emp.lastName);
-                    return empFirst === hcaFirst && empLast === hcaLast;
-                });
-            });
-        }
-        
-        // Count HCA-only employees
-        function countHCAOnlyEmployees() {
-            return getHCAOnlyEmployees().length;
-        }
-        
-        // Update HCA Only alert display
-        function updateHCAOnlyAlert() {
-            const alertEl = document.getElementById('hcaOnlyAlert');
-            const countEl = document.getElementById('hcaOnlyCount');
-            const listEl = document.getElementById('hcaOnlyList');
-            
-            if (!alertEl) return;
-            
-            const hcaOnly = getHCAOnlyEmployees();
-            
-            if (hcaOnly.length > 0) {
-                alertEl.style.display = 'block';
-                countEl.textContent = hcaOnly.length;
-                
-                // Render the list
-                listEl.innerHTML = hcaOnly.map(hca => {
-                    const initials = ((hca.firstName || '').charAt(0) + (hca.lastName || '').charAt(0)).toUpperCase();
-                    const name = `${hca.firstName || ''} ${hca.lastName || ''}`.trim();
-                    const exp = hca.expirationDate ? `Exp: ${formatDateShort(hca.expirationDate)}` : 'No expiration';
-                    return `<div class="hca-only-item">
-                        <div class="hca-avatar">${initials}</div>
-                        <div class="hca-info">
-                            <div class="hca-name">${escapeHtml(name)}</div>
-                            <div class="hca-exp">${exp}</div>
-                            <div class="hca-note">In HCA Tracker, not in Email Manager</div>
-                        </div>
-                    </div>`;
-                }).join('');
-            } else {
-                alertEl.style.display = 'none';
-            }
-        }
-        
-        // Toggle HCA Only details visibility
-        function toggleHCAOnlyDetails() {
-            const detailsEl = document.getElementById('hcaOnlyDetails');
-            const btn = document.querySelector('#hcaOnlyAlert button');
-            
-            if (detailsEl.style.display === 'none') {
-                detailsEl.style.display = 'block';
-                btn.textContent = 'Hide Details';
-            } else {
-                detailsEl.style.display = 'none';
-                btn.textContent = 'Show Details';
-            }
-        }
-        
-        // Sync HCA data from HCA Tracker Google Sheet
-        async function syncHCAData() {
-            showLoading(true, 'Syncing HCA data...', 'Fetching from HCA Tracker');
-            
-            try {
-                const result = await apiCall({ action: 'getHCATrackerData' }, 'POST');
-                
-                if (!result.success) {
-                    throw new Error(result.error || 'Failed to fetch HCA data');
-                }
-                
-                hcaTrackerData = result.data || [];
-                hcaLastSync = new Date();
-                
-                // Re-render the employee directory with HCA data
-                renderEmployeeDirectory();
-                
-                const mismatchCount = countHCAMismatches();
-                if (mismatchCount > 0) {
-                    showToast(`HCA synced: ${hcaTrackerData.length} records. ${mismatchCount} employee${mismatchCount > 1 ? 's' : ''} not found in HCA Tracker.`, 'warning');
-                } else {
-                    showToast(`HCA synced: ${hcaTrackerData.length} records`, 'success');
-                }
-                
-            } catch (e) {
-                console.error('HCA Sync error:', e);
-                showToast('HCA sync failed: ' + e.message, 'error');
-            } finally {
-                showLoading(false);
-            }
+        function clearClientFilters() {
+            document.getElementById('clientDirectorySearch').value = '';
+            document.getElementById('filterStatus').value = '';
+            renderClientDirectory();
         }
         
         function updateStats() {
             const thirtyDaysAgo = new Date(); thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
             const recentEmails = emailLogs.filter(l => new Date(l.sentAt) >= thirtyDaysAgo);
             let warnings = 0, final = 0;
-            employees.forEach(e => {
+            clients.forEach(e => {
                 const level = getEmployeeWarningLevel(e.id);
                 if (level > 0 && level < 4) warnings++;
                 if (level >= 4) final++;
             });
             
-            document.getElementById('statTotal').textContent = employees.length;
+            document.getElementById('statTotal').textContent = clients.length;
             document.getElementById('statWarnings').textContent = warnings;
             document.getElementById('statFinal').textContent = final;
             document.getElementById('statEmails').textContent = recentEmails.length;
         }
         
-        function openEmployeeModal(empId = null) {
-            document.getElementById('employeeModalTitle').textContent = empId ? 'Edit Employee' : 'Add Employee';
-            document.getElementById('editEmployeeId').value = empId || '';
+        function openClientModal(empId = null) {
+            document.getElementById('clientModalTitle').textContent = empId ? 'Edit Client' : 'Add Client';
+            document.getElementById('editClientId').value = empId || '';
             
             // Clear fields first
             document.getElementById('empFirstName').value = '';
             document.getElementById('empLastName').value = '';
             document.getElementById('empEmail').value = '';
             document.getElementById('empStatus').value = 'active';
-            document.getElementById('empDepartment').value = '';
-            document.getElementById('empPosition').value = '';
-            document.getElementById('empSupervisor').value = '';
-            document.getElementById('empHireDate').value = '';
+            document.getElementById('empPhone').value = '';
+            document.getElementById('empCaseManager').value = '';
+            document.getElementById('empAddress').value = '';
+            document.getElementById('empInsuranceCompany').value = '';
+            document.getElementById('empPolicyNumber').value = '';
+            document.getElementById('empStartDate').value = '';
             document.getElementById('empBirthDate').value = '';
-            document.getElementById('empTBDate').value = '';
-            document.getElementById('empTBXray').checked = false;
-            document.getElementById('empTrainingDate').value = '';
-            document.getElementById('empHCAExpiration').innerHTML = '<span class="hca-exp-value">—</span>';
             
             if (empId) {
                 // Convert to string for comparison (handles both number and string IDs)
                 const searchId = String(empId);
-                const emp = employees.find(e => String(e.id) === searchId);
+                const emp = clients.find(e => String(e.id) === searchId);
                 console.log('Looking for employee ID:', empId, '(as string:', searchId, ')');
                 console.log('Found employee:', emp);
                 
@@ -2959,8 +2497,8 @@ Write your email content here..."></div>
                     document.getElementById('empLastName').value = lastName;
                     document.getElementById('empEmail').value = emp.email || '';
                     document.getElementById('empStatus').value = emp.status || 'active';
-                    document.getElementById('empDepartment').value = emp.department || '';
-                    document.getElementById('empPosition').value = emp.position || '';
+                    document.getElementById('empPhone').value = emp.phone || '';
+                    document.getElementById('empCaseManager').value = emp.caseManager || '';
                     document.getElementById('empSupervisor').value = emp.supervisor || '';
                     
                     // Date fields - format for date input (YYYY-MM-DD)
@@ -2999,11 +2537,11 @@ Write your email content here..."></div>
                     console.log('Populated fields:', { firstName, lastName, email: emp.email, status: emp.status });
                 } else {
                     console.error('Employee not found in local array!');
-                    console.log('Available IDs:', employees.map(e => e.id));
+                    console.log('Available IDs:', clients.map(e => e.id));
                     showToast('Employee not found - try refreshing', 'error');
                 }
             }
-            document.getElementById('employeeModal').classList.add('active');
+            document.getElementById('clientModal').classList.add('active');
         }
         
         function formatDateForInput(dateStr) {
@@ -3017,55 +2555,53 @@ Write your email content here..."></div>
             }
         }
         
-        function editEmployee(id) { 
+        function editClient(id) { 
             console.log('Edit button clicked for ID:', id);
-            openEmployeeModal(id); 
+            openClientModal(id); 
         }
         
-        async function saveEmployee() {
-            const id = document.getElementById('editEmployeeId').value;
+        async function saveClient() {
+            const id = document.getElementById('editClientId').value;
             const firstName = document.getElementById('empFirstName').value.trim();
             const lastName = document.getElementById('empLastName').value.trim();
             const email = document.getElementById('empEmail').value.trim();
             const status = document.getElementById('empStatus').value;
-            const department = document.getElementById('empDepartment').value.trim();
-            const position = document.getElementById('empPosition').value.trim();
-            const supervisor = document.getElementById('empSupervisor').value.trim();
-            const hireDate = document.getElementById('empHireDate').value || null;
+            const phone = document.getElementById('empPhone').value.trim();
+            const caseManager = document.getElementById('empCaseManager').value.trim();
+            const address = document.getElementById('empAddress').value.trim();
+            const insuranceCompany = document.getElementById('empInsuranceCompany').value.trim();
+            const policyNumber = document.getElementById('empPolicyNumber').value.trim();
+            const startDate = document.getElementById('empStartDate').value || null;
             const birthDate = document.getElementById('empBirthDate').value || null;
-            const tbDate = document.getElementById('empTBDate').value || null;
-            const tbXray = document.getElementById('empTBXray').checked;
-            const trainingDate = document.getElementById('empTrainingDate').value || null;
-            // Note: HCA expiration is read-only from HCA Tracker, not editable here
             
             if (!firstName || !lastName || !email) { showToast('First name, last name, and email required', 'error'); return; }
             if (!isValidEmail(email)) { showToast('Invalid email', 'error'); return; }
             
             // Check for duplicate email - use String() for ID comparison, handle null emails
-            const dup = employees.find(e => e.email && e.email.toLowerCase() === email.toLowerCase() && String(e.id) !== String(id));
-            if (dup) { showToast('Email already exists for another employee', 'error'); return; }
+            const dup = clients.find(e => e.email && e.email.toLowerCase() === email.toLowerCase() && String(e.id) !== String(id));
+            if (dup) { showToast('Email already exists for another client', 'error'); return; }
             
             showLoading(true, 'Saving...');
             try {
                 const data = { 
-                    action: id ? 'updateEmployee' : 'addEmployee', 
+                    action: id ? 'updateClient' : 'addClient', 
                     id: id || undefined, 
-                    firstName, lastName, email, status, department, position, supervisor,
-                    hireDate, birthDate, tbDate, tbXray, trainingDate
+                    firstName, lastName, email, status, phone, caseManager, address,
+                    insuranceCompany, policyNumber, startDate, birthDate
                 };
                 const result = await apiCall(data, 'POST');
                 if (!result.success) throw new Error(result.error);
                 
                 const empData = { firstName, lastName, email, status, department, position, supervisor, hireDate, birthDate, tbDate, tbXray, trainingDate };
                 if (id) {
-                    const idx = employees.findIndex(e => String(e.id) === String(id));
-                    if (idx !== -1) employees[idx] = { ...employees[idx], ...empData };
+                    const idx = clients.findIndex(e => String(e.id) === String(id));
+                    if (idx !== -1) clients[idx] = { ...clients[idx], ...clientData };
                 } else {
-                    employees.push({ id: result.data.id, ...empData });
+                    clients.push({ id: result.data.id, ...empData });
                 }
                 
-                closeModal('employeeModal');
-                renderEmployeeDirectory();
+                closeModal('clientModal');
+                renderClientDirectory();
                 updateStats();
                 showToast('Employee saved!', 'success');
             } catch (e) {
@@ -3075,14 +2611,14 @@ Write your email content here..."></div>
             }
         }
         
-        async function deleteEmployee(id) {
-            if (!confirm('Delete employee?')) return;
+        async function deleteClient(id) {
+            if (!confirm('Delete client?')) return;
             showLoading(true, 'Deleting...');
             try {
-                const result = await apiCall({ action: 'deleteEmployee', id }, 'POST');
+                const result = await apiCall({ action: 'deleteClient', id }, 'POST');
                 if (!result.success) throw new Error(result.error);
-                employees = employees.filter(e => e.id !== id);
-                renderEmployeeDirectory();
+                clients = clients.filter(e => e.id !== id);
+                renderClientDirectory();
                 updateStats();
                 showToast('Deleted', 'success');
             } catch (e) {
@@ -3098,9 +2634,9 @@ Write your email content here..."></div>
         function populateLogFilters() {
             // Populate department filter
             const deptSelect = document.getElementById('logDepartmentFilter');
-            const departments = [...new Set(employees.map(e => e.department).filter(Boolean))].sort();
-            deptSelect.innerHTML = '<option value="">All Departments</option>' + 
-                departments.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
+            const caseManagers = [...new Set(clients.map(e => e.caseManager).filter(Boolean))].sort();
+            deptSelect.innerHTML = '<option value="">All Case Managers</option>' + 
+                caseManagers.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
             
             // Populate template filter
             const tplSelect = document.getElementById('logTemplateFilter');
@@ -3130,8 +2666,8 @@ Write your email content here..."></div>
             // Search filter (name or email)
             if (searchInput) {
                 filtered = filtered.filter(l => {
-                    const name = (l.employeeName || '').toLowerCase();
-                    const email = (l.employeeEmail || '').toLowerCase();
+                    const name = (l.clientName || '').toLowerCase();
+                    const email = (l.clientEmail || '').toLowerCase();
                     return name.includes(searchInput) || email.includes(searchInput);
                 });
             }
@@ -3139,7 +2675,7 @@ Write your email content here..."></div>
             // Department filter
             if (deptFilter) {
                 filtered = filtered.filter(l => {
-                    const emp = employees.find(e => String(e.id) === String(l.employeeId));
+                    const emp = clients.find(e => String(e.id) === String(l.clientId));
                     return emp && emp.department === deptFilter;
                 });
             }
@@ -3170,11 +2706,11 @@ Write your email content here..."></div>
             }
             
             container.innerHTML = filtered.map(log => {
-                const emp = employees.find(e => String(e.id) === String(log.employeeId));
+                const emp = clients.find(e => String(e.id) === String(log.clientId));
                 const dept = emp?.department || '-';
                 return `<tr>
                     <td>${formatDateTime(log.sentAt)}</td>
-                    <td><div style="font-weight: 600;">${escapeHtml(log.employeeName)}</div><div style="font-size: 12px; color: #666;">${escapeHtml(log.employeeEmail)}</div></td>
+                    <td><div style="font-weight: 600;">${escapeHtml(log.clientName)}</div><div style="font-size: 12px; color: #666;">${escapeHtml(log.clientEmail)}</div></td>
                     <td>${escapeHtml(dept)}</td>
                     <td><span class="template-category">${log.templateCategory || ''}</span> ${escapeHtml(log.templateName)}</td>
                     <td style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(log.subject)}</td>
@@ -3190,7 +2726,7 @@ Write your email content here..."></div>
             
             document.getElementById('logModalContent').innerHTML = `
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
-                    <div><label style="font-size: 11px; color: #666; text-transform: uppercase;">To</label><p style="font-weight: 600;">${escapeHtml(log.employeeName)}</p><p style="font-size: 13px; color: #666;">${escapeHtml(log.employeeEmail)}</p></div>
+                    <div><label style="font-size: 11px; color: #666; text-transform: uppercase;">To</label><p style="font-weight: 600;">${escapeHtml(log.clientName)}</p><p style="font-size: 13px; color: #666;">${escapeHtml(log.clientEmail)}</p></div>
                     <div><label style="font-size: 11px; color: #666; text-transform: uppercase;">From</label><p>${escapeHtml(log.sentFrom)}</p></div>
                     <div><label style="font-size: 11px; color: #666; text-transform: uppercase;">Date</label><p>${formatDateTime(log.sentAt)}</p></div>
                     <div><label style="font-size: 11px; color: #666; text-transform: uppercase;">Template</label><p>${escapeHtml(log.templateName)}</p></div>
@@ -3209,16 +2745,16 @@ Write your email content here..."></div>
             const log = emailLogs.find(l => l.id === viewingLogId);
             if (!log) return;
             
-            const emp = employees.find(e => String(e.id) === String(log.employeeId));
+            const emp = clients.find(e => String(e.id) === String(log.clientId));
             const tpl = templates.find(t => t.id === log.templateId);
             
-            if (emp) { selectedEmployeeIds.clear(); selectedEmployeeIds.add(String(emp.id)); }
+            if (emp) { selectedClientIds.clear(); selectedClientIds.add(String(emp.id)); }
             if (tpl) selectedTemplate = tpl;
             variableValues = log.variables || {};
             
             closeModal('logModal');
             showTab('compose');
-            renderEmployeeList();
+            renderClientList();
             renderTemplateList();
             extractVariables();
             updateRecipientsDisplay();
@@ -3394,8 +2930,8 @@ Write your email content here..."></div>
             }
             
             // Refresh employee table to update date colors based on new thresholds
-            if (document.getElementById('employeeTableBody')) {
-                renderEmployeeDirectory();
+            if (document.getElementById('clientTableBody')) {
+                renderClientDirectory();
             }
         }
         
@@ -3433,17 +2969,17 @@ Write your email content here..."></div>
                 return;
             }
             
-            if (!confirm('Run automation now? This will send emails to all eligible active employees.')) return;
+            if (!confirm('Run automation now? This will send emails to all eligible active clients.')) return;
             
             showLoading(true, 'Running automation...');
             try {
                 // Get HCA employee IDs for TB, Training, HCA notifications
-                const hcaEmployeeIds = employees
+                const hcaEmployeeIds = clients
                     .filter(e => e.status === 'active' && isHCAPosition(e))
                     .map(e => e.id);
                 
                 // Get non-X-Ray employee IDs for TB notifications
-                const tbEligibleIds = employees
+                const tbEligibleIds = clients
                     .filter(e => e.status === 'active' && isHCAPosition(e) && !(e.tbXray === true || e.tbXray === 'true'))
                     .map(e => e.id);
                 
@@ -3471,12 +3007,12 @@ Write your email content here..."></div>
             showLoading(true, 'Checking pending emails...');
             try {
                 // Get HCA employee IDs for TB, Training, HCA notifications
-                const hcaEmployeeIds = employees
+                const hcaEmployeeIds = clients
                     .filter(e => e.status === 'active' && isHCAPosition(e))
                     .map(e => e.id);
                 
                 // Get non-X-Ray employee IDs for TB notifications
-                const tbEligibleIds = employees
+                const tbEligibleIds = clients
                     .filter(e => e.status === 'active' && isHCAPosition(e) && !(e.tbXray === true || e.tbXray === 'true'))
                     .map(e => e.id);
                 
@@ -3498,7 +3034,7 @@ Write your email content here..."></div>
                 let html = '<div style="max-height: 400px; overflow-y: auto;">';
                 pending.forEach(p => {
                     html += `<div style="padding: 10px; background: #F9FAFB; border-radius: 8px; margin-bottom: 10px;">
-                        <div style="font-weight: 600;">${escapeHtml(p.employeeName)}</div>
+                        <div style="font-weight: 600;">${escapeHtml(p.clientName)}</div>
                         <div style="font-size: 12px; color: #666;">${escapeHtml(p.triggerType)} - ${escapeHtml(p.templateName)}</div>
                     </div>`;
                 });
@@ -3545,7 +3081,7 @@ Write your email content here..."></div>
                     warningLevel: 0
                 },
                 {
-                    name: 'TB Test Reminder',
+                    name: 'Service Renewal Reminder',
                     category: 'reminder',
                     subject: 'TB Test Due {{tb_due_date}} - Action Required',
                     body: `<p>Dear {{first_name}},</p>
@@ -3561,7 +3097,7 @@ alice.care</p>`,
                     warningLevel: 0
                 },
                 {
-                    name: 'Annual Training Reminder',
+                    name: 'Annual Annual Review Reminder',
                     category: 'reminder',
                     subject: 'Annual Training Due {{training_due_date}} - Action Required',
                     body: `<p>Dear {{first_name}},</p>
@@ -3624,7 +3160,7 @@ alice.care</p>`,
         // DATA MANAGEMENT
         // ============================================
         function exportData() {
-            const data = { employees, templates, logs: emailLogs, aliases, settings, exportedAt: new Date().toISOString() };
+            const data = { clients, templates, logs: emailLogs, aliases, settings, exportedAt: new Date().toISOString() };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
