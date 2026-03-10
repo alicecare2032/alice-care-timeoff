@@ -405,6 +405,8 @@
         .automation-actions .btn { display: flex; align-items: center; gap: 8px; }
         .automation-actions .btn svg { width: 16px; height: 16px; }
     </style>
+    <!-- Disable Cloudflare email obfuscation for this page -->
+    <meta name="cf-2fa-verify" content="no-email-obfuscation">
 </head>
 <body>
     <div class="toast-container" id="toastContainer"></div>
@@ -589,8 +591,8 @@
                                         <div class="email-preview-tagline">Home Care Organization</div>
                                     </div>
                                     <div class="email-preview-meta">
-                                        <div class="preview-meta-row"><span class="preview-meta-label">To:</span><span class="preview-meta-value" id="previewTo">Select employee(s)</span></div>
-                                        <div class="preview-meta-row"><span class="preview-meta-label">From:</span><span class="preview-meta-value" id="previewFrom"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="71190331101d1812145f12100314">[email&#160;protected]</a></span></div>
+                                        <div class="preview-meta-row"><span class="preview-meta-label">To:</span><span class="preview-meta-value" id="previewTo">Select client(s)</span></div>
+                                        <div class="preview-meta-row"><span class="preview-meta-label">From:</span><span class="preview-meta-value" id="previewFrom">info@alice.care</span></div>
                                         <div class="preview-meta-row"><span class="preview-meta-label">Subject:</span><span class="preview-meta-value" id="previewSubject">Select a template</span></div>
                                     </div>
                                     <div class="email-preview-body" id="previewBody">Select client(s) and a template to preview the email.</div>
@@ -1170,7 +1172,7 @@ Write your email content here..."></div>
         // ============================================
         // STATE
         // ============================================
-        const STORAGE_KEY = 'alicecare_webapp_url';
+        const STORAGE_KEY = 'alicecare_client_webapp_url';
         let WEB_APP_URL = '';
         let clients = [];
         let templates = [];
@@ -1801,7 +1803,7 @@ Write your email content here..."></div>
             if (testMode) {
                 toEl.textContent = (document.getElementById('testEmailAddress').value || 'test@example.com') + ' (Test)';
             } else if (selectedClientIds.size === 0) {
-                toEl.textContent = 'Select employee(s)';
+                toEl.textContent = 'Select client(s)';
             } else if (selectedClientIds.size === 1) {
                 const emp = clients.find(e => String(e.id) === [...selectedClientIds][0]);
                 toEl.textContent = emp ? emp.email : 'Unknown';
