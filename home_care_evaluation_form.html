@@ -985,7 +985,14 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        var SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
+        // ── Alice Care Evaluation Form ───────────────────────────────────────────
+        // Backend GS : evaluation.gs  (already deployed)
+        // Spreadsheet: https://docs.google.com/spreadsheets/d/1JAKJMXHRiAcjqPLYMNtc9QYGosHpbKctJe_wRD9w7U4
+        // Sheet tab  : "Evaluations"  (GID 111169195)
+        //
+        // Paste your existing /exec deployment URL below:
+        // ────────────────────────────────────────────────────────────────────────
+        var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwRsoUMU-iiv18n1F04SUYa2BFlq32ZZHGLoP3QBtRFjMtFIWlEA2eN9qviTvUnCF2tyA/exec';
         var EDIT_PIN = '19731972';
         var isEditMode = false;
         var currentRecordId = null;
@@ -1100,7 +1107,7 @@
 
             var localResults = searchLocalStorage(query);
             
-            fetch(SCRIPT_URL + '?action=search&query=' + encodeURIComponent(query))
+            fetch(SCRIPT_URL + '?action=search&term=' + encodeURIComponent(query))
                 .then(function(r) { return r.json(); })
                 .then(function(data) {
                     document.getElementById('searchLoading').style.display = 'none';
@@ -1181,7 +1188,7 @@
                 } catch (e) {}
             }
 
-            fetch(SCRIPT_URL + '?action=get&recordId=' + encodeURIComponent(recordId))
+            fetch(SCRIPT_URL + '?action=get&id=' + encodeURIComponent(recordId))
                 .then(function(r) { return r.json(); })
                 .then(function(data) {
                     if (data.success && data.record) {
