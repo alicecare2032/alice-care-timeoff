@@ -810,6 +810,7 @@
                         <th class="sortable" onclick="sortTable('employeeId')" id="th-employeeId">Employee ID <span class="sort-icon">⇅</span></th>
                         <th class="sortable" onclick="sortTable('requestType')" id="th-requestType">Type <span class="sort-icon">⇅</span></th>
                         <th class="sortable" onclick="sortTable('status')" id="th-status">Status <span class="sort-icon">⇅</span></th>
+                        <th class="sortable" onclick="sortTable('requestDate')" id="th-requestDate">Date <span class="sort-icon">⇅</span></th>
                         <th class="sortable" onclick="sortTable('weekYear')" id="th-weekYear">Week <span class="sort-icon">⇅</span></th>
                         <th class="sortable" onclick="sortTable('totalHours')" id="th-totalHours">Requested Hours <span class="sort-icon">⇅</span></th>
                         <th class="sortable" onclick="sortTable('approvedHours')" id="th-approvedHours">Approved Hours <span class="sort-icon">⇅</span></th>
@@ -818,7 +819,7 @@
                 </thead>
                 <tbody id="requestsTableBody">
                     <tr>
-                        <td colspan="8" class="loading">Loading requests</td>
+                        <td colspan="9" class="loading">Loading requests</td>
                     </tr>
                 </tbody>
             </table>
@@ -926,7 +927,7 @@
         
         function loadRequests() {
             var requestsTableBody = document.getElementById('requestsTableBody');
-            requestsTableBody.innerHTML = '<tr><td colspan="8" class="loading">Loading requests</td></tr>';
+            requestsTableBody.innerHTML = '<tr><td colspan="9" class="loading">Loading requests</td></tr>';
             
             fetch(GOOGLE_SCRIPT_URL)
                 .then(function(response) {
@@ -941,16 +942,16 @@
                             displayRequests();
                             updateStats();
                         } else {
-                            requestsTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #FF7475;">Error loading requests: ' + (result.error || 'Unknown error') + '</td></tr>';
+                            requestsTableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: #FF7475;">Error loading requests: ' + (result.error || 'Unknown error') + '</td></tr>';
                         }
                     } catch (e) {
                         console.error('Parse error:', e);
-                        requestsTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #FF7475;">Error: Unable to load requests. Please check Google Apps Script deployment.</td></tr>';
+                        requestsTableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: #FF7475;">Error: Unable to load requests. Please check Google Apps Script deployment.</td></tr>';
                     }
                 })
                 .catch(function(error) {
                     console.error('Fetch error:', error);
-                    requestsTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #FF7475;">Network error. Please try again.</td></tr>';
+                    requestsTableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: #FF7475;">Network error. Please try again.</td></tr>';
                 });
         }
         
@@ -961,7 +962,7 @@
             filterCount.innerHTML = 'Showing <span style="color: #F57600; font-weight: 700;">' + filteredRequests.length + '</span> requests';
             
             if (filteredRequests.length === 0) {
-                requestsTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #3D3D3D;">No requests found</td></tr>';
+                requestsTableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: #3D3D3D;">No requests found</td></tr>';
                 return;
             }
             
@@ -986,15 +987,26 @@
                 
                 var typeBadge = '<span class="badge badge-' + req.requestType + '">' + req.requestType.toUpperCase() + '</span>';
                 
+                // Get formatted date from requestDate (e.g., "25-Nov-25")
+                var formattedDate = 'N/A';
+                if (req.requestDate) {
+                    var dateObj = new Date(req.requestDate);
+                    var day = String(dateObj.getDate()).padStart(2, '0');
+                    var month = dateObj.toLocaleDateString('en-US', { month: 'short' });
+                    var year = String(dateObj.getFullYear()).slice(-2);
+                    formattedDate = day + '-' + month + '-' + year;
+                }
+                
                 html += '<tr>' +
                     '<td class="employee-name-cell">' + req.employeeName + ' ' + req.employeeLastName + '</td>' +
                     '<td>' + req.employeeId + '</td>' +
                     '<td>' + typeBadge + '</td>' +
                     '<td>' + statusBadge + '</td>' +
+                    '<td>' + formattedDate + '</td>' +
                     '<td>' + (req.weekYear || 'N/A') + '</td>' +
                     '<td class="hours-cell">' + totalHours.toFixed(2) + ' hrs</td>' +
                     '<td class="hours-cell">' + (req.approvedHours ? parseFloat(req.approvedHours).toFixed(2) : '-') + '</td>' +
-                    '<td><button class="btn btn-view-details btn-small" onclick="openDetailModal(\'' + req.requestId + '\')">View Details</button></td>' +
+                    '<td><button class="btn btn-view-details btn-small" onclick="openDetailModal(' + i + ')">View Details</button></td>' +
                     '</tr>';
             }
             
@@ -1044,6 +1056,10 @@
                 } else if (column === 'approvedHours') {
                     valA = parseFloat(a.approvedHours) || 0;
                     valB = parseFloat(b.approvedHours) || 0;
+                } else if (column === 'requestDate') {
+                    // Sort by date
+                    valA = a.requestDate ? new Date(a.requestDate).getTime() : 0;
+                    valB = b.requestDate ? new Date(b.requestDate).getTime() : 0;
                 } else if (column === 'weekYear') {
                     // Parse week-year format (e.g., "47-2024")
                     valA = parseWeekYear(a.weekYear);
@@ -1080,17 +1096,14 @@
             return 0;
         }
         
-        function openDetailModal(requestId) {
-            // Find the request
-            var req = null;
-            for (var i = 0; i < filteredRequests.length; i++) {
-                if (filteredRequests[i].requestId === requestId) {
-                    req = filteredRequests[i];
-                    break;
-                }
-            }
+        function openDetailModal(index) {
+            // Get request directly by index from filteredRequests
+            var req = filteredRequests[index];
             
-            if (!req) return;
+            if (!req) {
+                console.error('Request not found at index:', index);
+                return;
+            }
             
             currentRequestForDetail = req;
             
@@ -1250,21 +1263,39 @@
         }
         
         function openReviewModalFromDetail() {
+            if (!currentRequestForDetail) {
+                console.error('No request selected');
+                alert('Error: No request selected. Please try again.');
+                return;
+            }
             var requestId = currentRequestForDetail.requestId;
-            closeModal('detailModal');
+            // Close detail modal without clearing currentRequestForDetail yet
+            document.getElementById('detailModal').style.display = 'none';
             openReviewModal(requestId);
         }
         
         function openApprovalModalFromDetail() {
+            if (!currentRequestForDetail) {
+                console.error('No request selected');
+                alert('Error: No request selected. Please try again.');
+                return;
+            }
             var requestId = currentRequestForDetail.requestId;
             var totalHours = currentRequestForDetail.totalHours;
-            closeModal('detailModal');
+            // Close detail modal without clearing currentRequestForDetail yet
+            document.getElementById('detailModal').style.display = 'none';
             openApprovalModal(requestId, totalHours);
         }
         
         function openRejectionModalFromDetail() {
+            if (!currentRequestForDetail) {
+                console.error('No request selected');
+                alert('Error: No request selected. Please try again.');
+                return;
+            }
             var requestId = currentRequestForDetail.requestId;
-            closeModal('detailModal');
+            // Close detail modal without clearing currentRequestForDetail yet
+            document.getElementById('detailModal').style.display = 'none';
             openRejectionModal(requestId);
         }
         
@@ -1449,6 +1480,22 @@
                 return;
             }
             
+            // Add Paychex CSV format section at the bottom
+            textContent += '\n\n--- PAYCHEX IMPORT FORMAT ---\n';
+            textContent += 'employee number,SICK,Hours,,,,,\n';
+            
+            // Add sick entries in CSV format
+            for (var i = 0; i < sickData.length; i++) {
+                var data = sickData[i];
+                textContent += data.employeeId + ',SICK,' + data.totalApproved.toFixed(2) + ',,,,,\n';
+            }
+            
+            // Add vacation entries in CSV format
+            for (var i = 0; i < vacationData.length; i++) {
+                var data = vacationData[i];
+                textContent += data.employeeId + ',VACATION,' + data.totalApproved.toFixed(2) + ',,,,,\n';
+            }
+            
             // Generate filename with current date and time
             var now = new Date();
             var dateStr = now.getFullYear() + '-' + 
@@ -1504,8 +1551,13 @@
         
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
-            currentRequestId = null;
-            currentRequestForDetail = null;
+            // Only clear relevant variables based on which modal is being closed
+            if (modalId === 'detailModal') {
+                currentRequestForDetail = null;
+            } else {
+                // For action modals (review, approval, rejection), clear currentRequestId
+                currentRequestId = null;
+            }
         }
         
         function submitReview() {
@@ -1516,6 +1568,11 @@
             console.log('Reviewer Name:', reviewerName);
             console.log('Review Comments:', reviewComments);
             console.log('Request ID:', currentRequestId);
+            
+            if (!currentRequestId) {
+                alert('Error: No request selected. Please close this modal and try again.');
+                return;
+            }
             
             if (!reviewerName) {
                 alert('Please enter your name');
@@ -1550,6 +1607,11 @@
             console.log('Approved Hours:', approvedHours);
             console.log('Approval Comments:', approvalComments);
             console.log('Request ID:', currentRequestId);
+            
+            if (!currentRequestId) {
+                alert('Error: No request selected. Please close this modal and try again.');
+                return;
+            }
             
             if (!approverName) {
                 alert('Please enter your name');
@@ -1588,6 +1650,11 @@
             console.log('Rejector Name:', rejectorName);
             console.log('Rejection Comments:', rejectionComments);
             console.log('Request ID:', currentRequestId);
+            
+            if (!currentRequestId) {
+                alert('Error: No request selected. Please close this modal and try again.');
+                return;
+            }
             
             if (!rejectorName) {
                 alert('Please enter your name');
@@ -1639,13 +1706,14 @@
             });
         }
         
-        // Close modal when clicking outside
+        // Close modal when clicking outside - but only for detail modal
+        // Don't close action modals (review, approval, rejection) by clicking outside
         window.onclick = function(event) {
-            if (event.target.className === 'modal') {
+            if (event.target.id === 'detailModal') {
                 event.target.style.display = 'none';
-                currentRequestId = null;
                 currentRequestForDetail = null;
             }
+            // Don't allow closing action modals by clicking backdrop - require explicit button click
         }
     </script>
 </body>
