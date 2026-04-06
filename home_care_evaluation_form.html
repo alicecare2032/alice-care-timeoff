@@ -1259,6 +1259,20 @@
             document.getElementById('editBanner').classList.add('show');
         }
 
+        // Google Sheets serializes time values using its internal epoch (Dec 30, 1899).
+        // A stored time like "5:00 PM" returns as "1899-12-30T17:00:00.000Z".
+        // This helper extracts the HH:mm portion so type="time" inputs accept it.
+        function isoToTimeString(val) {
+            if (!val) return '';
+            // Full ISO datetime: "1899-12-30T17:00:00.000Z" -> "17:00"
+            var isoMatch = String(val).match(/T(\d{2}):(\d{2})/);
+            if (isoMatch) return isoMatch[1] + ':' + isoMatch[2];
+            // Already HH:mm or HH:mm:ss
+            var hhmm = String(val).match(/^(\d{1,2}):(\d{2})/);
+            if (hhmm) return hhmm[1].padStart(2,'0') + ':' + hhmm[2];
+            return '';
+        }
+
         function populateForm(data) {
             var form = document.getElementById('evaluationForm');
             if (data.evaluationDate) {
@@ -1276,6 +1290,9 @@
                     for (var i = 0; i < elements.length; i++) {
                         elements[i].checked = elements[i].value === data[key];
                     }
+                } else if (el.type === 'time') {
+                    // Convert Google Sheets ISO datetime or any time string to HH:mm
+                    el.value = isoToTimeString(data[key]);
                 } else {
                     el.value = data[key] || '';
                 }
@@ -1379,22 +1396,42 @@
             var dateStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
             var filename = 'HomeCare_Eval_' + name + '_' + dateStr + '.pdf';
             
-            showToast('Generating PDF...', 'info');
+            showToast('Generating PDF... please wait', 'info');
             
+            // Hide action buttons so they don't appear in the PDF
+            var actionBar = document.querySelector('.action-buttons');
+            var editBanner = document.getElementById('editBanner');
+            var toast = document.getElementById('toast');
+            if (actionBar) actionBar.style.display = 'none';
+            if (editBanner) editBanner.style.display = 'none';
+            if (toast) toast.style.display = 'none';
+
             var element = document.querySelector('.container');
             var opt = {
-                margin: [8, 8, 8, 8],
+                margin: [10, 8, 10, 8],
                 filename: filename,
-                image: { type: 'jpeg', quality: 0.95 },
-                html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+                image: { type: 'jpeg', quality: 0.92 },
+                // scale: 1.5 is safer than 2 for large complex forms
+                html2canvas: { scale: 1.5, useCORS: true, scrollY: 0, logging: false },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                // 'css' + 'legacy' is more stable than 'avoid-all' for complex forms
+                pagebreak: { mode: ['css', 'legacy'] }
             };
             
-            html2pdf().set(opt).from(element).save().then(function() {
+            html2pdf().set(opt).from(element).save()
+            .then(function() {
                 showToast('PDF generated!', 'success');
-            }).catch(function() {
-                showToast('PDF failed', 'error');
+            })
+            .catch(function(err) {
+                // Surface the real error so it is visible in the console
+                console.error('PDF generation error:', err);
+                showToast('PDF failed: ' + (err && err.message ? err.message : 'unknown error'), 'error');
+            })
+            .finally(function() {
+                // Always restore hidden UI elements
+                if (actionBar) actionBar.style.display = '';
+                if (editBanner) editBanner.style.display = '';
+                if (toast) toast.style.display = '';
             });
         }
 
