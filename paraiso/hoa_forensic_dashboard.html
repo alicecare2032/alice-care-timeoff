@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administradora de Inmuebles Paraiso | HOA Expense Analysis 2023-2025</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f4f0;--surface:#fff;--surf2:#f9f8f5;--border:#e2dfd6;--border2:#ccc9be;
+  --navy:#1a2540;--text:#1a2540;--text2:#566070;--text3:#9aa4b4;
+  --gold:#a87820;--gold-lt:#c89840;--gold-dk:#8a6010;--gold-bg:rgba(168,120,32,.08);--gold-bd:rgba(168,120,32,.22);
+  --teal:#2a9d8a;--teal-bg:rgba(42,157,138,.08);--teal-bd:rgba(42,157,138,.22);
+  --sky:#2c6db0;--sky-bg:rgba(44,109,176,.08);--sky-bd:rgba(44,109,176,.22);
+  --rose:#c04040;--rose-bg:rgba(192,64,64,.08);--green:#2a7a50;--green-bg:rgba(42,122,80,.08);
+  --grad:linear-gradient(135deg,#a87820,#c89840,#8a6010);
+  --sh:0 2px 16px rgba(26,37,64,.07);--sh2:0 4px 24px rgba(26,37,64,.12);
+  --font-serif:'Playfair Display',serif;--font-sans:'IBM Plex Sans',sans-serif;--font-mono:'IBM Plex Mono',monospace;--r:8px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-size:14px;line-height:1.6;}
+
+.top-nav{background:var(--navy);padding:0 48px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.18);}
+.nav-brand{display:flex;align-items:center;gap:12px;}
+.nav-logo{width:30px;height:30px;border:1.5px solid rgba(200,152,64,.7);border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:var(--font-serif);font-size:13px;color:var(--gold-lt);font-weight:700;}
+.nav-name{font-family:var(--font-serif);font-size:15px;color:#fff;}
+.nav-name em{color:var(--gold-lt);font-style:normal;}
+.nav-links{display:flex;gap:4px;}
+.nav-link{display:flex;align-items:center;gap:7px;padding:8px 16px;border-radius:6px;font-family:var(--font-mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.5);text-decoration:none;transition:all .2s;border:1px solid transparent;}
+.nav-link:hover{color:rgba(255,255,255,.9);background:rgba(255,255,255,.06);}
+.nav-link.active{color:var(--gold-lt);background:rgba(200,152,64,.12);border-color:rgba(200,152,64,.3);}
+
+.header{background:var(--navy);padding:48px 48px 40px;position:relative;}
+.header::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad);}
+.header-inner{max-width:1360px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:24px;}
+.header-eyebrow{font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:var(--gold-lt);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px;}
+.header-eyebrow::before{content:'';width:24px;height:1px;background:var(--gold-lt);}
+.header h1{font-family:var(--font-serif);font-size:32px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:8px;}
+.header h1 em{font-style:italic;color:var(--gold-lt);}
+.header-sub{font-family:var(--font-mono);font-size:11px;color:rgba(255,255,255,.35);letter-spacing:1px;}
+.curr-toggle-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:5px;}
+.curr-toggle-lbl{font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:rgba(255,255,255,.3);text-transform:uppercase;}
+.curr-toggle{display:flex;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.12);border-radius:7px;overflow:hidden;position:relative;padding:3px;}
+.toggle-pill{position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 6px);background:var(--grad);border-radius:5px;transition:transform .28s cubic-bezier(.34,1.56,.64,1);}
+.toggle-pill.usd{transform:translateX(calc(100% + 6px));}
+.curr-toggle button{position:relative;z-index:1;background:none;border:none;padding:8px 22px;cursor:pointer;font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:2px;transition:color .2s;color:rgba(255,255,255,.4);min-width:80px;}
+.curr-toggle button.active{color:var(--navy);font-weight:700;}
+.rate-badge{font-family:var(--font-mono);font-size:9px;color:rgba(255,255,255,.3);}
+.rate-badge span{color:#4dc4b0;font-weight:500;}
+
+.main{padding:44px 48px;max-width:1360px;margin:0 auto;}
+.sec-gap{margin-bottom:52px;}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;}
+.sec-title{font-family:var(--font-serif);font-size:22px;font-weight:600;color:var(--navy);}
+.sec-count{font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;}
+.sec-desc{font-size:12px;color:var(--text2);margin-bottom:22px;}
+
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px;box-shadow:var(--sh);position:relative;overflow:hidden;transition:box-shadow .2s,transform .2s;}
+.kpi:hover{box-shadow:var(--sh2);transform:translateY(-1px);}
+.kpi-top{position:absolute;top:0;left:0;right:0;height:3px;}
+.kpi-top.gold{background:var(--grad);}
+.kpi-top.red{background:linear-gradient(90deg,#c04040,#e07070);}
+.kpi-top.green{background:linear-gradient(90deg,#2a9d8a,#60c4b0);}
+.kpi-top.sky{background:linear-gradient(90deg,#2c6db0,#5090d8);}
+.kpi-lbl{font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;margin-bottom:8px;}
+.kpi-val{font-family:var(--font-mono);font-size:21px;font-weight:500;color:var(--navy);margin-bottom:2px;}
+.kpi-note{font-family:var(--font-mono);font-size:9px;color:var(--text2);}
+.kpi-badge{display:inline-block;margin-top:7px;padding:2px 8px;border-radius:3px;font-family:var(--font-mono);font-size:9px;font-weight:600;}
+.badge-up{background:var(--rose-bg);color:var(--rose);}
+.badge-dn{background:var(--green-bg);color:var(--green);}
+.badge-warn{background:var(--gold-bg);color:var(--gold-dk);}
+
+.bridge{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;margin-bottom:52px;}
+.bridge-header{background:var(--navy);padding:18px 28px;display:flex;align-items:center;gap:14px;}
+.bridge-icon{width:34px;height:34px;border-radius:6px;background:rgba(42,157,138,.2);border:1px solid rgba(42,157,138,.35);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.bridge-title{font-family:var(--font-serif);font-size:15px;font-weight:600;color:#fff;}
+.bridge-subtitle{font-family:var(--font-mono);font-size:9px;color:rgba(255,255,255,.3);letter-spacing:1px;margin-top:2px;}
+.bridge-body{padding:24px 28px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.bridge-stat{padding:18px;border-radius:var(--r);border:1px solid var(--border);background:var(--surf2);}
+.bridge-stat-lbl{font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;margin-bottom:8px;}
+.bridge-stat-val{font-family:var(--font-mono);font-size:22px;font-weight:500;margin-bottom:4px;}
+.bridge-stat-note{font-family:var(--font-mono);font-size:9px;color:var(--text2);}
+.yr-row{margin-bottom:8px;}
+.yr-lbl{font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-bottom:2px;}
+.bridge-note{margin:0 28px 24px;background:var(--teal-bg);border:1px solid var(--teal-bd);border-radius:6px;padding:14px 18px;display:flex;align-items:flex-start;gap:10px;}
+.bridge-note-body{font-size:12px;color:var(--text2);line-height:1.7;}
+.bridge-link{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-family:var(--font-mono);font-size:10px;color:var(--teal);text-decoration:none;transition:color .2s;}
+.bridge-link:hover{color:var(--navy);}
+
+.alert-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:52px;}
+.alert-box{border-radius:var(--r);padding:20px 22px;background:var(--surface);box-shadow:var(--sh);border:1px solid var(--border);border-left:4px solid;}
+.alert-box.critical{border-left-color:var(--rose);}
+.alert-box.warning{border-left-color:var(--gold);}
+.alert-box.positive{border-left-color:var(--teal);}
+.alert-tag{font-family:var(--font-mono);font-size:8px;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;font-weight:600;}
+.critical .alert-tag{color:var(--rose);}
+.warning .alert-tag{color:var(--gold-dk);}
+.positive .alert-tag{color:var(--teal);}
+.alert-value{font-family:var(--font-mono);font-size:18px;font-weight:500;margin-bottom:6px;}
+.critical .alert-value{color:var(--rose);}
+.warning .alert-value{color:var(--gold-dk);}
+.positive .alert-value{color:var(--teal);}
+.alert-title{font-family:var(--font-serif);font-size:13px;font-weight:600;color:var(--navy);margin-bottom:8px;}
+.alert-body{font-size:12px;color:var(--text2);line-height:1.7;}
+.dyn{font-weight:500;}
+
+/* TABS - key fix: keep hidden tabs in DOM but invisible */
+.tab-nav{display:flex;border-bottom:2px solid var(--border);margin-bottom:28px;flex-wrap:wrap;}
+.tab-btn{background:none;border:none;border-bottom:3px solid transparent;padding:10px 18px;cursor:pointer;font-family:var(--font-mono);font-size:10px;letter-spacing:1px;color:var(--text3);transition:all .2s;margin-bottom:-2px;}
+.tab-btn:hover{color:var(--text2);}
+.tab-btn.active{color:var(--gold-dk);border-bottom-color:var(--gold);}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+.chart-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px;}
+.chart-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:24px;}
+.chart-full{margin-bottom:24px;}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:26px;box-shadow:var(--sh);}
+.chart-title{font-family:var(--font-serif);font-size:15px;font-weight:600;color:var(--navy);margin-bottom:3px;}
+.chart-sub{font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:1px;margin-bottom:18px;text-transform:uppercase;}
+
+.findings-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:52px;}
+.finding-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:26px;box-shadow:var(--sh);}
+.finding-num{font-family:var(--font-serif);font-size:52px;font-weight:900;color:var(--border2);line-height:1;margin-bottom:10px;}
+.finding-title{font-family:var(--font-serif);font-size:16px;font-weight:600;color:var(--navy);margin-bottom:10px;}
+.finding-body{font-size:12px;color:var(--text2);line-height:1.75;}
+.finding-stat{margin-top:14px;padding-top:14px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:11px;color:var(--text3);}
+.stat-em{color:var(--gold-dk);font-weight:500;}
+.stat-em.red{color:var(--rose);}
+.stat-em.green{color:var(--teal);}
+
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);}
+.table-controls{padding:16px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--surf2);}
+.tbl-search{background:var(--surface);border:1px solid var(--border2);border-radius:5px;padding:7px 14px;font-family:var(--font-mono);font-size:11px;color:var(--text);outline:none;width:200px;transition:border-color .2s;}
+.tbl-search:focus{border-color:var(--gold);}
+.tbl-search::placeholder{color:var(--text3);}
+.tbl-info{margin-left:auto;font-family:var(--font-mono);font-size:9px;color:var(--text3);}
+.table-scroll{max-height:580px;overflow-y:auto;overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead{background:var(--navy);position:sticky;top:0;z-index:2;}
+th{padding:10px 12px;text-align:right;font-family:var(--font-mono);font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.4);border-bottom:1px solid rgba(255,255,255,.08);white-space:nowrap;}
+th:first-child{text-align:left;min-width:200px;}
+tbody tr{border-bottom:1px solid var(--border);transition:background .12s;}
+tbody tr:hover{background:var(--surf2);}
+td{padding:9px 12px;text-align:right;font-family:var(--font-mono);font-size:11px;color:var(--text2);white-space:nowrap;}
+td:first-child{text-align:left;color:var(--text);font-family:var(--font-sans);font-weight:500;font-size:11px;}
+.cat-label{display:inline-block;padding:1px 6px;border-radius:3px;font-family:var(--font-mono);font-size:8px;letter-spacing:1px;text-transform:uppercase;margin-right:6px;}
+.cat-a{background:var(--sky-bg);color:var(--sky);border:1px solid var(--sky-bd);}
+.cat-o{background:var(--gold-bg);color:var(--gold-dk);border:1px solid var(--gold-bd);}
+.cat-s{background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal-bd);}
+.cat-m{background:rgba(120,60,180,.08);color:#7830b0;border:1px solid rgba(120,60,180,.2);}
+.over-budget{color:var(--rose)!important;}
+.under-budget{color:var(--teal)!important;}
+.chg-badge{display:inline-block;padding:1px 5px;border-radius:3px;font-size:9px;}
+.chg-up{background:var(--rose-bg);color:var(--rose);}
+.chg-dn{background:var(--teal-bg);color:var(--teal);}
+.tfoot-row td{font-weight:600;color:var(--navy)!important;border-top:2px solid var(--border2);background:var(--surf2);font-size:12px;padding:12px;}
+
+.footer{background:var(--navy);padding:22px 48px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:10px;}
+.footer-txt{font-family:var(--font-mono);font-size:9px;color:rgba(255,255,255,.3);}
+.footer-link{font-family:var(--font-mono);font-size:9px;color:var(--gold-lt);text-decoration:none;}
+.footer-link:hover{color:#fff;}
+
+@media(max-width:1100px){
+  .main,.header,.footer,.top-nav{padding-left:24px;padding-right:24px;}
+  .kpi-row,.chart-grid-2,.chart-grid-3,.alert-grid,.findings-grid{grid-template-columns:1fr;}
+  .bridge-body{grid-template-columns:1fr;}
+}
+
+/* JUSTIFICATION SECTION */
+.just-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
+.just-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px;box-shadow:var(--sh);position:relative;overflow:hidden;}
+.just-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;}
+.just-card.market::before{background:linear-gradient(180deg,#2c6db0,#5090d8);}
+.just-card.service::before{background:linear-gradient(180deg,#2a9d8a,#60c4b0);}
+.just-card.concern::before{background:linear-gradient(180deg,#c04040,#e07070);}
+.just-card.saving::before{background:linear-gradient(180deg,#2a7a50,#60b080);}
+.just-icon{font-size:22px;margin-bottom:10px;}
+.just-title{font-family:var(--font-serif);font-size:14px;font-weight:600;color:var(--navy);margin-bottom:6px;}
+.just-body{font-size:12px;color:var(--text2);line-height:1.75;}
+.just-stat{margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:10px;color:var(--text3);}
+.just-stat b{font-weight:600;}
+.just-stat b.up{color:var(--rose);}
+.just-stat b.ok{color:var(--teal);}
+.just-stat b.warn{color:var(--gold-dk);}
+.owner-msg{background:var(--navy);border-radius:var(--r);padding:26px 30px;margin-bottom:52px;display:flex;gap:22px;align-items:flex-start;}
+.owner-msg-icon{font-size:28px;flex-shrink:0;margin-top:2px;}
+.owner-msg-body{}
+.owner-msg-title{font-family:var(--font-serif);font-size:18px;font-weight:600;color:#fff;margin-bottom:10px;}
+.owner-msg-text{font-size:13px;color:rgba(255,255,255,.65);line-height:1.8;}
+.owner-msg-text b{color:var(--gold-lt);}
+.owner-msg-text .ok{color:#4dc4b0;}
+.waterfall-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;box-shadow:var(--sh);margin-bottom:24px;}
+.waterfall-title{font-family:var(--font-serif);font-size:15px;font-weight:600;color:var(--navy);margin-bottom:3px;}
+.waterfall-sub{font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:16px;}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="nav-brand">
+    <div class="nav-logo">TP</div>
+    <div class="nav-name">The <em>Paraiso</em> Residences</div>
+  </div>
+  <div class="nav-links">
+    <a href="hoa_payment_schedule.html" class="nav-link">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="3" width="14" height="11" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5 1v4M11 1v4M1 7h14"/></svg>
+      Payment Schedule
+    </a>
+    <a href="hoa_forensic_dashboard.html" class="nav-link active">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M1 12l4-5 3 3 4-6 3 4v4H1z" opacity=".7"/><path d="M0 2h16v1H0z"/></svg>
+      HOA Expense Analysis
+    </a>
+    <a href="hoa_expense_timeline.html" class="nav-link">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M1 13 C4 9 6 11 8 7 C10 3 12 5 15 2" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      Expense Timeline
+    </a>
+  </div>
+</nav>
+
+<div class="header">
+  <div class="header-inner">
+    <div>
+      <div class="header-eyebrow">Forensic Financial Review</div>
+      <h1>HOA Operating Expenses<br><em>2023 &ndash; 2025 Analysis</em></h1>
+      <div class="header-sub">PRESUPUESTO DE OPERACIONES VS REAL &nbsp;&middot;&nbsp; 3 FISCAL YEARS &nbsp;&middot;&nbsp; IVA INCLUDED</div>
+    </div>
+    <div class="curr-toggle-wrap">
+      <div class="curr-toggle-lbl">Display Currency</div>
+      <div class="curr-toggle">
+        <div class="toggle-pill usd" id="togglePill"></div>
+        <button id="btnMXN" onclick="setCurrency('MXN')">MXN</button>
+        <button id="btnUSD" class="active" onclick="setCurrency('USD')">USD</button>
+      </div>
+      <div class="rate-badge">Rate: <span id="rateDisplay">1 USD = 17.46 MXN</span> &nbsp;&middot;&nbsp; Apr 9, 2026</div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+<div class="kpi-row" style="margin-top:8px;">
+  <div class="kpi"><div class="kpi-top gold"></div><div class="kpi-lbl">3-Year Total Actual Spend</div><div class="kpi-val cv" data-mxn="25960892">$25,960,892</div><div class="kpi-note">2023 + 2024 + 2025</div><span class="kpi-badge badge-up">+9.1% CAGR</span></div>
+  <div class="kpi"><div class="kpi-top sky"></div><div class="kpi-lbl">2023 Actual vs Budget</div><div class="kpi-val cv" data-mxn="8348144">$8,348,144</div><div class="kpi-note">Budget: <span class="cv" data-mxn="8942565">$8,942,565</span></div><span class="kpi-badge badge-dn">6.6% UNDER</span></div>
+  <div class="kpi"><div class="kpi-top sky"></div><div class="kpi-lbl">2024 Actual vs Budget</div><div class="kpi-val cv" data-mxn="8507841">$8,507,841</div><div class="kpi-note">Budget: <span class="cv" data-mxn="8879694">$8,879,694</span></div><span class="kpi-badge badge-dn">4.2% UNDER</span></div>
+  <div class="kpi"><div class="kpi-top red"></div><div class="kpi-lbl">2025 Actual vs Budget</div><div class="kpi-val cv" data-mxn="9104908">$9,104,908</div><div class="kpi-note">Budget: <span class="cv" data-mxn="9673894">$9,673,894</span></div><span class="kpi-badge badge-dn">5.9% UNDER</span></div>
+</div>
+<div class="kpi-row">
+  <div class="kpi"><div class="kpi-top gold"></div><div class="kpi-lbl">Payroll Share (Avg)</div><div class="kpi-val">50.6%</div><div class="kpi-note">Largest single line item</div><span class="kpi-badge badge-warn">DOMINANT</span></div>
+  <div class="kpi"><div class="kpi-top red"></div><div class="kpi-lbl">"Other Expenses" 2024 Spike</div><div class="kpi-val cv" data-mxn="584922">$584,922</div><div class="kpi-note">Budget was <span class="cv" data-mxn="100000">$100,000</span></div><span class="kpi-badge badge-up">485% OVER</span></div>
+  <div class="kpi"><div class="kpi-top red"></div><div class="kpi-lbl">Elevator Maint. Volatility</div><div class="kpi-val">&plusmn;82.5%</div><div class="kpi-note"><span class="cv" data-mxn="119699">$119,699</span> (2024) vs <span class="cv" data-mxn="218707">$218,707</span> (2025)</div><span class="kpi-badge badge-up">HIGH RISK</span></div>
+  <div class="kpi"><div class="kpi-top green"></div><div class="kpi-lbl">Water Spend Trend</div><div class="kpi-val">-31.8%</div><div class="kpi-note"><span class="cv" data-mxn="493394">$493,394</span> (2023) to <span class="cv" data-mxn="336387">$336,387</span> (2025)</div><span class="kpi-badge badge-dn">POSITIVE</span></div>
+</div>
+
+<!-- REVENUE BRIDGE -->
+<div class="sec-gap">
+  <div class="sec-head"><div class="sec-title">Fee Revenue Context</div><div class="sec-count">LINKED TO PAYMENT SCHEDULE</div></div>
+  <div class="sec-desc">How owner maintenance fee revenue covers operating expenses &mdash; the critical financial sustainability picture.</div>
+  <div class="bridge">
+    <div class="bridge-header">
+      <div class="bridge-icon">&#128200;</div>
+      <div>
+        <div class="bridge-title">Owner Fee Revenue vs. Operating Expenses &mdash; 2023 to 2025</div>
+        <div class="bridge-subtitle">58 units &middot; USD $35,095/mo &middot; USD $421,140/yr &middot; MXN equivalent at 17.46</div>
+      </div>
+    </div>
+    <div class="bridge-body">
+      <div class="bridge-stat">
+        <div class="bridge-stat-lbl">Annual Fee Revenue (MXN equiv.)</div>
+        <div class="bridge-stat-val" style="color:var(--teal)"><span class="cv" data-mxn="7352904">$7,352,904</span></div>
+        <div class="bridge-stat-note">USD $421,140 x 17.46 &middot; constant across all years</div>
+      </div>
+      <div class="bridge-stat">
+        <div class="bridge-stat-lbl">Coverage by Year</div>
+        <div class="yr-row" style="font-family:var(--font-mono);font-size:11px;color:var(--text3)">2023 &mdash; <strong style="color:var(--rose)">86.9%</strong> covered &middot; gap <span class="cv" style="color:var(--rose)" data-mxn="995240">$995,240</span></div>
+        <div class="yr-row" style="font-family:var(--font-mono);font-size:11px;color:var(--text3)">2024 &mdash; <strong style="color:var(--rose)">86.4%</strong> covered &middot; gap <span class="cv" style="color:var(--rose)" data-mxn="1154937">$1,154,937</span></div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--text3)">2025 &mdash; <strong style="color:var(--rose)">80.8%</strong> covered &middot; gap <span class="cv" style="color:var(--rose)" data-mxn="1751004">$1,751,004</span></div>
+      </div>
+      <div class="bridge-stat">
+        <div class="bridge-stat-lbl">2025 Fee Shortfall</div>
+        <div class="bridge-stat-val" style="color:var(--rose)"><span class="cv" data-mxn="1751004">$1,751,004</span></div>
+        <div class="bridge-stat-note">approx. +23.8% per-unit fee increase needed to break even at 2025 costs</div>
+      </div>
+    </div>
+    <div class="bridge-note">
+      <div style="font-size:18px;flex-shrink:0;margin-top:2px;">&#10003;</div>
+      <div class="bridge-note-body">
+        Operating expenses grew 9.1% from 2023 to 2025 while fee revenue remained flat, widening the annual shortfall from <span class="cv" style="color:var(--rose);font-weight:600" data-mxn="995240">$995,240</span> to <span class="cv" style="color:var(--rose);font-weight:600" data-mxn="1751004">$1,751,004</span>. The 2025 expense report already shows a new unbudgeted Capital Contribution Recovery entry of <span class="cv" style="font-weight:600" data-mxn="75978">$75,978</span> as evidence of this funding pressure.
+        <br><a href="hoa_payment_schedule.html" class="bridge-link">View Owner Payment Schedule &#8594;</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FORENSIC FLAGS -->
+<div class="sec-gap">
+  <div class="sec-head"><div class="sec-title">Forensic Flags</div><div class="sec-count">9 FINDINGS</div></div>
+  <div class="sec-desc">Material variances and anomalies warranting investigation or explanation.</div>
+  <div class="alert-grid">
+    <div class="alert-box critical"><div class="alert-tag">Critical Flag</div><div class="alert-value">+485%</div><div class="alert-title">Other Expenses &mdash; 2024 Spike</div><div class="alert-body">Rose from <span class="cv" data-mxn="345845">$345,845</span> in 2023 to <span class="cv" data-mxn="584922">$584,922</span> in 2024 against a <span class="cv" data-mxn="100000">$100,000</span> budget. Three consecutive years of material overage (246% &rarr; 485% &rarr; 186%) signal this catch-all absorbs unclassified expenditures requiring sub-ledger detail.</div></div>
+    <div class="alert-box critical"><div class="alert-tag">Critical Flag</div><div class="alert-value">+82.5% swing</div><div class="alert-title">Elevator Maintenance &mdash; Erratic Pattern</div><div class="alert-body">Dropped from <span class="cv" data-mxn="183223">$183,223</span> (2023) to <span class="cv" data-mxn="119699">$119,699</span> (2024) then surged to <span class="cv" data-mxn="218707">$218,707</span> (2025), exceeding budget by 28.3%. Likely reflects deferred maintenance in 2024 followed by corrective spending in 2025.</div></div>
+    <div class="alert-box critical"><div class="alert-tag">Critical Flag</div><div class="alert-value">+96.3%</div><div class="alert-title">Office Supplies &mdash; Chronic Overage</div><div class="alert-body">Grew from <span class="cv" data-mxn="38925">$38,925</span> in 2023 to <span class="cv" data-mxn="76349">$76,349</span> in 2025, nearly doubling. All three years exceeded budget. 2025 actual stands 92.8% above its <span class="cv" data-mxn="39600">$39,600</span> budget.</div></div>
+    <div class="alert-box warning"><div class="alert-tag">Warning</div><div class="alert-value"><span class="cv" data-mxn="75978">$75,978</span></div><div class="alert-title">Capital Contribution Recovery &mdash; New 2025 Line</div><div class="alert-body">A new unbudgeted line appears in 2025 for <span class="cv" data-mxn="75978">$75,978</span>. Direct evidence of HOA fee shortfall pressure &mdash; an inter-entity recharge that must be disclosed to owners with supporting documentation.</div></div>
+    <div class="alert-box warning"><div class="alert-tag">Warning</div><div class="alert-value">+25.4%</div><div class="alert-title">Bank Commissions &mdash; Consistently Over Budget</div><div class="alert-body">Exceeded budget in 2024 (<span class="cv" data-mxn="141487">$141,487</span> vs <span class="cv" data-mxn="120000">$120,000</span>) and 2025 (<span class="cv" data-mxn="146002">$146,002</span> vs <span class="cv" data-mxn="134000">$134,000</span>). May indicate increased transaction volume, new fee structures, or penalty activity.</div></div>
+    <div class="alert-box warning"><div class="alert-tag">Warning</div><div class="alert-value">110% over</div><div class="alert-title">Licenses &amp; Permits &mdash; Volatile Budget</div><div class="alert-body">Swung from <span class="cv" data-mxn="7500">$7,500</span> (2023) to <span class="cv" data-mxn="23200">$23,200</span> (2024, 110% over budget) then to <span class="cv" data-mxn="3105">$3,105</span> (2025). Unpredictable permit schedules or incomplete accrual of permit costs.</div></div>
+    <div class="alert-box positive"><div class="alert-tag">Positive Finding</div><div class="alert-value">-31.8%</div><div class="alert-title">Water Consumption Declining</div><div class="alert-body">Water spend fell from <span class="cv" data-mxn="493394">$493,394</span> (2023) to <span class="cv" data-mxn="336387">$336,387</span> (2025). The <span class="cv" data-mxn="504000">$504,000</span> annual budget has not been adjusted &mdash; an opportunity to reallocate to underfunded lines.</div></div>
+    <div class="alert-box positive"><div class="alert-tag">Positive Finding</div><div class="alert-value"><span class="cv" data-mxn="594570">$594,570</span> saved</div><div class="alert-title">Payroll Consistently Under Budget</div><div class="alert-body">Payroll stayed below budget every year: 12.7% under on average. Cumulative 3-year savings of <span class="cv" data-mxn="594570">$594,570</span> against annual budgets averaging <span class="cv" data-mxn="4897334">$4,897,334</span>.</div></div>
+    <div class="alert-box positive"><div class="alert-tag">Positive Finding</div><div class="alert-value">Stable</div><div class="alert-title">Fumigation &mdash; Near-Perfect Budget Adherence</div><div class="alert-body">Aligned exactly with budget in 2023 and 2024, and came in only 4.0% over in 2025 (<span class="cv" data-mxn="175940">$175,940</span> vs <span class="cv" data-mxn="169200">$169,200</span>). A benchmark for effective vendor contract management.</div></div>
+  </div>
+</div>
+
+<!-- OWNER JUSTIFICATION -->
+<div class="sec-gap">
+  <div class="sec-head">
+    <div class="sec-title">What Is Driving the Cost Increase</div>
+    <div class="sec-count">OWNER CONTEXT &middot; 2023 &rarr; 2025</div>
+  </div>
+  <div class="sec-desc">Total operating expenses rose <strong>$832,741 MXN (10.0%)</strong> from 2023 to 2025. Three factors account for 93% of that increase &mdash; two are external market forces outside management&rsquo;s control, and one is a structural funding obligation. Where management did have control, costs declined.</div>
+
+  <div class="waterfall-wrap">
+    <div class="waterfall-title">Expense Movement Waterfall &mdash; 2023 to 2025</div>
+    <div class="waterfall-sub">Each bar shows one category&rsquo;s contribution to the total $832,741 MXN increase</div>
+    <canvas id="chartWaterfall" height="140"></canvas>
+  </div>
+
+  <div class="just-grid">
+    <div class="just-card market">
+      <div class="just-icon">&#128188;</div>
+      <div class="just-title">Labor Market &amp; Payroll Adjustments</div>
+      <div class="just-body">The HOA employs permanent staff for security, maintenance, cleaning, and administration. Mexican federal law requires annual minimum wage adjustments and labor cost inflation has run well above general CPI. Payroll grew 11.6% over two years, consistent with the national labor market. This is not discretionary &mdash; it is a legal and operational requirement to maintain current service levels.</div>
+      <div class="just-stat"><b class="up">+$482,910 MXN</b> &nbsp;&middot;&nbsp; <b class="up">58%</b> of total increase &nbsp;&middot;&nbsp; <b>11.6% growth</b> vs ~12% Mexico labor inflation</div>
+    </div>
+    <div class="just-card market">
+      <div class="just-icon">&#127968;</div>
+      <div class="just-title">Property Insurance &mdash; Coastal Risk Premium</div>
+      <div class="just-body">Los Cabos sits in a Category 4&ndash;5 hurricane corridor. Property and liability insurance for a multi-story condominium in this zone has risen significantly since 2022 as reinsurance markets repriced coastal Mexican exposure following back-to-back storm seasons. Insurance premiums grew 18.6% over two years. This coverage protects the entire building &mdash; common areas, structure, and owner liability &mdash; and cannot be reduced without materially increasing financial risk to every unit owner.</div>
+      <div class="just-stat"><b class="up">+$202,395 MXN</b> &nbsp;&middot;&nbsp; <b class="up">24.3%</b> of total increase &nbsp;&middot;&nbsp; <b>18.6% premium growth</b></div>
+    </div>
+    <div class="just-card service">
+      <div class="just-icon">&#127869;</div>
+      <div class="just-title">Staff Benefits Scale With Headcount</div>
+      <div class="just-body">Staff meals are a contractual benefit tied directly to the number of employees on shift. The 39.1% increase mirrors payroll growth and confirms no decoupling between staffing levels and this benefit. Where payroll savings were achieved (12.7% under budget on average), meal costs also tracked proportionally. This line provides no independent forensic concern &mdash; it moves in lockstep with labor.</div>
+      <div class="just-stat"><b class="up">+$91,043 MXN</b> &nbsp;&middot;&nbsp; <b class="up">10.9%</b> of total increase &nbsp;&middot;&nbsp; <b>Tracks payroll growth exactly</b></div>
+    </div>
+    <div class="just-card service">
+      <div class="just-icon">&#128736;</div>
+      <div class="just-title">Elevator &amp; Building Safety Systems</div>
+      <div class="just-body">Elevator maintenance is a non-negotiable safety and liability item. The pattern across three years (over budget &rarr; significantly under budget &rarr; over budget) is a textbook deferred maintenance cycle: partial service in 2024 followed by corrective work in 2025. Owners should note that consistent annual investment in elevator maintenance costs less long-term than reactive repair of major failures, which can reach $500K+ MXN for a full modernization.</div>
+      <div class="just-stat"><b class="warn">+$35,483 MXN</b> net increase &nbsp;&middot;&nbsp; <b class="warn">2024 underinvestment risk</b> &nbsp;&middot;&nbsp; 2025: $218,707</div>
+    </div>
+    <div class="just-card service">
+      <div class="just-icon">&#127807;</div>
+      <div class="just-title">Grounds, Fumigation &amp; Sanitation</div>
+      <div class="just-body">Garden landscaping, fumigation, and garbage collection represent the visible quality of the common areas that directly impacts property values and owner enjoyment. These three lines together increased only $35,535 MXN over two years &mdash; a combined 7.4% increase over the period &mdash; demonstrating disciplined vendor contract management. Fumigation in particular showed near-perfect budget adherence all three years.</div>
+      <div class="just-stat"><b class="ok">+$35,535 MXN combined</b> for 3 service lines &nbsp;&middot;&nbsp; <b>Only 4.3%</b> of total increase</div>
+    </div>
+    <div class="just-card concern">
+      <div class="just-icon">&#9888;</div>
+      <div class="just-title">Capital Contribution Recovery &mdash; Requires Clarification</div>
+      <div class="just-body">A new unbudgeted line of <span class="cv" data-mxn="75978">$75,978 MXN</span> appears in 2025 labeled <em>Recuperacion Gastos Capital Contribution</em>. This indicates an external party (likely the developer or management company) has been subsidizing the HOA&rsquo;s operational shortfall and the HOA began repaying that in 2025. Owners have the right to know the full amount contributed, on what terms, and the total repayment obligation. This disclosure should be requested formally at the next assembly.</div>
+      <div class="just-stat"><b class="up">+$75,978 MXN</b> &nbsp;&middot;&nbsp; <b class="up">9.1%</b> of total increase &nbsp;&middot;&nbsp; <b class="warn">Unbudgeted &amp; undisclosed</b></div>
+    </div>
+  </div>
+
+  <div class="just-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:0;">
+    <div class="just-card saving" style="grid-column:1/2;">
+      <div class="just-icon">&#128167;</div>
+      <div class="just-title">Water Efficiency &mdash; Significant Savings</div>
+      <div class="just-body">Water consumption fell 31.8% over two years, saving <span class="cv" data-mxn="157008">$157,008 MXN</span> that directly offset cost increases elsewhere. This is likely attributable to infrastructure improvements, leak detection, or behavioral changes. The budget has not been adjusted downward to reflect this efficiency gain, creating a hidden cushion that should be reallocated to underfunded lines like elevator maintenance.</div>
+      <div class="just-stat"><b class="ok">-$157,008 MXN</b> savings vs 2023 &nbsp;&middot;&nbsp; <b class="ok">Largest positive offset</b></div>
+    </div>
+    <div class="just-card saving" style="grid-column:2/3;">
+      <div class="just-icon">&#128205;</div>
+      <div class="just-title">Payroll Discipline &mdash; Consistent Under-Budget</div>
+      <div class="just-body">Despite growing 11.6%, payroll stayed 12.7% below its approved budget every year, generating <span class="cv" data-mxn="594570">$594,570 MXN</span> in cumulative savings. This is the clearest evidence of operational discipline. If payroll had reached its approved budget ceiling, total expenses would have been $594K higher &mdash; pushing the fee coverage ratio below 74% by 2025.</div>
+      <div class="just-stat"><b class="ok">-$594,570 MXN</b> cumulative savings &nbsp;&middot;&nbsp; <b class="ok">12.7% avg under budget</b></div>
+    </div>
+    <div class="just-card saving" style="grid-column:3/4;">
+      <div class="just-icon">&#128202;</div>
+      <div class="just-title">The Fee Gap: What Owners Need to Know</div>
+      <div class="just-body">Even with payroll savings and water efficiency, current fees cover only <strong style="color:var(--rose)">80.8%</strong> of 2025 expenses. The 10% cost increase over two years represents approximately <span class="cv" data-mxn="69395">$69,395 MXN/month</span> ($4,000 USD/month) more in annual operating costs than when the current fee schedule was set. A fee increase of approximately <strong>23.8%</strong> across all tiers would be needed to close the current gap without external subsidy.</div>
+      <div class="just-stat"><b class="up">23.8% increase needed</b> to break even at 2025 costs &nbsp;&middot;&nbsp; <b class="warn">Gap widening annually</b></div>
+    </div>
+  </div>
+
+  <div class="owner-msg" style="margin-top:20px;">
+    <div class="owner-msg-icon">&#128203;</div>
+    <div class="owner-msg-body">
+      <div class="owner-msg-title">Summary for Owner Communication</div>
+      <div class="owner-msg-text">
+        The <b>10% cost increase</b> over two years is principally explained by <b>labor market inflation</b> (required by Mexican law) and <b>coastal property insurance</b> (driven by hurricane exposure repricing) &mdash; two factors no HOA in the region can avoid. Management has demonstrated discipline: payroll came in <span class="ok"><b>12.7% below budget every year</b></span> and water costs fell <span class="ok"><b>31.8%</b></span>. The real conversation that owners need to have is about the <b>structural funding gap</b>: fees have not increased since the current schedule was set, while operating costs grew at 5% per year. The unbudgeted <b>Capital Contribution Recovery line in 2025</b> indicates external parties have been subsidizing the deficit &mdash; a situation that requires full disclosure and a long-term fee adjustment plan. The data supports a fee increase conversation grounded in documented, verifiable costs.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHARTS -->
+<div class="sec-gap">
+  <div class="sec-head"><div class="sec-title">Visual Analysis</div><div class="sec-count">VALUES UPDATE WITH CURRENCY TOGGLE</div></div>
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('totals',this)">TOTAL SPEND</button>
+    <button class="tab-btn" onclick="switchTab('major',this)">MAJOR CATEGORIES</button>
+    <button class="tab-btn" onclick="switchTab('admin',this)">ADMIN</button>
+    <button class="tab-btn" onclick="switchTab('ops',this)">OPERATIONS</button>
+    <button class="tab-btn" onclick="switchTab('services',this)">SERVICES</button>
+    <button class="tab-btn" onclick="switchTab('variance',this)">VARIANCE</button>
+  </div>
+  <div id="tab-totals" class="tab-content active">
+    <div class="chart-grid-2">
+      <div class="chart-card"><div class="chart-title">Total Annual Spend vs Budget</div><div class="chart-sub">2023 &middot; 2024 &middot; 2025</div><canvas id="chartTotalBar"></canvas></div>
+      <div class="chart-card"><div class="chart-title">Year-over-Year Spend Trend</div><div class="chart-sub">Actual spend vs budget trend</div><canvas id="chartTotalLine"></canvas></div>
+    </div>
+    <div class="chart-grid-3">
+      <div class="chart-card"><div class="chart-title">2023 Expense Mix</div><div class="chart-sub">By major category group</div><canvas id="chartPie2023"></canvas></div>
+      <div class="chart-card"><div class="chart-title">2024 Expense Mix</div><div class="chart-sub">By major category group</div><canvas id="chartPie2024"></canvas></div>
+      <div class="chart-card"><div class="chart-title">2025 Expense Mix</div><div class="chart-sub">By major category group</div><canvas id="chartPie2025"></canvas></div>
+    </div>
+  </div>
+  <div id="tab-major" class="tab-content">
+    <div class="chart-full"><div class="chart-card"><div class="chart-title">Top 8 Expense Lines &mdash; 3-Year Comparison</div><div class="chart-sub">Actual spend &middot; 2023 vs 2024 vs 2025</div><canvas id="chartMajor"></canvas></div></div>
+    <div class="chart-grid-2">
+      <div class="chart-card"><div class="chart-title">Payroll Trend</div><div class="chart-sub">Actual vs Budget &middot; 3 years</div><canvas id="chartPayroll"></canvas></div>
+      <div class="chart-card"><div class="chart-title">Insurance Policy Trend</div><div class="chart-sub">Actual vs Budget &middot; 3 years</div><canvas id="chartInsurance"></canvas></div>
+    </div>
+  </div>
+  <div id="tab-admin" class="tab-content">
+    <div class="chart-full"><div class="chart-card"><div class="chart-title">Administrative Expenses &mdash; 3-Year Trend</div><div class="chart-sub">All Admin categories (A)</div><canvas id="chartAdmin"></canvas></div></div>
+    <div class="chart-grid-2">
+      <div class="chart-card"><div class="chart-title">Bank Commissions &mdash; Consistent Overage</div><div class="chart-sub">Actual vs Budget</div><canvas id="chartBank"></canvas></div>
+      <div class="chart-card"><div class="chart-title">Office Supplies &mdash; Chronic Overage</div><div class="chart-sub">Actual vs Budget</div><canvas id="chartOffice"></canvas></div>
+    </div>
+  </div>
+  <div id="tab-ops" class="tab-content">
+    <div class="chart-full"><div class="chart-card"><div class="chart-title">Operations Expenses &mdash; 3-Year Trend</div><div class="chart-sub">Categories O (excl. Payroll for scale)</div><canvas id="chartOps"></canvas></div></div>
+    <div class="chart-grid-3">
+      <div class="chart-card"><div class="chart-title">Electricity</div><div class="chart-sub">Actual vs Budget &middot; 2024 budget overestimated</div><canvas id="chartElec"></canvas></div>
+      <div class="chart-card"><div class="chart-title">Water Consumption</div><div class="chart-sub">Actual vs Budget &middot; declining trend</div><canvas id="chartWater"></canvas></div>
+      <div class="chart-card"><div class="chart-title">Other Expenses (Catch-All Flag)</div><div class="chart-sub">Actual vs Budget &middot; critical overages</div><canvas id="chartOther"></canvas></div>
+    </div>
+  </div>
+  <div id="tab-services" class="tab-content">
+    <div class="chart-full"><div class="chart-card"><div class="chart-title">Services &amp; Maintenance &mdash; 3-Year Comparison</div><div class="chart-sub">Categories S and M</div><canvas id="chartServices"></canvas></div></div>
+    <div class="chart-grid-2">
+      <div class="chart-card"><div class="chart-title">Elevator Maintenance &mdash; Volatility Alert</div><div class="chart-sub">Actual vs Budget &middot; erratic 3-year pattern</div><canvas id="chartElevator"></canvas></div>
+      <div class="chart-card"><div class="chart-title">Maintenance Services &amp; Parts</div><div class="chart-sub">Actual vs Budget &middot; structural underfunding</div><canvas id="chartMaint"></canvas></div>
+    </div>
+  </div>
+  <div id="tab-variance" class="tab-content">
+    <div class="chart-full"><div class="chart-card"><div class="chart-title">2025 Budget Variance by Category</div><div class="chart-sub">Actual minus budget &middot; red = over budget &middot; green = under budget</div><canvas id="chartVar2025"></canvas></div></div>
+    <div class="chart-grid-2">
+      <div class="chart-card"><div class="chart-title">2023 Budget Variance</div><div class="chart-sub">Over / under budget by line item</div><canvas id="chartVar2023"></canvas></div>
+      <div class="chart-card"><div class="chart-title">2024 Budget Variance</div><div class="chart-sub">Over / under budget by line item</div><canvas id="chartVar2024"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- FINDINGS -->
+<div class="sec-gap">
+  <div class="sec-head"><div class="sec-title">Detailed Forensic Findings</div><div class="sec-count">6 KEY FINDINGS</div></div>
+  <div class="findings-grid">
+    <div class="finding-card"><div class="finding-num">01</div><div class="finding-title">Payroll: Largest Risk, Best Discipline</div><div class="finding-body">Payroll represents 50&ndash;51% of all operating expenditure. The organization achieved under-budget performance every year, averaging 12.7% below budget. Payroll grew from <span class="cv" data-mxn="4172232">$4.17M</span> (2023) to <span class="cv" data-mxn="4655142">$4.66M</span> (2025) &mdash; an 11.5% increase. This growth rate outpaces flat fee revenue, directly widening the coverage gap each year.</div><div class="finding-stat">3-Year Total: <span class="stat-em cv" data-mxn="13043337">$13,043,337</span> &nbsp;&middot;&nbsp; Avg Budget Savings: <span class="stat-em green">12.7%/yr</span></div></div>
+    <div class="finding-card"><div class="finding-num">02</div><div class="finding-title">Other Expenses: The Forensic Flashpoint</div><div class="finding-body">"Otros Egresos Ext." presents the most significant forensic concern. In 2023 it reached <span class="cv" data-mxn="345845">$345,845</span> against a <span class="cv" data-mxn="100000">$100,000</span> budget (246% over). In 2024 it surged to <span class="cv" data-mxn="584922">$584,922</span> (485% over). The 3-year cumulative actual of <span class="cv" data-mxn="1217013">$1,217,013</span> vs a <span class="cv" data-mxn="300000">$300,000</span> budget demands sub-ledger documentation.</div><div class="finding-stat">3-Year Excess: <span class="stat-em red cv" data-mxn="917013">$917,013</span> &nbsp;&middot;&nbsp; Avg Overage: <span class="stat-em red">306%</span></div></div>
+    <div class="finding-card"><div class="finding-num">03</div><div class="finding-title">Insurance: Rising Cost Trajectory</div><div class="finding-body">Insurance premiums rose from <span class="cv" data-mxn="1090047">$1.09M</span> (2023) to <span class="cv" data-mxn="1292442">$1.29M</span> (2025), an 18.6% increase. In 2024 the actual cost exceeded budget by 4.2%. The consistent upward trajectory likely reflects escalating coastal and hurricane-risk insurance costs in Los Cabos.</div><div class="finding-stat">3-Year Growth: <span class="stat-em red">+18.6%</span> &nbsp;&middot;&nbsp; 2025 vs Budget: <span class="stat-em green">0.9% under</span></div></div>
+    <div class="finding-card"><div class="finding-num">04</div><div class="finding-title">Electricity: Budget Overestimation in 2024</div><div class="finding-body">Electricity budget in 2024 was set at <span class="cv" data-mxn="432000">$432,000</span> yet actual consumption came in at <span class="cv" data-mxn="269801">$269,801</span> &mdash; a 37.5% underrun. By 2025 actual climbed to <span class="cv" data-mxn="342578">$342,578</span> against a still-inflated <span class="cv" data-mxn="453600">$453,600</span> budget. Persistently overestimated electricity budgets create false available headroom.</div><div class="finding-stat">2024 Budget Gap: <span class="stat-em red cv" data-mxn="162199">$162,199</span> &nbsp;&middot;&nbsp; 3-Year Range: <span class="stat-em"><span class="cv" data-mxn="269801">$270K</span>&ndash;<span class="cv" data-mxn="368918">$369K</span></span></div></div>
+    <div class="finding-card"><div class="finding-num">05</div><div class="finding-title">Maintenance Services: Structural Underfunding</div><div class="finding-body">General maintenance exceeded budget all three years: <span class="cv" data-mxn="81194">$81,194</span> vs <span class="cv" data-mxn="29900">$29,900</span> (2023, 171.5% over), <span class="cv" data-mxn="94718">$94,718</span> vs <span class="cv" data-mxn="78000">$78,000</span> (2024), and <span class="cv" data-mxn="123278">$123,278</span> vs <span class="cv" data-mxn="96000">$96,000</span> (2025). Actual spend grew 51.8% from 2023 to 2025, far outpacing the budget increase.</div><div class="finding-stat">2023 Overage: <span class="stat-em red">171.5%</span> &nbsp;&middot;&nbsp; 3-Year Growth: <span class="stat-em red">+51.8%</span></div></div>
+    <div class="finding-card"><div class="finding-num">06</div><div class="finding-title">Staff Meals: Consistent 39% Growth</div><div class="finding-body">Staff meals grew from <span class="cv" data-mxn="232690">$232,690</span> (2023) to <span class="cv" data-mxn="323733">$323,733</span> (2025), a 39.1% increase over three years. The upward trend parallels payroll growth, suggesting this benefit scales proportionally with headcount. Management should confirm whether the benefit has contractual or regulatory basis.</div><div class="finding-stat">3-Year Growth: <span class="stat-em red">+39.1%</span> &nbsp;&middot;&nbsp; 2025 Budget Adherence: <span class="stat-em green">6.7% under</span></div></div>
+  </div>
+</div>
+
+<!-- TABLE -->
+<div class="sec-gap">
+  <div class="sec-head"><div class="sec-title">Complete Line-Item Data</div><div class="sec-count">28 EXPENSE CATEGORIES</div></div>
+  <div class="sec-desc">All expense categories &middot; actual vs budget &middot; 3-year trend &middot; variance indicators. Values update with the currency toggle above.</div>
+  <div class="table-wrap">
+    <div class="table-controls">
+      <input class="tbl-search" id="tableSearch" type="text" placeholder="Search expense category..." oninput="filterTable(this.value)">
+      <span class="tbl-info" id="tblInfo">28 categories shown</span>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Expense Category</th>
+            <th>2023 Actual</th><th>2023 Budget</th><th>Var%</th>
+            <th>2024 Actual</th><th>2024 Budget</th><th>Var%</th>
+            <th>2025 Actual</th><th>2025 Budget</th><th>Var%</th>
+            <th>23&rarr;24</th><th>24&rarr;25</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+        <tfoot>
+          <tr class="tfoot-row">
+            <td>TOTAL (28 categories)</td>
+            <td id="tf23a"></td><td id="tf23b"></td><td class="under-budget">-6.6%</td>
+            <td id="tf24a"></td><td id="tf24b"></td><td class="under-budget">-4.2%</td>
+            <td id="tf25a"></td><td id="tf25b"></td><td class="under-budget">-5.9%</td>
+            <td class="over-budget">+1.9%</td><td class="over-budget">+7.0%</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="footer">
+  <div class="footer-txt">Administradora de Inmuebles Paraiso, A.C. &middot; HOA Expense Analysis 2023&ndash;2025 &middot; Figures include IVA &middot; USD rate: 17.46 MXN</div>
+  <a href="hoa_payment_schedule.html" class="footer-link">View Owner Payment Schedule &rarr;</a>
+</div>
+
+<script>
+// ── STATE ──
+const RATE = 17.46;
+let CUR = 'USD';
+
+const cv = v => CUR === 'USD' ? v / RATE : v;
+const sym = () => CUR === 'USD' ? 'USD $' : '$';
+function fmt(mxn) {
+  if (mxn === 0) return '&mdash;';
+  const v = cv(mxn);
+  return sym() + Math.abs(v).toLocaleString('en-US', {maximumFractionDigits: 0});
+}
+function yFmt(v) {
+  const s = CUR === 'USD' ? '$' : '$';
+  const a = Math.abs(v);
+  if (a >= 1000000) return s + (v/1000000).toFixed(1) + 'M';
+  if (a >= 1000) return s + (v/1000).toFixed(0) + 'K';
+  return s + v.toFixed(0);
+}
+
+// ── DATA ──
+const rows = [
+  {cat:'A',name:'Insurance Policy',         a23:1090047.12,b23:1148853.82,a24:1114123.36,b24:1069515.90,a25:1292441.63,b25:1303740.00},
+  {cat:'A',name:'Rent Office',              a23:493120.90, b23:584640.00, a24:506681.04, b24:487200.00, a25:532847.38, b25:570024.00},
+  {cat:'A',name:'Training',                 a23:0,         b23:12000.00,  a24:10529.00,  b24:12000.00,  a25:6960.00,   b25:12000.00},
+  {cat:'A',name:'Office Supplies',          a23:38925.30,  b23:35000.00,  a24:61503.62,  b24:38400.00,  a25:76349.02,  b25:39600.00},
+  {cat:'A',name:'Print Equipment Rental',   a23:20660.99,  b23:24000.00,  a24:24132.44,  b24:24000.00,  a25:21222.50,  b25:26400.00},
+  {cat:'A',name:'Bank Commissions',         a23:116459.89, b23:180000.00, a24:141486.83, b24:120000.00, a25:146001.84, b25:134000.00},
+  {cat:'A',name:'Contpaq Technical Support',a23:19243.82,  b23:23850.75,  a24:11644.08,  b24:20183.28,  a25:33642.02,  b25:22920.00},
+  {cat:'O',name:'Uniforms',                 a23:59073.75,  b23:63880.00,  a24:51007.19,  b24:73250.00,  a25:64106.14,  b25:75830.00},
+  {cat:'O',name:'Payroll (Nomina)',          a23:4172231.74,b23:4859451.21,a24:4215963.78,b24:4788233.07,a25:4655141.55,b25:5044318.72},
+  {cat:'O',name:'Year-End Expenses',        a23:25975.40,  b23:17000.00,  a24:20819.32,  b24:18000.00,  a25:22155.50,  b25:19000.00},
+  {cat:'O',name:'Staff Meals',              a23:232690.05, b23:216000.00, a24:262823.20, b24:308448.00, a25:323732.70, b25:347004.00},
+  {cat:'O',name:'Licenses & Permits',       a23:7500.00,   b23:11025.00,  a24:23200.00,  b24:11025.00,  a25:3105.00,   b25:11600.00},
+  {cat:'O',name:'Notarial Expenses',        a23:0,         b23:6000.00,   a24:0,         b24:6000.00,   a25:0,         b25:6500.00},
+  {cat:'O',name:'Electricity',              a23:368918.00, b23:340200.00, a24:269800.97, b24:432000.00, a25:342578.00, b25:453600.00},
+  {cat:'O',name:'Water Consumption',        a23:493394.40, b23:504000.00, a24:401940.00, b24:492000.00, a25:336386.82, b25:504000.00},
+  {cat:'O',name:'Telephone',               a23:34614.00,  b23:52628.00,  a24:32014.00,  b24:50009.40,  a25:32764.00,  b25:48000.00},
+  {cat:'O',name:'Cleaning Supplies',        a23:36390.34,  b23:35000.00,  a24:34169.86,  b24:44100.00,  a25:36070.44,  b25:44100.00},
+  {cat:'O',name:'Other Expenses (Otros Egresos)', a23:345845.19,b23:100000.00,a24:584922.21,b24:100000.00,a25:286246.03,b25:100000.00},
+  {cat:'O',name:'Hurricane Season Groceries',a23:6212.51,  b23:5000.00,   a24:3868.37,   b24:6000.00,   a25:5113.12,   b25:6000.00},
+  {cat:'O',name:'Capital Contribution Recovery',a23:0,     b23:0,         a24:0,         b24:0,         a25:75977.50,  b25:0},
+  {cat:'S',name:'Garbage Collection',       a23:67369.00,  b23:68600.00,  a24:75735.00,  b24:73080.00,  a25:75735.00,  b25:75780.00},
+  {cat:'S',name:'Elevator Maintenance',     a23:183223.10, b23:180000.00, a24:119698.99, b24:176000.00, a25:218706.54, b25:170500.00},
+  {cat:'S',name:'Fumigation',               a23:150336.00, b23:150336.00, a24:157852.80, b24:157852.80, a25:175939.52, b25:169200.00},
+  {cat:'S',name:'Garden / Landscaping',     a23:288425.39, b23:269200.00, a24:270836.20, b24:266846.40, a25:289990.72, b25:284400.00},
+  {cat:'M',name:'Maintenance Services & Parts',a23:81193.97,b23:29900.00, a24:94717.66,  b24:78000.00,  a25:123277.70, b25:96000.00},
+  {cat:'M',name:'Minor Hand Tools',         a23:9333.00,   b23:15000.00,  a24:13130.00,  b24:16000.00,  a25:4394.41,   b25:19000.00},
+  {cat:'M',name:'Lobby Doors Maintenance',  a23:6960.00,   b23:8000.00,   a24:0,         b24:8400.00,   a25:0,         b25:8400.00},
+  {cat:'M',name:'Fountain Maintenance',     a23:0,         b23:3000.00,   a24:5240.94,   b24:3150.00,   a25:0,         b25:6000.00},
+];
+const TOT = {a23:8348143.86,b23:8942564.78,a24:8507840.86,b24:8879693.85,a25:9104907.58,b25:9673894.22};
+
+// ── CHART ENGINE ── lazy per tab
+const CH = {};
+const builtTabs = new Set();
+Chart.defaults.color = '#566070';
+Chart.defaults.font.family = "'IBM Plex Mono', monospace";
+Chart.defaults.font.size = 10;
+const GC = '#e8e4da', TC = '#9aa4b4';
+const C23 = 'rgba(44,109,176,0.78)';
+const C24 = 'rgba(168,120,32,0.78)';
+const C25 = 'rgba(42,157,138,0.78)';
+const CBG = 'rgba(26,37,64,0.07)';
+
+function opts(extra) {
+  return Object.assign({
+    responsive: true,
+    plugins: {
+      legend: {position:'bottom', labels:{boxWidth:10,padding:14,color:'#566070'}},
+      tooltip: {backgroundColor:'#1a2540', titleColor:'#fff', bodyColor:'#d0d8f0',
+        callbacks: {label: c => ' ' + (CUR==='USD'?'USD ':'')+' $' + c.raw.toLocaleString('en-US',{maximumFractionDigits:0})}}
+    },
+    scales: {
+      x: {grid:{color:GC}, ticks:{color:TC}},
+      y: {grid:{color:GC}, ticks:{color:TC, callback: v => yFmt(v)}}
+    }
+  }, extra || {});
+}
+
+function mkChart(id, type, labels, datasets, extraOpts) {
+  if (CH[id]) { CH[id].destroy(); delete CH[id]; }
+  const el = document.getElementById(id);
+  if (!el) return;
+  CH[id] = new Chart(el, {type, data:{labels, datasets}, options: opts(extraOpts)});
+}
+
+function mkBar(id, labels, datasets) {
+  mkChart(id,'bar',labels,datasets,{scales:{x:{grid:{color:GC},ticks:{color:TC}},y:{grid:{color:GC},ticks:{color:TC,callback:v=>yFmt(v)}}}});
+}
+function mkLine(id, labels, datasets) {
+  mkChart(id,'line',labels,datasets,{scales:{x:{grid:{color:GC},ticks:{color:TC}},y:{grid:{color:GC},ticks:{color:TC,callback:v=>yFmt(v)}}}});
+}
+function mkDough(id, labels, vals) {
+  if (CH[id]) { CH[id].destroy(); delete CH[id]; }
+  const el = document.getElementById(id); if (!el) return;
+  const tot = vals.reduce((a,b)=>a+b,0);
+  CH[id] = new Chart(el, {
+    type:'doughnut',
+    data:{labels, datasets:[{data:vals, backgroundColor:['#2c6db0','#a87820','#2a9d8a','#8030c0'], borderColor:'#fff', borderWidth:3}]},
+    options:{
+      responsive:true, cutout:'65%',
+      plugins:{
+        legend:{position:'bottom', labels:{boxWidth:10, padding:12, color:'#566070', font:{size:9}}},
+        tooltip:{backgroundColor:'#1a2540', callbacks:{label: c => ' $'+c.raw.toLocaleString('en-US',{maximumFractionDigits:0})+' ('+(c.raw/tot*100).toFixed(1)+'%)'}}
+      }
+    }
+  });
+}
+function mkHBar(id, labels, vals) {
+  if (CH[id]) { CH[id].destroy(); delete CH[id]; }
+  const el = document.getElementById(id); if (!el) return;
+  CH[id] = new Chart(el, {
+    type:'bar',
+    data:{labels, datasets:[{label:'Variance', data:vals, backgroundColor:vals.map(v=>v>0?'rgba(192,64,64,0.7)':'rgba(42,157,138,0.7)'), borderRadius:3}]},
+    options:{
+      indexAxis:'y', responsive:true,
+      plugins:{
+        legend:{display:false},
+        tooltip:{backgroundColor:'#1a2540', callbacks:{label: c => ' $'+c.raw.toLocaleString('en-US',{maximumFractionDigits:0})+(c.raw>0?' OVER':' UNDER')}}
+      },
+      scales:{
+        x:{grid:{color:GC}, ticks:{color:TC, callback:v=>yFmt(v)}},
+        y:{grid:{color:GC}, ticks:{color:TC, font:{size:9}}}
+      }
+    }
+  });
+}
+
+const YRS = ['2023','2024','2025'];
+const catNames = ['Insurance','Rent Office','Training','Office Suppl.','Print Equip.','Bank Comm.','Contpaq','Uniforms','Payroll','Year-End','Staff Meals','Licenses','Notarial','Electricity','Water','Telephone','Cleaning','Other Exp.','Hurricane','Cap.Contrib.','Garbage','Elevator','Fumigation','Garden','Maint.Svc','Minor Tools','Lobby Doors','Fountain'];
+
+function buildChartsForTab(tab) {
+  if (builtTabs.has(tab+CUR)) return;
+  builtTabs.add(tab+CUR);
+
+  if (tab === 'totals') {
+    mkBar('chartTotalBar', YRS, [
+      {label:'Actual', data:[cv(TOT.a23),cv(TOT.a24),cv(TOT.a25)], backgroundColor:[C23,C24,C25], borderRadius:4},
+      {label:'Budget', data:[cv(TOT.b23),cv(TOT.b24),cv(TOT.b25)], backgroundColor:CBG, borderRadius:4}
+    ]);
+    mkLine('chartTotalLine', YRS, [
+      {label:'Actual Spend', data:[cv(TOT.a23),cv(TOT.a24),cv(TOT.a25)], borderColor:'#a87820', backgroundColor:'rgba(168,120,32,0.08)', tension:0.4, fill:true, pointRadius:6, pointBackgroundColor:'#a87820', borderWidth:2},
+      {label:'Budget', data:[cv(TOT.b23),cv(TOT.b24),cv(TOT.b25)], borderColor:'rgba(26,37,64,0.25)', borderDash:[5,5], tension:0.4, pointRadius:4, borderWidth:1.5}
+    ]);
+    ['23','24','25'].forEach(yr => {
+      let A=0,O=0,S=0,M=0;
+      rows.forEach(r => { const v=r['a'+yr]; if(r.cat==='A')A+=v; else if(r.cat==='O')O+=v; else if(r.cat==='S')S+=v; else M+=v; });
+      mkDough('chartPie20'+yr, ['Admin','Operations','Services','Maintenance'], [A,O,S,M].map(cv));
+    });
+  }
+  if (tab === 'major') {
+    const top8 = [['Payroll',4172231.74,4215963.78,4655141.55],['Insurance',1090047.12,1114123.36,1292441.63],['Water',493394.40,401940,336386.82],['Rent',493120.90,506681.04,532847.38],['Other Exp.',345845.19,584922.21,286246.03],['Staff Meals',232690.05,262823.20,323732.70],['Electricity',368918,269800.97,342578],['Garden',288425.39,270836.20,289990.72]];
+    mkBar('chartMajor', top8.map(r=>r[0]), [
+      {label:'2023', data:top8.map(r=>cv(r[1])), backgroundColor:C23, borderRadius:3},
+      {label:'2024', data:top8.map(r=>cv(r[2])), backgroundColor:C24, borderRadius:3},
+      {label:'2025', data:top8.map(r=>cv(r[3])), backgroundColor:C25, borderRadius:3}
+    ]);
+    function sb(id,act,bud,col){mkBar(id,YRS,[{label:'Actual',data:act.map(cv),backgroundColor:col,borderRadius:4},{label:'Budget',data:bud.map(cv),backgroundColor:CBG,borderRadius:4}]);}
+    sb('chartPayroll',[4172231.74,4215963.78,4655141.55],[4859451.21,4788233.07,5044318.72],C23);
+    sb('chartInsurance',[1090047.12,1114123.36,1292441.63],[1148853.82,1069515.90,1303740.00],C24);
+  }
+  if (tab === 'admin') {
+    mkBar('chartAdmin', ['Bank Comm.','Office Suppl.','Contpaq','Print Equip.','Rent Office','Training'], [
+      {label:'2023', data:[116459.89,38925.30,19243.82,20660.99,493120.90,0].map(cv), backgroundColor:C23, borderRadius:3},
+      {label:'2024', data:[141486.83,61503.62,11644.08,24132.44,506681.04,10529].map(cv), backgroundColor:C24, borderRadius:3},
+      {label:'2025', data:[146001.84,76349.02,33642.02,21222.50,532847.38,6960].map(cv), backgroundColor:C25, borderRadius:3}
+    ]);
+    function sb(id,act,bud,col){mkBar(id,YRS,[{label:'Actual',data:act.map(cv),backgroundColor:col,borderRadius:4},{label:'Budget',data:bud.map(cv),backgroundColor:CBG,borderRadius:4}]);}
+    sb('chartBank',[116459.89,141486.83,146001.84],[180000,120000,134000],'rgba(192,64,64,0.75)');
+    sb('chartOffice',[38925.30,61503.62,76349.02],[35000,38400,39600],'rgba(192,64,64,0.75)');
+  }
+  if (tab === 'ops') {
+    mkBar('chartOps', ['Uniforms','Year-End','Staff Meals','Licenses','Electricity','Water','Telephone','Cleaning','Other Exp.','Hurricane'], [
+      {label:'2023', data:[59073.75,25975.40,232690.05,7500,368918,493394.40,34614,36390.34,345845.19,6212.51].map(cv), backgroundColor:C23, borderRadius:3},
+      {label:'2024', data:[51007.19,20819.32,262823.20,23200,269800.97,401940,32014,34169.86,584922.21,3868.37].map(cv), backgroundColor:C24, borderRadius:3},
+      {label:'2025', data:[64106.14,22155.50,323732.70,3105,342578,336386.82,32764,36070.44,286246.03,5113.12].map(cv), backgroundColor:C25, borderRadius:3}
+    ]);
+    function sb(id,act,bud,col){mkBar(id,YRS,[{label:'Actual',data:act.map(cv),backgroundColor:col,borderRadius:4},{label:'Budget',data:bud.map(cv),backgroundColor:CBG,borderRadius:4}]);}
+    sb('chartElec',[368918,269800.97,342578],[340200,432000,453600],'rgba(192,144,40,0.75)');
+    sb('chartWater',[493394.40,401940,336386.82],[504000,492000,504000],C23);
+    sb('chartOther',[345845.19,584922.21,286246.03],[100000,100000,100000],'rgba(192,64,64,0.75)');
+  }
+  if (tab === 'services') {
+    mkBar('chartServices', ['Garbage','Elevator','Fumigation','Garden','Maint.Svc','Minor Tools','Lobby Doors','Fountain'], [
+      {label:'2023', data:[67369,183223.10,150336,288425.39,81193.97,9333,6960,0].map(cv), backgroundColor:C23, borderRadius:3},
+      {label:'2024', data:[75735,119698.99,157852.80,270836.20,94717.66,13130,0,5240.94].map(cv), backgroundColor:C24, borderRadius:3},
+      {label:'2025', data:[75735,218706.54,175939.52,289990.72,123277.70,4394.41,0,0].map(cv), backgroundColor:C25, borderRadius:3}
+    ]);
+    function sb(id,act,bud,col){mkBar(id,YRS,[{label:'Actual',data:act.map(cv),backgroundColor:col,borderRadius:4},{label:'Budget',data:bud.map(cv),backgroundColor:CBG,borderRadius:4}]);}
+    sb('chartElevator',[183223.10,119698.99,218706.54],[180000,176000,170500],'rgba(120,60,192,0.75)');
+    sb('chartMaint',[81193.97,94717.66,123277.70],[29900,78000,96000],'rgba(192,64,64,0.75)');
+  }
+  if (tab === 'variance') {
+    ['23','24','25'].forEach(yr => {
+      mkHBar('chartVar20'+yr, catNames, rows.map(r => cv(r['a'+yr]-r['b'+yr])));
+    });
+  }
+}
+
+// ── TABS ──
+let currentTab = 'totals';
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  currentTab = id;
+  // Rebuild after tab is visible so canvas has dimensions
+  requestAnimationFrame(() => {
+    builtTabs.delete(id+CUR); // force rebuild
+    buildChartsForTab(id);
+  });
+}
+
+// ── CURRENCY ──
+function setCurrency(cur) {
+  if (CUR === cur) return;
+  CUR = cur;
+  document.getElementById('btnMXN').classList.toggle('active', cur==='MXN');
+  document.getElementById('btnUSD').classList.toggle('active', cur==='USD');
+  document.getElementById('togglePill').classList.toggle('usd', cur==='USD');
+  document.getElementById('rateDisplay').textContent = cur==='USD' ? '17.46 MXN = 1 USD' : '1 USD = 17.46 MXN';
+  updateDOM();
+  buildTable(document.getElementById('tableSearch').value);
+  builtTabs.clear(); // force all chart rebuilds
+  buildChartsForTab(currentTab);
+  buildWaterfall();
+}
+
+// ── DOM UPDATE ──
+function updateDOM() {
+  document.querySelectorAll('.cv[data-mxn]').forEach(el => {
+    el.innerHTML = fmt(parseFloat(el.dataset.mxn));
+  });
+}
+
+// ── TABLE ──
+function buildTable(filter) {
+  filter = (filter||'').toLowerCase();
+  const body = document.getElementById('tableBody');
+  body.innerHTML = '';
+  const catCls = {A:'cat-a',O:'cat-o',S:'cat-s',M:'cat-m'};
+  let count = 0;
+  rows.forEach(r => {
+    if (filter && !r.name.toLowerCase().includes(filter)) return;
+    count++;
+    const v23 = r.b23 ? (r.a23-r.b23)/r.b23*100 : null;
+    const v24 = r.b24 ? (r.a24-r.b24)/r.b24*100 : null;
+    const v25 = (r.b25===0&&r.a25>0) ? null : (r.b25 ? (r.a25-r.b25)/r.b25*100 : null);
+    const vc = v => v!==null&&Math.abs(v)>3?(v>0?'over-budget':'under-budget'):'';
+    const vs = v => v===null?'<span style="color:var(--text3)">N/A</span>':v.toFixed(1)+'%';
+    const cb = v => {if(v===null)return '<span style="color:var(--text3)">-</span>';return `<span class="chg-badge ${v>0?'chg-up':'chg-dn'}">${v>0?'+':''}${v.toFixed(1)}%</span>`;};
+    const d24 = r.a23>0 ? (r.a24-r.a23)/r.a23*100 : null;
+    const d25 = r.a24>0 ? (r.a25-r.a24)/r.a24*100 : null;
+    const newFlag = r.b25===0&&r.a25>0 ? ' <span style="font-size:8px;font-weight:600;color:var(--rose)">NEW</span>' : '';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><span class="cat-label ${catCls[r.cat]}">${r.cat}</span>${r.name}</td>` +
+      `<td>${fmt(r.a23)}</td><td style="color:var(--text3)">${fmt(r.b23)}</td><td class="${vc(v23)}">${vs(v23)}</td>` +
+      `<td>${fmt(r.a24)}</td><td style="color:var(--text3)">${fmt(r.b24)}</td><td class="${vc(v24)}">${vs(v24)}</td>` +
+      `<td>${fmt(r.a25)}${newFlag}</td><td style="color:var(--text3)">${fmt(r.b25)}</td><td class="${v25!==null?vc(v25):''}">${v25!==null?vs(v25):'<span style="color:var(--rose);font-size:9px">UNBUDGETED</span>'}</td>` +
+      `<td>${cb(d24)}</td><td>${cb(d25)}</td>`;
+    body.appendChild(tr);
+  });
+  document.getElementById('tblInfo').textContent = `${count} categories shown`;
+  document.getElementById('tf23a').innerHTML = fmt(TOT.a23);
+  document.getElementById('tf23b').innerHTML = fmt(TOT.b23);
+  document.getElementById('tf24a').innerHTML = fmt(TOT.a24);
+  document.getElementById('tf24b').innerHTML = fmt(TOT.b24);
+  document.getElementById('tf25a').innerHTML = fmt(TOT.a25);
+  document.getElementById('tf25b').innerHTML = fmt(TOT.b25);
+}
+function filterTable(v) { buildTable(v); }
+
+
+// ── WATERFALL CHART ──
+function buildWaterfall() {
+  const el = document.getElementById('chartWaterfall');
+  if (!el) return;
+  if (CH['chartWaterfall']) { CH['chartWaterfall'].destroy(); delete CH['chartWaterfall']; }
+
+  // Each category: delta from 2023 to 2025, top movers only
+  const items = [
+    {name:'Payroll',        delta:482910, dir:1},
+    {name:'Insurance',      delta:202395, dir:1},
+    {name:'Staff Meals',    delta:91043,  dir:1},
+    {name:'Cap.Contrib.',   delta:75978,  dir:1},
+    {name:'Maint.Svc',      delta:42084,  dir:1},
+    {name:'Rent Office',    delta:39726,  dir:1},
+    {name:'Office Suppl.',  delta:37424,  dir:1},
+    {name:'Elevator',       delta:35483,  dir:1},
+    {name:'Other (net)',    delta:-59599, dir:-1},
+    {name:'Electricity',    delta:-26340, dir:-1},
+    {name:'Water',          delta:-157008,dir:-1},
+  ];
+
+  const labels = items.map(r => r.name);
+  const vals   = items.map(r => cv(r.delta));
+  const colors = vals.map(v => v > 0 ? 'rgba(192,64,64,0.75)' : 'rgba(42,157,138,0.75)');
+
+  CH['chartWaterfall'] = new Chart(el, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Change 2023→2025',
+        data: vals,
+        backgroundColor: colors,
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {display: false},
+        tooltip: {
+          backgroundColor: '#1a2540',
+          callbacks: {
+            label: c => {
+              const sign = c.raw >= 0 ? '+' : '';
+              return ' ' + sign + fmt(Math.abs(c.raw)) + (c.raw >= 0 ? ' INCREASE' : ' DECREASE');
+            }
+          }
+        }
+      },
+      scales: {
+        x: {grid:{color:GC}, ticks:{color:TC, font:{size:9}}},
+        y: {
+          grid:{color:GC},
+          ticks:{color:TC, font:{size:9}, callback: v => {
+            const s = '$';
+            const a = Math.abs(v);
+            if (a >= 1000000) return (v<0?'-':'')+s+(a/1000000).toFixed(1)+'M';
+            if (a >= 1000) return (v<0?'-':'')+s+(a/1000).toFixed(0)+'K';
+            return s+v;
+          }}
+        }
+      }
+    }
+  });
+}
+
+// ── INIT ──
+updateDOM();
+buildTable('');
+buildWaterfall();
+// Build first tab after paint so canvas dimensions are ready
+requestAnimationFrame(() => buildChartsForTab('totals'));
+</script>
+</body>
+</html>

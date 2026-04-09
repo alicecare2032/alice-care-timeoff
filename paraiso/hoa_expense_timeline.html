@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Paraiso Residences — Expense Timeline</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f4f0;--surface:#fff;--surf2:#f9f8f5;--border:#e2dfd6;--border2:#ccc9be;
+  --navy:#1a2540;--text:#1a2540;--text2:#566070;--text3:#9aa4b4;
+  --gold:#a87820;--gold-lt:#c89840;--gold-dk:#8a6010;--gold-bg:rgba(168,120,32,.08);--gold-bd:rgba(168,120,32,.22);
+  --teal:#2a9d8a;--sky:#2c6db0;--rose:#c04040;
+  --grad:linear-gradient(135deg,#a87820,#c89840,#8a6010);
+  --sh:0 2px 16px rgba(26,37,64,.07);--sh2:0 4px 28px rgba(26,37,64,.12);
+  --font-serif:'Playfair Display',serif;--font-sans:'IBM Plex Sans',sans-serif;--font-mono:'IBM Plex Mono',monospace;
+  --sidebar:260px;--r:8px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-size:14px;min-height:100vh;}
+
+/* NAV */
+.top-nav{background:var(--navy);padding:0 32px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:300;box-shadow:0 2px 12px rgba(0,0,0,.18);}
+.nav-brand{display:flex;align-items:center;gap:12px;}
+.nav-logo{width:30px;height:30px;border:1.5px solid rgba(200,152,64,.7);border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:var(--font-serif);font-size:13px;color:var(--gold-lt);font-weight:700;}
+.nav-name{font-family:var(--font-serif);font-size:15px;color:#fff;}
+.nav-name em{color:var(--gold-lt);font-style:normal;}
+.nav-links{display:flex;gap:4px;}
+.nav-link{display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:6px;font-family:var(--font-mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.5);text-decoration:none;transition:all .2s;border:1px solid transparent;}
+.nav-link:hover{color:rgba(255,255,255,.9);background:rgba(255,255,255,.06);}
+.nav-link.active{color:var(--gold-lt);background:rgba(200,152,64,.12);border-color:rgba(200,152,64,.3);}
+
+/* HEADER */
+.page-header{background:var(--navy);padding:32px 32px 28px;position:relative;}
+.page-header::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad);}
+.header-inner{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;}
+.header-eyebrow{font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:var(--gold-lt);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:10px;}
+.header-eyebrow::before{content:'';width:20px;height:1px;background:var(--gold-lt);}
+.header h1{font-family:var(--font-serif);font-size:26px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:6px;}
+.header h1 em{font-style:italic;color:var(--gold-lt);}
+.header-sub{font-family:var(--font-mono);font-size:10px;color:rgba(255,255,255,.3);letter-spacing:1px;}
+.curr-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:5px;}
+.curr-lbl{font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:rgba(255,255,255,.3);text-transform:uppercase;}
+.curr-toggle{display:flex;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.12);border-radius:6px;overflow:hidden;position:relative;padding:3px;}
+.toggle-pill{position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 6px);background:var(--grad);border-radius:4px;transition:transform .25s cubic-bezier(.34,1.56,.64,1);}
+.toggle-pill.usd{transform:translateX(calc(100% + 6px));}
+.curr-toggle button{position:relative;z-index:1;background:none;border:none;padding:7px 20px;cursor:pointer;font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:2px;transition:color .2s;color:rgba(255,255,255,.4);}
+.curr-toggle button.active{color:var(--navy);font-weight:700;}
+.rate-note{font-family:var(--font-mono);font-size:8px;color:rgba(255,255,255,.25);}
+
+/* CONTROLS BAR */
+.controls-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 32px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;box-shadow:var(--sh);position:sticky;top:54px;z-index:200;}
+.ctrl-group{display:flex;align-items:center;gap:6px;}
+.ctrl-label{font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;white-space:nowrap;}
+.ctrl-sep{width:1px;height:24px;background:var(--border);margin:0 4px;}
+.tab-pill{background:none;border:1px solid var(--border2);border-radius:5px;padding:5px 12px;cursor:pointer;font-family:var(--font-mono);font-size:10px;color:var(--text2);transition:all .18s;white-space:nowrap;}
+.tab-pill:hover{border-color:var(--gold);color:var(--gold-dk);}
+.tab-pill.active{background:var(--gold-bg);border-color:var(--gold-bd);color:var(--gold-dk);font-weight:600;}
+.ctrl-info{margin-left:auto;font-family:var(--font-mono);font-size:10px;color:var(--text3);}
+.view-toggle{display:flex;gap:4px;margin-left:auto;}
+
+/* LAYOUT */
+.layout{display:flex;height:calc(100vh - 54px - 60px - 54px);min-height:500px;}
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.sidebar-head{padding:14px 16px 10px;border-bottom:1px solid var(--border);background:var(--surf2);}
+.sidebar-title{font-family:var(--font-mono);font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;margin-bottom:10px;}
+.sidebar-actions{display:flex;gap:6px;}
+.sb-btn{background:none;border:1px solid var(--border2);border-radius:4px;padding:4px 10px;cursor:pointer;font-family:var(--font-mono);font-size:9px;color:var(--text2);transition:all .15s;}
+.sb-btn:hover{border-color:var(--gold);color:var(--gold-dk);}
+.cat-filter{display:flex;gap:4px;flex-wrap:wrap;padding:10px 16px;border-bottom:1px solid var(--border);}
+.cat-btn{padding:3px 8px;border-radius:3px;border:1px solid;font-family:var(--font-mono);font-size:8px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:opacity .15s;font-weight:600;}
+.cat-btn:hover{opacity:.7;}
+.cat-a{background:rgba(44,109,176,.1);color:var(--sky);border-color:rgba(44,109,176,.25);}
+.cat-o{background:rgba(168,120,32,.1);color:var(--gold-dk);border-color:rgba(168,120,32,.25);}
+.cat-s{background:rgba(42,157,138,.1);color:var(--teal);border-color:rgba(42,157,138,.25);}
+.cat-m{background:rgba(120,60,180,.1);color:#7830b0;border-color:rgba(120,60,180,.25);}
+.expense-list{flex:1;overflow-y:auto;padding:8px 0;}
+.expense-item{display:flex;align-items:center;gap:9px;padding:6px 16px;cursor:pointer;transition:background .12s;user-select:none;}
+.expense-item:hover{background:var(--surf2);}
+.exp-swatch{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+.exp-name{font-family:var(--font-sans);font-size:11px;color:var(--text2);flex:1;line-height:1.3;}
+.exp-cat{font-family:var(--font-mono);font-size:8px;color:var(--text3);}
+.exp-check{width:14px;height:14px;border:1.5px solid var(--border2);border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.exp-check.on{background:var(--navy);border-color:var(--navy);}
+.exp-check.on::after{content:'';width:5px;height:3px;border-left:1.5px solid #fff;border-bottom:1.5px solid #fff;transform:rotate(-45deg) translate(1px,-1px);}
+.exp-total{font-family:var(--font-mono);font-size:9px;color:var(--text3);text-align:right;}
+
+/* CHART AREA */
+.chart-area{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
+.chart-wrap{flex:1;padding:20px 24px 12px;position:relative;}
+.chart-canvas-wrap{position:relative;width:100%;height:100%;}
+.hover-info{position:absolute;top:12px;right:12px;background:var(--navy);border-radius:var(--r);padding:14px 18px;min-width:180px;max-width:260px;box-shadow:var(--sh2);opacity:0;pointer-events:none;transition:opacity .2s;}
+.hover-info.visible{opacity:1;}
+.hover-date{font-family:var(--font-mono);font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.4);text-transform:uppercase;margin-bottom:10px;}
+.hover-rows{display:flex;flex-direction:column;gap:5px;max-height:260px;overflow-y:auto;}
+.hover-row{display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:10px;}
+.hover-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+.hover-name{color:rgba(255,255,255,.6);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hover-val{color:#fff;font-weight:500;}
+.chart-footer{padding:8px 24px 16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface);}
+.chart-note{font-family:var(--font-mono);font-size:9px;color:var(--text3);}
+.legend-summary{font-family:var(--font-mono);font-size:10px;color:var(--text2);}
+
+/* SCROLLBAR */
+.expense-list::-webkit-scrollbar{width:4px;}
+.expense-list::-webkit-scrollbar-track{background:transparent;}
+.expense-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+@media(max-width:900px){
+  .sidebar{display:none;}
+  .layout{height:auto;}
+  .chart-wrap{height:420px;}
+}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="nav-brand">
+    <div class="nav-logo">TP</div>
+    <div class="nav-name">The <em>Paraiso</em> Residences</div>
+  </div>
+  <div class="nav-links">
+    <a href="hoa_payment_schedule.html" class="nav-link">
+      <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="3" width="14" height="11" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5 1v4M11 1v4M1 7h14"/></svg>
+      Payment Schedule
+    </a>
+    <a href="hoa_forensic_dashboard.html" class="nav-link">
+      <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M1 12l4-5 3 3 4-6 3 4v4H1z" opacity=".7"/><path d="M0 2h16v1H0z"/></svg>
+      Expense Analysis
+    </a>
+    <a href="hoa_expense_timeline.html" class="nav-link active">
+      <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M1 13 C4 9 6 11 8 7 C10 3 12 5 15 2" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      Expense Timeline
+    </a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="header-inner">
+    <div>
+      <div class="header-eyebrow">Interactive Timeline &middot; All Categories</div>
+      <h1>HOA Expense <em>Timeline</em></h1>
+      <div class="header-sub">28 EXPENSE CATEGORIES &nbsp;&middot;&nbsp; 2023 &ndash; 2025 &nbsp;&middot;&nbsp; MONTHLY AVERAGE VIEW</div>
+    </div>
+    <div class="curr-wrap">
+      <div class="curr-lbl">Currency</div>
+      <div class="curr-toggle">
+        <div class="toggle-pill usd" id="togglePill"></div>
+        <button id="btnMXN" onclick="setCurrency('MXN')">MXN</button>
+        <button id="btnUSD" class="active" onclick="setCurrency('USD')">USD</button>
+      </div>
+      <div class="rate-note">Rate: 1 USD = 17.46 MXN &nbsp;&middot;&nbsp; Apr 9, 2026</div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTROLS BAR -->
+<div class="controls-bar">
+  <span class="ctrl-label">Time Range</span>
+  <div class="ctrl-group" id="yearBtns">
+    <button class="tab-pill active" onclick="setYear('all',this)">All Years</button>
+    <button class="tab-pill" onclick="setYear('2023',this)">2023</button>
+    <button class="tab-pill" onclick="setYear('2024',this)">2024</button>
+    <button class="tab-pill" onclick="setYear('2025',this)">2025</button>
+  </div>
+  <div class="ctrl-sep"></div>
+  <span class="ctrl-label">Quarter</span>
+  <div class="ctrl-group" id="qtrBtns">
+    <button class="tab-pill active" onclick="setQuarter('all',this)">All</button>
+    <button class="tab-pill" onclick="setQuarter('Q1',this)">Q1</button>
+    <button class="tab-pill" onclick="setQuarter('Q2',this)">Q2</button>
+    <button class="tab-pill" onclick="setQuarter('Q3',this)">Q3</button>
+    <button class="tab-pill" onclick="setQuarter('Q4',this)">Q4</button>
+  </div>
+  <div class="ctrl-sep"></div>
+  <span class="ctrl-label">Month</span>
+  <div class="ctrl-group" id="moBtns">
+    <button class="tab-pill active" onclick="setMonth('all',this)" style="font-size:9px">All</button>
+    <button class="tab-pill" onclick="setMonth(0,this)" style="font-size:9px">Jan</button>
+    <button class="tab-pill" onclick="setMonth(1,this)" style="font-size:9px">Feb</button>
+    <button class="tab-pill" onclick="setMonth(2,this)" style="font-size:9px">Mar</button>
+    <button class="tab-pill" onclick="setMonth(3,this)" style="font-size:9px">Apr</button>
+    <button class="tab-pill" onclick="setMonth(4,this)" style="font-size:9px">May</button>
+    <button class="tab-pill" onclick="setMonth(5,this)" style="font-size:9px">Jun</button>
+    <button class="tab-pill" onclick="setMonth(6,this)" style="font-size:9px">Jul</button>
+    <button class="tab-pill" onclick="setMonth(7,this)" style="font-size:9px">Aug</button>
+    <button class="tab-pill" onclick="setMonth(8,this)" style="font-size:9px">Sep</button>
+    <button class="tab-pill" onclick="setMonth(9,this)" style="font-size:9px">Oct</button>
+    <button class="tab-pill" onclick="setMonth(10,this)" style="font-size:9px">Nov</button>
+    <button class="tab-pill" onclick="setMonth(11,this)" style="font-size:9px">Dec</button>
+  </div>
+  <span class="ctrl-info" id="ctrlInfo">36 months &nbsp;&middot;&nbsp; 28 categories</span>
+</div>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-head">
+      <div class="sidebar-title">Expense Categories</div>
+      <div class="sidebar-actions">
+        <button class="sb-btn" onclick="selectAll(true)">All</button>
+        <button class="sb-btn" onclick="selectAll(false)">None</button>
+        <button class="sb-btn" onclick="selectTop5()">Top 5</button>
+      </div>
+    </div>
+    <div class="cat-filter">
+      <button class="cat-btn cat-a" onclick="selectCat('A')">A Admin</button>
+      <button class="cat-btn cat-o" onclick="selectCat('O')">O Ops</button>
+      <button class="cat-btn cat-s" onclick="selectCat('S')">S Svc</button>
+      <button class="cat-btn cat-m" onclick="selectCat('M')">M Maint</button>
+    </div>
+    <div class="expense-list" id="expenseList"></div>
+  </div>
+
+  <!-- CHART -->
+  <div class="chart-area">
+    <div class="chart-wrap">
+      <div class="chart-canvas-wrap">
+        <canvas id="mainChart"></canvas>
+        <div class="hover-info" id="hoverInfo">
+          <div class="hover-date" id="hoverDate"></div>
+          <div class="hover-rows" id="hoverRows"></div>
+        </div>
+      </div>
+    </div>
+    <div class="chart-footer">
+      <div class="chart-note">Monthly values = annual total / 12 &nbsp;&middot;&nbsp; Hover chart for details &nbsp;&middot;&nbsp; Year boundaries shown as vertical markers</div>
+      <div class="legend-summary" id="legendSummary"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── CONSTANTS ──
+const RATE = 17.46;
+let CUR = 'USD';
+const cv = v => CUR === 'USD' ? v / RATE : v;
+function fmt(v) {
+  const a = Math.abs(v);
+  if (a >= 1000000) return (CUR==='USD'?'$':'$') + (v/1000000).toFixed(2) + 'M';
+  if (a >= 1000) return (CUR==='USD'?'$':'$') + (v/1000).toFixed(0) + 'K';
+  return '$' + v.toFixed(0);
+}
+
+// ── COLORS - 28 distinct ──
+const COLORS = [
+  '#2563eb','#d97706','#059669','#7c3aed','#dc2626',
+  '#0891b2','#65a30d','#db2777','#f59e0b','#0f766e',
+  '#6366f1','#ef4444','#4ade80','#8b5cf6','#06b6d4',
+  '#f97316','#14b8a6','#a855f7','#ca8a04','#22c55e',
+  '#3b82f6','#ec4899','#78716c','#0d9488','#b45309',
+  '#4f46e5','#be185d','#15803d'
+];
+
+// ── EXPENSE DATA ──
+const ROWS = [
+  {cat:'A',name:'Insurance Policy',         a23:1090047.12,a24:1114123.36,a25:1292441.63},
+  {cat:'A',name:'Rent Office',              a23:493120.90, a24:506681.04, a25:532847.38},
+  {cat:'A',name:'Training',                 a23:0,         a24:10529.00,  a25:6960.00},
+  {cat:'A',name:'Office Supplies',          a23:38925.30,  a24:61503.62,  a25:76349.02},
+  {cat:'A',name:'Print Equipment Rental',   a23:20660.99,  a24:24132.44,  a25:21222.50},
+  {cat:'A',name:'Bank Commissions',         a23:116459.89, a24:141486.83, a25:146001.84},
+  {cat:'A',name:'Contpaq Technical Support',a23:19243.82,  a24:11644.08,  a25:33642.02},
+  {cat:'O',name:'Uniforms',                 a23:59073.75,  a24:51007.19,  a25:64106.14},
+  {cat:'O',name:'Payroll (Nomina)',          a23:4172231.74,a24:4215963.78,a25:4655141.55},
+  {cat:'O',name:'Year-End Expenses',        a23:25975.40,  a24:20819.32,  a25:22155.50},
+  {cat:'O',name:'Staff Meals',              a23:232690.05, a24:262823.20, a25:323732.70},
+  {cat:'O',name:'Licenses & Permits',       a23:7500.00,   a24:23200.00,  a25:3105.00},
+  {cat:'O',name:'Notarial Expenses',        a23:0,         a24:0,         a25:0},
+  {cat:'O',name:'Electricity',              a23:368918.00, a24:269800.97, a25:342578.00},
+  {cat:'O',name:'Water Consumption',        a23:493394.40, a24:401940.00, a25:336386.82},
+  {cat:'O',name:'Telephone',                a23:34614.00,  a24:32014.00,  a25:32764.00},
+  {cat:'O',name:'Cleaning Supplies',        a23:36390.34,  a24:34169.86,  a25:36070.44},
+  {cat:'O',name:'Other Expenses (Otros Egresos)',a23:345845.19,a24:584922.21,a25:286246.03},
+  {cat:'O',name:'Hurricane Season Groceries',a23:6212.51,  a24:3868.37,   a25:5113.12},
+  {cat:'O',name:'Capital Contribution Recovery',a23:0,     a24:0,         a25:75977.50},
+  {cat:'S',name:'Garbage Collection',       a23:67369.00,  a24:75735.00,  a25:75735.00},
+  {cat:'S',name:'Elevator Maintenance',     a23:183223.10, a24:119698.99, a25:218706.54},
+  {cat:'S',name:'Fumigation',               a23:150336.00, a24:157852.80, a25:175939.52},
+  {cat:'S',name:'Garden / Landscaping',     a23:288425.39, a24:270836.20, a25:289990.72},
+  {cat:'M',name:'Maintenance Services & Parts',a23:81193.97,a24:94717.66, a25:123277.70},
+  {cat:'M',name:'Minor Hand Tools',         a23:9333.00,   a24:13130.00,  a25:4394.41},
+  {cat:'M',name:'Lobby Doors Maintenance',  a23:6960.00,   a24:0,         a25:0},
+  {cat:'M',name:'Fountain Maintenance',     a23:0,         a24:5240.94,   a25:0},
+];
+
+// ── TIME AXIS ──
+// 36 monthly data points: Jan 2023 to Dec 2025
+// Value at each month = annual total / 12 for that year
+// Smooth interpolation: linear blend between year-boundary values
+const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const YRS = ['23','24','25'];
+
+// Generate all 36 labels and meta
+const ALL_LABELS = [];
+const ALL_META = []; // {year: 0|1|2, month: 0-11, quarter: 0-3}
+for (let y = 0; y < 3; y++) {
+  for (let m = 0; m < 12; m++) {
+    ALL_LABELS.push(MONTH_NAMES[m] + " '" + YRS[y]);
+    ALL_META.push({year: y, month: m, quarter: Math.floor(m / 3)});
+  }
+}
+
+// Generate monthly values per row using smooth interpolation
+// Strategy: within a year, interpolate from (prev_year_end) to (next_year_start)
+// Mid-year anchor = annual/12. Smooth between adjacent year midpoints.
+function genMonthly(row) {
+  const annuals = [row.a23, row.a24, row.a25];
+  const monthly = annuals.map(a => a / 12);
+  const pts = [];
+  for (let y = 0; y < 3; y++) {
+    for (let m = 0; m < 12; m++) {
+      const idx = y * 12 + m;
+      // Smooth transition: interpolate toward next year in last 2 months
+      if (m >= 10 && y < 2) {
+        const t = (m - 10) / 2; // 0 at m=10, 1 at m=12
+        pts.push(monthly[y] * (1 - t * 0.5) + monthly[y + 1] * (t * 0.5));
+      } else if (m <= 1 && y > 0) {
+        const t = (2 - m) / 2;
+        pts.push(monthly[y] * (1 - t * 0.5) + monthly[y - 1] * (t * 0.5));
+      } else {
+        pts.push(monthly[y]);
+      }
+    }
+  }
+  return pts;
+}
+
+// Pre-compute all monthly data
+const ALL_MONTHLY = ROWS.map(r => genMonthly(r));
+
+// ── FILTER STATE ──
+let selectedYear = 'all';
+let selectedQuarter = 'all';
+let selectedMonth = 'all';
+let visibleRows = new Set(ROWS.map((_, i) => i));
+
+// Compute visible time indices based on filters
+function getVisibleIndices() {
+  return ALL_META.map((m, i) => ({i, ...m})).filter(pt => {
+    if (selectedYear !== 'all' && pt.year !== parseInt(selectedYear) - 2023) return false;
+    if (selectedQuarter !== 'all') {
+      const qMap = {Q1:0,Q2:1,Q3:2,Q4:3};
+      if (pt.quarter !== qMap[selectedQuarter]) return false;
+    }
+    if (selectedMonth !== 'all' && pt.month !== selectedMonth) return false;
+    return true;
+  });
+}
+
+// ── CHART ──
+let chart = null;
+
+function buildChart() {
+  const vis = getVisibleIndices();
+  const labels = vis.map(pt => ALL_LABELS[pt.i]);
+  const datasets = [];
+
+  ROWS.forEach((row, ri) => {
+    if (!visibleRows.has(ri)) return;
+    const data = vis.map(pt => cv(ALL_MONTHLY[ri][pt.i]));
+    const color = COLORS[ri];
+    datasets.push({
+      label: row.name,
+      data,
+      borderColor: color,
+      backgroundColor: color + '12',
+      borderWidth: 1.8,
+      pointRadius: vis.length <= 12 ? 4 : 0,
+      pointHoverRadius: 5,
+      pointBackgroundColor: color,
+      tension: 0.38,
+      fill: false,
+      _rowIdx: ri,
+    });
+  });
+
+  if (chart) { chart.destroy(); chart = null; }
+
+  const ctx = document.getElementById('mainChart');
+  chart = new Chart(ctx, {
+    type: 'line',
+    data: {labels, datasets},
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {mode: 'index', intersect: false},
+      animation: {duration: 280},
+      plugins: {
+        legend: {display: false},
+        tooltip: {
+          enabled: false,
+          external: externalTooltip,
+        },
+      },
+      scales: {
+        x: {
+          grid: {color: '#e8e4da', drawBorder: false},
+          ticks: {
+            color: '#9aa4b4',
+            font: {family: "'IBM Plex Mono'", size: 9},
+            maxRotation: 45,
+            autoSkip: true,
+            maxTicksLimit: 24,
+          }
+        },
+        y: {
+          grid: {color: '#e8e4da', drawBorder: false},
+          ticks: {
+            color: '#9aa4b4',
+            font: {family: "'IBM Plex Mono'", size: 9},
+            callback: v => {
+              const s = CUR === 'USD' ? '$' : '$';
+              if (Math.abs(v) >= 1000000) return s + (v/1000000).toFixed(1) + 'M';
+              if (Math.abs(v) >= 1000) return s + (v/1000).toFixed(0) + 'K';
+              return s + v.toFixed(0);
+            }
+          },
+          beginAtZero: true,
+        }
+      }
+    }
+  });
+
+  // Update info
+  const activeCount = [...visibleRows].length;
+  document.getElementById('ctrlInfo').textContent = `${vis.length} months · ${activeCount} categories`;
+  updateLegendSummary(activeCount);
+}
+
+// ── EXTERNAL TOOLTIP ──
+function externalTooltip(ctx) {
+  const {chart, tooltip} = ctx;
+  const info = document.getElementById('hoverInfo');
+  const dateEl = document.getElementById('hoverDate');
+  const rowsEl = document.getElementById('hoverRows');
+
+  if (tooltip.opacity === 0) { info.classList.remove('visible'); return; }
+  info.classList.add('visible');
+  dateEl.textContent = tooltip.title?.[0] || '';
+
+  const items = tooltip.dataPoints
+    .slice()
+    .sort((a, b) => b.raw - a.raw)
+    .slice(0, 10);
+
+  rowsEl.innerHTML = items.map(pt => {
+    const color = pt.dataset.borderColor;
+    const name = pt.dataset.label;
+    const val = CUR === 'USD' ? fmt(pt.raw) : fmt(pt.raw);
+    return `<div class="hover-row">
+      <div class="hover-dot" style="background:${color}"></div>
+      <div class="hover-name" title="${name}">${name}</div>
+      <div class="hover-val">${val}/mo</div>
+    </div>`;
+  }).join('');
+
+  if (items.length < tooltip.dataPoints.length) {
+    rowsEl.innerHTML += `<div style="font-family:var(--font-mono);font-size:9px;color:rgba(255,255,255,.3);margin-top:6px">+${tooltip.dataPoints.length - items.length} more</div>`;
+  }
+}
+
+// ── SIDEBAR ──
+function buildSidebar() {
+  const list = document.getElementById('expenseList');
+  list.innerHTML = '';
+  const catColors = {A:'#2c6db0',O:'#a87820',S:'#2a9d8a',M:'#7830b0'};
+
+  ROWS.forEach((row, i) => {
+    const on = visibleRows.has(i);
+    const total3yr = row.a23 + row.a24 + row.a25;
+    const div = document.createElement('div');
+    div.className = 'expense-item';
+    div.innerHTML = `
+      <div class="exp-check ${on ? 'on' : ''}" id="chk${i}"></div>
+      <div class="exp-swatch" style="background:${COLORS[i]}"></div>
+      <div style="flex:1;min-width:0">
+        <div class="exp-name">${row.name}</div>
+        <div class="exp-total">${CUR==='USD'?'$'+(total3yr/RATE/1000).toFixed(0)+'K USD':'$'+(total3yr/1000).toFixed(0)+'K MXN'} &middot; 3yr</div>
+      </div>
+      <div class="exp-cat" style="color:${catColors[row.cat]}">${row.cat}</div>
+    `;
+    div.onclick = () => toggleRow(i);
+    list.appendChild(div);
+  });
+}
+
+function toggleRow(i) {
+  if (visibleRows.has(i)) { visibleRows.delete(i); }
+  else { visibleRows.add(i); }
+  document.getElementById(`chk${i}`).className = 'exp-check ' + (visibleRows.has(i) ? 'on' : '');
+  buildChart();
+}
+
+function selectAll(on) {
+  ROWS.forEach((_, i) => { if (on) visibleRows.add(i); else visibleRows.delete(i); });
+  buildSidebar();
+  buildChart();
+}
+
+function selectCat(cat) {
+  visibleRows.clear();
+  ROWS.forEach((r, i) => { if (r.cat === cat) visibleRows.add(i); });
+  buildSidebar();
+  buildChart();
+}
+
+function selectTop5() {
+  const ranked = ROWS.map((r, i) => ({i, total: r.a23+r.a24+r.a25})).sort((a,b) => b.total - a.total);
+  visibleRows.clear();
+  ranked.slice(0, 5).forEach(r => visibleRows.add(r.i));
+  buildSidebar();
+  buildChart();
+}
+
+// ── FILTERS ──
+function resetBtns(groupId) {
+  document.querySelectorAll(`#${groupId} .tab-pill`).forEach(b => b.classList.remove('active'));
+}
+
+function setYear(yr, btn) {
+  resetBtns('yearBtns'); btn.classList.add('active');
+  selectedYear = yr;
+  // Reset quarter and month when year changes
+  selectedQuarter = 'all'; selectedMonth = 'all';
+  document.querySelectorAll('#qtrBtns .tab-pill').forEach((b,i) => b.classList.toggle('active', i===0));
+  document.querySelectorAll('#moBtns .tab-pill').forEach((b,i) => b.classList.toggle('active', i===0));
+  buildChart();
+}
+
+function setQuarter(qtr, btn) {
+  resetBtns('qtrBtns'); btn.classList.add('active');
+  selectedQuarter = qtr;
+  selectedMonth = 'all';
+  document.querySelectorAll('#moBtns .tab-pill').forEach((b,i) => b.classList.toggle('active', i===0));
+  buildChart();
+}
+
+function setMonth(mo, btn) {
+  resetBtns('moBtns'); btn.classList.add('active');
+  selectedMonth = mo;
+  if (mo !== 'all') {
+    selectedQuarter = 'all';
+    document.querySelectorAll('#qtrBtns .tab-pill').forEach((b,i) => b.classList.toggle('active', i===0));
+  }
+  buildChart();
+}
+
+// ── CURRENCY ──
+function setCurrency(cur) {
+  if (CUR === cur) return;
+  CUR = cur;
+  document.getElementById('btnMXN').classList.toggle('active', cur==='MXN');
+  document.getElementById('btnUSD').classList.toggle('active', cur==='USD');
+  document.getElementById('togglePill').classList.toggle('usd', cur==='USD');
+  buildSidebar();
+  buildChart();
+}
+
+function updateLegendSummary(n) {
+  const total = [...visibleRows].reduce((s, i) => {
+    const r = ROWS[i];
+    return s + r.a23 + r.a24 + r.a25;
+  }, 0);
+  document.getElementById('legendSummary').textContent =
+    n + ' categories · 3yr total: ' + (CUR==='USD'?'USD $'+(total/RATE/1000000).toFixed(2)+'M':'$'+(total/1000000).toFixed(2)+'M MXN');
+}
+
+// ── INIT ──
+// Start with top 8 visible (less clutter)
+const top8 = ROWS.map((r,i)=>({i,t:r.a23+r.a24+r.a25})).sort((a,b)=>b.t-a.t).slice(0,8).map(r=>r.i);
+visibleRows = new Set(top8);
+buildSidebar();
+buildChart();
+</script>
+</body>
+</html>

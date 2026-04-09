@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Paraiso Residences - Owner Payment Schedule</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f4f0;--surface:#fff;--surf2:#f9f8f5;--border:#e2dfd6;--border2:#ccc9be;
+  --navy:#1a2540;--navy2:#2d3f60;--text:#1a2540;--text2:#566070;--text3:#9aa4b4;
+  --gold:#a87820;--gold-lt:#c89840;--gold-dk:#8a6010;--gold-bg:rgba(168,120,32,.08);--gold-bd:rgba(168,120,32,.22);
+  --teal:#2a9d8a;--teal-bg:rgba(42,157,138,.08);--teal-bd:rgba(42,157,138,.22);
+  --sky:#2c6db0;--sky-bg:rgba(44,109,176,.08);--sky-bd:rgba(44,109,176,.22);
+  --rose:#c04040;--rose-bg:rgba(192,64,64,.08);
+  --grad:linear-gradient(135deg,#a87820,#c89840,#8a6010);
+  --sh:0 2px 16px rgba(26,37,64,.07);--sh2:0 4px 24px rgba(26,37,64,.12);
+  --font-serif:'Playfair Display',serif;--font-sans:'IBM Plex Sans',sans-serif;--font-mono:'IBM Plex Mono',monospace;
+  --r:8px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-size:14px;line-height:1.6;}
+
+/* NAV */
+.top-nav{background:var(--navy);padding:0 48px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.18);}
+.nav-brand{display:flex;align-items:center;gap:12px;}
+.nav-logo{width:30px;height:30px;border:1.5px solid rgba(200,152,64,.7);border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:var(--font-serif);font-size:13px;color:var(--gold-lt);font-weight:700;}
+.nav-name{font-family:var(--font-serif);font-size:15px;color:#fff;}
+.nav-name em{color:var(--gold-lt);font-style:normal;}
+.nav-links{display:flex;gap:4px;}
+.nav-link{display:flex;align-items:center;gap:7px;padding:8px 16px;border-radius:6px;font-family:var(--font-mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.5);text-decoration:none;transition:all .2s;border:1px solid transparent;}
+.nav-link:hover{color:rgba(255,255,255,.9);background:rgba(255,255,255,.06);}
+.nav-link.active{color:var(--gold-lt);background:rgba(200,152,64,.12);border-color:rgba(200,152,64,.3);}
+
+/* HERO */
+.hero{background:var(--navy);padding:56px 48px 48px;position:relative;overflow:hidden;}
+.hero::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad);}
+.hero-inner{max-width:1360px;margin:0 auto;display:grid;grid-template-columns:1fr auto;gap:48px;align-items:center;}
+.hero-tag{font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:var(--gold-lt);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.hero-tag::before{content:'';width:24px;height:1px;background:var(--gold-lt);}
+.hero h1{font-family:var(--font-serif);font-size:38px;font-weight:700;color:#fff;line-height:1.15;margin-bottom:10px;}
+.hero h1 em{font-style:italic;color:var(--gold-lt);}
+.hero-sub{font-family:var(--font-mono);font-size:11px;color:rgba(255,255,255,.35);letter-spacing:1px;margin-bottom:22px;}
+.hero-pills{display:flex;gap:8px;flex-wrap:wrap;}
+.pill{padding:5px 14px;border-radius:20px;font-family:var(--font-mono);font-size:9px;letter-spacing:1px;border:1px solid;}
+.pill-gold{border-color:rgba(200,152,64,.4);color:var(--gold-lt);background:rgba(200,152,64,.1);}
+.pill-teal{border-color:rgba(42,157,138,.4);color:#4dc4b0;background:rgba(42,157,138,.1);}
+.pill-sky{border-color:rgba(80,144,216,.4);color:#80b8ff;background:rgba(80,144,216,.1);}
+.hero-stats{display:flex;flex-direction:column;gap:12px;min-width:280px;}
+.hero-stat{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--r);padding:16px 20px;position:relative;overflow:hidden;}
+.hero-stat::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--grad);}
+.hero-stat-lbl{font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:rgba(255,255,255,.3);text-transform:uppercase;margin-bottom:4px;}
+.hero-stat-val{font-family:var(--font-mono);font-size:20px;font-weight:500;color:var(--gold-lt);}
+.hero-stat-note{font-family:var(--font-mono);font-size:9px;color:rgba(255,255,255,.25);margin-top:2px;}
+
+/* MAIN */
+.main{padding:44px 48px;max-width:1360px;margin:0 auto;}
+.sec-gap{margin-bottom:52px;}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;}
+.sec-title{font-family:var(--font-serif);font-size:22px;font-weight:600;color:var(--navy);}
+.sec-count{font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;}
+.sec-desc{font-size:12px;color:var(--text2);margin-bottom:22px;}
+
+/* KPI */
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:52px;}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px;box-shadow:var(--sh);position:relative;overflow:hidden;transition:box-shadow .2s,transform .2s;}
+.kpi:hover{box-shadow:var(--sh2);transform:translateY(-1px);}
+.kpi-top{position:absolute;top:0;left:0;right:0;height:3px;}
+.kpi-top.gold{background:var(--grad);}
+.kpi-top.teal{background:linear-gradient(90deg,#2a9d8a,#60c4b0);}
+.kpi-top.sky{background:linear-gradient(90deg,#2c6db0,#5090d8);}
+.kpi-top.sand{background:linear-gradient(90deg,#c0a060,#e0c080);}
+.kpi-lbl{font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;margin-bottom:8px;}
+.kpi-val{font-family:var(--font-mono);font-size:21px;font-weight:500;color:var(--navy);margin-bottom:2px;}
+.kpi-note{font-family:var(--font-mono);font-size:9px;color:var(--text2);}
+
+/* BRIDGE */
+.bridge{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;margin-bottom:52px;}
+.bridge-header{background:var(--navy);padding:20px 28px;display:flex;align-items:center;gap:14px;}
+.bridge-icon{width:36px;height:36px;border-radius:6px;background:rgba(200,152,64,.15);border:1px solid rgba(200,152,64,.3);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.bridge-title{font-family:var(--font-serif);font-size:16px;font-weight:600;color:#fff;}
+.bridge-subtitle{font-family:var(--font-mono);font-size:9px;color:rgba(255,255,255,.35);letter-spacing:1px;margin-top:2px;}
+.bridge-body{padding:28px;display:grid;grid-template-columns:1fr 1px 1fr 1px 1fr;align-items:start;}
+.bridge-div{background:var(--border);margin:0 24px;}
+.bridge-col{padding:0 24px;}
+.bridge-col:first-child{padding-left:0;}
+.bridge-col:last-child{padding-right:0;}
+.bridge-col-lbl{font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;margin-bottom:10px;}
+.bridge-col-val{font-family:var(--font-mono);font-size:26px;font-weight:500;margin-bottom:4px;}
+.bridge-col-note{font-family:var(--font-mono);font-size:9px;color:var(--text2);}
+.yr-row{margin-bottom:10px;}
+.yr-lbl{font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-bottom:2px;}
+.yr-val{font-family:var(--font-mono);font-size:18px;font-weight:500;}
+.bridge-alert{margin:0 28px 28px;background:var(--rose-bg);border:1px solid rgba(192,64,64,.2);border-radius:6px;padding:14px 18px;display:flex;align-items:flex-start;gap:12px;}
+.bridge-alert-body{font-size:12px;color:var(--text2);line-height:1.7;}
+.bridge-alert-body strong{color:var(--rose);font-weight:600;}
+.bridge-link{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-family:var(--font-mono);font-size:10px;color:var(--sky);text-decoration:none;letter-spacing:.5px;transition:color .2s;}
+.bridge-link:hover{color:var(--navy);}
+
+/* CHARTS */
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:52px;}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:26px;box-shadow:var(--sh);}
+.chart-title{font-family:var(--font-serif);font-size:15px;font-weight:600;color:var(--navy);margin-bottom:3px;}
+.chart-sub{font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:1px;margin-bottom:18px;text-transform:uppercase;}
+
+/* TIERS */
+.tier-row{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:52px;}
+.tier-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:28px;box-shadow:var(--sh);position:relative;overflow:hidden;transition:box-shadow .2s,transform .2s;}
+.tier-card:hover{box-shadow:var(--sh2);transform:translateY(-2px);}
+.tier-card.premium{border-top:3px solid var(--gold);}
+.tier-card.standard{border-top:3px solid var(--sky);}
+.tier-card.value{border-top:3px solid var(--teal);}
+.tier-badge{display:inline-block;padding:3px 10px;border-radius:3px;font-family:var(--font-mono);font-size:8px;letter-spacing:2px;text-transform:uppercase;font-weight:600;margin-bottom:16px;}
+.premium .tier-badge{background:var(--gold-bg);color:var(--gold-dk);border:1px solid var(--gold-bd);}
+.standard .tier-badge{background:var(--sky-bg);color:var(--sky);border:1px solid var(--sky-bd);}
+.value .tier-badge{background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal-bd);}
+.tier-amount{font-family:var(--font-serif);font-size:38px;font-weight:700;line-height:1;margin-bottom:4px;}
+.premium .tier-amount{color:var(--gold-dk);}
+.standard .tier-amount{color:var(--sky);}
+.value .tier-amount{color:var(--teal);}
+.tier-period{font-family:var(--font-mono);font-size:10px;color:var(--text2);margin-bottom:20px;}
+.tier-div{height:1px;background:var(--border);margin-bottom:18px;}
+.tier-row-stat{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:1px solid var(--bg);}
+.tier-stat-lbl{font-family:var(--font-mono);font-size:9px;color:var(--text3);}
+.tier-stat-val{font-family:var(--font-mono);font-size:11px;font-weight:500;color:var(--text);}
+.tier-units{display:flex;flex-wrap:wrap;gap:5px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border);}
+.unit-chip{padding:3px 8px;border-radius:4px;font-family:var(--font-mono);font-size:9px;cursor:pointer;transition:all .15s;border:1px solid;}
+.premium .unit-chip{background:var(--gold-bg);color:var(--gold-dk);border-color:var(--gold-bd);}
+.standard .unit-chip{background:var(--sky-bg);color:var(--sky);border-color:var(--sky-bd);}
+.value .unit-chip{background:var(--teal-bg);color:var(--teal);border-color:var(--teal-bd);}
+.unit-chip:hover{opacity:.65;}
+
+/* CALENDAR */
+.cal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:52px;}
+.cal-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);transition:box-shadow .2s;}
+.cal-card:hover{box-shadow:var(--sh2);}
+.cal-head{background:var(--navy);padding:18px 20px 16px;border-bottom:3px solid var(--gold-lt);}
+.cal-qtr{font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:rgba(255,255,255,.35);text-transform:uppercase;margin-bottom:4px;}
+.cal-month{font-family:var(--font-serif);font-size:24px;font-weight:700;color:#fff;}
+.cal-due{font-family:var(--font-mono);font-size:9px;color:rgba(255,255,255,.35);margin-top:3px;}
+.cal-body{padding:18px 20px;}
+.cal-line{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:10px;}
+.cal-line:last-of-type{border:none;}
+.cal-line-lbl{color:var(--text2);}
+.cal-line-val{color:var(--navy);font-weight:500;}
+.cal-total{margin-top:14px;padding-top:14px;border-top:2px solid var(--border2);display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:13px;font-weight:600;}
+.cal-total-lbl{color:var(--text2);}
+.cal-total-val{color:var(--gold-dk);}
+
+/* FLOORS */
+.floor-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:52px;}
+.floor-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;box-shadow:var(--sh);transition:box-shadow .2s;}
+.floor-card:hover{box-shadow:var(--sh2);}
+.floor-lbl{font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;margin-bottom:6px;}
+.floor-num{font-family:var(--font-serif);font-size:34px;font-weight:700;color:var(--navy);line-height:1;margin-bottom:14px;}
+.floor-bar{display:flex;height:8px;margin-bottom:14px;border-radius:4px;overflow:hidden;gap:3px;}
+.seg-p{background:var(--gold);}
+.seg-s{background:var(--sky);}
+.seg-v{background:var(--teal);}
+.floor-stats{display:flex;flex-direction:column;gap:5px;}
+.floor-stat-row{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:9px;}
+.floor-stat-lbl{color:var(--text3);}
+.floor-stat-val{color:var(--text2);font-weight:500;}
+
+/* TABLE */
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);}
+.table-controls{padding:16px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--surf2);}
+.tbl-search{background:var(--surface);border:1px solid var(--border2);border-radius:5px;padding:7px 14px;font-family:var(--font-mono);font-size:11px;color:var(--text);outline:none;width:180px;transition:border-color .2s;}
+.tbl-search:focus{border-color:var(--gold);}
+.tbl-search::placeholder{color:var(--text3);}
+.filter-btn{background:var(--surface);border:1px solid var(--border2);border-radius:5px;padding:6px 14px;font-family:var(--font-mono);font-size:9px;letter-spacing:1px;color:var(--text2);cursor:pointer;transition:all .18s;}
+.filter-btn:hover{border-color:var(--gold);color:var(--gold-dk);}
+.filter-btn.active{background:var(--gold-bg);border-color:var(--gold-bd);color:var(--gold-dk);font-weight:600;}
+.tbl-info{margin-left:auto;font-family:var(--font-mono);font-size:9px;color:var(--text3);}
+.table-scroll{max-height:560px;overflow-y:auto;overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead{background:var(--navy);position:sticky;top:0;z-index:2;}
+th{padding:10px 16px;text-align:left;font-family:var(--font-mono);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);border-bottom:1px solid rgba(255,255,255,.08);white-space:nowrap;cursor:pointer;user-select:none;transition:color .15s;}
+th:hover{color:rgba(255,255,255,.8);}
+th.sorted{color:var(--gold-lt);}
+th:not(:first-child){text-align:right;}
+tbody tr{border-bottom:1px solid var(--border);transition:background .12s;cursor:pointer;}
+tbody tr:hover{background:var(--surf2);}
+td{padding:10px 16px;font-family:var(--font-mono);font-size:11px;color:var(--text2);white-space:nowrap;}
+td:not(:first-child){text-align:right;}
+.td-unit{font-weight:600;color:var(--navy);font-size:12px;}
+.tier-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:7px;vertical-align:middle;}
+.dot-premium{background:var(--gold);}
+.dot-standard{background:var(--sky);}
+.dot-value{background:var(--teal);}
+.tier-tag{display:inline-block;padding:1px 7px;border-radius:3px;font-size:8px;letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+.tag-premium{background:var(--gold-bg);color:var(--gold-dk);border:1px solid var(--gold-bd);}
+.tag-standard{background:var(--sky-bg);color:var(--sky);border:1px solid var(--sky-bd);}
+.tag-value{background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal-bd);}
+.amt-premium{color:var(--gold-dk)!important;font-weight:600;}
+.amt-standard{color:var(--sky)!important;font-weight:600;}
+.amt-value{color:var(--teal)!important;font-weight:600;}
+.st-pending{display:inline-block;padding:2px 8px;border-radius:10px;font-size:8px;font-weight:600;letter-spacing:1px;background:var(--gold-bg);color:var(--gold-dk);border:1px solid var(--gold-bd);}
+.tfoot-row td{font-weight:600;color:var(--navy)!important;border-top:2px solid var(--border2);background:var(--surf2);font-size:12px;padding:12px 16px;}
+
+/* FOOTER */
+.footer{background:var(--navy);padding:22px 48px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:10px;}
+.footer-txt{font-family:var(--font-mono);font-size:9px;color:rgba(255,255,255,.3);}
+.footer-link{font-family:var(--font-mono);font-size:9px;color:var(--gold-lt);text-decoration:none;}
+.footer-link:hover{color:#fff;}
+
+@media(max-width:1100px){
+  .main,.hero,.footer,.top-nav{padding-left:24px;padding-right:24px;}
+  .kpi-row,.tier-row,.cal-grid,.floor-grid,.chart-grid{grid-template-columns:1fr;}
+  .hero-inner{grid-template-columns:1fr;}
+  .bridge-body{grid-template-columns:1fr;gap:20px;}
+  .bridge-div{display:none;}
+}
+
+/* EXPENSE TIMELINE SECTION */
+.timeline-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;margin-bottom:52px;}
+.timeline-head{background:var(--navy);padding:18px 26px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.tl-title{font-family:var(--font-serif);font-size:16px;font-weight:600;color:#fff;}
+.tl-sub{font-family:var(--font-mono);font-size:9px;color:rgba(255,255,255,.35);letter-spacing:1px;margin-top:2px;}
+.tl-controls{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.tl-pill{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:4px;padding:5px 12px;cursor:pointer;font-family:var(--font-mono);font-size:9px;letter-spacing:1px;color:rgba(255,255,255,.5);transition:all .18s;}
+.tl-pill:hover{color:rgba(255,255,255,.9);border-color:rgba(255,255,255,.35);}
+.tl-pill.active{background:rgba(200,152,64,.2);border-color:rgba(200,152,64,.45);color:var(--gold-lt);font-weight:600;}
+.tl-body{padding:22px 26px 18px;}
+.tl-legend{display:flex;flex-wrap:wrap;gap:10px;padding:10px 26px 18px;border-top:1px solid var(--border);}
+.tl-leg-item{display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:9px;color:var(--text2);cursor:pointer;transition:opacity .15s;}
+.tl-leg-item:hover{opacity:.65;}
+.tl-leg-dot{width:10px;height:4px;border-radius:2px;flex-shrink:0;}
+.tl-note{padding:0 26px 16px;font-family:var(--font-mono);font-size:9px;color:var(--text3);}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="nav-brand">
+    <div class="nav-logo">TP</div>
+    <div class="nav-name">The <em>Paraiso</em> Residences</div>
+  </div>
+  <div class="nav-links">
+    <a href="hoa_payment_schedule.html" class="nav-link active">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="3" width="14" height="11" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5 1v4M11 1v4M1 7h14"/></svg>
+      Payment Schedule
+    </a>
+    <a href="hoa_forensic_dashboard.html" class="nav-link">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M1 12l4-5 3 3 4-6 3 4v4H1z" opacity=".7"/><path d="M0 2h16v1H0z"/></svg>
+      HOA Expense Analysis
+    </a>
+    <a href="hoa_expense_timeline.html" class="nav-link">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M1 13 C4 9 6 11 8 7 C10 3 12 5 15 2" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      Expense Timeline
+    </a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-tag">Owner Portal &middot; Cuota de Mantenimiento</div>
+      <h1>Maintenance Fee<br><em>Payment Schedule</em></h1>
+      <div class="hero-sub">ADMINISTRADORA DE INMUEBLES PARAISO, A.C. &nbsp;&middot;&nbsp; 58 UNITS &nbsp;&middot;&nbsp; QUARTERLY BILLING</div>
+      <div class="hero-pills">
+        <span class="pill pill-gold">Due: Jan &middot; Apr &middot; Jul &middot; Oct</span>
+        <span class="pill pill-teal">All Fees in USD</span>
+        <span class="pill pill-sky">3 Fee Tiers</span>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-lbl">Monthly Revenue (100% collected)</div>
+        <div class="hero-stat-val">USD $35,095</div>
+        <div class="hero-stat-note">All 58 units combined</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-lbl">Quarterly Collection Per Period</div>
+        <div class="hero-stat-val">USD $105,285</div>
+        <div class="hero-stat-note">Jan &middot; Apr &middot; Jul &middot; Oct</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-lbl">Projected Annual Revenue</div>
+        <div class="hero-stat-val">USD $421,140</div>
+        <div class="hero-stat-note">4 quarters x $105,285</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+<div class="kpi-row" style="margin-top:8px;">
+  <div class="kpi"><div class="kpi-top gold"></div><div class="kpi-lbl">Total Units</div><div class="kpi-val">58</div><div class="kpi-note">Residential units</div></div>
+  <div class="kpi"><div class="kpi-top gold"></div><div class="kpi-lbl">Premium $700/mo</div><div class="kpi-val">13 units</div><div class="kpi-note">22.4% of portfolio</div></div>
+  <div class="kpi"><div class="kpi-top sky"></div><div class="kpi-lbl">Standard $615/mo</div><div class="kpi-val">24 units</div><div class="kpi-note">41.4% of portfolio</div></div>
+  <div class="kpi"><div class="kpi-top teal"></div><div class="kpi-lbl">Value $535/mo</div><div class="kpi-val">21 units</div><div class="kpi-note">36.2% of portfolio</div></div>
+  <div class="kpi"><div class="kpi-top sand"></div><div class="kpi-lbl">Annual Revenue (100%)</div><div class="kpi-val">$421,140</div><div class="kpi-note">USD &middot; fully collected</div></div>
+</div>
+
+<!-- BRIDGE -->
+<div class="sec-gap">
+  <div class="sec-head"><div class="sec-title">Revenue vs. Operating Expenses</div><div class="sec-count">FINANCIAL BRIDGE</div></div>
+  <div class="sec-desc">How fee revenue compares to actual HOA operating expenditure &mdash; the critical link between owner payments and operational sustainability.</div>
+  <div class="bridge">
+    <div class="bridge-header">
+      <div class="bridge-icon">&#9878;</div>
+      <div>
+        <div class="bridge-title">Fee Revenue vs. Actual Operating Expenses &mdash; 2023 to 2025</div>
+        <div class="bridge-subtitle">Annual HOA fees in MXN equivalent (at 17.46 MXN/USD) vs. actual operating costs</div>
+      </div>
+    </div>
+    <div class="bridge-body">
+      <div class="bridge-col">
+        <div class="bridge-col-lbl">Annual Fee Revenue (MXN equiv.)</div>
+        <div class="bridge-col-val" style="color:var(--teal)">$7,352,904</div>
+        <div class="bridge-col-note">USD $421,140 x 17.46 rate<br>Constant across all 3 years</div>
+      </div>
+      <div class="bridge-div"></div>
+      <div class="bridge-col">
+        <div class="bridge-col-lbl">Actual Operating Expenses (MXN)</div>
+        <div class="yr-row"><div class="yr-lbl">2023</div><div class="yr-val" style="color:var(--navy)">$8,348,144</div></div>
+        <div class="yr-row"><div class="yr-lbl">2024</div><div class="yr-val" style="color:var(--navy)">$8,507,841</div></div>
+        <div class="yr-row"><div class="yr-lbl">2025</div><div class="yr-val" style="color:var(--navy)">$9,104,908</div></div>
+      </div>
+      <div class="bridge-div"></div>
+      <div class="bridge-col">
+        <div class="bridge-col-lbl">Annual Funding Gap (MXN)</div>
+        <div class="yr-row"><div class="yr-lbl">2023 shortfall</div><div class="yr-val" style="color:var(--rose)">-$995,240</div><div class="bridge-col-note">86.9% fee coverage</div></div>
+        <div class="yr-row"><div class="yr-lbl">2024 shortfall</div><div class="yr-val" style="color:var(--rose)">-$1,154,937</div><div class="bridge-col-note">86.4% fee coverage</div></div>
+        <div class="yr-row"><div class="yr-lbl">2025 shortfall</div><div class="yr-val" style="color:var(--rose)">-$1,751,004</div><div class="bridge-col-note">80.8% fee coverage</div></div>
+      </div>
+    </div>
+    <div class="bridge-alert">
+      <div style="font-size:18px;flex-shrink:0;margin-top:2px;">&#9888;</div>
+      <div class="bridge-alert-body">
+        At current fee levels, HOA maintenance fees cover only <strong>80.8%</strong> of 2025 operating expenses &mdash; a gap of approximately <strong>$1.75M MXN (~USD $100,344)</strong>. This shortfall has widened each year as operating costs grew 9.1% since 2023 while fee revenue remained flat. The HOA must fund the remaining balance through supplemental assessments, reserves, or capital contributions. The 2025 expense report already shows a new unbudgeted &ldquo;Capital Contribution Recovery&rdquo; line of $75,978 as evidence of this pressure.
+        <br>
+        <a href="hoa_forensic_dashboard.html" class="bridge-link">View Full HOA Expense Analysis &#8594;</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHARTS -->
+<div class="sec-gap">
+  <div class="sec-head"><div class="sec-title">Fee Coverage Trend</div><div class="sec-count">2023 &middot; 2024 &middot; 2025</div></div>
+  <div class="sec-desc">Visual comparison of annual fee revenue against actual operating expenses across three fiscal years.</div>
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title">Fee Revenue vs. Operating Expenses</div>
+      <div class="chart-sub">MXN equivalent &middot; all three years</div>
+      <canvas id="chartCoverage" height="220"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Fee Coverage Ratio (%)</div>
+      <div class="chart-sub">Percentage of expenses covered by fee revenue</div>
+      <canvas id="chartRatio" height="220"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- EXPENSE TIMELINE -->
+<div class="sec-gap">
+  <div class="sec-head">
+    <div class="sec-title">HOA Expense Trend &mdash; Where Your Fees Go</div>
+    <div class="sec-count">2023 &middot; 2024 &middot; 2025</div>
+  </div>
+  <div class="sec-desc">Monthly average spend per major expense category, compared to the monthly fee revenue collected. This shows the context behind each quarterly payment and how costs have evolved over three years.</div>
+  <div class="timeline-card">
+    <div class="timeline-head">
+      <div>
+        <div class="tl-title">Monthly Operating Costs vs Fee Revenue</div>
+        <div class="tl-sub">TOP EXPENSE CATEGORIES &nbsp;&middot;&nbsp; MONTHLY AVERAGE &nbsp;&middot;&nbsp; USD</div>
+      </div>
+      <div class="tl-controls">
+        <span style="font-family:var(--font-mono);font-size:8px;letter-spacing:1px;color:rgba(255,255,255,.3)">SHOW:</span>
+        <button class="tl-pill active" onclick="setTLView('top5',this)">Top 5</button>
+        <button class="tl-pill" onclick="setTLView('top8',this)">Top 8</button>
+        <button class="tl-pill" onclick="setTLView('all',this)">All Categories</button>
+        <button class="tl-pill" onclick="setTLView('admin',this)">Admin</button>
+        <button class="tl-pill" onclick="setTLView('ops',this)">Operations</button>
+        <button class="tl-pill" onclick="setTLView('services',this)">Services</button>
+      </div>
+    </div>
+    <div class="tl-body">
+      <canvas id="tlChart" height="240"></canvas>
+    </div>
+    <div class="tl-legend" id="tlLegend"></div>
+    <div class="tl-note">Monthly values = annual total / 12 &nbsp;&middot;&nbsp; Fee revenue line = USD $35,095/mo (constant) &nbsp;&middot;&nbsp; Click legend items to toggle categories</div>
+  </div>
+</div>
+
+<!-- TIERS -->
+<div class="sec-gap">
+  <div class="sec-head"><div class="sec-title">Fee Tiers</div><div class="sec-count">3 TIERS &middot; 58 UNITS</div></div>
+  <div class="sec-desc">Each tier reflects unit classification. Payments are due quarterly in January, April, July, and October.</div>
+  <div class="tier-row">
+    <div class="tier-card premium">
+      <div class="tier-badge">Premium</div>
+      <div class="tier-amount">$700</div>
+      <div class="tier-period">per month &middot; USD</div>
+      <div class="tier-div"></div>
+      <div class="tier-row-stat"><span class="tier-stat-lbl">Quarterly payment</span><span class="tier-stat-val">USD $2,100</span></div>
+      <div class="tier-row-stat"><span class="tier-stat-lbl">Annual per unit</span><span class="tier-stat-val">USD $8,400</span></div>
+      <div class="tier-row-stat"><span class="tier-stat-lbl">Units in tier</span><span class="tier-stat-val">13 units</span></div>
+      <div class="tier-row-stat"><span class="tier-stat-lbl">Monthly tier revenue</span><span class="tier-stat-val">USD $9,100</span></div>
+      <div class="tier-row-stat"><span class="tier-stat-lbl">Annual tier revenue</span><span class="tier-stat-val">USD $109,200</span></div>
+      <div class="tier-units" id="chips-premium"></div>
+    </div>
+    <div class="tier-card standard">
+      <div class="tier-badge">Standard</div>
+      <div class="tier-amount">$615</div>
+      <div class="tier-period">per month &middot; USD</div>
+      <div class="tier-div"></div>
+      <div class="tier-row-stat"><span class="tier-stat-lbl">Quarterly payment</span><span class="tier-stat-val">USD $1,845</span></div>
+      <div class="tier-row-stat"><span class="tier-stat-lbl">Annual per unit</span><span class="tier-stat-val">USD $7,380</span></div>
+      <div class="tier-row-stat"><span class="tier-stat-lbl">Units in tier</span><span class="tier-stat-val">24 units</span></div>
+      <div class="tier-row-stat"><span class="tier-stat-lbl">Monthly tier revenue</span><span class="tier-stat-val">USD $14,760</span></div>
+      <div class="tier-row-stat"><span class="tier-stat-lbl">Annual tier revenue</span><span class="tier-stat-val">USD $177,120</span></div>
+      <div class="tier-units" id="chips-standard"></div>
+    </div>
+    <div class="tier-card value">
+      <div class="tier-badge">Value</div>
+      <div class="tier-amount">$535</div>
+      <div class="tier-period">per month &middot; USD</div>
+      <div class="tier-div"></div>
+      <div class="tier-row-stat"><span class="tier-stat-lbl">Quarterly payment</span><span class="tier-stat-val">USD $1,605</span></div>
+      <div class="tier-row-stat"><span class="tier-stat-lbl">Annual per unit</span><span class="tier-stat-val">USD $6,420</span></div>
+      <div class="tier-row-stat"><span class="tier-stat-lbl">Units in tier</span><span class="tier-stat-val">21 units</span></div>
+      <div class="tier-row-stat"><span class="tier-stat-lbl">Monthly tier revenue</span><span class="tier-stat-val">USD $11,235</span></div>
+      <div class="tier-row-stat"><span class="tier-stat-lbl">Annual tier revenue</span><span class="tier-stat-val">USD $134,820</span></div>
+      <div class="tier-units" id="chips-value"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CALENDAR -->
+<div class="sec-gap">
+  <div class="sec-head"><div class="sec-title">Payment Calendar</div><div class="sec-count">QUARTERLY &middot; 4 PERIODS/YEAR</div></div>
+  <div class="sec-desc">All 58 owners pay quarterly. Each period covers 3 months of fees due at the start of the quarter.</div>
+  <div class="cal-grid">
+    <div class="cal-card"><div class="cal-head"><div class="cal-qtr">Q1 &middot; First Quarter</div><div class="cal-month">January</div><div class="cal-due">Due: January 1 &middot; covers Jan&ndash;Feb&ndash;Mar</div></div><div class="cal-body"><div class="cal-line"><span class="cal-line-lbl">Premium (13 x $2,100)</span><span class="cal-line-val">$27,300</span></div><div class="cal-line"><span class="cal-line-lbl">Standard (24 x $1,845)</span><span class="cal-line-val">$44,280</span></div><div class="cal-line"><span class="cal-line-lbl">Value (21 x $1,605)</span><span class="cal-line-val">$33,705</span></div><div class="cal-total"><span class="cal-total-lbl">Q1 Collection</span><span class="cal-total-val">USD $105,285</span></div></div></div>
+    <div class="cal-card"><div class="cal-head"><div class="cal-qtr">Q2 &middot; Second Quarter</div><div class="cal-month">April</div><div class="cal-due">Due: April 1 &middot; covers Apr&ndash;May&ndash;Jun</div></div><div class="cal-body"><div class="cal-line"><span class="cal-line-lbl">Premium (13 x $2,100)</span><span class="cal-line-val">$27,300</span></div><div class="cal-line"><span class="cal-line-lbl">Standard (24 x $1,845)</span><span class="cal-line-val">$44,280</span></div><div class="cal-line"><span class="cal-line-lbl">Value (21 x $1,605)</span><span class="cal-line-val">$33,705</span></div><div class="cal-total"><span class="cal-total-lbl">Q2 Collection</span><span class="cal-total-val">USD $105,285</span></div></div></div>
+    <div class="cal-card"><div class="cal-head"><div class="cal-qtr">Q3 &middot; Third Quarter</div><div class="cal-month">July</div><div class="cal-due">Due: July 1 &middot; covers Jul&ndash;Aug&ndash;Sep</div></div><div class="cal-body"><div class="cal-line"><span class="cal-line-lbl">Premium (13 x $2,100)</span><span class="cal-line-val">$27,300</span></div><div class="cal-line"><span class="cal-line-lbl">Standard (24 x $1,845)</span><span class="cal-line-val">$44,280</span></div><div class="cal-line"><span class="cal-line-lbl">Value (21 x $1,605)</span><span class="cal-line-val">$33,705</span></div><div class="cal-total"><span class="cal-total-lbl">Q3 Collection</span><span class="cal-total-val">USD $105,285</span></div></div></div>
+    <div class="cal-card"><div class="cal-head"><div class="cal-qtr">Q4 &middot; Fourth Quarter</div><div class="cal-month">October</div><div class="cal-due">Due: October 1 &middot; covers Oct&ndash;Nov&ndash;Dec</div></div><div class="cal-body"><div class="cal-line"><span class="cal-line-lbl">Premium (13 x $2,100)</span><span class="cal-line-val">$27,300</span></div><div class="cal-line"><span class="cal-line-lbl">Standard (24 x $1,845)</span><span class="cal-line-val">$44,280</span></div><div class="cal-line"><span class="cal-line-lbl">Value (21 x $1,605)</span><span class="cal-line-val">$33,705</span></div><div class="cal-total"><span class="cal-total-lbl">Q4 Collection</span><span class="cal-total-val">USD $105,285</span></div></div></div>
+  </div>
+</div>
+
+<!-- FLOORS -->
+<div class="sec-gap">
+  <div class="sec-head"><div class="sec-title">Floor-by-Floor Breakdown</div><div class="sec-count">FLOORS 11 &middot; 12 &middot; 13 &middot; 14</div></div>
+  <div class="sec-desc">Units grouped by floor. Colored bar shows tier distribution per floor.</div>
+  <div class="floor-grid" id="floorGrid"></div>
+</div>
+
+<!-- TABLE -->
+<div class="sec-gap">
+  <div class="sec-head"><div class="sec-title">Complete Unit Schedule</div><div class="sec-count">58 UNITS</div></div>
+  <div class="sec-desc">Full fee schedule for all residential units. Filter by tier or search by unit number. Click any column header to sort.</div>
+  <div class="table-wrap">
+    <div class="table-controls">
+      <input class="tbl-search" id="tblSearch" type="text" placeholder="Search unit..." oninput="renderTable()">
+      <button class="filter-btn active" onclick="setFilter('all',this)">All Tiers</button>
+      <button class="filter-btn" onclick="setFilter('premium',this)">Premium $700</button>
+      <button class="filter-btn" onclick="setFilter('standard',this)">Standard $615</button>
+      <button class="filter-btn" onclick="setFilter('value',this)">Value $535</button>
+      <span class="tbl-info" id="tblInfo">58 units shown</span>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortBy('u')">Unit #</th>
+            <th onclick="sortBy('floor')">Floor</th>
+            <th onclick="sortBy('tier')">Tier</th>
+            <th onclick="sortBy('mo')">Monthly</th>
+            <th onclick="sortBy('qtr')">Quarterly</th>
+            <th onclick="sortBy('annual')">Annual</th>
+            <th>Q1 Jan</th><th>Q2 Apr</th><th>Q3 Jul</th><th>Q4 Oct</th>
+          </tr>
+        </thead>
+        <tbody id="tblBody"></tbody>
+        <tfoot>
+          <tr class="tfoot-row">
+            <td colspan="3">TOTAL &mdash; 58 UNITS</td>
+            <td>USD $35,095</td><td>USD $105,285</td><td>USD $421,140</td>
+            <td>$105,285</td><td>$105,285</td><td>$105,285</td><td>$105,285</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="footer">
+  <div class="footer-txt">Administradora de Inmuebles Paraiso, A.C. &middot; Cuota de mantenimiento mensual &middot; All fees in USD</div>
+  <a href="hoa_forensic_dashboard.html" class="footer-link">View HOA Expense Analysis &rarr;</a>
+</div>
+
+<script>
+const RATE=17.46;
+const units=[
+  {u:'1101',mo:700},{u:'1102',mo:615},{u:'1103',mo:615},{u:'1104',mo:615},
+  {u:'1105',mo:615},{u:'1106',mo:615},{u:'1107',mo:615},{u:'1108',mo:615},
+  {u:'1109',mo:615},{u:'1110',mo:615},{u:'1111',mo:615},{u:'1112',mo:615},
+  {u:'1113',mo:700},{u:'1114',mo:615},{u:'1115',mo:615},{u:'1116',mo:700},
+  {u:'1117',mo:700},{u:'1118',mo:700},
+  {u:'1201',mo:615},{u:'1202',mo:615},{u:'1203',mo:700},{u:'1204',mo:615},
+  {u:'1205',mo:615},{u:'1206',mo:615},{u:'1207',mo:535},{u:'1208',mo:615},
+  {u:'1209',mo:535},{u:'1210',mo:700},{u:'1211',mo:700},{u:'1212',mo:700},
+  {u:'1213',mo:535},{u:'1214',mo:535},{u:'1215',mo:535},{u:'1216',mo:615},
+  {u:'1217',mo:615},{u:'1218',mo:535},
+  {u:'1301',mo:535},{u:'1302',mo:535},{u:'1303',mo:615},{u:'1304',mo:535},
+  {u:'1305',mo:700},{u:'1306',mo:700},{u:'1307',mo:535},{u:'1308',mo:535},
+  {u:'1309',mo:535},
+  {u:'1400',mo:535},{u:'1401',mo:535},{u:'1402',mo:535},{u:'1403',mo:700},
+  {u:'1404',mo:535},{u:'1405',mo:535},{u:'1406',mo:535},{u:'1407',mo:535},
+  {u:'1408',mo:700},{u:'1409',mo:535},{u:'1410',mo:615},{u:'1411',mo:615},
+  {u:'1412',mo:535},
+];
+units.forEach(r=>{r.floor=r.u.substring(0,2);r.qtr=r.mo*3;r.annual=r.mo*12;r.tier=r.mo===700?'premium':r.mo===615?'standard':'value';});
+
+function buildChips(id,tier){const el=document.getElementById(id);units.filter(r=>r.tier===tier).forEach(r=>{const c=document.createElement('div');c.className='unit-chip';c.textContent=r.u;c.onclick=()=>{document.getElementById('tblSearch').value=r.u;renderTable();};el.appendChild(c);});}
+buildChips('chips-premium','premium');buildChips('chips-standard','standard');buildChips('chips-value','value');
+
+['11','12','13','14'].forEach(f=>{
+  const fu=units.filter(r=>r.floor===f);
+  const fp=fu.filter(r=>r.tier==='premium').length,fs=fu.filter(r=>r.tier==='standard').length,fv=fu.filter(r=>r.tier==='value').length;
+  const rev=fu.reduce((a,r)=>a+r.mo,0);
+  const card=document.createElement('div');card.className='floor-card';
+  card.innerHTML=`<div class="floor-lbl">Floor</div><div class="floor-num">${f}</div>
+    <div class="floor-bar">${fp>0?`<div class="seg-p" style="flex:${fp}"></div>`:''}${fs>0?`<div class="seg-s" style="flex:${fs}"></div>`:''}${fv>0?`<div class="seg-v" style="flex:${fv}"></div>`:''}</div>
+    <div class="floor-stats">
+      <div class="floor-stat-row"><span class="floor-stat-lbl">Total units</span><span class="floor-stat-val">${fu.length}</span></div>
+      <div class="floor-stat-row"><span class="floor-stat-lbl" style="color:var(--gold)">Premium $700</span><span class="floor-stat-val">${fp}</span></div>
+      <div class="floor-stat-row"><span class="floor-stat-lbl" style="color:var(--sky)">Standard $615</span><span class="floor-stat-val">${fs}</span></div>
+      <div class="floor-stat-row"><span class="floor-stat-lbl" style="color:var(--teal)">Value $535</span><span class="floor-stat-val">${fv}</span></div>
+      <div class="floor-stat-row"><span class="floor-stat-lbl">Monthly revenue</span><span class="floor-stat-val">$${rev.toLocaleString()}</span></div>
+      <div class="floor-stat-row"><span class="floor-stat-lbl">Annual revenue</span><span class="floor-stat-val">$${(rev*12).toLocaleString()}</span></div>
+    </div>`;
+  document.getElementById('floorGrid').appendChild(card);
+});
+
+Chart.defaults.color='#6b7a94';Chart.defaults.font.family="'IBM Plex Mono',monospace";Chart.defaults.font.size=10;
+const GC='#e8e4da',TC='#9aa4b4';
+const annualFeesMXN=421140*RATE;
+const expenses={2023:8348143.86,2024:8507840.86,2025:9104907.58};
+
+new Chart(document.getElementById('chartCoverage'),{type:'bar',data:{labels:['2023','2024','2025'],datasets:[{label:'Fee Revenue (MXN equiv.)',data:[annualFeesMXN,annualFeesMXN,annualFeesMXN],backgroundColor:'rgba(42,157,138,0.75)',borderRadius:4},{label:'Operating Expenses (MXN)',data:Object.values(expenses),backgroundColor:'rgba(192,64,64,0.65)',borderRadius:4}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:14}},tooltip:{backgroundColor:'#1a2540',callbacks:{label:c=>' $'+c.raw.toLocaleString('en-US',{maximumFractionDigits:0})}}},scales:{x:{grid:{color:GC},ticks:{color:TC}},y:{grid:{color:GC},ticks:{color:TC,callback:v=>'$'+(v/1000000).toFixed(1)+'M'}}}}});
+
+new Chart(document.getElementById('chartRatio'),{type:'line',data:{labels:['2023','2024','2025'],datasets:[{label:'Fee Coverage %',data:[+(annualFeesMXN/expenses[2023]*100).toFixed(1),+(annualFeesMXN/expenses[2024]*100).toFixed(1),+(annualFeesMXN/expenses[2025]*100).toFixed(1)],borderColor:'#2a9d8a',backgroundColor:'rgba(42,157,138,0.08)',tension:0.4,fill:true,pointRadius:6,pointBackgroundColor:'#2a9d8a',borderWidth:2},{label:'100% Coverage',data:[100,100,100],borderColor:'rgba(192,64,64,0.45)',borderDash:[6,4],pointRadius:0,borderWidth:1.5}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:14}},tooltip:{backgroundColor:'#1a2540',callbacks:{label:c=>c.raw+'%'}}},scales:{x:{grid:{color:GC},ticks:{color:TC}},y:{grid:{color:GC},ticks:{color:TC,callback:v=>v+'%'},min:70,max:105}}}});
+
+let filter='all',sortKey='u',sortAsc=true;
+function setFilter(f,btn){filter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderTable();}
+function sortBy(k){sortKey===k?sortAsc=!sortAsc:(sortKey=k,sortAsc=true);renderTable();}
+function renderTable(){
+  const q=document.getElementById('tblSearch').value.toLowerCase();
+  let data=[...units];
+  if(filter!=='all')data=data.filter(r=>r.tier===filter);
+  if(q)data=data.filter(r=>r.u.includes(q)||r.tier.includes(q));
+  data.sort((a,b)=>{let va=a[sortKey],vb=b[sortKey];if(typeof va==='string'){va=va.toLowerCase();vb=vb.toLowerCase();}return sortAsc?(va>vb?1:-1):(va<vb?1:-1);});
+  const body=document.getElementById('tblBody');body.innerHTML='';
+  const tc={premium:'tag-premium',standard:'tag-standard',value:'tag-value'};
+  const ac={premium:'amt-premium',standard:'amt-standard',value:'amt-value'};
+  data.forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td class="td-unit"><span class="tier-dot dot-${r.tier}"></span>${r.u}</td><td>Floor ${r.floor}</td><td><span class="tier-tag ${tc[r.tier]}">${r.tier.charAt(0).toUpperCase()+r.tier.slice(1)}</span></td><td><span class="${ac[r.tier]}">$${r.mo}/mo</span></td><td><span class="${ac[r.tier]}">$${r.qtr.toLocaleString()}</span></td><td>$${r.annual.toLocaleString()}/yr</td><td><span class="st-pending">DUE</span></td><td><span class="st-pending">DUE</span></td><td><span class="st-pending">DUE</span></td><td><span class="st-pending">DUE</span></td>`;
+    body.appendChild(tr);
+  });
+  document.getElementById('tblInfo').textContent=`${data.length} unit${data.length!==1?'s':''} shown`;
+}
+renderTable();
+
+
+// ── EXPENSE TIMELINE ON PAYMENT SCHEDULE ──
+const RATE_PS = 17.46;
+const TL_ROWS = [
+  {cat:'O',name:'Payroll',         a23:4172231.74,a24:4215963.78,a25:4655141.55},
+  {cat:'A',name:'Insurance',       a23:1090047.12,a24:1114123.36,a25:1292441.63},
+  {cat:'O',name:'Water',           a23:493394.40, a24:401940.00, a25:336386.82},
+  {cat:'A',name:'Rent Office',     a23:493120.90, a24:506681.04, a25:532847.38},
+  {cat:'O',name:'Other Expenses',  a23:345845.19, a24:584922.21, a25:286246.03},
+  {cat:'O',name:'Staff Meals',     a23:232690.05, a24:262823.20, a25:323732.70},
+  {cat:'O',name:'Electricity',     a23:368918.00, a24:269800.97, a25:342578.00},
+  {cat:'S',name:'Garden',          a23:288425.39, a24:270836.20, a25:289990.72},
+  {cat:'O',name:'Staff Meals',     a23:232690.05, a24:262823.20, a25:323732.70},
+  {cat:'S',name:'Elevator',        a23:183223.10, a24:119698.99, a25:218706.54},
+  {cat:'S',name:'Fumigation',      a23:150336.00, a24:157852.80, a25:175939.52},
+  {cat:'A',name:'Bank Commissions',a23:116459.89, a24:141486.83, a25:146001.84},
+  {cat:'M',name:'Maint.Services',  a23:81193.97,  a24:94717.66,  a25:123277.70},
+  {cat:'O',name:'Uniforms',        a23:59073.75,  a24:51007.19,  a25:64106.14},
+  {cat:'S',name:'Garbage',         a23:67369.00,  a24:75735.00,  a25:75735.00},
+  {cat:'A',name:'Rent Office',     a23:493120.90, a24:506681.04, a25:532847.38},
+  {cat:'O',name:'Cleaning',        a23:36390.34,  a24:34169.86,  a25:36070.44},
+  {cat:'O',name:'Telephone',       a23:34614.00,  a24:32014.00,  a25:32764.00},
+];
+
+// Deduplicate
+const TL_DATA = [];
+const seen = new Set();
+TL_ROWS.forEach(r => {
+  const key = r.cat+r.name;
+  if (!seen.has(key)) { seen.add(key); TL_DATA.push(r); }
+});
+
+// Sort by 2025 actual
+TL_DATA.sort((a,b) => b.a25 - a.a25);
+
+const TL_COLORS = [
+  '#dc2626','#2563eb','#059669','#d97706','#7c3aed',
+  '#0891b2','#65a30d','#db2777','#f59e0b','#0f766e',
+  '#6366f1','#ef4444','#8b5cf6','#f97316','#14b8a6',
+  '#a855f7','#ca8a04','#22c55e',
+];
+
+const TL_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const TL_LABELS = [];
+for (let y=0;y<3;y++) for (let m=0;m<12;m++) TL_LABELS.push(TL_MONTHS[m]+" '"+"232425"[y*2]+("232425"[y*2+1]||''));
+
+// Rebuild labels correctly
+TL_LABELS.length = 0;
+const YRS_PS = ['23','24','25'];
+for (let y=0;y<3;y++) for (let m=0;m<12;m++) TL_LABELS.push(TL_MONTHS[m]+" '"+YRS_PS[y]);
+
+function tlMonthly(row) {
+  const ann = [row.a23/RATE_PS, row.a24/RATE_PS, row.a25/RATE_PS].map(v=>v/12);
+  const pts = [];
+  for (let y=0;y<3;y++) for (let m=0;m<12;m++) {
+    if (m>=10&&y<2){ const t=(m-10)/2; pts.push(ann[y]*(1-t*0.4)+ann[y+1]*(t*0.4)); }
+    else if (m<=1&&y>0){ const t=(2-m)/2; pts.push(ann[y]*(1-t*0.4)+ann[y-1]*(t*0.4)); }
+    else pts.push(ann[y]);
+  }
+  return pts;
+}
+
+let tlChart = null;
+let tlVisible = new Set([0,1,2,3,4]);
+
+function buildTLLegend() {
+  const leg = document.getElementById('tlLegend');
+  if (!leg) return;
+  leg.innerHTML = '';
+  TL_DATA.slice(0,8).forEach((r,i) => {
+    const on = tlVisible.has(i);
+    const div = document.createElement('div');
+    div.className = 'tl-leg-item';
+    div.style.opacity = on ? '1' : '0.35';
+    div.innerHTML = '<div class="tl-leg-dot" style="background:'+TL_COLORS[i]+'"></div>' + r.name;
+    div.onclick = () => { tlVisible.has(i)?tlVisible.delete(i):tlVisible.add(i); buildTLChart(); buildTLLegend(); };
+    leg.appendChild(div);
+  });
+  // Fee revenue legend item
+  const feeLeg = document.createElement('div');
+  feeLeg.className = 'tl-leg-item';
+  feeLeg.innerHTML = '<div class="tl-leg-dot" style="background:#2a9d8a;height:3px;border-top:2px dashed #2a9d8a;background:transparent;width:18px"></div> Fee Revenue (USD $35,095/mo)';
+  leg.appendChild(feeLeg);
+}
+
+function buildTLChart() {
+  const el = document.getElementById('tlChart');
+  if (!el) return;
+  if (tlChart) { tlChart.destroy(); tlChart = null; }
+  const GC='#e8e4da', TC='#9aa4b4';
+
+  const datasets = [];
+
+  // Fee revenue reference line (constant)
+  datasets.push({
+    label: 'Fee Revenue (total)',
+    data: Array(36).fill(35095),
+    borderColor: '#2a9d8a',
+    borderWidth: 2,
+    borderDash: [6,3],
+    backgroundColor: 'transparent',
+    pointRadius: 0,
+    tension: 0,
+    order: 0,
+  });
+
+  TL_DATA.slice(0,8).forEach((r,i) => {
+    if (!tlVisible.has(i)) return;
+    datasets.push({
+      label: r.name,
+      data: tlMonthly(r),
+      borderColor: TL_COLORS[i],
+      backgroundColor: TL_COLORS[i]+'14',
+      borderWidth: 1.8,
+      pointRadius: 0,
+      pointHoverRadius: 4,
+      tension: 0.38,
+      fill: false,
+      order: i+1,
+    });
+  });
+
+  tlChart = new Chart(el, {
+    type: 'line',
+    data: { labels: TL_LABELS, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      animation: { duration: 250 },
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1a2540',
+          titleColor: '#fff',
+          bodyColor: '#d0d8f0',
+          callbacks: {
+            label: c => {
+              if (c.raw === undefined) return;
+              const v = c.raw;
+              return ' ' + c.dataset.label + ': $' + v.toLocaleString('en-US',{maximumFractionDigits:0}) + '/mo';
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid:{color:GC},
+          ticks:{color:TC,font:{family:"'IBM Plex Mono'",size:9},maxRotation:35,autoSkip:true,maxTicksLimit:18}
+        },
+        y: {
+          grid:{color:GC},
+          beginAtZero:true,
+          ticks:{color:TC,font:{family:"'IBM Plex Mono'",size:9},callback:v=>'$'+(v>=1000?(v/1000).toFixed(0)+'K':v.toFixed(0))}
+        }
+      }
+    }
+  });
+}
+
+function setTLView(view, btn) {
+  document.querySelectorAll('.tl-pill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const catMap = {admin:'A',ops:'O',services:'S'};
+  if (view==='top5') tlVisible=new Set([0,1,2,3,4]);
+  else if (view==='top8') tlVisible=new Set([0,1,2,3,4,5,6,7]);
+  else if (view==='all') tlVisible=new Set(TL_DATA.map((_,i)=>i));
+  else {
+    const cat=catMap[view];
+    tlVisible=new Set(TL_DATA.map((r,i)=>r.cat===cat?i:-1).filter(i=>i>=0));
+  }
+  buildTLChart();
+  buildTLLegend();
+}
+
+// Init timeline after DOM ready
+requestAnimationFrame(()=>{ buildTLChart(); buildTLLegend(); });
+
+</script>
+</body>
+</html>
