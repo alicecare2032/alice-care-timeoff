@@ -411,7 +411,7 @@ td:first-child{text-align:left;color:var(--text);font-family:var(--font-sans);fo
   <div id="tab-totals" class="tab-content active">
     <div class="chart-grid-2">
       <div class="chart-card"><div class="chart-title">Total Annual Spend vs Budget</div><div class="chart-sub">2023 &middot; 2024 &middot; 2025</div><canvas id="chartTotalBar"></canvas></div>
-      <div class="chart-card"><div class="chart-title">Year-over-Year Spend Trend</div><div class="chart-sub">Actual spend vs budget trend</div><canvas id="chartTotalLine"></canvas></div>
+      <div class="chart-card"><div class="chart-title">Year-over-Year Spend Trend</div><div class="chart-sub">Actual spend &nbsp;&middot;&nbsp; budget &nbsp;&middot;&nbsp; fee revenue collected (estimated, 100% collection) &mdash; gap = annual shortfall</div><canvas id="chartTotalLine"></canvas></div>
     </div>
     <div class="chart-grid-3">
       <div class="chart-card"><div class="chart-title">2023 Expense Mix</div><div class="chart-sub">By major category group</div><canvas id="chartPie2023"></canvas></div>
@@ -653,10 +653,58 @@ function buildChartsForTab(tab) {
       {label:'Actual', data:[cv(TOT.a23),cv(TOT.a24),cv(TOT.a25)], backgroundColor:[C23,C24,C25], borderRadius:4},
       {label:'Budget', data:[cv(TOT.b23),cv(TOT.b24),cv(TOT.b25)], backgroundColor:CBG, borderRadius:4}
     ]);
-    mkLine('chartTotalLine', YRS, [
-      {label:'Actual Spend', data:[cv(TOT.a23),cv(TOT.a24),cv(TOT.a25)], borderColor:'#a87820', backgroundColor:'rgba(168,120,32,0.08)', tension:0.4, fill:true, pointRadius:6, pointBackgroundColor:'#a87820', borderWidth:2},
-      {label:'Budget', data:[cv(TOT.b23),cv(TOT.b24),cv(TOT.b25)], borderColor:'rgba(26,37,64,0.25)', borderDash:[5,5], tension:0.4, pointRadius:4, borderWidth:1.5}
-    ]);
+    const FEE_MXN = 421140 * RATE; // USD $35,095/mo × 12 = $421,140/yr — source: Cuota de Mantenimiento schedule (58 units, assumes 100% collection)
+    const feeVal = cv(FEE_MXN);
+    // Build trend chart with custom tooltip showing gap
+    if (CH['chartTotalLine']) { CH['chartTotalLine'].destroy(); delete CH['chartTotalLine']; }
+    CH['chartTotalLine'] = new Chart(document.getElementById('chartTotalLine'), {
+      type: 'line',
+      data: {
+        labels: YRS,
+        datasets: [
+          {label:'Actual Spend', data:[cv(TOT.a23),cv(TOT.a24),cv(TOT.a25)], borderColor:'#a87820', backgroundColor:'rgba(168,120,32,0.06)', tension:0.4, fill:true, pointRadius:6, pointBackgroundColor:'#a87820', pointStyle:'circle', borderWidth:2.5},
+          {label:'Approved Budget', data:[cv(TOT.b23),cv(TOT.b24),cv(TOT.b25)], borderColor:'rgba(26,37,64,0.4)', borderDash:[6,4], tension:0.4, pointRadius:4, pointBackgroundColor:'rgba(26,37,64,0.4)', borderWidth:1.5, backgroundColor:'transparent'},
+          {label:'Fee Revenue — collected (estimated)', data:[feeVal,feeVal,feeVal], borderColor:'#2a9d8a', borderDash:[3,3], backgroundColor:'rgba(42,157,138,0.08)', tension:0, pointRadius:5, pointBackgroundColor:'#2a9d8a', pointStyle:'rectRot', borderWidth:2.5, fill:true}
+        ]
+      },
+      options: {
+        responsive:true,
+        plugins:{
+          legend:{position:'bottom', labels:{boxWidth:10, padding:14, color:'#566070', usePointStyle:true}},
+          tooltip:{
+            backgroundColor:'#1a2540',
+            titleColor:'#fff',
+            bodyColor:'#d0d8f0',
+            padding:12,
+            callbacks:{
+              label: c => {
+                const sym = CUR==='USD' ? 'USD $' : '$';
+                const val = sym + c.raw.toLocaleString('en-US',{maximumFractionDigits:0});
+                return ' ' + c.dataset.label + ': ' + val;
+              },
+              afterBody: items => {
+                const spend = items.find(i=>i.dataset.label==='Actual Spend');
+                const fee   = items.find(i=>i.dataset.label==='Fee Revenue — collected (estimated)');
+                if (!spend || !fee) return [];
+                const gap = spend.raw - fee.raw;
+                const sym = CUR==='USD' ? 'USD $' : '$';
+                const pct = ((fee.raw/spend.raw)*100).toFixed(1);
+                return [
+                  '',
+                  ' \u26a0 Shortfall: ' + sym + gap.toLocaleString('en-US',{maximumFractionDigits:0}),
+                  ' Coverage: ' + pct + '% of expenses funded by fees',
+                  ' \u2139 Estimated at 100% collection \u00b7 58 units \u00b7 $35,095/mo'
+                ];
+              }
+            }
+          }
+        },
+        scales:{
+          x:{grid:{color:GC},ticks:{color:TC}},
+          y:{grid:{color:GC},ticks:{color:TC,callback:v=>yFmt(v)},beginAtZero:false}
+        }
+      }
+    });
     ['23','24','25'].forEach(yr => {
       let A=0,O=0,S=0,M=0;
       rows.forEach(r => { const v=r['a'+yr]; if(r.cat==='A')A+=v; else if(r.cat==='O')O+=v; else if(r.cat==='S')S+=v; else M+=v; });
