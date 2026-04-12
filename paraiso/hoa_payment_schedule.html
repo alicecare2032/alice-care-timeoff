@@ -206,12 +206,44 @@ td:not(:first-child){text-align:right;}
 .footer-link{font-family:var(--font-mono);font-size:9px;color:var(--gold-lt);text-decoration:none;}
 .footer-link:hover{color:#fff;}
 
+/* OWNERSHIP */
+.own-tag{display:inline-block;padding:1px 7px;border-radius:3px;font-size:8px;letter-spacing:1px;text-transform:uppercase;font-weight:700;margin-left:5px;vertical-align:middle;}
+.own-builder{background:rgba(120,60,180,.1);color:#7830b0;border:1px solid rgba(120,60,180,.25);}
+.own-private{background:rgba(42,157,138,.08);color:var(--teal);border:1px solid var(--teal-bd);}
+.own-split-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;margin-bottom:52px;}
+.own-split-head{background:var(--navy);padding:18px 28px;display:flex;align-items:center;gap:14px;}
+.own-split-icon{width:34px;height:34px;border-radius:6px;background:rgba(120,60,180,.2);border:1px solid rgba(120,60,180,.35);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.own-split-title{font-family:var(--font-serif);font-size:16px;font-weight:600;color:#fff;}
+.own-split-sub{font-family:var(--font-mono);font-size:9px;color:rgba(255,255,255,.3);letter-spacing:1px;margin-top:2px;}
+.own-split-body{padding:28px;display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+.own-half{display:flex;flex-direction:column;gap:16px;}
+.own-half-title{font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;}
+.own-meter-wrap{display:flex;flex-direction:column;gap:8px;}
+.own-meter-row{display:flex;align-items:center;gap:10px;}
+.own-meter-lbl{font-family:var(--font-mono);font-size:10px;color:var(--text2);width:90px;flex-shrink:0;}
+.own-meter-bar{flex:1;height:14px;border-radius:4px;background:var(--border);overflow:hidden;position:relative;}
+.own-meter-fill{height:100%;border-radius:4px;transition:width .6s ease;}
+.fill-builder{background:linear-gradient(90deg,#7830b0,#a060d8);}
+.fill-private{background:linear-gradient(90deg,#2a9d8a,#60c4b0);}
+.own-meter-val{font-family:var(--font-mono);font-size:11px;font-weight:600;width:48px;text-align:right;flex-shrink:0;}
+.own-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.own-stat{background:var(--surf2);border:1px solid var(--border);border-radius:6px;padding:14px 16px;}
+.own-stat-lbl{font-family:var(--font-mono);font-size:8px;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;margin-bottom:5px;}
+.own-stat-val{font-family:var(--font-mono);font-size:18px;font-weight:500;}
+.own-stat-note{font-family:var(--font-mono);font-size:9px;color:var(--text2);margin-top:3px;}
+.own-note-box{margin:0 28px 24px;padding:14px 18px;background:rgba(120,60,180,.06);border:1px solid rgba(120,60,180,.2);border-radius:6px;font-size:12px;color:var(--text2);line-height:1.7;}
+.own-note-box strong{color:#7830b0;}
+.filter-btn.own-all{border-color:var(--border2);}
+.filter-btn.builder-filter.active{background:rgba(120,60,180,.1);border-color:rgba(120,60,180,.35);color:#7830b0;}
+.filter-btn.private-filter.active{background:var(--teal-bg);border-color:var(--teal-bd);color:var(--teal);}
+
 @media(max-width:1100px){
   .main,.hero,.footer,.top-nav{padding-left:24px;padding-right:24px;}
   .kpi-row,.tier-row,.cal-grid,.floor-grid,.chart-grid{grid-template-columns:1fr;}
   .hero-inner{grid-template-columns:1fr;}
   .bridge-body{grid-template-columns:1fr;gap:20px;}
   .bridge-div{display:none;}
+  .own-split-body{grid-template-columns:1fr;}
 }
 
 /* EXPENSE TIMELINE SECTION */
@@ -445,6 +477,92 @@ td:not(:first-child){text-align:right;}
   </div>
 </div>
 
+<!-- OWNERSHIP BREAKDOWN -->
+<div class="sec-gap">
+  <div class="sec-head"><div class="sec-title">Ownership Split</div><div class="sec-count">BUILDER vs. PRIVATE &middot; UNITS &amp; MILLESIMIS</div></div>
+  <div class="sec-desc">Distribution of units between the Builder (developer-retained) and Private owners, measured both by number of units and by millesimis &mdash; the proportional fee-based voting weight used in Mexican condominium law.</div>
+  <div class="own-split-card">
+    <div class="own-split-head">
+      <div class="own-split-icon">&#9878;</div>
+      <div>
+        <div class="own-split-title">Ownership Distribution &mdash; 58 Residential Units</div>
+        <div class="own-split-sub">Source: Cuota de Mantenimiento Mensual &nbsp;&middot;&nbsp; Millesimis based on monthly fee value</div>
+      </div>
+    </div>
+    <div class="own-split-body">
+      <div class="own-half">
+        <div>
+          <div class="own-half-title">By Number of Units</div>
+          <div class="own-meter-wrap">
+            <div class="own-meter-row">
+              <div class="own-meter-lbl" style="color:#7830b0">Builder</div>
+              <div class="own-meter-bar"><div class="own-meter-fill fill-builder" style="width:25.9%"></div></div>
+              <div class="own-meter-val" style="color:#7830b0">25.9%</div>
+            </div>
+            <div class="own-meter-row">
+              <div class="own-meter-lbl" style="color:var(--teal)">Private</div>
+              <div class="own-meter-bar"><div class="own-meter-fill fill-private" style="width:74.1%"></div></div>
+              <div class="own-meter-val" style="color:var(--teal)">74.1%</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="own-half-title">By Millesimis (fee-based voting weight)</div>
+          <div class="own-meter-wrap">
+            <div class="own-meter-row">
+              <div class="own-meter-lbl" style="color:#7830b0">Builder</div>
+              <div class="own-meter-bar"><div class="own-meter-fill fill-builder" style="width:26.4%"></div></div>
+              <div class="own-meter-val" style="color:#7830b0">26.4%</div>
+            </div>
+            <div class="own-meter-row">
+              <div class="own-meter-lbl" style="color:var(--teal)">Private</div>
+              <div class="own-meter-bar"><div class="own-meter-fill fill-private" style="width:73.6%"></div></div>
+              <div class="own-meter-val" style="color:var(--teal)">73.6%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="own-half">
+        <div class="own-stat-grid">
+          <div class="own-stat">
+            <div class="own-stat-lbl">Builder Units</div>
+            <div class="own-stat-val" style="color:#7830b0">15</div>
+            <div class="own-stat-note">of 58 total</div>
+          </div>
+          <div class="own-stat">
+            <div class="own-stat-lbl">Private Units</div>
+            <div class="own-stat-val" style="color:var(--teal)">43</div>
+            <div class="own-stat-note">of 58 total</div>
+          </div>
+          <div class="own-stat">
+            <div class="own-stat-lbl">Builder Monthly Fees</div>
+            <div class="own-stat-val" style="color:#7830b0">$9,260</div>
+            <div class="own-stat-note">USD &middot; 26.4% of $35,095</div>
+          </div>
+          <div class="own-stat">
+            <div class="own-stat-lbl">Private Monthly Fees</div>
+            <div class="own-stat-val" style="color:var(--teal)">$25,835</div>
+            <div class="own-stat-note">USD &middot; 73.6% of $35,095</div>
+          </div>
+          <div class="own-stat">
+            <div class="own-stat-lbl">Builder Annual Fees</div>
+            <div class="own-stat-val" style="color:#7830b0;font-size:15px">$111,120</div>
+            <div class="own-stat-note">USD &middot; if 100% paid</div>
+          </div>
+          <div class="own-stat">
+            <div class="own-stat-lbl">Private Annual Fees</div>
+            <div class="own-stat-val" style="color:var(--teal);font-size:15px">$310,020</div>
+            <div class="own-stat-note">USD &middot; if 100% paid</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="own-note-box">
+      <strong>Governance note:</strong> Under Mexican condominium law (Ley de Condominios), voting rights at owner assemblies are allocated by millesimis. With <strong>26.4% millesimis</strong>, the Builder holds significant weight on resolutions requiring a qualified majority (typically 75%+). Private owners collectively control <strong>73.6%</strong> &mdash; sufficient for ordinary resolutions but not a supermajority alone. Any vote on fee increases, budget approval, or Capital Contribution Recovery terms requires understanding this distribution.
+    </div>
+  </div>
+</div>
+
 <!-- FLOORS -->
 <div class="sec-gap">
   <div class="sec-head"><div class="sec-title">Floor-by-Floor Breakdown</div><div class="sec-count">FLOORS 11 &middot; 12 &middot; 13 &middot; 14</div></div>
@@ -463,6 +581,9 @@ td:not(:first-child){text-align:right;}
       <button class="filter-btn" onclick="setFilter('premium',this)">Premium $700</button>
       <button class="filter-btn" onclick="setFilter('standard',this)">Standard $615</button>
       <button class="filter-btn" onclick="setFilter('value',this)">Value $535</button>
+      <div style="width:1px;height:20px;background:var(--border);margin:0 4px;"></div>
+      <button class="filter-btn builder-filter" onclick="setOwner('builder',this)">Builder Owned</button>
+      <button class="filter-btn private-filter" onclick="setOwner('private',this)">Private Owned</button>
       <span class="tbl-info" id="tblInfo">58 units shown</span>
     </div>
     <div class="table-scroll">
@@ -471,6 +592,7 @@ td:not(:first-child){text-align:right;}
           <tr>
             <th onclick="sortBy('u')">Unit #</th>
             <th onclick="sortBy('floor')">Floor</th>
+            <th onclick="sortBy('owner')">Ownership</th>
             <th onclick="sortBy('tier')">Tier</th>
             <th onclick="sortBy('mo')">Monthly</th>
             <th onclick="sortBy('qtr')">Quarterly</th>
@@ -500,6 +622,7 @@ td:not(:first-child){text-align:right;}
 
 <script>
 const RATE=17.46;
+const BUILDER_UNITS=new Set(['1207','1210','1211','1212','1301','1302','1304','1305','1306','1308','1402','1403','1404','1408','1410']);
 const units=[
   {u:'1101',mo:700},{u:'1102',mo:615},{u:'1103',mo:615},{u:'1104',mo:615},
   {u:'1105',mo:615},{u:'1106',mo:615},{u:'1107',mo:615},{u:'1108',mo:615},
@@ -519,7 +642,7 @@ const units=[
   {u:'1408',mo:700},{u:'1409',mo:535},{u:'1410',mo:615},{u:'1411',mo:615},
   {u:'1412',mo:535},
 ];
-units.forEach(r=>{r.floor=r.u.substring(0,2);r.qtr=r.mo*3;r.annual=r.mo*12;r.tier=r.mo===700?'premium':r.mo===615?'standard':'value';});
+units.forEach(r=>{r.floor=r.u.substring(0,2);r.qtr=r.mo*3;r.annual=r.mo*12;r.tier=r.mo===700?'premium':r.mo===615?'standard':'value';r.owner=BUILDER_UNITS.has(r.u)?'builder':'private';});
 
 function buildChips(id,tier){const el=document.getElementById(id);units.filter(r=>r.tier===tier).forEach(r=>{const c=document.createElement('div');c.className='unit-chip';c.textContent=r.u;c.onclick=()=>{document.getElementById('tblSearch').value=r.u;renderTable();};el.appendChild(c);});}
 buildChips('chips-premium','premium');buildChips('chips-standard','standard');buildChips('chips-value','value');
@@ -551,21 +674,26 @@ new Chart(document.getElementById('chartCoverage'),{type:'bar',data:{labels:['20
 
 new Chart(document.getElementById('chartRatio'),{type:'line',data:{labels:['2023','2024','2025'],datasets:[{label:'Fee Coverage %',data:[+(annualFeesMXN/expenses[2023]*100).toFixed(1),+(annualFeesMXN/expenses[2024]*100).toFixed(1),+(annualFeesMXN/expenses[2025]*100).toFixed(1)],borderColor:'#2a9d8a',backgroundColor:'rgba(42,157,138,0.08)',tension:0.4,fill:true,pointRadius:6,pointBackgroundColor:'#2a9d8a',borderWidth:2},{label:'100% Coverage',data:[100,100,100],borderColor:'rgba(192,64,64,0.45)',borderDash:[6,4],pointRadius:0,borderWidth:1.5}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:14}},tooltip:{backgroundColor:'#1a2540',callbacks:{label:c=>c.raw+'%'}}},scales:{x:{grid:{color:GC},ticks:{color:TC}},y:{grid:{color:GC},ticks:{color:TC,callback:v=>v+'%'},min:70,max:105}}}});
 
-let filter='all',sortKey='u',sortAsc=true;
-function setFilter(f,btn){filter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderTable();}
+let filter='all',ownerFilter='all',sortKey='u',sortAsc=true;
+function setFilter(f,btn){filter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');ownerFilter='all';renderTable();}
+function setOwner(o,btn){ownerFilter=ownerFilter===o?'all':o;document.querySelectorAll('.filter-btn.builder-filter,.filter-btn.private-filter').forEach(b=>b.classList.remove('active'));if(ownerFilter!=='all')btn.classList.add('active');renderTable();}
 function sortBy(k){sortKey===k?sortAsc=!sortAsc:(sortKey=k,sortAsc=true);renderTable();}
 function renderTable(){
   const q=document.getElementById('tblSearch').value.toLowerCase();
   let data=[...units];
   if(filter!=='all')data=data.filter(r=>r.tier===filter);
-  if(q)data=data.filter(r=>r.u.includes(q)||r.tier.includes(q));
+  if(ownerFilter!=='all')data=data.filter(r=>r.owner===ownerFilter);
+  if(q)data=data.filter(r=>r.u.includes(q)||r.tier.includes(q)||r.owner.includes(q));
   data.sort((a,b)=>{let va=a[sortKey],vb=b[sortKey];if(typeof va==='string'){va=va.toLowerCase();vb=vb.toLowerCase();}return sortAsc?(va>vb?1:-1):(va<vb?1:-1);});
   const body=document.getElementById('tblBody');body.innerHTML='';
   const tc={premium:'tag-premium',standard:'tag-standard',value:'tag-value'};
   const ac={premium:'amt-premium',standard:'amt-standard',value:'amt-value'};
   data.forEach(r=>{
+    const ownerTag=r.owner==='builder'
+      ?'<span class="own-tag own-builder">Builder</span>'
+      :'<span class="own-tag own-private">Private</span>';
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td class="td-unit"><span class="tier-dot dot-${r.tier}"></span>${r.u}</td><td>Floor ${r.floor}</td><td><span class="tier-tag ${tc[r.tier]}">${r.tier.charAt(0).toUpperCase()+r.tier.slice(1)}</span></td><td><span class="${ac[r.tier]}">$${r.mo}/mo</span></td><td><span class="${ac[r.tier]}">$${r.qtr.toLocaleString()}</span></td><td>$${r.annual.toLocaleString()}/yr</td><td><span class="st-pending">DUE</span></td><td><span class="st-pending">DUE</span></td><td><span class="st-pending">DUE</span></td><td><span class="st-pending">DUE</span></td>`;
+    tr.innerHTML=`<td class="td-unit"><span class="tier-dot dot-${r.tier}"></span>${r.u}</td><td>Floor ${r.floor}</td><td>${ownerTag}</td><td><span class="tier-tag ${tc[r.tier]}">${r.tier.charAt(0).toUpperCase()+r.tier.slice(1)}</span></td><td><span class="${ac[r.tier]}">$${r.mo}/mo</span></td><td><span class="${ac[r.tier]}">$${r.qtr.toLocaleString()}</span></td><td>$${r.annual.toLocaleString()}/yr</td><td><span class="st-pending">DUE</span></td><td><span class="st-pending">DUE</span></td><td><span class="st-pending">DUE</span></td><td><span class="st-pending">DUE</span></td>`;
     body.appendChild(tr);
   });
   document.getElementById('tblInfo').textContent=`${data.length} unit${data.length!==1?'s':''} shown`;
