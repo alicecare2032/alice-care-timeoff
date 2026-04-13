@@ -2689,9 +2689,9 @@
                         <div class="row-limit-selector">
                             <label for="rowLimit">Show:</label>
                             <select id="rowLimit" onchange="setRowLimit(this.value)">
-                                <option value="10">10</option>
+                                <option value="10" selected>10</option>
                                 <option value="20">20</option>
-                                <option value="all" selected>All</option>
+                                <option value="all">All</option>
                             </select>
                             <span class="row-count-info" id="rowCountInfo"></span>
                         </div>
@@ -2825,7 +2825,7 @@
         let currentStatusFilter = 'all';
         let currentBUFilter = 'all';
         let currentTemplateFilter = 'all';
-        let currentRowLimit = 'all';
+        let currentRowLimit = '10';
         let currentPage = 1;
         let currentSort = { column: null, direction: 'asc' };
         const charts = {};
@@ -6078,6 +6078,12 @@
             if (currentSort.column) {
                 sortTable(currentSort.column, currentSort.type, currentSort.direction);
             } else {
+                // Default: newest first by Created date
+                filteredPrograms.sort((a, b) => {
+                    const da = a.createdDate ? a.createdDate.getTime() : 0;
+                    const db = b.createdDate ? b.createdDate.getTime() : 0;
+                    return db - da;
+                });
                 renderTable();
             }
         }
