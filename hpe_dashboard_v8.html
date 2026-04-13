@@ -6191,6 +6191,13 @@
                 allPrograms = await fetchSmartsheetData();
                 filteredPrograms = allPrograms.filter(p => hasValidSSID(p));
 
+                // Default sort: newest Created date first
+                filteredPrograms.sort((a, b) => {
+                    const da = a.createdDate ? a.createdDate.getTime() : 0;
+                    const db = b.createdDate ? b.createdDate.getTime() : 0;
+                    return db - da;
+                });
+
                 // Hide loading, show dashboard
                 document.getElementById('loadingIndicator').style.display = 'none';
                 document.getElementById('dashboardContent').style.display = 'block';
