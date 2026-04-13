@@ -242,18 +242,78 @@ td:first-child{text-align:left;color:var(--text);font-family:var(--font-sans);fo
 
 <div class="main">
 
-<div class="kpi-row" style="margin-top:8px;">
-  <div class="kpi"><div class="kpi-top gold"></div><div class="kpi-lbl">3-Year Total Actual Spend</div><div class="kpi-val cv" data-mxn="25960892">$25,960,892</div><div class="kpi-note">2023 + 2024 + 2025</div><span class="kpi-badge badge-up">+9.1% CAGR</span></div>
-  <div class="kpi"><div class="kpi-top sky"></div><div class="kpi-lbl">2023 Actual vs Budget</div><div class="kpi-val cv" data-mxn="8348144">$8,348,144</div><div class="kpi-note">Budget: <span class="cv" data-mxn="8942565">$8,942,565</span></div><span class="kpi-badge badge-dn">6.6% UNDER</span></div>
-  <div class="kpi"><div class="kpi-top sky"></div><div class="kpi-lbl">2024 Actual vs Budget</div><div class="kpi-val cv" data-mxn="8507841">$8,507,841</div><div class="kpi-note">Budget: <span class="cv" data-mxn="8879694">$8,879,694</span></div><span class="kpi-badge badge-dn">4.2% UNDER</span></div>
-  <div class="kpi"><div class="kpi-top red"></div><div class="kpi-lbl">2025 Actual vs Budget</div><div class="kpi-val cv" data-mxn="9104908">$9,104,908</div><div class="kpi-note">Budget: <span class="cv" data-mxn="9673894">$9,673,894</span></div><span class="kpi-badge badge-dn">5.9% UNDER</span></div>
+
+<!-- KPI ROW 1 — Fee vs Actual shortfall story -->
+<div class="kpi-row" style="margin-top:8px;grid-template-columns:repeat(4,1fr);">
+  <div class="kpi" style="border-top:3px solid var(--teal);background:linear-gradient(160deg,#fff 60%,rgba(42,157,138,.04));">
+    <div class="kpi-top teal"></div>
+    <div class="kpi-lbl">Annual Fee Revenue (estimated)</div>
+    <div class="kpi-val" style="color:var(--teal)"><span class="cv" data-mxn="7352904"></span></div>
+    <div class="kpi-note">58 units &middot; 100% collection &middot; <span id="feeUSDNote">USD $421,140</span></div>
+    <span class="kpi-badge" style="background:rgba(42,157,138,.1);color:var(--teal);">FLAT — 3 YRS</span>
+  </div>
+  <div class="kpi" style="border-top:3px solid var(--rose);">
+    <div class="kpi-top red"></div>
+    <div class="kpi-lbl">2023 Actual Spend vs Fees</div>
+    <div class="kpi-val" style="font-size:17px"><span class="cv" data-mxn="8348144"></span></div>
+    <div class="kpi-note">Shortfall: <strong style="color:var(--rose)"><span class="cv" data-mxn="995240">−$56,989</span></strong></div>
+    <span class="kpi-badge badge-up">88.1% COVERED</span>
+  </div>
+  <div class="kpi" style="border-top:3px solid var(--rose);">
+    <div class="kpi-top red"></div>
+    <div class="kpi-lbl">2024 Actual Spend vs Fees</div>
+    <div class="kpi-val" style="font-size:17px"><span class="cv" data-mxn="8507841"></span></div>
+    <div class="kpi-note">Shortfall: <strong style="color:var(--rose)"><span class="cv" data-mxn="1154937">−$66,137</span></strong></div>
+    <span class="kpi-badge badge-up">86.4% COVERED</span>
+  </div>
+  <div class="kpi" style="border-top:3px solid #c04040;box-shadow:0 0 0 1px rgba(192,64,64,.15);">
+    <div class="kpi-top red"></div>
+    <div class="kpi-lbl">2025 Actual Spend vs Fees</div>
+    <div class="kpi-val" style="font-size:17px;color:var(--rose)"><span class="cv" data-mxn="9104908"></span></div>
+    <div class="kpi-note">Shortfall: <strong style="color:var(--rose)"><span class="cv" data-mxn="1751004">−$100,333</span></strong></div>
+    <span class="kpi-badge badge-up">80.8% COVERED</span>
+  </div>
 </div>
-<div class="kpi-row">
-  <div class="kpi"><div class="kpi-top gold"></div><div class="kpi-lbl">Payroll Share (Avg)</div><div class="kpi-val">50.6%</div><div class="kpi-note">Largest single line item</div><span class="kpi-badge badge-warn">DOMINANT</span></div>
-  <div class="kpi"><div class="kpi-top red"></div><div class="kpi-lbl">"Other Expenses" 2024 Spike</div><div class="kpi-val cv" data-mxn="584922">$584,922</div><div class="kpi-note">Budget was <span class="cv" data-mxn="100000">$100,000</span></div><span class="kpi-badge badge-up">485% OVER</span></div>
-  <div class="kpi"><div class="kpi-top red"></div><div class="kpi-lbl">Elevator Maint. Volatility</div><div class="kpi-val">&plusmn;82.5%</div><div class="kpi-note"><span class="cv" data-mxn="119699">$119,699</span> (2024) vs <span class="cv" data-mxn="218707">$218,707</span> (2025)</div><span class="kpi-badge badge-up">HIGH RISK</span></div>
-  <div class="kpi"><div class="kpi-top green"></div><div class="kpi-lbl">Water Spend Trend</div><div class="kpi-val">-31.8%</div><div class="kpi-note"><span class="cv" data-mxn="493394">$493,394</span> (2023) to <span class="cv" data-mxn="336387">$336,387</span> (2025)</div><span class="kpi-badge badge-dn">POSITIVE</span></div>
+
+<!-- KPI ROW 2 — Shortfall trend + key flags -->
+<div class="kpi-row" style="grid-template-columns:repeat(5,1fr);">
+  <div class="kpi">
+    <div class="kpi-top red"></div>
+    <div class="kpi-lbl">Annual Deficit (2025)</div>
+    <div class="kpi-val" style="color:var(--rose)">~$100K</div>
+    <div class="kpi-note">USD &middot; gap nearly doubled since 2023</div>
+    <span class="kpi-badge badge-up">WIDENING</span>
+  </div>
+  <div class="kpi">
+    <div class="kpi-top gold"></div>
+    <div class="kpi-lbl">Payroll Share of Spend</div>
+    <div class="kpi-val">50.6%</div>
+    <div class="kpi-note">Largest single line item</div>
+    <span class="kpi-badge badge-warn">DOMINANT</span>
+  </div>
+  <div class="kpi">
+    <div class="kpi-top red"></div>
+    <div class="kpi-lbl">"Other Expenses" 2024 Spike</div>
+    <div class="kpi-val cv" data-mxn="584922">$584,922</div>
+    <div class="kpi-note">Budget was <span class="cv" data-mxn="100000">$100,000</span></div>
+    <span class="kpi-badge badge-up">485% OVER</span>
+  </div>
+  <div class="kpi">
+    <div class="kpi-top red"></div>
+    <div class="kpi-lbl">Elevator Maint. Volatility</div>
+    <div class="kpi-val">&plusmn;82.5%</div>
+    <div class="kpi-note"><span class="cv" data-mxn="119699">$119,699</span> (2024) vs <span class="cv" data-mxn="218707">$218,707</span> (2025)</div>
+    <span class="kpi-badge badge-up">HIGH RISK</span>
+  </div>
+  <div class="kpi">
+    <div class="kpi-top green"></div>
+    <div class="kpi-lbl">Water Spend Trend</div>
+    <div class="kpi-val">-31.8%</div>
+    <div class="kpi-note"><span class="cv" data-mxn="493394">$493,394</span> (2023) → <span class="cv" data-mxn="336387">$336,387</span> (2025)</div>
+    <span class="kpi-badge badge-dn">POSITIVE</span>
+  </div>
 </div>
+
 
 <!-- REVENUE BRIDGE -->
 <div class="sec-gap">
@@ -795,6 +855,8 @@ function updateDOM() {
   document.querySelectorAll('.cv[data-mxn]').forEach(el => {
     el.innerHTML = fmt(parseFloat(el.dataset.mxn));
   });
+  const fn = document.getElementById('feeUSDNote');
+  if (fn) fn.textContent = CUR === 'USD' ? 'MXN equiv. at 17.46' : 'USD $421,140';
 }
 
 // ── TABLE ──
