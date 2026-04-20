@@ -241,17 +241,122 @@
       background: #1A365C;
     }
 
+    /* Pricing Config Bar */
+    .pricing-bar {
+      background: linear-gradient(135deg, #FDF4FF 0%, #FAF5FF 100%);
+      padding: 12px 36px;
+      border-bottom: 1px solid #E9D5FF;
+      display: grid;
+      grid-template-columns: auto repeat(5, 1fr) auto;
+      gap: 10px 14px;
+      align-items: center;
+    }
+    .pricing-bar.hidden { display: none; }
+    .pb-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #7C3AED;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .pb-title::before {
+      content: '';
+      width: 3px;
+      height: 12px;
+      background: #7C3AED;
+      border-radius: 2px;
+    }
+
+    .price-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .price-input-group label {
+      font-size: 10px;
+      font-weight: 600;
+      color: #6B21A8;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .price-input-wrap {
+      position: relative;
+    }
+    .price-input-wrap .prefix {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      font-weight: 700;
+      color: #7C3AED;
+      pointer-events: none;
+    }
+    .price-input-wrap input[type="number"] {
+      padding-left: 22px;
+      padding-top: 7px;
+      padding-bottom: 7px;
+      border: 1.5px solid #D8B4FE;
+      background: #FFFFFF;
+      color: #6B21A8;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .price-input-wrap input[type="number"]:focus {
+      border-color: #7C3AED;
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+    }
+    .price-input-wrap input[type="number"]::-webkit-outer-spin-button,
+    .price-input-wrap input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .price-input-wrap input[type="number"] {
+      -moz-appearance: textfield;
+    }
+
+    .btn-reset-pricing {
+      background: #FFFFFF;
+      color: #7C3AED;
+      border: 1.5px solid #D8B4FE;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+      letter-spacing: 0.2px;
+    }
+    .btn-reset-pricing:hover {
+      background: #FAF5FF;
+      border-color: #7C3AED;
+    }
+    .btn-reset-pricing.flash {
+      background: #7C3AED;
+      color: #FFFFFF;
+      border-color: #7C3AED;
+    }
+
     /* Caregiver Sub Bar */
     .caregiver-bar {
       background: linear-gradient(135deg, #ECFDF5 0%, #F0FDF4 100%);
       padding: 14px 36px;
       border-bottom: 1px solid #D1FAE5;
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr;
-      gap: 16px;
+      grid-template-columns: auto 1fr 1fr 1fr;
+      gap: 12px 18px;
       align-items: center;
     }
     .caregiver-bar.hidden { display: none; }
+    .caregiver-bar .cb-rules-note {
+      grid-column: 1 / -1;
+    }
     .cb-title {
       font-size: 11px;
       font-weight: 700;
@@ -333,6 +438,51 @@
       border-left: 2px solid #0F766E;
     }
     .cb-rules-note strong { color: #064E3B; }
+
+    /* Margin floor slider - red variant */
+    .slider-group.margin-floor label { color: #B91C1C; }
+    .slider-group.margin-floor .slider-val { color: #B91C1C; }
+    .slider-group.margin-floor input[type="range"] { background: #FEE2E2; }
+    .slider-group.margin-floor input[type="range"]::-webkit-slider-thumb { background: #B91C1C; }
+    .slider-group.margin-floor input[type="range"]::-moz-range-thumb { background: #B91C1C; }
+
+    /* Warning banner */
+    .margin-warning {
+      background: #FEF2F2;
+      border: 1px solid #FCA5A5;
+      border-left: 4px solid #DC2626;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-top: 12px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #991B1B;
+      display: none;
+    }
+    .margin-warning.visible { display: block; }
+    .margin-warning strong { color: #7F1D1D; }
+
+    /* Floor card */
+    .insight-card.floor-card {
+      background: #FEF2F2;
+      border-color: #FCA5A5;
+    }
+    .insight-card.floor-card .insight-label { color: #991B1B; }
+    .insight-card.floor-card .insight-value { color: #991B1B; }
+    .insight-card.floor-card.safe {
+      background: linear-gradient(135deg, #F0FAF3 0%, #E6F4EA 100%);
+      border-color: #B7DFC6;
+    }
+    .insight-card.floor-card.safe .insight-label { color: #1B7A3D; }
+    .insight-card.floor-card.safe .insight-value { color: #1B7A3D; }
+
+    /* Effective rate card */
+    .insight-card.effective-card {
+      background: linear-gradient(135deg, #F0F9FF 0%, #DBEAFE 100%);
+      border-color: #93C5FD;
+    }
+    .insight-card.effective-card .insight-label { color: #1D4ED8; }
+    .insight-card.effective-card .insight-value { color: #1D4ED8; }
 
     /* Chart Section */
     .chart-section { padding: 28px 36px 18px; }
@@ -539,7 +689,7 @@
 
     .insights-grid {
       display: grid;
-      grid-template-columns: repeat(6, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 10px;
     }
 
@@ -884,12 +1034,14 @@
     /* Responsive */
     @media screen and (max-width: 1100px) {
       .controls-bar { grid-template-columns: repeat(4, 1fr); }
-      .caregiver-bar { grid-template-columns: 1fr 1fr; }
+      .pricing-bar { grid-template-columns: repeat(3, 1fr); }
+      .caregiver-bar { grid-template-columns: 1fr 1fr 1fr; }
       .insights-grid { grid-template-columns: repeat(3, 1fr); }
     }
 
     @media screen and (max-width: 700px) {
       .controls-bar { grid-template-columns: 1fr 1fr; padding: 16px 20px; }
+      .pricing-bar { grid-template-columns: 1fr 1fr; padding: 12px 20px; }
       .caregiver-bar { grid-template-columns: 1fr; padding: 14px 20px; }
       .chart-section { padding: 20px 20px 14px; }
       .insights-section { padding: 6px 20px 20px; }
@@ -1016,6 +1168,53 @@
         </div>
       </div>
 
+      <!-- Pricing Model Config Bar -->
+      <div class="pricing-bar">
+        <div class="pb-title">Pricing Model</div>
+
+        <div class="price-input-group">
+          <label for="pxUrgent">Urgent (&lt;24hr)</label>
+          <div class="price-input-wrap">
+            <span class="prefix">$</span>
+            <input type="number" id="pxUrgent" min="0" step="1" value="10">
+          </div>
+        </div>
+
+        <div class="price-input-group">
+          <label for="pxNight">Night (7p-7a) per hr</label>
+          <div class="price-input-wrap">
+            <span class="prefix">$</span>
+            <input type="number" id="pxNight" min="0" step="1" value="5">
+          </div>
+        </div>
+
+        <div class="price-input-group">
+          <label for="px1hr">1 hr first-hour</label>
+          <div class="price-input-wrap">
+            <span class="prefix">$</span>
+            <input type="number" id="px1hr" min="0" step="1" value="10">
+          </div>
+        </div>
+
+        <div class="price-input-group">
+          <label for="px2hr">2 hr second-hour</label>
+          <div class="price-input-wrap">
+            <span class="prefix">$</span>
+            <input type="number" id="px2hr" min="0" step="1" value="5">
+          </div>
+        </div>
+
+        <div class="price-input-group">
+          <label for="pxBase">Base rate (Companion)</label>
+          <div class="price-input-wrap">
+            <span class="prefix">$</span>
+            <input type="number" id="pxBase" min="0" step="1" value="45">
+          </div>
+        </div>
+
+        <button class="btn-reset-pricing" id="btnResetPricing" title="Reset to default values">Reset</button>
+      </div>
+
       <!-- Caregiver Sub-Bar (conditional) -->
       <div class="caregiver-bar hidden" id="caregiverBar">
         <div class="cb-title">Caregiver Pay Model</div>
@@ -1036,8 +1235,16 @@
           <input type="range" id="cgBonus" min="0" max="100" step="5" value="50">
         </div>
 
+        <div class="slider-group margin-floor">
+          <div class="slider-label-row">
+            <label for="cgFloor">Minimum margin floor</label>
+            <span class="slider-val" id="cgFloorVal">40%</span>
+          </div>
+          <input type="range" id="cgFloor" min="0" max="70" step="5" value="40">
+        </div>
+
         <div class="cb-rules-note">
-          <strong>Bonus trigger:</strong> urgent (&lt;24hr) AND 1-2 hour service. When triggered, the bonus pool = urgent fee ($10) + Companionship short-shift premium ($10 for 1 hr, $5 for 2 hr). The share % splits that pool between caregiver and alice.care. When the trigger does not apply, caregiver pay equals base rate × hours with no bonus. The overnight premium is never part of the pool.
+          <strong>Bonus pool = premium fees on this booking:</strong> urgent fee, night shift per-hour premium, and short-shift premium (1 hr and 2 hr Companionship). Premium amounts are configurable in the purple Pricing Model bar above. The share % splits the pool between caregiver bonus and alice.care margin. <strong>Margin floor</strong> flags hours where margin drops below the set threshold, letting you tune the bonus share without eroding profitability. Bonus is a one-time incentive per shift, not an hourly rate bump.
         </div>
       </div>
 
@@ -1062,6 +1269,7 @@
       <div class="insights-section">
         <div class="insights-title">Active Config Insights</div>
         <div class="insights-grid" id="insightsGrid"></div>
+        <div class="margin-warning" id="marginWarning"></div>
         <div class="narrative-callout" id="narrativeCallout"></div>
       </div>
 
@@ -1142,6 +1350,14 @@
       cgRateVal:       document.getElementById('cgRateVal'),
       cgBonus:         document.getElementById('cgBonus'),
       cgBonusVal:      document.getElementById('cgBonusVal'),
+      cgFloor:         document.getElementById('cgFloor'),
+      cgFloorVal:      document.getElementById('cgFloorVal'),
+      pxUrgent:        document.getElementById('pxUrgent'),
+      pxNight:         document.getElementById('pxNight'),
+      px1hr:           document.getElementById('px1hr'),
+      px2hr:           document.getElementById('px2hr'),
+      pxBase:          document.getElementById('pxBase'),
+      btnResetPricing: document.getElementById('btnResetPricing'),
       addToCartBtn:    document.getElementById('addToCartBtn'),
       chart:           document.getElementById('chart'),
       chartTitle:      document.getElementById('chartTitle'),
@@ -1150,6 +1366,7 @@
       serviceInfoBar:  document.getElementById('serviceInfoBar'),
       tooltip:         document.getElementById('tooltip'),
       insightsGrid:    document.getElementById('insightsGrid'),
+      marginWarning:   document.getElementById('marginWarning'),
       narrativeCallout:document.getElementById('narrativeCallout'),
       cartCount:       document.getElementById('cartCount'),
       cartContent:     document.getElementById('cartContent'),
@@ -1196,11 +1413,64 @@
         els.cgBonusVal.textContent = `${els.cgBonus.value}%`;
         update();
       });
+      els.cgFloor.addEventListener('input', () => {
+        els.cgFloorVal.textContent = `${els.cgFloor.value}%`;
+        update();
+      });
+
+      // Pricing model inputs
+      const handlePricingChange = () => { readPricingInputs(); update(); };
+      els.pxUrgent.addEventListener('input', handlePricingChange);
+      els.pxNight.addEventListener('input', handlePricingChange);
+      els.px1hr.addEventListener('input', handlePricingChange);
+      els.px2hr.addEventListener('input', handlePricingChange);
+      els.pxBase.addEventListener('input', handlePricingChange);
+
+      els.btnResetPricing.addEventListener('click', () => {
+        PRICING = { ...DEFAULT_PRICING };
+        writePricingInputs();
+        els.btnResetPricing.classList.add('flash');
+        els.btnResetPricing.textContent = '✓ Reset';
+        setTimeout(() => {
+          els.btnResetPricing.classList.remove('flash');
+          els.btnResetPricing.textContent = 'Reset';
+        }, 1200);
+        update();
+      });
       els.addToCartBtn.addEventListener('click', addToCart);
       els.btnClearCart.addEventListener('click', clearCart);
 
+      readPricingInputs();  // sync PRICING object with initial DOM values
       update();
       renderCart();
+    }
+
+    // ===== Pricing Model Config =====
+    // Configurable pricing values that drive all revenue and caregiver bonus math.
+    // Changing these values re-runs the entire analysis without page reload.
+    const DEFAULT_PRICING = {
+      urgent:      10,  // <24hr booking premium (flat per booking)
+      night:        5,  // overnight per-hour premium (7 PM to 7 AM)
+      shortHour1:  10,  // 1-hour Companionship short-visit premium (added to first hour)
+      shortHour2:   5,  // 2-hour Companionship premium (added to first hour)
+      baseCompanion: 45 // Companionship hourly base rate
+    };
+    let PRICING = { ...DEFAULT_PRICING };
+
+    function readPricingInputs() {
+      PRICING.urgent        = Math.max(0, parseFloat(els.pxUrgent.value) || 0);
+      PRICING.night         = Math.max(0, parseFloat(els.pxNight.value)  || 0);
+      PRICING.shortHour1    = Math.max(0, parseFloat(els.px1hr.value)    || 0);
+      PRICING.shortHour2    = Math.max(0, parseFloat(els.px2hr.value)    || 0);
+      PRICING.baseCompanion = Math.max(0, parseFloat(els.pxBase.value)   || 0);
+    }
+
+    function writePricingInputs() {
+      els.pxUrgent.value = PRICING.urgent;
+      els.pxNight.value  = PRICING.night;
+      els.px1hr.value    = PRICING.shortHour1;
+      els.px2hr.value    = PRICING.shortHour2;
+      els.pxBase.value   = PRICING.baseCompanion;
     }
 
     // ===== Calculation =====
@@ -1216,23 +1486,31 @@
     function calcCost(serviceId, duration, startHour, urgent, recurring, miles) {
       let base = 0;
       if (serviceId === '100') {
-        if (duration === 1) base = 55;
-        else if (duration <= 3) base = 45 * duration + 5;
-        else { const rate = recurring ? 40 : 45; base = rate * duration; }
+        // Companionship: base rate × hours, plus short-shift premiums
+        if (duration === 1) base = PRICING.baseCompanion + PRICING.shortHour1;
+        else if (duration <= 3) base = PRICING.baseCompanion * duration + PRICING.shortHour2;
+        else {
+          // 4 to 8 hour tier: reduced rate when recurring, else base rate
+          const rate = recurring ? Math.max(0, PRICING.baseCompanion - 5) : PRICING.baseCompanion;
+          base = rate * duration;
+        }
       } else if (serviceId === '610') {
+        // Transportation: fixed $55/hr (not part of configurable pricing model)
         base = 55 * duration + (miles || 0);
       } else {
+        // Task services use their menu-defined price
         base = SERVICES[serviceId].price;
         duration = 1;
       }
-      if (urgent) base += 10;
+      if (urgent) base += PRICING.urgent;
       const overnightHours = countOvernightHours(startHour, duration);
-      base += overnightHours * 5;
+      base += overnightHours * PRICING.night;
       return { total: base, overnightHours };
     }
 
     function calcBaseline(serviceId, duration, miles) {
-      if (serviceId === '100') return 45 * duration;
+      // Baseline = old flat-rate model (no modifiers at all)
+      if (serviceId === '100') return PRICING.baseCompanion * duration;
       if (serviceId === '610') return 55 * duration + (miles || 0);
       return SERVICES[serviceId].price;
     }
@@ -1240,13 +1518,11 @@
     // Caregiver cost at a given start hour, given the active config
     // Caregiver pay breakdown.
     // Base pay: always rate × effective_hours.
-    // Bonus incentive: triggers ONLY when urgent (<24hr) AND service duration is 1 or 2 hours.
-    // When triggered, the bonus pool = urgent fee ($10) + short-shift premium ($10 for 1hr
-    // Companionship, $5 for 2hr Companionship, $0 for tasks since they have no short-shift
-    // premium in the pricing model). The share % determines how much of that pool goes to
-    // the caregiver as bonus. The rest stays in alice.care margin. Overnight premium is NOT
-    // part of the bonus pool. This bonus is a one-time incentive per shift, not an hourly rate bump.
-    function calcCaregiverBreakdown(serviceId, duration, urgent, rate, bonusPct) {
+    // Bonus incentive: the share % applied to the total premium fees charged on this booking.
+    // Premium fees in the pool: urgent + night + short-shift (all configurable above).
+    // The share % splits the pool between caregiver (bonus) and alice.care. The bonus is a
+    // one-time incentive per shift, not an hourly rate bump.
+    function calcCaregiverBreakdown(serviceId, duration, urgent, rate, bonusPct, startHour) {
       const service = SERVICES[serviceId];
       const effHours = service.type === 'task' ? 1 : duration;
       const basePay = rate * effHours;
@@ -1254,28 +1530,36 @@
       const premiumParts = [];
       let bonusPool = 0;
 
-      // Bonus triggers ONLY when urgent AND 1-2 effective hours
-      const triggers = urgent && effHours >= 1 && effHours <= 2;
+      // Urgent (<24hr) premium
+      if (urgent && PRICING.urgent > 0) {
+        bonusPool += PRICING.urgent;
+        premiumParts.push({ name: 'Urgent (<24hr)', amount: PRICING.urgent });
+      }
 
-      if (triggers) {
-        // Urgent fee
-        bonusPool += 10;
-        premiumParts.push({ name: 'Urgent (<24hr)', amount: 10 });
+      // Night shift premium (when startHour is provided, count overnight hours inside shift)
+      const overnightHours = (startHour !== undefined && startHour !== null)
+        ? countOvernightHours(startHour, effHours)
+        : 0;
+      if (overnightHours > 0 && PRICING.night > 0) {
+        const amount = overnightHours * PRICING.night;
+        bonusPool += amount;
+        premiumParts.push({ name: `Night shift (${overnightHours} × $${PRICING.night})`, amount });
+      }
 
-        // Short-shift premium applies only to Companionship (tasks have no such premium)
-        if (serviceId === '100') {
-          if (duration === 1) {
-            bonusPool += 10;
-            premiumParts.push({ name: '1-hour short-visit', amount: 10 });
-          } else if (duration === 2) {
-            bonusPool += 5;
-            premiumParts.push({ name: '2-hour first-hour', amount: 5 });
-          }
+      // 1 or 2 hour service premium (Companionship only)
+      if (serviceId === '100') {
+        if (duration === 1 && PRICING.shortHour1 > 0) {
+          bonusPool += PRICING.shortHour1;
+          premiumParts.push({ name: '1-hour short-visit', amount: PRICING.shortHour1 });
+        } else if (duration === 2 && PRICING.shortHour2 > 0) {
+          bonusPool += PRICING.shortHour2;
+          premiumParts.push({ name: '2-hour first-hour', amount: PRICING.shortHour2 });
         }
       }
 
       const caregiverBonus = bonusPool * (bonusPct / 100);
       const companyShare = bonusPool - caregiverBonus;
+      const triggers = bonusPool > 0;
 
       return {
         base: basePay,
@@ -1283,6 +1567,7 @@
         rate,
         triggers,
         bonusPool,
+        overnightHours,
         premiumParts,
         caregiverBonus,
         companyShare,
@@ -1292,10 +1577,10 @@
     }
 
     function calcCaregiverCost(serviceId, duration, startHour, urgent, recurring, miles, rate, bonusPct) {
-      return calcCaregiverBreakdown(serviceId, duration, urgent, rate, bonusPct).total;
+      return calcCaregiverBreakdown(serviceId, duration, urgent, rate, bonusPct, startHour).total;
     }
 
-    // Builds both total pay and base pay data for each hour (both flat across hours in this model)
+    // Builds flat base pay line (rate × effective hours, no bonus)
     function calcCaregiverBaseOnly(serviceId, duration, rate) {
       const service = SERVICES[serviceId];
       const effHours = service.type === 'task' ? 1 : duration;
@@ -1476,6 +1761,10 @@
             <span class="legend-swatch margin"></span>
             <span>Gross margin</span>
           </div>
+          <div class="legend-item">
+            <span class="legend-swatch" style="background:rgba(220,38,38,0.12);border:1px solid rgba(220,38,38,0.5);height:12px;border-radius:3px;"></span>
+            <span>Below margin floor</span>
+          </div>
         `;
       }
 
@@ -1592,7 +1881,7 @@
 
       const caregiverPath = caregiverData ? caregiverData.map((d, i) => `${i === 0 ? 'M' : 'L'} ${xScale(d.hour)} ${yScale(d.cost)}`).join(' ') : '';
 
-      // Base pay line (flat, below total pay when bonus triggers, otherwise same as total)
+      // Base pay line (flat horizontal, always at rate × effective_hours)
       let caregiverBasePay = null;
       let caregiverBasePath = '';
       let bonusExists = false;
@@ -1601,9 +1890,9 @@
         const dur = SERVICES[svcId].type === 'task' ? 1 : parseInt(els.duration.value, 10);
         const rate = parseFloat(els.cgRate.value);
         caregiverBasePay = calcCaregiverBaseOnly(svcId, dur, rate);
-        // Flat horizontal line at base pay
         caregiverBasePath = `M ${xScale(0)} ${yScale(caregiverBasePay)} L ${xScale(23)} ${yScale(caregiverBasePay)}`;
-        bonusExists = caregiverData[0].cost > caregiverBasePay + 0.01;
+        // Bonus exists if ANY hour has total > base (overnight makes this vary now)
+        bonusExists = caregiverData.some(d => d.cost > caregiverBasePay + 0.01);
       }
 
       // Margin area: between active (top) and TOTAL caregiver pay (bottom)
@@ -1614,16 +1903,15 @@
         marginArea = `${forward} ${backward} Z`;
       }
 
-      // Bonus band: filled area between base pay (below) and total pay (above), only when bonus > 0
+      // Bonus band: filled area between base pay (flat, bottom) and total pay curve (top, varies by hour).
+      // When total pay == base (no bonus at that hour), the band has zero height there.
       let bonusBand = '';
       if (showCaregiver && caregiverData && bonusExists) {
-        const topY = yScale(caregiverData[0].cost);
-        const botY = yScale(caregiverBasePay);
-        bonusBand = `
-          <rect x="${PAD.left}" y="${topY}"
-                width="${W}" height="${botY - topY}"
-                fill="url(#bonusGradient)" opacity="1" />
-        `;
+        // Top edge: follow total pay curve from left to right
+        const top = caregiverData.map((d, i) => `${i === 0 ? 'M' : 'L'} ${xScale(d.hour)} ${yScale(d.cost)}`).join(' ');
+        // Bottom edge: horizontal base pay line going right-to-left
+        const bottom = `L ${xScale(23)} ${yScale(caregiverBasePay)} L ${xScale(0)} ${yScale(caregiverBasePay)} Z`;
+        bonusBand = `<path d="${top} ${bottom}" fill="url(#bonusGradient)" />`;
       }
 
       // Baseline line
@@ -1650,11 +1938,31 @@
                 stroke-linejoin="round" stroke-linecap="round" opacity="0.9"
                 ${classAttr} />
         `;
-        // Small dots at each data point on cart lines (so they're visible even when overlapping)
         item.data.forEach(d => {
           cartPaths += `<circle cx="${xScale(d.hour)}" cy="${yScale(d.cost)}" r="2" fill="${item.color}" opacity="0.9" />`;
         });
       });
+
+      // Margin floor danger zones: vertical red shading for hours where margin % falls below floor
+      let dangerZones = '';
+      if (showCaregiver && caregiverData) {
+        const marginFloor = parseInt(els.cgFloor.value, 10);
+        const hourWidth = W / 23;
+        caregiverData.forEach((cg, i) => {
+          const rev = activeData[i].cost;
+          const marginPct = rev > 0 ? (rev - cg.cost) / rev * 100 : 0;
+          if (marginPct < marginFloor) {
+            const cx = xScale(activeData[i].hour);
+            dangerZones += `
+              <rect x="${cx - hourWidth / 2}" y="${PAD.top}"
+                    width="${hourWidth}" height="${H}"
+                    fill="#DC2626" opacity="0.08" />
+              <line x1="${cx}" y1="${PAD.top}" x2="${cx}" y2="${PAD.top + H}"
+                    stroke="#DC2626" stroke-width="1" stroke-dasharray="2 3" opacity="0.5" />
+            `;
+          }
+        });
+      }
 
       // Active data dots
       const activeDots = activeData.map(d => `
@@ -1693,15 +2001,12 @@
         </g>
       ` : '';
 
-      // Compute caregiver breakdown once (it's flat across hours)
+      // Compute caregiver breakdown per hour (overnight now affects bonus pool)
       const activeServiceId = els.service.value;
       const activeDuration = SERVICES[activeServiceId].type === 'task' ? 1 : parseInt(els.duration.value, 10);
       const activeUrgent = els.urgent.checked;
       const cgRateVal = parseFloat(els.cgRate.value);
       const cgBonusVal = parseInt(els.cgBonus.value, 10);
-      const cgBreakdown = caregiverData
-        ? calcCaregiverBreakdown(activeServiceId, activeDuration, activeUrgent, cgRateVal, cgBonusVal)
-        : null;
 
       // Hit zones
       const hitZones = activeData.map((d, i) => {
@@ -1714,6 +2019,12 @@
           color: item.color,
           cost: item.data[i].cost
         }));
+
+        // Per-hour breakdown (pool varies with overnight)
+        const bdAtHour = caregiverData
+          ? calcCaregiverBreakdown(activeServiceId, activeDuration, activeUrgent, cgRateVal, cgBonusVal, d.hour)
+          : null;
+
         return `
           <rect x="${xScale(d.hour) - 16}" y="${PAD.top}"
                 width="32" height="${H}"
@@ -1723,10 +2034,11 @@
                 data-baseline="${baselineValue}"
                 data-show-baseline="${showBaseline}"
                 data-caregiver="${caregiverVal !== null ? caregiverVal : ''}"
-                data-cg-base="${cgBreakdown ? cgBreakdown.base : ''}"
-                data-cg-bonus="${cgBreakdown ? cgBreakdown.caregiverBonus : ''}"
-                data-cg-pool="${cgBreakdown ? cgBreakdown.bonusPool : ''}"
-                data-cg-triggers="${cgBreakdown ? cgBreakdown.triggers : ''}"
+                data-cg-base="${bdAtHour ? bdAtHour.base : ''}"
+                data-cg-bonus="${bdAtHour ? bdAtHour.caregiverBonus : ''}"
+                data-cg-pool="${bdAtHour ? bdAtHour.bonusPool : ''}"
+                data-cg-triggers="${bdAtHour ? bdAtHour.triggers : ''}"
+                data-cg-parts='${bdAtHour ? JSON.stringify(bdAtHour.premiumParts) : "[]"}'
                 data-margin="${margin !== null ? margin : ''}"
                 data-margin-pct="${marginPct !== null ? marginPct : ''}"
                 data-on="${d.overnightHours}"
@@ -1770,6 +2082,7 @@
         </defs>
 
         ${overnightBands}
+        ${dangerZones}
         ${gridLines.join('')}
         ${xTicks.join('')}
         ${yAxisLabel}
@@ -1802,22 +2115,33 @@
         ${showCaregiver && caregiverData ? `
           <path d="${caregiverPath}" fill="none" stroke="#0F766E" stroke-width="2.5"
                 stroke-linejoin="round" stroke-linecap="round" />
-          ${bonusExists ? `
-            <path d="${caregiverBasePath}" fill="none" stroke="#0F766E" stroke-width="1.5"
-                  stroke-dasharray="5 4" stroke-linejoin="round" stroke-linecap="round" opacity="0.75" />
-            <rect x="${PAD.left + 6}" y="${yScale(caregiverBasePay) - 9}" width="96" height="14" rx="7"
-                  fill="#ECFDF5" stroke="#0F766E" stroke-width="1" opacity="0.95" />
-            <text x="${PAD.left + 54}" y="${yScale(caregiverBasePay) + 1}" text-anchor="middle"
-                  font-size="10" fill="#064E3B" font-family="Poppins" font-weight="700">
-              Base pay $${caregiverBasePay.toFixed(0)}
-            </text>
-            <rect x="${PAD.left + 6}" y="${yScale(caregiverData[0].cost) - 9}" width="108" height="14" rx="7"
-                  fill="#0F766E" opacity="0.95" />
-            <text x="${PAD.left + 60}" y="${yScale(caregiverData[0].cost) + 1}" text-anchor="middle"
-                  font-size="10" fill="#FFFFFF" font-family="Poppins" font-weight="700">
-              Total pay $${caregiverData[0].cost.toFixed(0)}
-            </text>
-          ` : `
+          ${bonusExists ? (() => {
+            const totalMin = Math.min(...caregiverData.map(d => d.cost));
+            const totalMax = Math.max(...caregiverData.map(d => d.cost));
+            const maxIdxCg = caregiverData.findIndex(d => d.cost === totalMax);
+            const labelAtMaxX = xScale(caregiverData[maxIdxCg].hour);
+            const labelAtMaxY = yScale(totalMax);
+            const totalLabelText = totalMin === totalMax
+              ? `Total pay $${totalMin.toFixed(0)}`
+              : `Total pay $${totalMin.toFixed(0)}-${totalMax.toFixed(0)}`;
+            const totalLabelW = totalLabelText.length * 6 + 18;
+            return `
+              <path d="${caregiverBasePath}" fill="none" stroke="#0F766E" stroke-width="1.5"
+                    stroke-dasharray="5 4" stroke-linejoin="round" stroke-linecap="round" opacity="0.75" />
+              <rect x="${PAD.left + 6}" y="${yScale(caregiverBasePay) - 9}" width="96" height="14" rx="7"
+                    fill="#ECFDF5" stroke="#0F766E" stroke-width="1" opacity="0.95" />
+              <text x="${PAD.left + 54}" y="${yScale(caregiverBasePay) + 1}" text-anchor="middle"
+                    font-size="10" fill="#064E3B" font-family="Poppins" font-weight="700">
+                Base pay $${caregiverBasePay.toFixed(0)}
+              </text>
+              <rect x="${PAD.left + 6}" y="${PAD.top + 4}" width="${totalLabelW}" height="14" rx="7"
+                    fill="#0F766E" opacity="0.95" />
+              <text x="${PAD.left + 6 + totalLabelW / 2}" y="${PAD.top + 14}" text-anchor="middle"
+                    font-size="10" fill="#FFFFFF" font-family="Poppins" font-weight="700">
+                ${totalLabelText}
+              </text>
+            `;
+          })() : `
             <rect x="${PAD.left + 6}" y="${yScale(caregiverData[0].cost) - 9}" width="108" height="14" rx="7"
                   fill="#0F766E" opacity="0.95" />
             <text x="${PAD.left + 60}" y="${yScale(caregiverData[0].cost) + 1}" text-anchor="middle"
@@ -1873,17 +2197,21 @@
         const cgBonusStr = zone.dataset.cgBonus;
         const cgPoolStr = zone.dataset.cgPool;
         const cgTriggersStr = zone.dataset.cgTriggers;
+        const cgPartsStr = zone.dataset.cgParts;
         const cgBase = cgBaseStr !== '' ? parseFloat(cgBaseStr) : null;
         const cgBonusAmt = cgBonusStr !== '' ? parseFloat(cgBonusStr) : null;
         const cgPool = cgPoolStr !== '' ? parseFloat(cgPoolStr) : null;
         const triggers = cgTriggersStr === 'true';
+        const parts = cgPartsStr ? JSON.parse(cgPartsStr) : [];
 
         html += `<div class="tt-detail tt-group tt-caregiver">Base pay: <strong>$${cgBase.toFixed(2)}</strong></div>`;
         if (triggers && cgBonusAmt > 0) {
-          html += `<div class="tt-detail tt-caregiver" style="opacity:0.9;">+ Bonus: <strong>$${cgBonusAmt.toFixed(2)}</strong> <span style="opacity:0.7;">(share of $${cgPool.toFixed(0)} pool)</span></div>`;
+          const partsInline = parts.map(p => `$${p.amount}`).join(' + ');
+          html += `<div class="tt-detail tt-caregiver" style="opacity:0.9;">Pool: ${partsInline} = <strong>$${cgPool.toFixed(0)}</strong></div>`;
+          html += `<div class="tt-detail tt-caregiver" style="opacity:0.9;">+ Bonus: <strong>$${cgBonusAmt.toFixed(2)}</strong> <span style="opacity:0.7;">(caregiver share)</span></div>`;
           html += `<div class="tt-detail tt-caregiver" style="opacity:0.95;">= Total: <strong>$${caregiver.toFixed(2)}</strong></div>`;
         } else {
-          html += `<div class="tt-detail tt-caregiver" style="opacity:0.75;">No bonus triggered on this booking</div>`;
+          html += `<div class="tt-detail tt-caregiver" style="opacity:0.75;">No premium fees on this booking</div>`;
         }
         html += `<div class="tt-detail tt-margin ${marginClass}">Margin: <strong>$${margin.toFixed(2)}</strong> (${marginPct.toFixed(0)}%)</div>`;
       }
@@ -1971,45 +2299,110 @@
       `;
 
       if (showCaregiver && caregiverData) {
-        // Get breakdown info for display
         const serviceId = els.service.value;
         const duration = SERVICES[serviceId].type === 'task' ? 1 : parseInt(els.duration.value, 10);
         const urgent = els.urgent.checked;
         const cgRate = parseFloat(els.cgRate.value);
         const cgBonus = parseInt(els.cgBonus.value, 10);
-        const breakdown = calcCaregiverBreakdown(serviceId, duration, urgent, cgRate, cgBonus);
+        const marginFloor = parseInt(els.cgFloor.value, 10);
 
-        // Base pay card (always shown)
-        const baseDetail = `$${breakdown.rate.toFixed(2)}/hr × ${breakdown.effHours} hr`;
+        // Compute bonus across all hours (varies with overnight now)
+        const hourlyBreakdowns = [];
+        for (let h = 0; h < 24; h++) {
+          hourlyBreakdowns.push(calcCaregiverBreakdown(serviceId, duration, urgent, cgRate, cgBonus, h));
+        }
+        const bonuses = hourlyBreakdowns.map(b => b.caregiverBonus);
+        const pools = hourlyBreakdowns.map(b => b.bonusPool);
+        const bonusMin = Math.min(...bonuses);
+        const bonusMax = Math.max(...bonuses);
+        const poolMin = Math.min(...pools);
+        const poolMax = Math.max(...pools);
 
-        // Bonus incentive card
-        let bonusDetail;
-        if (breakdown.triggers) {
-          const poolParts = breakdown.premiumParts.map(p => `$${p.amount}`).join(' + ');
-          bonusDetail = `${cgBonus}% of $${breakdown.bonusPool} pool (${poolParts})`;
-        } else if (!urgent && breakdown.effHours <= 2) {
-          bonusDetail = 'Needs urgent (&lt;24hr) booking to trigger';
-        } else if (urgent && breakdown.effHours > 2) {
-          bonusDetail = 'Needs 1 or 2 hour service to trigger';
+        const baseOnly = hourlyBreakdowns[0].base;
+        const baseDetail = `$${cgRate.toFixed(2)}/hr × ${hourlyBreakdowns[0].effHours} hr`;
+
+        // Effective hourly rate = total caregiver pay / effective hours
+        const effRates = caregiverData.map(d => d.cost / hourlyBreakdowns[0].effHours);
+        const effMin = Math.min(...effRates);
+        const effMax = Math.max(...effRates);
+
+        // Margin% at each hour
+        const marginPcts = data.map((d, i) => d.cost > 0 ? (d.cost - caregiverData[i].cost) / d.cost * 100 : 0);
+        const minMarginPct = Math.min(...marginPcts);
+        const maxMarginPct = Math.max(...marginPcts);
+        const breachHours = marginPcts.filter(p => p < marginFloor).length;
+        const floorSafe = breachHours === 0;
+
+        // Bonus card content
+        let bonusValue, bonusDetail;
+        if (bonusMax === 0) {
+          bonusValue = '$0.00';
+          bonusDetail = 'No premium fees on this booking';
+        } else if (bonusMin === bonusMax) {
+          bonusValue = `+$${bonusMin.toFixed(2)}`;
+          bonusDetail = `${cgBonus}% of $${poolMin} pool · flat across hours`;
         } else {
-          bonusDetail = 'Needs urgent AND 1-2 hr service';
+          bonusValue = `+$${bonusMin.toFixed(2)} to $${bonusMax.toFixed(2)}`;
+          bonusDetail = `Pool $${poolMin} to $${poolMax} · ${cgBonus}% share`;
         }
 
-        const bonusClass = breakdown.caregiverBonus > 0 ? '' : 'negative';
+        const bonusClass = bonusMax > 0 ? '' : 'negative';
+
+        // Effective rate display
+        const effValue = effMin === effMax
+          ? `$${effMin.toFixed(2)}`
+          : `$${effMin.toFixed(2)} to $${effMax.toFixed(2)}`;
+        const effDetail = effMin === effMax
+          ? `Flat across all hours`
+          : `Peaks on overnight bookings`;
+
+        // Floor card content
+        const floorLabel = floorSafe ? 'Margin Floor · Safe' : 'Margin Floor · At Risk';
+        const floorValueText = `${minMarginPct.toFixed(0)}% min`;
+        const floorDetail = floorSafe
+          ? `All 24 hrs ≥ ${marginFloor}% threshold`
+          : `${breachHours} of 24 hrs below ${marginFloor}% floor`;
 
         html += `
           <div class="insight-card caregiver-card">
             <div class="insight-label">Caregiver Base Pay</div>
-            <div class="insight-value">$${breakdown.base.toFixed(2)}</div>
+            <div class="insight-value">$${baseOnly.toFixed(2)}</div>
             <div class="insight-detail">${baseDetail}</div>
           </div>
           <div class="insight-card margin-card">
             <div class="insight-label">Bonus Incentive</div>
-            <div class="insight-value ${bonusClass}" style="${breakdown.caregiverBonus === 0 ? 'color:#94A3B8;' : ''}">${breakdown.caregiverBonus > 0 ? '+' : ''}$${breakdown.caregiverBonus.toFixed(2)}</div>
+            <div class="insight-value ${bonusClass}" style="${bonusMax === 0 ? 'color:#94A3B8;' : ''}${bonusMin !== bonusMax ? 'font-size:15px;' : ''}">${bonusValue}</div>
             <div class="insight-detail">${bonusDetail}</div>
           </div>
+          <div class="insight-card effective-card">
+            <div class="insight-label">Effective Rate / hr</div>
+            <div class="insight-value" style="${effMin !== effMax ? 'font-size:15px;' : ''}">${effValue}</div>
+            <div class="insight-detail">${effDetail}</div>
+          </div>
+          <div class="insight-card floor-card ${floorSafe ? 'safe' : ''}">
+            <div class="insight-label">${floorLabel}</div>
+            <div class="insight-value">${floorValueText}</div>
+            <div class="insight-detail">${floorDetail}</div>
+          </div>
         `;
+
+        // Warning banner
+        if (!floorSafe) {
+          const breachHoursList = data
+            .filter((_, i) => marginPcts[i] < marginFloor)
+            .map(d => formatHour(d.hour));
+          const hoursLabel = breachHoursList.length <= 6
+            ? breachHoursList.join(', ')
+            : `${breachHoursList.slice(0, 4).join(', ')}, and ${breachHoursList.length - 4} more`;
+          els.marginWarning.innerHTML = `
+            <strong>⚠ Margin floor breach:</strong> At ${cgBonus}% bonus share, <strong>${breachHours} hour${breachHours > 1 ? 's' : ''}</strong> fall below your ${marginFloor}% margin floor. Minimum margin on this config is <strong>${minMarginPct.toFixed(1)}%</strong>. At-risk start times: ${hoursLabel}. Lower the bonus share or raise the revenue to restore margin.
+          `;
+          els.marginWarning.classList.add('visible');
+        } else {
+          els.marginWarning.classList.remove('visible');
+        }
       } else {
+        els.marginWarning.classList.remove('visible');
         html += `
           <div class="insight-card urgent-impact">
             <div class="insight-label">Urgent Fee</div>
@@ -2067,22 +2460,41 @@
         const serviceId = els.service.value;
         const cgRate = parseFloat(els.cgRate.value);
         const cgBonus = parseInt(els.cgBonus.value, 10);
-        const breakdown = calcCaregiverBreakdown(serviceId, duration, urgent, cgRate, cgBonus);
-        const cgVal = breakdown.total;
-        const bestMargin = Math.max(...data.map(d => d.cost - cgVal));
-        const worstMargin = Math.min(...data.map(d => d.cost - cgVal));
-        const bestMarginPct = maxVal > 0 ? (bestMargin / maxVal * 100) : 0;
-        const worstMarginPct = minVal > 0 ? (worstMargin / minVal * 100) : 0;
 
-        if (breakdown.triggers && breakdown.caregiverBonus > 0) {
-          const partsText = breakdown.premiumParts.map(p => `<strong>${p.name} ($${p.amount})</strong>`).join(' + ');
-          narrative += ` <span class="narrative-highlight">Caregiver pay model:</span> base pay is $${cgRate.toFixed(2)}/hr × ${breakdown.effHours} hr = <strong>$${breakdown.base.toFixed(2)}</strong>. The booking triggers a bonus because it is urgent AND ${breakdown.effHours} hour${breakdown.effHours > 1 ? 's' : ''}. Bonus pool = ${partsText} = <strong>$${breakdown.bonusPool}</strong>. At ${cgBonus}% share, caregiver earns a bonus of <strong>$${breakdown.caregiverBonus.toFixed(2)}</strong> on top of base, bringing total to <strong>$${cgVal.toFixed(2)}</strong>. alice.care keeps $${breakdown.companyShare.toFixed(2)} from the pool plus all overnight premium. Margin swings from <strong>$${worstMargin.toFixed(0)}</strong> (${worstMarginPct.toFixed(0)}%) to <strong>$${bestMargin.toFixed(0)}</strong> (${bestMarginPct.toFixed(0)}%) driven entirely by overnight exposure.`;
+        // Per-hour breakdowns
+        const breakdowns = [];
+        for (let h = 0; h < 24; h++) {
+          breakdowns.push(calcCaregiverBreakdown(serviceId, duration, urgent, cgRate, cgBonus, h));
+        }
+        const bonuses = breakdowns.map(b => b.caregiverBonus);
+        const pools = breakdowns.map(b => b.bonusPool);
+        const bonusMin = Math.min(...bonuses);
+        const bonusMax = Math.max(...bonuses);
+        const poolMin = Math.min(...pools);
+        const poolMax = Math.max(...pools);
+        const baseOnly = breakdowns[0].base;
+
+        // Margin range
+        const margins = data.map((d, i) => d.cost - caregiverData[i].cost);
+        const bestMargin = Math.max(...margins);
+        const worstMargin = Math.min(...margins);
+        const bestMarginIdx = margins.indexOf(bestMargin);
+        const worstMarginIdx = margins.indexOf(worstMargin);
+        const bestMarginPct = data[bestMarginIdx].cost > 0 ? (bestMargin / data[bestMarginIdx].cost * 100) : 0;
+        const worstMarginPct = data[worstMarginIdx].cost > 0 ? (worstMargin / data[worstMarginIdx].cost * 100) : 0;
+
+        if (bonusMax === 0) {
+          narrative += ` <span class="narrative-highlight">Caregiver pay model:</span> no premium fees apply to this booking. Caregiver earns base pay only: $${cgRate.toFixed(2)}/hr × ${breakdowns[0].effHours} hr = <strong>$${baseOnly.toFixed(2)}</strong>. All revenue flows to alice.care as margin. Margin ranges from <strong>$${worstMargin.toFixed(0)}</strong> (${worstMarginPct.toFixed(0)}%) to <strong>$${bestMargin.toFixed(0)}</strong> (${bestMarginPct.toFixed(0)}%).`;
+        } else if (bonusMin === bonusMax) {
+          // Flat bonus (no overnight variation in pool)
+          const parts = breakdowns[0].premiumParts.map(p => `<strong>${p.name} ($${p.amount})</strong>`).join(' + ');
+          narrative += ` <span class="narrative-highlight">Caregiver pay model:</span> base pay is $${cgRate.toFixed(2)}/hr × ${breakdowns[0].effHours} hr = <strong>$${baseOnly.toFixed(2)}</strong>. Bonus pool = ${parts} = <strong>$${poolMin}</strong> (flat across all start hours). At ${cgBonus}% share, caregiver earns a bonus of <strong>$${bonusMin.toFixed(2)}</strong>. Our margin swings from <strong>$${worstMargin.toFixed(0)}</strong> (${worstMarginPct.toFixed(0)}%) to <strong>$${bestMargin.toFixed(0)}</strong> (${bestMarginPct.toFixed(0)}%) based on overnight exposure in revenue.`;
         } else {
-          let reason = '';
-          if (!urgent && breakdown.effHours <= 2) reason = 'the booking is not urgent';
-          else if (urgent && breakdown.effHours > 2) reason = 'the service is longer than 2 hours';
-          else reason = 'neither the urgent nor short-shift conditions apply';
-          narrative += ` <span class="narrative-highlight">Caregiver pay model:</span> no bonus triggers because ${reason}. Caregiver earns base pay only: $${cgRate.toFixed(2)}/hr × ${breakdown.effHours} hr = <strong>$${cgVal.toFixed(2)}</strong>. Margin ranges from <strong>$${worstMargin.toFixed(0)}</strong> (${worstMarginPct.toFixed(0)}%) to <strong>$${bestMargin.toFixed(0)}</strong> (${bestMarginPct.toFixed(0)}%), all from overnight pricing alice.care keeps.`;
+          // Variable bonus (overnight hours vary)
+          const peakBd = breakdowns.reduce((a, b) => a.bonusPool > b.bonusPool ? a : b);
+          const peakParts = peakBd.premiumParts.map(p => `<strong>${p.name} ($${p.amount})</strong>`).join(' + ');
+          const peakHour = breakdowns.indexOf(peakBd);
+          narrative += ` <span class="narrative-highlight">Caregiver pay model:</span> base pay is $${cgRate.toFixed(2)}/hr × ${breakdowns[0].effHours} hr = <strong>$${baseOnly.toFixed(2)}</strong>. The bonus pool varies by start hour because overnight premium flows into it. Pool ranges from <strong>$${poolMin}</strong> (non-overnight hours) to <strong>$${poolMax}</strong> (peak at ${formatHour(peakHour)}: ${peakParts}). At ${cgBonus}% share, caregiver bonus ranges from <strong>$${bonusMin.toFixed(2)}</strong> to <strong>$${bonusMax.toFixed(2)}</strong>. Our margin ranges from <strong>$${worstMargin.toFixed(0)}</strong> (${worstMarginPct.toFixed(0)}%) to <strong>$${bestMargin.toFixed(0)}</strong> (${bestMarginPct.toFixed(0)}%).`;
         }
       }
 
