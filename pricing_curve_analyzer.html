@@ -1,0 +1,2258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pricing Curve Analyzer | Alice Care</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Poppins', Arial, Helvetica, sans-serif;
+      background-color: #F0F7FF;
+      color: #2D4A6F;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page-wrapper { padding: 30px 15px 50px; }
+
+    .app-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      background: #FFFFFF;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 6px 28px rgba(26, 54, 92, 0.08);
+    }
+
+    /* Header */
+    .app-header {
+      background: linear-gradient(135deg, #F57600 0%, #E06900 100%);
+      padding: 22px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+    .app-header::before {
+      content: '';
+      position: absolute;
+      width: 200px; height: 200px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 50%;
+      top: -90px; right: 6%;
+    }
+    .logo { font-size: 26px; font-weight: 700; position: relative; z-index: 1; }
+    .logo .alice { color: #FFFFFF; }
+    .logo .care { color: #1A365C; font-weight: 400; }
+    .header-label {
+      color: rgba(255, 255, 255, 0.92);
+      font-size: 12px;
+      font-weight: 500;
+      position: relative;
+      z-index: 1;
+      text-align: right;
+    }
+    .header-label small {
+      display: block;
+      font-size: 10.5px;
+      opacity: 0.85;
+      font-weight: 400;
+      margin-top: 3px;
+    }
+
+    /* Title */
+    .title-section {
+      padding: 24px 36px 20px;
+      border-bottom: 1px solid #E2E8F0;
+    }
+    .title-section h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1A365C;
+      margin-bottom: 6px;
+    }
+    .title-section h1 span { color: #F57600; }
+    .title-section p {
+      font-size: 13px;
+      color: #4A5F7F;
+      line-height: 1.55;
+      max-width: 820px;
+    }
+
+    /* Controls */
+    .controls-bar {
+      background: #FAFCFF;
+      padding: 18px 36px;
+      border-bottom: 1px solid #E2E8F0;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr) auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .control-group { display: flex; flex-direction: column; }
+    .control-group.hidden { display: none; }
+
+    .control-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #1A365C;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    select, input[type="number"] {
+      padding: 10px 12px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px;
+      color: #1A365C;
+      background: #FFFFFF;
+      border: 1.5px solid #D0DDF0;
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      width: 100%;
+    }
+    select:focus, input:focus {
+      border-color: #F57600;
+      box-shadow: 0 0 0 3px rgba(245, 118, 0, 0.12);
+    }
+
+    .toggle-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #FFFFFF;
+      border: 1.5px solid #D0DDF0;
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+      min-height: 40px;
+    }
+    .toggle-group:hover { border-color: #F5B985; }
+    .toggle-group.active {
+      border-color: #F57600;
+      background: linear-gradient(135deg, #FFF3E8 0%, #FFE5CC 100%);
+    }
+    .toggle-group input { display: none; }
+    .toggle-group .toggle-pill {
+      flex-shrink: 0;
+      width: 28px;
+      height: 16px;
+      background: #D0DDF0;
+      border-radius: 10px;
+      position: relative;
+      transition: background 0.2s;
+    }
+    .toggle-group .toggle-pill::after {
+      content: '';
+      position: absolute;
+      width: 12px; height: 12px;
+      background: #FFFFFF;
+      border-radius: 50%;
+      top: 2px; left: 2px;
+      transition: left 0.2s;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    .toggle-group.active .toggle-pill { background: #F57600; }
+    .toggle-group.active .toggle-pill::after { left: 14px; }
+    .toggle-group .toggle-content {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      min-width: 0;
+    }
+    .toggle-group .toggle-title {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #1A365C;
+      line-height: 1.2;
+    }
+    .toggle-group.active .toggle-title { color: #F57600; }
+    .toggle-group .toggle-sub {
+      font-size: 9.5px;
+      color: #7A8BA3;
+      line-height: 1.2;
+    }
+
+    .toggle-group.recurring.active {
+      border-color: #1B7A3D;
+      background: linear-gradient(135deg, #F0FAF3 0%, #E6F4EA 100%);
+    }
+    .toggle-group.recurring.active .toggle-pill { background: #1B7A3D; }
+    .toggle-group.recurring.active .toggle-title { color: #1B7A3D; }
+
+    .toggle-group.baseline.active {
+      border-color: #64748B;
+      background: #F1F5F9;
+    }
+    .toggle-group.baseline.active .toggle-pill { background: #64748B; }
+    .toggle-group.baseline.active .toggle-title { color: #475569; }
+
+    .toggle-group.caregiver.active {
+      border-color: #0F766E;
+      background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+    }
+    .toggle-group.caregiver.active .toggle-pill { background: #0F766E; }
+    .toggle-group.caregiver.active .toggle-title { color: #0F766E; }
+
+    .btn-add-compare {
+      min-height: 40px;
+      padding: 10px 14px;
+      background: #1B7A3D;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+    }
+    .btn-add-compare:hover {
+      background: #166530;
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px rgba(27, 122, 61, 0.25);
+    }
+    .btn-add-compare .plus {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      background: rgba(255,255,255,0.25);
+      border-radius: 50%;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .btn-add-compare.saved {
+      background: #1A365C;
+    }
+
+    /* Caregiver Sub Bar */
+    .caregiver-bar {
+      background: linear-gradient(135deg, #ECFDF5 0%, #F0FDF4 100%);
+      padding: 14px 36px;
+      border-bottom: 1px solid #D1FAE5;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 16px;
+      align-items: center;
+    }
+    .caregiver-bar.hidden { display: none; }
+    .cb-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #0F766E;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cb-title::before {
+      content: '';
+      width: 3px;
+      height: 12px;
+      background: #0F766E;
+      border-radius: 2px;
+    }
+
+    .slider-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .slider-group .slider-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .slider-group label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #0F766E;
+    }
+    .slider-group .slider-val {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0F766E;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    input[type="range"] {
+      width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      background: #D1FAE5;
+      border-radius: 4px;
+      outline: none;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      background: #0F766E;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      transition: transform 0.15s;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+    input[type="range"]::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      background: #0F766E;
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .cb-rules-note {
+      font-size: 10.5px;
+      color: #065F46;
+      line-height: 1.45;
+      background: rgba(255,255,255,0.5);
+      border-radius: 6px;
+      padding: 6px 10px;
+      border-left: 2px solid #0F766E;
+    }
+    .cb-rules-note strong { color: #064E3B; }
+
+    /* Chart Section */
+    .chart-section { padding: 28px 36px 18px; }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .chart-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1A365C;
+    }
+    .chart-title span { color: #F57600; }
+
+    .chart-legend {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 11px;
+      color: #4A5F7F;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .legend-swatch {
+      width: 22px;
+      height: 3px;
+      border-radius: 2px;
+      background: #1A365C;
+    }
+    .legend-swatch.urgent {
+      background: transparent;
+      border-top: 3px dashed #F57600;
+      height: 0;
+    }
+    .legend-swatch.baseline {
+      background: transparent;
+      border-top: 2px dotted #64748B;
+      height: 0;
+    }
+    .legend-swatch.overnight {
+      background: linear-gradient(135deg, #FFF3E8 0%, #FFE5CC 100%);
+      border: 1px solid #F5C992;
+      height: 12px;
+      border-radius: 3px;
+    }
+    .legend-swatch.margin {
+      background: rgba(20, 184, 166, 0.25);
+      border: 1px solid #14B8A6;
+      height: 12px;
+      border-radius: 3px;
+    }
+    .legend-swatch.caregiver {
+      background: #0F766E;
+    }
+    .legend-swatch.cart {
+      border-radius: 2px;
+      height: 3px;
+    }
+
+    .service-info-bar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .badge.basic { background: #E6F0FC; color: #1A365C; }
+    .badge.premium { background: #FFE5CC; color: #B85300; }
+    .badge.time { background: #E6F4EA; color: #1B7A3D; }
+    .badge.task { background: #F0F7FF; color: #1A365C; }
+
+    .chart-hint {
+      display: none;
+      background: #FFFBF0;
+      border: 1px solid #F5DFA0;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 11px;
+      color: #5A4A1E;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+    .chart-hint.visible { display: block; }
+    .chart-hint strong { color: #1A365C; }
+
+    .chart-wrap {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 14px;
+      position: relative;
+    }
+
+    .chart-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      overflow: visible;
+    }
+
+    /* Pulse animation for new cart line */
+    @keyframes pulseNew {
+      0%, 100% { stroke-width: 2; opacity: 0.9; }
+      50%      { stroke-width: 4.5; opacity: 1; }
+    }
+    .cart-line-new { animation: pulseNew 0.7s ease-in-out 3; }
+
+    /* Tooltip */
+    .chart-tooltip {
+      position: absolute;
+      background: #1A365C;
+      color: #FFFFFF;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      line-height: 1.5;
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(-50%, calc(-100% - 12px));
+      transition: opacity 0.15s;
+      white-space: nowrap;
+      box-shadow: 0 4px 14px rgba(26, 54, 92, 0.25);
+      z-index: 10;
+      min-width: 180px;
+    }
+    .chart-tooltip.show { opacity: 1; }
+    .chart-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: #1A365C;
+    }
+    .chart-tooltip .tt-time {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.65);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 500;
+    }
+    .chart-tooltip .tt-amount {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 2px 0;
+    }
+    .chart-tooltip .tt-detail {
+      font-size: 10.5px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+    .chart-tooltip .tt-detail strong { color: #FFFFFF; }
+    .chart-tooltip .tt-group {
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      margin-top: 6px;
+      padding-top: 6px;
+    }
+    .chart-tooltip .tt-caregiver { color: #6EE7B7; }
+    .chart-tooltip .tt-margin { color: #6EE7B7; }
+    .chart-tooltip .tt-margin.negative { color: #FCA5A5; }
+    .chart-tooltip .tt-urgent { color: #FFCC99; }
+    .chart-tooltip .tt-baseline { color: #B0C0D0; font-style: italic; }
+
+    /* Insights */
+    .insights-section { padding: 10px 36px 24px; }
+
+    .insights-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1A365C;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .insights-title::before {
+      content: '';
+      width: 3px;
+      height: 14px;
+      background: #F57600;
+      border-radius: 2px;
+    }
+
+    .insights-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+    }
+
+    .insight-card {
+      background: #FAFCFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      padding: 12px 13px;
+    }
+    .insight-card.best {
+      background: linear-gradient(135deg, #F0FAF3 0%, #E6F4EA 100%);
+      border-color: #B7DFC6;
+    }
+    .insight-card.worst {
+      background: linear-gradient(135deg, #FFF3E8 0%, #FFE5CC 100%);
+      border-color: #F5C992;
+    }
+    .insight-card.range {
+      background: #F0F7FF;
+      border-color: #C7D9EE;
+    }
+    .insight-card.urgent-impact {
+      background: #FFFBF0;
+      border-color: #F5DFA0;
+    }
+    .insight-card.baseline-card {
+      background: #F1F5F9;
+      border-color: #CBD5E1;
+    }
+    .insight-card.caregiver-card {
+      background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+      border-color: #0F766E;
+    }
+    .insight-card.margin-card {
+      background: linear-gradient(135deg, #ECFEFF 0%, #CFFAFE 100%);
+      border-color: #14B8A6;
+    }
+
+    .insight-label {
+      font-size: 9.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #7A8BA3;
+      margin-bottom: 5px;
+    }
+    .insight-card.best .insight-label { color: #1B7A3D; }
+    .insight-card.worst .insight-label { color: #B85300; }
+    .insight-card.range .insight-label { color: #1A365C; }
+    .insight-card.urgent-impact .insight-label { color: #5A4A1E; }
+    .insight-card.baseline-card .insight-label { color: #475569; }
+    .insight-card.caregiver-card .insight-label { color: #064E3B; }
+    .insight-card.margin-card .insight-label { color: #0F766E; }
+
+    .insight-value {
+      font-size: 19px;
+      font-weight: 700;
+      color: #1A365C;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+      line-height: 1;
+      margin-bottom: 3px;
+    }
+    .insight-card.best .insight-value { color: #1B7A3D; }
+    .insight-card.worst .insight-value { color: #B85300; }
+    .insight-card.baseline-card .insight-value { color: #475569; }
+    .insight-card.caregiver-card .insight-value { color: #064E3B; }
+    .insight-card.margin-card .insight-value { color: #0F766E; }
+    .insight-card.margin-card .insight-value.negative { color: #DC2626; }
+
+    .insight-detail {
+      font-size: 10px;
+      color: #4A5F7F;
+      line-height: 1.4;
+    }
+
+    .narrative-callout {
+      margin-top: 16px;
+      padding: 14px 18px;
+      background: #F0F7FF;
+      border-left: 4px solid #1A365C;
+      border-radius: 8px;
+      font-size: 12.5px;
+      line-height: 1.65;
+      color: #2D4A6F;
+    }
+    .narrative-callout strong { color: #1A365C; }
+    .narrative-callout .narrative-highlight {
+      color: #0F766E;
+      font-weight: 600;
+    }
+
+    /* Comparison Cart */
+    .cart-section { padding: 10px 36px 30px; }
+
+    .cart-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .cart-section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1A365C;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cart-section-title::before {
+      content: '';
+      width: 3px;
+      height: 14px;
+      background: #1B7A3D;
+      border-radius: 2px;
+    }
+    .cart-section-title .cart-count {
+      font-size: 11px;
+      color: #7A8BA3;
+      text-transform: none;
+      letter-spacing: 0;
+      font-weight: 500;
+      margin-left: 4px;
+    }
+
+    .btn-clear {
+      background: #FFFFFF;
+      color: #7A8BA3;
+      border: 1.5px solid #D0DDF0;
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-clear:hover {
+      background: #FEF5F4;
+      color: #EF4444;
+      border-color: #EF4444;
+    }
+
+    .cart-empty {
+      text-align: center;
+      padding: 24px 16px;
+      color: #7A8BA3;
+      font-size: 12.5px;
+      line-height: 1.6;
+      background: #FAFCFF;
+      border: 1.5px dashed #C7D9EE;
+      border-radius: 10px;
+    }
+    .cart-empty .empty-icon {
+      font-size: 28px;
+      color: #C7D9EE;
+      margin-bottom: 6px;
+      display: block;
+    }
+    .cart-empty strong {
+      display: block;
+      color: #1A365C;
+      font-size: 13px;
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+
+    .cart-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 10px;
+    }
+
+    .cart-item {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: start;
+      transition: all 0.3s;
+    }
+    .cart-item.just-added {
+      border-color: #1B7A3D;
+      box-shadow: 0 0 0 3px rgba(27, 122, 61, 0.15);
+    }
+
+    .cart-item .ci-color-bar {
+      width: 4px;
+      height: 100%;
+      border-radius: 2px;
+      min-height: 48px;
+    }
+
+    .cart-item .ci-content { min-width: 0; }
+
+    .cart-item .ci-name {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #1A365C;
+      margin-bottom: 2px;
+      line-height: 1.3;
+    }
+
+    .cart-item .ci-meta {
+      font-size: 10.5px;
+      color: #4A5F7F;
+      line-height: 1.5;
+      margin-bottom: 5px;
+    }
+
+    .cart-item .ci-stats {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 10.5px;
+      color: #4A5F7F;
+    }
+    .cart-item .ci-stats strong {
+      color: #1A365C;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+
+    .cart-item .ci-remove {
+      background: transparent;
+      border: 1px solid #E2E8F0;
+      color: #7A8BA3;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1;
+      padding: 0;
+      transition: all 0.15s;
+      align-self: start;
+    }
+    .cart-item .ci-remove:hover {
+      background: #FEF5F4;
+      border-color: #EF4444;
+      color: #EF4444;
+    }
+
+    .cart-totals {
+      margin-top: 12px;
+      background: linear-gradient(135deg, #F0FAF3 0%, #E6F4EA 100%);
+      border: 2px solid #1B7A3D;
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      align-items: center;
+    }
+    .cart-totals .ct-block { text-align: center; }
+    .cart-totals .ct-block:first-child { text-align: left; }
+    .cart-totals .ct-block:last-child { text-align: right; }
+
+    .cart-totals .ct-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #1B7A3D;
+      margin-bottom: 4px;
+    }
+    .cart-totals .ct-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1B7A3D;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+      line-height: 1;
+    }
+    .cart-totals .ct-sub {
+      font-size: 10.5px;
+      color: #4A5F7F;
+      margin-top: 3px;
+    }
+    .cart-totals .ct-savings {
+      color: #1B7A3D;
+      font-weight: 600;
+    }
+    .cart-totals .ct-overage {
+      color: #B85300;
+      font-weight: 600;
+    }
+
+    /* Footer */
+    .app-footer {
+      background: #1A365C;
+      padding: 18px 36px;
+      text-align: center;
+      border-top: 3px solid #F57600;
+    }
+    .footer-logo { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+    .footer-logo .alice { color: #F57600; }
+    .footer-logo .care { color: #FFFFFF; font-weight: 400; }
+    .footer-meta {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.6);
+      line-height: 1.5;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: #1B7A3D;
+      color: white;
+      padding: 14px 22px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 6px 24px rgba(27, 122, 61, 0.35);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px);
+      transition: all 0.25s;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast-icon {
+      width: 24px;
+      height: 24px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+
+    /* Responsive */
+    @media screen and (max-width: 1100px) {
+      .controls-bar { grid-template-columns: repeat(4, 1fr); }
+      .caregiver-bar { grid-template-columns: 1fr 1fr; }
+      .insights-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media screen and (max-width: 700px) {
+      .controls-bar { grid-template-columns: 1fr 1fr; padding: 16px 20px; }
+      .caregiver-bar { grid-template-columns: 1fr; padding: 14px 20px; }
+      .chart-section { padding: 20px 20px 14px; }
+      .insights-section { padding: 6px 20px 20px; }
+      .cart-section { padding: 6px 20px 24px; }
+      .insights-grid { grid-template-columns: 1fr 1fr; }
+      .cart-totals { grid-template-columns: 1fr; gap: 12px; }
+      .cart-totals .ct-block:first-child,
+      .cart-totals .ct-block,
+      .cart-totals .ct-block:last-child { text-align: center; }
+      .app-header { padding: 18px 20px; }
+      .title-section { padding: 20px 20px 16px; }
+      .app-footer { padding: 18px 20px; }
+      .title-section h1 { font-size: 19px; }
+      .toast { right: 15px; bottom: 15px; left: 15px; justify-content: center; }
+    }
+
+    @media screen and (max-width: 440px) {
+      .controls-bar { grid-template-columns: 1fr; }
+      .insights-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="app-container">
+
+      <!-- Header -->
+      <div class="app-header">
+        <div class="logo">
+          <span class="alice">alice.</span><span class="care">care</span>
+        </div>
+        <div class="header-label">
+          Pricing Curve Analyzer
+          <small>Revenue · Caregiver Pay · Margin</small>
+        </div>
+      </div>
+
+      <!-- Title -->
+      <div class="title-section">
+        <h1>Cost, Pay &amp; <span>Margin Curves</span></h1>
+        <p>Pick a service, set caregiver pay, and see how revenue, caregiver cost, and margin evolve across every possible start hour. Toggle the baseline for old flat-rate comparison, the urgent overlay for same-day pricing, and add scenarios to the cart to overlay multiple curves at once.</p>
+      </div>
+
+      <!-- Controls -->
+      <div class="controls-bar">
+        <div class="control-group">
+          <label class="control-label" for="service">Service</label>
+          <select id="service"></select>
+        </div>
+
+        <div class="control-group" id="durationGroup">
+          <label class="control-label" for="duration">Duration</label>
+          <select id="duration">
+            <option value="1">1 hour</option>
+            <option value="2">2 hours</option>
+            <option value="3">3 hours</option>
+            <option value="4" selected>4 hours</option>
+            <option value="5">5 hours</option>
+            <option value="6">6 hours</option>
+            <option value="7">7 hours</option>
+            <option value="8">8 hours</option>
+          </select>
+        </div>
+
+        <div class="control-group hidden" id="milesGroup">
+          <label class="control-label" for="miles">Miles</label>
+          <input type="number" id="miles" min="0" step="1" value="0">
+        </div>
+
+        <div class="control-group hidden" id="recurringGroup">
+          <label class="control-label">Recurring</label>
+          <label class="toggle-group recurring" id="recurringToggle">
+            <input type="checkbox" id="recurring">
+            <div class="toggle-pill"></div>
+            <div class="toggle-content">
+              <div class="toggle-title">$40/hr</div>
+              <div class="toggle-sub">Custom plan</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Urgent (&lt;24h)</label>
+          <label class="toggle-group" id="urgentToggle">
+            <input type="checkbox" id="urgent">
+            <div class="toggle-pill"></div>
+            <div class="toggle-content">
+              <div class="toggle-title">+$10 fee</div>
+              <div class="toggle-sub">Same-day</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Baseline</label>
+          <label class="toggle-group baseline active" id="baselineToggle">
+            <input type="checkbox" id="baseline" checked>
+            <div class="toggle-pill"></div>
+            <div class="toggle-content">
+              <div class="toggle-title">Flat rate</div>
+              <div class="toggle-sub">Old model</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Caregiver Pay</label>
+          <label class="toggle-group caregiver" id="caregiverToggle">
+            <input type="checkbox" id="caregiver">
+            <div class="toggle-pill"></div>
+            <div class="toggle-content">
+              <div class="toggle-title">Show pay</div>
+              <div class="toggle-sub">+ margin</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" style="visibility:hidden;">Save</label>
+          <button class="btn-add-compare" id="addToCartBtn">
+            <span class="plus">+</span>
+            Add to Cart
+          </button>
+        </div>
+      </div>
+
+      <!-- Caregiver Sub-Bar (conditional) -->
+      <div class="caregiver-bar hidden" id="caregiverBar">
+        <div class="cb-title">Caregiver Pay Model</div>
+
+        <div class="slider-group">
+          <div class="slider-label-row">
+            <label for="cgRate">Base pay rate</label>
+            <span class="slider-val" id="cgRateVal">$22 / hr</span>
+          </div>
+          <input type="range" id="cgRate" min="20" max="25" step="0.25" value="22">
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-label-row">
+            <label for="cgBonus">Caregiver bonus share</label>
+            <span class="slider-val" id="cgBonusVal">50%</span>
+          </div>
+          <input type="range" id="cgBonus" min="0" max="100" step="5" value="50">
+        </div>
+
+        <div class="cb-rules-note">
+          <strong>Bonus trigger:</strong> urgent (&lt;24hr) AND 1-2 hour service. When triggered, the bonus pool = urgent fee ($10) + Companionship short-shift premium ($10 for 1 hr, $5 for 2 hr). The share % splits that pool between caregiver and alice.care. When the trigger does not apply, caregiver pay equals base rate × hours with no bonus. The overnight premium is never part of the pool.
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="chart-section">
+        <div class="chart-header">
+          <div class="chart-title" id="chartTitle">Cost by Start Time</div>
+          <div class="chart-legend" id="chartLegend"></div>
+        </div>
+
+        <div class="service-info-bar" id="serviceInfoBar"></div>
+
+        <div class="chart-hint" id="chartHint"></div>
+
+        <div class="chart-wrap">
+          <svg class="chart-svg" id="chart" viewBox="0 0 840 460" preserveAspectRatio="xMidYMid meet"></svg>
+          <div class="chart-tooltip" id="tooltip"></div>
+        </div>
+      </div>
+
+      <!-- Insights -->
+      <div class="insights-section">
+        <div class="insights-title">Active Config Insights</div>
+        <div class="insights-grid" id="insightsGrid"></div>
+        <div class="narrative-callout" id="narrativeCallout"></div>
+      </div>
+
+      <!-- Comparison Cart -->
+      <div class="cart-section">
+        <div class="cart-header-row">
+          <div class="cart-section-title">
+            Comparison Cart
+            <span class="cart-count" id="cartCount">(empty)</span>
+          </div>
+          <button class="btn-clear" id="btnClearCart" style="display:none;">Clear All</button>
+        </div>
+        <div id="cartContent"></div>
+      </div>
+
+      <!-- Footer -->
+      <div class="app-footer">
+        <div class="footer-logo">
+          <span class="alice">alice.</span><span class="care">care</span>
+        </div>
+        <div class="footer-meta">
+          TEKKS LLC DBA alice.care &nbsp;·&nbsp; CDSS Licensed HCO #344700080 &nbsp;·&nbsp; Fair Oaks, California<br>
+          Internal Tool &nbsp;·&nbsp; Operations Analytics
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="toast" id="toast">
+    <div class="toast-icon">✓</div>
+    <div id="toastMessage">Added to comparison</div>
+  </div>
+
+  <script>
+    // ===== Service Menu =====
+    const SERVICES = {
+      '100':  { name: 'Companionship',               price: 45, type: 'time', skill: 'basic',   desc: 'Observe, engage, monitor.' },
+      '200':  { name: 'Basic Tidying Up',            price: 45, type: 'task', skill: 'basic',   desc: '1-hour task: light household support.' },
+      '300':  { name: 'Feeding & Meal Prep',         price: 45, type: 'task', skill: 'basic',   desc: '1-hour task: cooking and serving.' },
+      '400':  { name: 'Med Reminders (non-medical)', price: 45, type: 'task', skill: 'premium', desc: '1-hour task: reminders only.' },
+      '500':  { name: 'Dressing',                    price: 45, type: 'task', skill: 'basic',   desc: '1-hour task: assist with dressing.' },
+      '610':  { name: 'Transportation',              price: 55, type: 'time', skill: 'basic',   desc: 'Drive client. Mileage bills separately.' },
+      '700':  { name: 'Bathing & Grooming',          price: 55, type: 'task', skill: 'premium', desc: '1-hour task: bath, grooming, toileting.' },
+      '800':  { name: 'Fall Assistance',             price: 45, type: 'task', skill: 'premium', desc: '1-hour task: non-injury falls.' },
+      '900':  { name: 'Toileting',                   price: 55, type: 'task', skill: 'premium', desc: '1-hour task: toileting assistance.' },
+      '1000': { name: 'Transferring',                price: 45, type: 'task', skill: 'premium', desc: '1-hour task: sit-to-sit transfers.' }
+    };
+
+    // Cart color palette
+    const CART_COLORS = [
+      '#6C4FB8', '#D63384', '#6FA818', '#8B5CF6',
+      '#06B6D4', '#DC2626', '#CA8A04', '#EA580C'
+    ];
+
+    // ===== State =====
+    let cart = [];
+    let justAddedId = null;
+
+    // ===== DOM refs =====
+    const els = {
+      service:         document.getElementById('service'),
+      duration:        document.getElementById('duration'),
+      durationGroup:   document.getElementById('durationGroup'),
+      miles:           document.getElementById('miles'),
+      milesGroup:      document.getElementById('milesGroup'),
+      recurring:       document.getElementById('recurring'),
+      recurringGroup:  document.getElementById('recurringGroup'),
+      recurringToggle: document.getElementById('recurringToggle'),
+      urgent:          document.getElementById('urgent'),
+      urgentToggle:    document.getElementById('urgentToggle'),
+      baseline:        document.getElementById('baseline'),
+      baselineToggle:  document.getElementById('baselineToggle'),
+      caregiver:       document.getElementById('caregiver'),
+      caregiverToggle: document.getElementById('caregiverToggle'),
+      caregiverBar:    document.getElementById('caregiverBar'),
+      cgRate:          document.getElementById('cgRate'),
+      cgRateVal:       document.getElementById('cgRateVal'),
+      cgBonus:         document.getElementById('cgBonus'),
+      cgBonusVal:      document.getElementById('cgBonusVal'),
+      addToCartBtn:    document.getElementById('addToCartBtn'),
+      chart:           document.getElementById('chart'),
+      chartTitle:      document.getElementById('chartTitle'),
+      chartLegend:     document.getElementById('chartLegend'),
+      chartHint:       document.getElementById('chartHint'),
+      serviceInfoBar:  document.getElementById('serviceInfoBar'),
+      tooltip:         document.getElementById('tooltip'),
+      insightsGrid:    document.getElementById('insightsGrid'),
+      narrativeCallout:document.getElementById('narrativeCallout'),
+      cartCount:       document.getElementById('cartCount'),
+      cartContent:     document.getElementById('cartContent'),
+      btnClearCart:    document.getElementById('btnClearCart'),
+      toast:           document.getElementById('toast'),
+      toastMessage:    document.getElementById('toastMessage')
+    };
+
+    // ===== Init =====
+    function init() {
+      Object.entries(SERVICES).forEach(([id, svc]) => {
+        const opt = document.createElement('option');
+        opt.value = id;
+        opt.textContent = `${svc.name}  ·  $${svc.price} ${svc.type === 'time' ? '/hr' : 'per task'}`;
+        els.service.appendChild(opt);
+      });
+      els.service.value = '100';
+
+      els.service.addEventListener('change', update);
+      els.duration.addEventListener('change', update);
+      els.miles.addEventListener('input', update);
+      els.recurring.addEventListener('change', () => {
+        els.recurringToggle.classList.toggle('active', els.recurring.checked);
+        update();
+      });
+      els.urgent.addEventListener('change', () => {
+        els.urgentToggle.classList.toggle('active', els.urgent.checked);
+        update();
+      });
+      els.baseline.addEventListener('change', () => {
+        els.baselineToggle.classList.toggle('active', els.baseline.checked);
+        update();
+      });
+      els.caregiver.addEventListener('change', () => {
+        els.caregiverToggle.classList.toggle('active', els.caregiver.checked);
+        els.caregiverBar.classList.toggle('hidden', !els.caregiver.checked);
+        update();
+      });
+      els.cgRate.addEventListener('input', () => {
+        els.cgRateVal.textContent = `$${parseFloat(els.cgRate.value).toFixed(2)} / hr`;
+        update();
+      });
+      els.cgBonus.addEventListener('input', () => {
+        els.cgBonusVal.textContent = `${els.cgBonus.value}%`;
+        update();
+      });
+      els.addToCartBtn.addEventListener('click', addToCart);
+      els.btnClearCart.addEventListener('click', clearCart);
+
+      update();
+      renderCart();
+    }
+
+    // ===== Calculation =====
+    function countOvernightHours(startHour, duration) {
+      let count = 0;
+      for (let i = 0; i < duration; i++) {
+        const h = (startHour + i) % 24;
+        if (h >= 19 || h < 7) count++;
+      }
+      return count;
+    }
+
+    function calcCost(serviceId, duration, startHour, urgent, recurring, miles) {
+      let base = 0;
+      if (serviceId === '100') {
+        if (duration === 1) base = 55;
+        else if (duration <= 3) base = 45 * duration + 5;
+        else { const rate = recurring ? 40 : 45; base = rate * duration; }
+      } else if (serviceId === '610') {
+        base = 55 * duration + (miles || 0);
+      } else {
+        base = SERVICES[serviceId].price;
+        duration = 1;
+      }
+      if (urgent) base += 10;
+      const overnightHours = countOvernightHours(startHour, duration);
+      base += overnightHours * 5;
+      return { total: base, overnightHours };
+    }
+
+    function calcBaseline(serviceId, duration, miles) {
+      if (serviceId === '100') return 45 * duration;
+      if (serviceId === '610') return 55 * duration + (miles || 0);
+      return SERVICES[serviceId].price;
+    }
+
+    // Caregiver cost at a given start hour, given the active config
+    // Caregiver pay breakdown.
+    // Base pay: always rate × effective_hours.
+    // Bonus incentive: triggers ONLY when urgent (<24hr) AND service duration is 1 or 2 hours.
+    // When triggered, the bonus pool = urgent fee ($10) + short-shift premium ($10 for 1hr
+    // Companionship, $5 for 2hr Companionship, $0 for tasks since they have no short-shift
+    // premium in the pricing model). The share % determines how much of that pool goes to
+    // the caregiver as bonus. The rest stays in alice.care margin. Overnight premium is NOT
+    // part of the bonus pool. This bonus is a one-time incentive per shift, not an hourly rate bump.
+    function calcCaregiverBreakdown(serviceId, duration, urgent, rate, bonusPct) {
+      const service = SERVICES[serviceId];
+      const effHours = service.type === 'task' ? 1 : duration;
+      const basePay = rate * effHours;
+
+      const premiumParts = [];
+      let bonusPool = 0;
+
+      // Bonus triggers ONLY when urgent AND 1-2 effective hours
+      const triggers = urgent && effHours >= 1 && effHours <= 2;
+
+      if (triggers) {
+        // Urgent fee
+        bonusPool += 10;
+        premiumParts.push({ name: 'Urgent (<24hr)', amount: 10 });
+
+        // Short-shift premium applies only to Companionship (tasks have no such premium)
+        if (serviceId === '100') {
+          if (duration === 1) {
+            bonusPool += 10;
+            premiumParts.push({ name: '1-hour short-visit', amount: 10 });
+          } else if (duration === 2) {
+            bonusPool += 5;
+            premiumParts.push({ name: '2-hour first-hour', amount: 5 });
+          }
+        }
+      }
+
+      const caregiverBonus = bonusPool * (bonusPct / 100);
+      const companyShare = bonusPool - caregiverBonus;
+
+      return {
+        base: basePay,
+        effHours,
+        rate,
+        triggers,
+        bonusPool,
+        premiumParts,
+        caregiverBonus,
+        companyShare,
+        bonusPct,
+        total: basePay + caregiverBonus
+      };
+    }
+
+    function calcCaregiverCost(serviceId, duration, startHour, urgent, recurring, miles, rate, bonusPct) {
+      return calcCaregiverBreakdown(serviceId, duration, urgent, rate, bonusPct).total;
+    }
+
+    // Builds both total pay and base pay data for each hour (both flat across hours in this model)
+    function calcCaregiverBaseOnly(serviceId, duration, rate) {
+      const service = SERVICES[serviceId];
+      const effHours = service.type === 'task' ? 1 : duration;
+      return rate * effHours;
+    }
+
+    function formatHour(h) {
+      const hh = h === 0 ? 12 : (h > 12 ? h - 12 : h);
+      const ampm = h < 12 ? 'AM' : 'PM';
+      return `${hh}:00 ${ampm}`;
+    }
+
+    function shortConfigLabel(cfg) {
+      const service = SERVICES[cfg.serviceId];
+      const durationLabel = service.type === 'task' ? '1hr' : `${cfg.duration}hr`;
+      const flags = [];
+      if (cfg.recurring) flags.push('recurring');
+      if (cfg.urgent) flags.push('urgent');
+      if (cfg.miles > 0) flags.push(`${cfg.miles}mi`);
+      return `${service.name} ${durationLabel}${flags.length ? ' (' + flags.join(', ') + ')' : ''}`;
+    }
+
+    function buildDataPoints(cfg) {
+      const points = [];
+      for (let h = 0; h < 24; h++) {
+        const result = calcCost(cfg.serviceId, cfg.duration, h, cfg.urgent, cfg.recurring, cfg.miles);
+        points.push({ hour: h, cost: result.total, overnightHours: result.overnightHours });
+      }
+      return points;
+    }
+
+    function buildCaregiverPoints(cfg, rate, bonusPct) {
+      const points = [];
+      for (let h = 0; h < 24; h++) {
+        const cost = calcCaregiverCost(cfg.serviceId, cfg.duration, h, cfg.urgent, cfg.recurring, cfg.miles, rate, bonusPct);
+        points.push({ hour: h, cost });
+      }
+      return points;
+    }
+
+    function configsMatch(a, b) {
+      return a.serviceId === b.serviceId &&
+             a.duration === b.duration &&
+             a.recurring === b.recurring &&
+             a.urgent === b.urgent &&
+             a.miles === b.miles;
+    }
+
+    // ===== Update =====
+    function update() {
+      const serviceId = els.service.value;
+      const service = SERVICES[serviceId];
+
+      if (service.type === 'time') {
+        els.durationGroup.classList.remove('hidden');
+      } else {
+        els.durationGroup.classList.add('hidden');
+      }
+
+      const duration = service.type === 'task' ? 1 : parseInt(els.duration.value, 10);
+
+      if (serviceId === '100' && duration >= 4) {
+        els.recurringGroup.classList.remove('hidden');
+      } else {
+        els.recurringGroup.classList.add('hidden');
+        els.recurring.checked = false;
+        els.recurringToggle.classList.remove('active');
+      }
+
+      if (serviceId === '610') {
+        els.milesGroup.classList.remove('hidden');
+      } else {
+        els.milesGroup.classList.add('hidden');
+      }
+
+      const recurring = els.recurring.checked;
+      const miles = parseInt(els.miles.value, 10) || 0;
+      const urgent = els.urgent.checked;
+      const showBaseline = els.baseline.checked;
+      const showCaregiver = els.caregiver.checked;
+      const cgRate = parseFloat(els.cgRate.value);
+      const cgBonus = parseInt(els.cgBonus.value, 10);
+
+      // Active config reflects URGENT toggle (so caregiver line matches what's charged)
+      const activeCfg = { serviceId, duration, recurring, urgent, miles };
+      const activeData = buildDataPoints(activeCfg);
+
+      // "Urgent overlay" line: only makes sense when user is NOT currently showing urgent in active
+      // When urgent is on in active, the active line IS the urgent line
+      const urgentOverlayData = (!urgent) ? buildDataPoints({ ...activeCfg, urgent: true }) : null;
+
+      const baselineValue = calcBaseline(serviceId, duration, miles);
+
+      const caregiverData = showCaregiver
+        ? buildCaregiverPoints(activeCfg, cgRate, cgBonus)
+        : null;
+
+      // Check if active matches a cart item
+      const matchIdx = cart.findIndex(item => configsMatch(item.cfg, activeCfg));
+
+      // Info bar
+      const durationLabel = service.type === 'task' ? '1 hr task' : `${duration} hr`;
+      els.serviceInfoBar.innerHTML = `
+        <span class="badge ${service.type === 'time' ? 'time' : 'task'}">${service.type === 'time' ? 'Time-based' : '1 hr task'}</span>
+        <span class="badge ${service.skill}">${service.skill === 'basic' ? 'Basic' : 'Premium'}</span>
+        <span style="font-size:12px;color:#4A5F7F;">
+          <strong style="color:#1A365C;">${service.name}</strong> · ${durationLabel}
+          ${recurring ? ' · Recurring' : ''}
+          ${urgent ? ' · Urgent' : ''}
+          ${miles > 0 ? ` · ${miles} mi` : ''}
+        </span>
+      `;
+
+      els.chartTitle.innerHTML = `Cost by <span>Start Time</span> · ${service.name} ${durationLabel}${recurring ? ' (Recurring)' : ''}${urgent ? ' (Urgent)' : ''}`;
+
+      // Chart hint if active matches a cart item
+      if (matchIdx >= 0) {
+        const cartItem = cart[matchIdx];
+        els.chartHint.innerHTML = `<strong>ⓘ</strong> The active config matches <strong>Cart Item ${matchIdx + 1}</strong> (<span style="color:${cartItem.color};font-weight:700;">${shortConfigLabel(cartItem.cfg)}</span>). The cart line sits directly beneath the active line. Change any control to see them separate.`;
+        els.chartHint.classList.add('visible');
+      } else {
+        els.chartHint.classList.remove('visible');
+      }
+
+      renderLegend(showCaregiver);
+      renderChart(activeData, urgentOverlayData, baselineValue, showBaseline, caregiverData, showCaregiver);
+      renderInsights(activeData, baselineValue, service, caregiverData, showCaregiver);
+      renderNarrative(activeData, baselineValue, service, duration, recurring, urgent, caregiverData, showCaregiver);
+    }
+
+    // ===== Legend =====
+    function renderLegend(showCaregiver) {
+      const showUrgentOverlay = els.urgent.checked ? false : false;
+      // If urgent is TRUE, active line IS urgent, no overlay line
+      // We show an overlay line only when urgent is OFF (the overlay is the "what if urgent" reference)
+      const showUrgentReference = !els.urgent.checked && true;
+
+      // Actually: the urgent toggle currently in controls acts as setting for active
+      // Let's simplify: when urgent IS on, legend shows "Active (urgent)"
+      // When urgent is off, we don't show a secondary line currently
+      // The user enables urgent via the toggle to actively switch the active line to urgent
+
+      let html = `
+        <div class="legend-item">
+          <span class="legend-swatch overnight"></span>
+          <span>Overnight (7 PM to 7 AM)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-swatch"></span>
+          <span>Revenue (active config)</span>
+        </div>
+      `;
+
+      if (els.baseline.checked) {
+        html += `
+          <div class="legend-item">
+            <span class="legend-swatch baseline"></span>
+            <span>Baseline (old flat rate)</span>
+          </div>
+        `;
+      }
+
+      if (showCaregiver) {
+        html += `
+          <div class="legend-item">
+            <span class="legend-swatch caregiver"></span>
+            <span>Caregiver total pay</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-swatch" style="background:transparent;border-top:2px dashed #0F766E;height:0;"></span>
+            <span>Caregiver base pay</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-swatch" style="background:repeating-linear-gradient(45deg,rgba(15,118,110,0.25),rgba(15,118,110,0.25) 3px,rgba(15,118,110,0.5) 3px,rgba(15,118,110,0.5) 4px);border:1px solid #0F766E;height:12px;border-radius:3px;"></span>
+            <span>Bonus incentive</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-swatch margin"></span>
+            <span>Gross margin</span>
+          </div>
+        `;
+      }
+
+      if (cart.length > 0) {
+        cart.forEach((item, idx) => {
+          html += `
+            <div class="legend-item">
+              <span class="legend-swatch cart" style="background:${item.color};"></span>
+              <span>${idx + 1}. ${shortConfigLabel(item.cfg)}</span>
+            </div>
+          `;
+        });
+      }
+
+      els.chartLegend.innerHTML = html;
+    }
+
+    // ===== Chart rendering =====
+    function renderChart(activeData, urgentOverlayData, baselineValue, showBaseline, caregiverData, showCaregiver) {
+      const VIEW_W = 840, VIEW_H = 460;
+      const PAD = { top: 24, right: 28, bottom: 56, left: 72 };
+      const W = VIEW_W - PAD.left - PAD.right;
+      const H = VIEW_H - PAD.top - PAD.bottom;
+
+      // Collect all values for scaling
+      const allValues = [...activeData.map(d => d.cost)];
+      if (urgentOverlayData) allValues.push(...urgentOverlayData.map(d => d.cost));
+      if (showBaseline) allValues.push(baselineValue);
+      if (showCaregiver && caregiverData) {
+        allValues.push(...caregiverData.map(d => d.cost));
+        // Include base pay (may be below total pay when bonus triggers)
+        const svcId = els.service.value;
+        const dur = SERVICES[svcId].type === 'task' ? 1 : parseInt(els.duration.value, 10);
+        const rate = parseFloat(els.cgRate.value);
+        allValues.push(calcCaregiverBaseOnly(svcId, dur, rate));
+      }
+      cart.forEach(item => allValues.push(...item.data.map(d => d.cost)));
+
+      const minVal = Math.min(...allValues);
+      const maxVal = Math.max(...allValues);
+      const range = Math.max(maxVal - minVal, 20);
+
+      // If caregiver is shown and goes way below revenue, extend scale to show it
+      const yMin = Math.floor((minVal - range * 0.12) / 5) * 5;
+      const yMax = Math.ceil((maxVal + range * 0.10) / 5) * 5;
+
+      const xScale = h => PAD.left + (h / 23) * W;
+      const yScale = v => PAD.top + H - ((v - yMin) / (yMax - yMin)) * H;
+
+      // Grid
+      const gridCount = 5;
+      const gridLines = [];
+      for (let i = 0; i <= gridCount; i++) {
+        const val = yMin + (yMax - yMin) * (i / gridCount);
+        const y = yScale(val);
+        gridLines.push(`
+          <line x1="${PAD.left}" y1="${y}" x2="${VIEW_W - PAD.right}" y2="${y}"
+                stroke="#EEF2F7" stroke-width="1" />
+          <text x="${PAD.left - 10}" y="${y + 4}" text-anchor="end"
+                font-size="11" fill="#7A8BA3" font-family="Poppins">
+            $${Math.round(val)}
+          </text>
+        `);
+      }
+
+      // Overnight zones
+      const overnightMorningEnd = xScale(7);
+      const overnightEveningStart = xScale(19);
+      const overnightBands = `
+        <rect x="${PAD.left}" y="${PAD.top}"
+              width="${overnightMorningEnd - PAD.left}" height="${H}"
+              fill="url(#overnightGradient)" opacity="0.5" />
+        <rect x="${overnightEveningStart}" y="${PAD.top}"
+              width="${VIEW_W - PAD.right - overnightEveningStart}" height="${H}"
+              fill="url(#overnightGradient)" opacity="0.5" />
+      `;
+
+      // X-axis ticks
+      const xTicks = [];
+      for (let h = 0; h <= 24; h += 3) {
+        const x = xScale(Math.min(h, 23));
+        const label = h === 24 ? '12 AM' : (h === 0 ? '12 AM' : (h < 12 ? `${h} AM` : (h === 12 ? '12 PM' : `${h - 12} PM`)));
+        xTicks.push(`
+          <line x1="${x}" y1="${PAD.top + H}" x2="${x}" y2="${PAD.top + H + 5}"
+                stroke="#7A8BA3" stroke-width="1" />
+          <text x="${x}" y="${PAD.top + H + 20}" text-anchor="middle"
+                font-size="11" fill="#4A5F7F" font-family="Poppins" font-weight="500">
+            ${label}
+          </text>
+        `);
+      }
+
+      // Zone labels
+      const zoneLabels = `
+        <text x="${(PAD.left + overnightMorningEnd) / 2}" y="${PAD.top + 16}" text-anchor="middle"
+              font-size="10" fill="#B85300" font-family="Poppins" font-weight="700" letter-spacing="0.5">
+          OVERNIGHT
+        </text>
+        <text x="${(overnightEveningStart + VIEW_W - PAD.right) / 2}" y="${PAD.top + 16}" text-anchor="middle"
+              font-size="10" fill="#B85300" font-family="Poppins" font-weight="700" letter-spacing="0.5">
+          OVERNIGHT
+        </text>
+        <text x="${(overnightMorningEnd + overnightEveningStart) / 2}" y="${PAD.top + 16}" text-anchor="middle"
+              font-size="10" fill="#4A5F7F" font-family="Poppins" font-weight="600" letter-spacing="0.5">
+          DAYTIME
+        </text>
+      `;
+
+      // Paths
+      const activePath = activeData.map((d, i) => `${i === 0 ? 'M' : 'L'} ${xScale(d.hour)} ${yScale(d.cost)}`).join(' ');
+      const activeArea = `${activePath} L ${xScale(23)} ${yScale(yMin)} L ${xScale(0)} ${yScale(yMin)} Z`;
+
+      const urgentPath = urgentOverlayData ? urgentOverlayData.map((d, i) => `${i === 0 ? 'M' : 'L'} ${xScale(d.hour)} ${yScale(d.cost)}`).join(' ') : '';
+
+      const caregiverPath = caregiverData ? caregiverData.map((d, i) => `${i === 0 ? 'M' : 'L'} ${xScale(d.hour)} ${yScale(d.cost)}`).join(' ') : '';
+
+      // Base pay line (flat, below total pay when bonus triggers, otherwise same as total)
+      let caregiverBasePay = null;
+      let caregiverBasePath = '';
+      let bonusExists = false;
+      if (showCaregiver && caregiverData) {
+        const svcId = els.service.value;
+        const dur = SERVICES[svcId].type === 'task' ? 1 : parseInt(els.duration.value, 10);
+        const rate = parseFloat(els.cgRate.value);
+        caregiverBasePay = calcCaregiverBaseOnly(svcId, dur, rate);
+        // Flat horizontal line at base pay
+        caregiverBasePath = `M ${xScale(0)} ${yScale(caregiverBasePay)} L ${xScale(23)} ${yScale(caregiverBasePay)}`;
+        bonusExists = caregiverData[0].cost > caregiverBasePay + 0.01;
+      }
+
+      // Margin area: between active (top) and TOTAL caregiver pay (bottom)
+      let marginArea = '';
+      if (showCaregiver && caregiverData) {
+        const forward = activeData.map((d, i) => `${i === 0 ? 'M' : 'L'} ${xScale(d.hour)} ${yScale(d.cost)}`).join(' ');
+        const backward = caregiverData.slice().reverse().map((d) => `L ${xScale(d.hour)} ${yScale(d.cost)}`).join(' ');
+        marginArea = `${forward} ${backward} Z`;
+      }
+
+      // Bonus band: filled area between base pay (below) and total pay (above), only when bonus > 0
+      let bonusBand = '';
+      if (showCaregiver && caregiverData && bonusExists) {
+        const topY = yScale(caregiverData[0].cost);
+        const botY = yScale(caregiverBasePay);
+        bonusBand = `
+          <rect x="${PAD.left}" y="${topY}"
+                width="${W}" height="${botY - topY}"
+                fill="url(#bonusGradient)" opacity="1" />
+        `;
+      }
+
+      // Baseline line
+      const baselineY = yScale(baselineValue);
+      const baselineLine = showBaseline ? `
+        <line x1="${PAD.left}" y1="${baselineY}" x2="${VIEW_W - PAD.right}" y2="${baselineY}"
+              stroke="#64748B" stroke-width="2" stroke-dasharray="3 4" opacity="0.85" />
+        <rect x="${VIEW_W - PAD.right - 72}" y="${baselineY - 18}" width="64" height="14" rx="7"
+              fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1" />
+        <text x="${VIEW_W - PAD.right - 40}" y="${baselineY - 8}" text-anchor="middle"
+              font-size="10" fill="#475569" font-family="Poppins" font-weight="700">
+          $${baselineValue} base
+        </text>
+      ` : '';
+
+      // Cart item paths
+      let cartPaths = '';
+      cart.forEach((item) => {
+        const path = item.data.map((d, i) => `${i === 0 ? 'M' : 'L'} ${xScale(d.hour)} ${yScale(d.cost)}`).join(' ');
+        const isNew = (item.id === justAddedId);
+        const classAttr = isNew ? 'class="cart-line-new"' : '';
+        cartPaths += `
+          <path d="${path}" fill="none" stroke="${item.color}" stroke-width="2"
+                stroke-linejoin="round" stroke-linecap="round" opacity="0.9"
+                ${classAttr} />
+        `;
+        // Small dots at each data point on cart lines (so they're visible even when overlapping)
+        item.data.forEach(d => {
+          cartPaths += `<circle cx="${xScale(d.hour)}" cy="${yScale(d.cost)}" r="2" fill="${item.color}" opacity="0.9" />`;
+        });
+      });
+
+      // Active data dots
+      const activeDots = activeData.map(d => `
+        <circle cx="${xScale(d.hour)}" cy="${yScale(d.cost)}" r="3.5"
+                fill="#FFFFFF" stroke="#1A365C" stroke-width="2" />
+      `).join('');
+
+      const urgentDots = urgentOverlayData ? urgentOverlayData.map(d => `
+        <circle cx="${xScale(d.hour)}" cy="${yScale(d.cost)}" r="3"
+                fill="#FFFFFF" stroke="#F57600" stroke-width="2" />
+      `).join('') : '';
+
+      const caregiverDots = caregiverData ? caregiverData.map(d => `
+        <circle cx="${xScale(d.hour)}" cy="${yScale(d.cost)}" r="2.5"
+                fill="#FFFFFF" stroke="#0F766E" stroke-width="1.8" />
+      `).join('') : '';
+
+      // Min/max annotations on active
+      const minIdx = activeData.reduce((mi, d, i) => d.cost < activeData[mi].cost ? i : mi, 0);
+      const maxIdx = activeData.reduce((mi, d, i) => d.cost > activeData[mi].cost ? i : mi, 0);
+
+      const minAnnotation = `
+        <g>
+          <circle cx="${xScale(activeData[minIdx].hour)}" cy="${yScale(activeData[minIdx].cost)}" r="6"
+                  fill="#1B7A3D" />
+          <circle cx="${xScale(activeData[minIdx].hour)}" cy="${yScale(activeData[minIdx].cost)}" r="3"
+                  fill="#FFFFFF" />
+        </g>
+      `;
+      const maxAnnotation = activeData[minIdx].cost !== activeData[maxIdx].cost ? `
+        <g>
+          <circle cx="${xScale(activeData[maxIdx].hour)}" cy="${yScale(activeData[maxIdx].cost)}" r="6"
+                  fill="#B85300" />
+          <circle cx="${xScale(activeData[maxIdx].hour)}" cy="${yScale(activeData[maxIdx].cost)}" r="3"
+                  fill="#FFFFFF" />
+        </g>
+      ` : '';
+
+      // Compute caregiver breakdown once (it's flat across hours)
+      const activeServiceId = els.service.value;
+      const activeDuration = SERVICES[activeServiceId].type === 'task' ? 1 : parseInt(els.duration.value, 10);
+      const activeUrgent = els.urgent.checked;
+      const cgRateVal = parseFloat(els.cgRate.value);
+      const cgBonusVal = parseInt(els.cgBonus.value, 10);
+      const cgBreakdown = caregiverData
+        ? calcCaregiverBreakdown(activeServiceId, activeDuration, activeUrgent, cgRateVal, cgBonusVal)
+        : null;
+
+      // Hit zones
+      const hitZones = activeData.map((d, i) => {
+        const urgentVal = urgentOverlayData ? urgentOverlayData[i].cost : null;
+        const caregiverVal = caregiverData ? caregiverData[i].cost : null;
+        const margin = caregiverVal !== null ? (d.cost - caregiverVal) : null;
+        const marginPct = margin !== null && d.cost > 0 ? (margin / d.cost * 100) : null;
+        const cartVals = cart.map(item => ({
+          name: shortConfigLabel(item.cfg),
+          color: item.color,
+          cost: item.data[i].cost
+        }));
+        return `
+          <rect x="${xScale(d.hour) - 16}" y="${PAD.top}"
+                width="32" height="${H}"
+                fill="transparent" class="hit-zone"
+                data-hour="${d.hour}" data-std="${d.cost}"
+                data-urg="${urgentVal !== null ? urgentVal : ''}"
+                data-baseline="${baselineValue}"
+                data-show-baseline="${showBaseline}"
+                data-caregiver="${caregiverVal !== null ? caregiverVal : ''}"
+                data-cg-base="${cgBreakdown ? cgBreakdown.base : ''}"
+                data-cg-bonus="${cgBreakdown ? cgBreakdown.caregiverBonus : ''}"
+                data-cg-pool="${cgBreakdown ? cgBreakdown.bonusPool : ''}"
+                data-cg-triggers="${cgBreakdown ? cgBreakdown.triggers : ''}"
+                data-margin="${margin !== null ? margin : ''}"
+                data-margin-pct="${marginPct !== null ? marginPct : ''}"
+                data-on="${d.overnightHours}"
+                data-cart='${JSON.stringify(cartVals)}'
+                data-cx="${xScale(d.hour)}" data-cy="${yScale(d.cost)}" />
+        `;
+      }).join('');
+
+      const yAxisLabel = `
+        <text x="${PAD.left - 50}" y="${PAD.top + H / 2}" text-anchor="middle"
+              font-size="11" fill="#1A365C" font-family="Poppins" font-weight="700"
+              letter-spacing="0.5" transform="rotate(-90, ${PAD.left - 50}, ${PAD.top + H / 2})">
+          DOLLARS
+        </text>
+      `;
+      const xAxisLabel = `
+        <text x="${PAD.left + W / 2}" y="${VIEW_H - 6}" text-anchor="middle"
+              font-size="11" fill="#1A365C" font-family="Poppins" font-weight="700" letter-spacing="0.5">
+          SERVICE START TIME
+        </text>
+      `;
+
+      els.chart.innerHTML = `
+        <defs>
+          <linearGradient id="overnightGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#FFE5CC" stop-opacity="0.6" />
+            <stop offset="100%" stop-color="#FFF3E8" stop-opacity="0.3" />
+          </linearGradient>
+          <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1A365C" stop-opacity="0.10" />
+            <stop offset="100%" stop-color="#1A365C" stop-opacity="0.02" />
+          </linearGradient>
+          <linearGradient id="marginGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#14B8A6" stop-opacity="0.35" />
+            <stop offset="100%" stop-color="#14B8A6" stop-opacity="0.10" />
+          </linearGradient>
+          <pattern id="bonusGradient" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
+            <rect width="8" height="8" fill="#0F766E" fill-opacity="0.15" />
+            <line x1="0" y1="0" x2="0" y2="8" stroke="#0F766E" stroke-width="1.5" stroke-opacity="0.4" />
+          </pattern>
+        </defs>
+
+        ${overnightBands}
+        ${gridLines.join('')}
+        ${xTicks.join('')}
+        ${yAxisLabel}
+        ${xAxisLabel}
+        ${zoneLabels}
+
+        <rect x="${PAD.left}" y="${PAD.top}" width="${W}" height="${H}"
+              fill="none" stroke="#D0DDF0" stroke-width="1" />
+
+        ${baselineLine}
+
+        ${showCaregiver && marginArea ? `
+          <path d="${marginArea}" fill="url(#marginGradient)" />
+        ` : ''}
+
+        ${bonusBand}
+
+        ${cartPaths}
+
+        ${!showCaregiver ? `<path d="${activeArea}" fill="url(#areaGradient)" />` : ''}
+
+        <path d="${activePath}" fill="none" stroke="#1A365C" stroke-width="2.5"
+              stroke-linejoin="round" stroke-linecap="round" />
+
+        ${urgentOverlayData ? `
+          <path d="${urgentPath}" fill="none" stroke="#F57600" stroke-width="2.5"
+                stroke-dasharray="6 4" stroke-linejoin="round" stroke-linecap="round" />
+        ` : ''}
+
+        ${showCaregiver && caregiverData ? `
+          <path d="${caregiverPath}" fill="none" stroke="#0F766E" stroke-width="2.5"
+                stroke-linejoin="round" stroke-linecap="round" />
+          ${bonusExists ? `
+            <path d="${caregiverBasePath}" fill="none" stroke="#0F766E" stroke-width="1.5"
+                  stroke-dasharray="5 4" stroke-linejoin="round" stroke-linecap="round" opacity="0.75" />
+            <rect x="${PAD.left + 6}" y="${yScale(caregiverBasePay) - 9}" width="96" height="14" rx="7"
+                  fill="#ECFDF5" stroke="#0F766E" stroke-width="1" opacity="0.95" />
+            <text x="${PAD.left + 54}" y="${yScale(caregiverBasePay) + 1}" text-anchor="middle"
+                  font-size="10" fill="#064E3B" font-family="Poppins" font-weight="700">
+              Base pay $${caregiverBasePay.toFixed(0)}
+            </text>
+            <rect x="${PAD.left + 6}" y="${yScale(caregiverData[0].cost) - 9}" width="108" height="14" rx="7"
+                  fill="#0F766E" opacity="0.95" />
+            <text x="${PAD.left + 60}" y="${yScale(caregiverData[0].cost) + 1}" text-anchor="middle"
+                  font-size="10" fill="#FFFFFF" font-family="Poppins" font-weight="700">
+              Total pay $${caregiverData[0].cost.toFixed(0)}
+            </text>
+          ` : `
+            <rect x="${PAD.left + 6}" y="${yScale(caregiverData[0].cost) - 9}" width="108" height="14" rx="7"
+                  fill="#0F766E" opacity="0.95" />
+            <text x="${PAD.left + 60}" y="${yScale(caregiverData[0].cost) + 1}" text-anchor="middle"
+                  font-size="10" fill="#FFFFFF" font-family="Poppins" font-weight="700">
+              Base pay $${caregiverData[0].cost.toFixed(0)}
+            </text>
+          `}
+        ` : ''}
+
+        ${activeDots}
+        ${urgentDots}
+        ${caregiverDots}
+        ${minAnnotation}
+        ${maxAnnotation}
+
+        ${hitZones}
+      `;
+
+      els.chart.querySelectorAll('.hit-zone').forEach(zone => {
+        zone.addEventListener('mouseenter', showTooltip);
+        zone.addEventListener('mousemove', showTooltip);
+        zone.addEventListener('mouseleave', hideTooltip);
+      });
+    }
+
+    function showTooltip(e) {
+      const zone = e.currentTarget;
+      const hour = parseInt(zone.dataset.hour);
+      const std = parseFloat(zone.dataset.std);
+      const urgStr = zone.dataset.urg;
+      const urg = urgStr !== '' ? parseFloat(urgStr) : null;
+      const baseline = parseFloat(zone.dataset.baseline);
+      const showBaseline = zone.dataset.showBaseline === 'true';
+      const caregiverStr = zone.dataset.caregiver;
+      const caregiver = caregiverStr !== '' ? parseFloat(caregiverStr) : null;
+      const marginStr = zone.dataset.margin;
+      const margin = marginStr !== '' ? parseFloat(marginStr) : null;
+      const marginPctStr = zone.dataset.marginPct;
+      const marginPct = marginPctStr !== '' ? parseFloat(marginPctStr) : null;
+      const on = parseInt(zone.dataset.on);
+      const cartVals = JSON.parse(zone.dataset.cart || '[]');
+
+      const tt = els.tooltip;
+      let html = `
+        <div class="tt-time">Start: ${formatHour(hour)}</div>
+        <div class="tt-amount">$${std.toFixed(2)}</div>
+        <div class="tt-detail">${on > 0 ? `Overnight: <strong>${on} hr</strong>` : 'All daytime'}</div>
+      `;
+
+      if (caregiver !== null) {
+        const marginClass = margin !== null && margin < 0 ? 'negative' : '';
+        const cgBaseStr = zone.dataset.cgBase;
+        const cgBonusStr = zone.dataset.cgBonus;
+        const cgPoolStr = zone.dataset.cgPool;
+        const cgTriggersStr = zone.dataset.cgTriggers;
+        const cgBase = cgBaseStr !== '' ? parseFloat(cgBaseStr) : null;
+        const cgBonusAmt = cgBonusStr !== '' ? parseFloat(cgBonusStr) : null;
+        const cgPool = cgPoolStr !== '' ? parseFloat(cgPoolStr) : null;
+        const triggers = cgTriggersStr === 'true';
+
+        html += `<div class="tt-detail tt-group tt-caregiver">Base pay: <strong>$${cgBase.toFixed(2)}</strong></div>`;
+        if (triggers && cgBonusAmt > 0) {
+          html += `<div class="tt-detail tt-caregiver" style="opacity:0.9;">+ Bonus: <strong>$${cgBonusAmt.toFixed(2)}</strong> <span style="opacity:0.7;">(share of $${cgPool.toFixed(0)} pool)</span></div>`;
+          html += `<div class="tt-detail tt-caregiver" style="opacity:0.95;">= Total: <strong>$${caregiver.toFixed(2)}</strong></div>`;
+        } else {
+          html += `<div class="tt-detail tt-caregiver" style="opacity:0.75;">No bonus triggered on this booking</div>`;
+        }
+        html += `<div class="tt-detail tt-margin ${marginClass}">Margin: <strong>$${margin.toFixed(2)}</strong> (${marginPct.toFixed(0)}%)</div>`;
+      }
+
+      if (urg !== null) {
+        const delta = urg - std;
+        html += `<div class="tt-detail tt-group tt-urgent">If urgent: <strong>$${urg.toFixed(2)}</strong> (+$${delta.toFixed(0)})</div>`;
+      }
+
+      if (showBaseline) {
+        const deltaFromBaseline = std - baseline;
+        const sign = deltaFromBaseline >= 0 ? '+' : '';
+        html += `<div class="tt-detail tt-baseline">vs baseline: <strong>${sign}$${deltaFromBaseline.toFixed(0)}</strong></div>`;
+      }
+
+      if (cartVals.length > 0) {
+        html += `<div class="tt-detail tt-group" style="color:#B0C0D0;">Cart items:</div>`;
+        cartVals.forEach((cv, idx) => {
+          html += `<div class="tt-detail" style="color:${cv.color};font-weight:600;">● ${idx + 1}. ${cv.name}: $${cv.cost.toFixed(2)}</div>`;
+        });
+      }
+
+      tt.innerHTML = html;
+
+      const rect = els.chart.getBoundingClientRect();
+      const svgRect = els.chart.viewBox.baseVal;
+      const scaleX = rect.width / svgRect.width;
+      const scaleY = rect.height / svgRect.height;
+      const cx = parseFloat(zone.dataset.cx) * scaleX;
+      const cy = parseFloat(zone.dataset.cy) * scaleY;
+
+      tt.style.left = `${cx + 14}px`;
+      tt.style.top = `${cy + 14}px`;
+      tt.classList.add('show');
+    }
+
+    function hideTooltip() {
+      els.tooltip.classList.remove('show');
+    }
+
+    // ===== Insights =====
+    function renderInsights(data, baselineValue, service, caregiverData, showCaregiver) {
+      const minIdx = data.reduce((mi, d, i) => d.cost < data[mi].cost ? i : mi, 0);
+      const maxIdx = data.reduce((mi, d, i) => d.cost > data[mi].cost ? i : mi, 0);
+      const minVal = data[minIdx].cost;
+      const maxVal = data[maxIdx].cost;
+      const range = maxVal - minVal;
+
+      const cheapestHours = data.filter(d => d.cost === minVal).map(d => d.hour);
+      const mostExpensiveHours = data.filter(d => d.cost === maxVal).map(d => d.hour);
+
+      const cheapestLabel = cheapestHours.length === 1
+        ? formatHour(cheapestHours[0])
+        : `${formatHour(cheapestHours[0])} to ${formatHour(cheapestHours[cheapestHours.length - 1])}`;
+      const expensiveLabel = mostExpensiveHours.length === 1
+        ? formatHour(mostExpensiveHours[0])
+        : `${formatHour(mostExpensiveHours[0])} to ${formatHour(mostExpensiveHours[mostExpensiveHours.length - 1])}`;
+
+      const rangePercent = minVal > 0 ? ((range / minVal) * 100).toFixed(0) : 0;
+
+      const baselineDelta = minVal - baselineValue;
+      const baselineSign = baselineDelta >= 0 ? '+' : '';
+
+      let html = `
+        <div class="insight-card best">
+          <div class="insight-label">Cheapest Start</div>
+          <div class="insight-value">$${minVal.toFixed(0)}</div>
+          <div class="insight-detail">${cheapestLabel}${cheapestHours.length > 1 ? ` · ${cheapestHours.length} hrs` : ''}</div>
+        </div>
+        <div class="insight-card worst">
+          <div class="insight-label">Most Expensive</div>
+          <div class="insight-value">$${maxVal.toFixed(0)}</div>
+          <div class="insight-detail">${expensiveLabel}${mostExpensiveHours.length > 1 ? ` · ${mostExpensiveHours.length} tie` : ''}</div>
+        </div>
+        <div class="insight-card range">
+          <div class="insight-label">Daily Variance</div>
+          <div class="insight-value">$${range.toFixed(0)}</div>
+          <div class="insight-detail">${range === 0 ? 'Flat all day' : `${rangePercent}% swing`}</div>
+        </div>
+        <div class="insight-card baseline-card">
+          <div class="insight-label">Baseline (Old)</div>
+          <div class="insight-value">$${baselineValue.toFixed(0)}</div>
+          <div class="insight-detail">vs cheapest: <strong>${baselineSign}$${baselineDelta.toFixed(0)}</strong></div>
+        </div>
+      `;
+
+      if (showCaregiver && caregiverData) {
+        // Get breakdown info for display
+        const serviceId = els.service.value;
+        const duration = SERVICES[serviceId].type === 'task' ? 1 : parseInt(els.duration.value, 10);
+        const urgent = els.urgent.checked;
+        const cgRate = parseFloat(els.cgRate.value);
+        const cgBonus = parseInt(els.cgBonus.value, 10);
+        const breakdown = calcCaregiverBreakdown(serviceId, duration, urgent, cgRate, cgBonus);
+
+        // Base pay card (always shown)
+        const baseDetail = `$${breakdown.rate.toFixed(2)}/hr × ${breakdown.effHours} hr`;
+
+        // Bonus incentive card
+        let bonusDetail;
+        if (breakdown.triggers) {
+          const poolParts = breakdown.premiumParts.map(p => `$${p.amount}`).join(' + ');
+          bonusDetail = `${cgBonus}% of $${breakdown.bonusPool} pool (${poolParts})`;
+        } else if (!urgent && breakdown.effHours <= 2) {
+          bonusDetail = 'Needs urgent (&lt;24hr) booking to trigger';
+        } else if (urgent && breakdown.effHours > 2) {
+          bonusDetail = 'Needs 1 or 2 hour service to trigger';
+        } else {
+          bonusDetail = 'Needs urgent AND 1-2 hr service';
+        }
+
+        const bonusClass = breakdown.caregiverBonus > 0 ? '' : 'negative';
+
+        html += `
+          <div class="insight-card caregiver-card">
+            <div class="insight-label">Caregiver Base Pay</div>
+            <div class="insight-value">$${breakdown.base.toFixed(2)}</div>
+            <div class="insight-detail">${baseDetail}</div>
+          </div>
+          <div class="insight-card margin-card">
+            <div class="insight-label">Bonus Incentive</div>
+            <div class="insight-value ${bonusClass}" style="${breakdown.caregiverBonus === 0 ? 'color:#94A3B8;' : ''}">${breakdown.caregiverBonus > 0 ? '+' : ''}$${breakdown.caregiverBonus.toFixed(2)}</div>
+            <div class="insight-detail">${bonusDetail}</div>
+          </div>
+        `;
+      } else {
+        html += `
+          <div class="insight-card urgent-impact">
+            <div class="insight-label">Urgent Fee</div>
+            <div class="insight-value">+$10</div>
+            <div class="insight-detail">Flat add per booking</div>
+          </div>
+          <div class="insight-card" style="background:#FAFCFF;border-style:dashed;">
+            <div class="insight-label" style="color:#7A8BA3;">Toggle Caregiver Pay</div>
+            <div class="insight-value" style="color:#C7D9EE;font-size:14px;">→</div>
+            <div class="insight-detail" style="color:#7A8BA3;">to see margin analytics</div>
+          </div>
+        `;
+      }
+
+      els.insightsGrid.innerHTML = html;
+    }
+
+    function renderNarrative(data, baselineValue, service, duration, recurring, urgent, caregiverData, showCaregiver) {
+      const minVal = Math.min(...data.map(d => d.cost));
+      const maxVal = Math.max(...data.map(d => d.cost));
+      const range = maxVal - minVal;
+      const expensiveDelta = maxVal - baselineValue;
+
+      let narrative = '';
+
+      if (service.type === 'task') {
+        narrative = `<strong>Task service pattern.</strong> ${service.name} is a 1-hour task with a flat base price. Revenue runs at $${minVal} during daytime (7 AM to 7 PM) and jumps to $${maxVal} when the hour lands in the overnight window.`;
+      } else if (service.name === 'Companionship') {
+        if (duration === 1) {
+          narrative = `<strong>Short visit pattern.</strong> 1-hour Companionship carries a $10 short-visit premium, so bookings start at $55 minimum. Overnight hours add $5.`;
+        } else if (duration >= 4) {
+          if (range === 0) {
+            narrative = `<strong>Flat zone.</strong> At this duration and start range, the overnight window covers every possible hour, so cost stays at $${minVal} regardless of start time.`;
+          } else {
+            const rate = recurring ? '$40' : '$45';
+            const savingsVsBaseline = baselineValue - minVal;
+            const intro = `<strong>Long visit pattern.</strong> At ${duration} hours using the ${rate}/hr rate, the curve climbs as more hours slide into the overnight window.`;
+            const baselineInsight = recurring
+              ? ` Recurring clients starting during daytime save <strong>$${savingsVsBaseline}</strong> vs the old flat rate ($${minVal} vs $${baselineValue}). A strong retention lever.`
+              : ` Daytime one-time starts match the old flat rate ($${minVal} vs $${baselineValue}), so most families feel no price change. Overnight starts add up to +$${expensiveDelta} on top of the old rate.`;
+            narrative = intro + baselineInsight;
+          }
+        } else {
+          narrative = `<strong>Mid-length pattern.</strong> At ${duration} hours, the $5 first-hour premium is constant and overnight adders create a rolling curve. Peak cost is around evening starts.`;
+        }
+      } else if (service.name === 'Transportation') {
+        narrative = `<strong>Transportation pattern.</strong> At $55 per hour, Transportation sits higher on the chart than Companionship but shares the same overnight curve shape.`;
+      }
+
+      if (urgent && range > 0) {
+        narrative += ` The active line reflects urgent pricing (+$10 booking fee).`;
+      }
+
+      if (showCaregiver && caregiverData) {
+        const serviceId = els.service.value;
+        const cgRate = parseFloat(els.cgRate.value);
+        const cgBonus = parseInt(els.cgBonus.value, 10);
+        const breakdown = calcCaregiverBreakdown(serviceId, duration, urgent, cgRate, cgBonus);
+        const cgVal = breakdown.total;
+        const bestMargin = Math.max(...data.map(d => d.cost - cgVal));
+        const worstMargin = Math.min(...data.map(d => d.cost - cgVal));
+        const bestMarginPct = maxVal > 0 ? (bestMargin / maxVal * 100) : 0;
+        const worstMarginPct = minVal > 0 ? (worstMargin / minVal * 100) : 0;
+
+        if (breakdown.triggers && breakdown.caregiverBonus > 0) {
+          const partsText = breakdown.premiumParts.map(p => `<strong>${p.name} ($${p.amount})</strong>`).join(' + ');
+          narrative += ` <span class="narrative-highlight">Caregiver pay model:</span> base pay is $${cgRate.toFixed(2)}/hr × ${breakdown.effHours} hr = <strong>$${breakdown.base.toFixed(2)}</strong>. The booking triggers a bonus because it is urgent AND ${breakdown.effHours} hour${breakdown.effHours > 1 ? 's' : ''}. Bonus pool = ${partsText} = <strong>$${breakdown.bonusPool}</strong>. At ${cgBonus}% share, caregiver earns a bonus of <strong>$${breakdown.caregiverBonus.toFixed(2)}</strong> on top of base, bringing total to <strong>$${cgVal.toFixed(2)}</strong>. alice.care keeps $${breakdown.companyShare.toFixed(2)} from the pool plus all overnight premium. Margin swings from <strong>$${worstMargin.toFixed(0)}</strong> (${worstMarginPct.toFixed(0)}%) to <strong>$${bestMargin.toFixed(0)}</strong> (${bestMarginPct.toFixed(0)}%) driven entirely by overnight exposure.`;
+        } else {
+          let reason = '';
+          if (!urgent && breakdown.effHours <= 2) reason = 'the booking is not urgent';
+          else if (urgent && breakdown.effHours > 2) reason = 'the service is longer than 2 hours';
+          else reason = 'neither the urgent nor short-shift conditions apply';
+          narrative += ` <span class="narrative-highlight">Caregiver pay model:</span> no bonus triggers because ${reason}. Caregiver earns base pay only: $${cgRate.toFixed(2)}/hr × ${breakdown.effHours} hr = <strong>$${cgVal.toFixed(2)}</strong>. Margin ranges from <strong>$${worstMargin.toFixed(0)}</strong> (${worstMarginPct.toFixed(0)}%) to <strong>$${bestMargin.toFixed(0)}</strong> (${bestMarginPct.toFixed(0)}%), all from overnight pricing alice.care keeps.`;
+        }
+      }
+
+      if (cart.length > 0) {
+        narrative += ` <strong>Cart:</strong> ${cart.length} comparison configuration${cart.length > 1 ? 's are' : ' is'} overlaid. Hover any hour to see all values at that start time.`;
+      }
+
+      els.narrativeCallout.innerHTML = narrative;
+    }
+
+    // ===== Cart =====
+    function addToCart() {
+      const serviceId = els.service.value;
+      const service = SERVICES[serviceId];
+      const duration = service.type === 'task' ? 1 : parseInt(els.duration.value, 10);
+      const recurring = els.recurring.checked;
+      const urgent = els.urgent.checked;
+      const miles = parseInt(els.miles.value, 10) || 0;
+
+      const cfg = { serviceId, duration, recurring, urgent, miles };
+
+      const dup = cart.find(item => configsMatch(item.cfg, cfg));
+      if (dup) {
+        showToast('Already in cart');
+        return;
+      }
+
+      const data = buildDataPoints(cfg);
+      const baseline = calcBaseline(serviceId, duration, miles);
+      const color = CART_COLORS[cart.length % CART_COLORS.length];
+      const id = Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+
+      cart.push({ id, cfg, data, baseline, color });
+      justAddedId = id;
+
+      showToast(`${service.name} added · ${color}`);
+
+      els.addToCartBtn.classList.add('saved');
+      els.addToCartBtn.innerHTML = '<span class="plus">✓</span> Added';
+      setTimeout(() => {
+        els.addToCartBtn.classList.remove('saved');
+        els.addToCartBtn.innerHTML = '<span class="plus">+</span> Add to Cart';
+      }, 1200);
+
+      // Clear the "just added" flag after animation completes so future re-renders don't re-animate
+      setTimeout(() => { justAddedId = null; }, 2500);
+
+      renderCart();
+      update();
+    }
+
+    function removeFromCart(id) {
+      cart = cart.filter(i => i.id !== id);
+      renderCart();
+      update();
+    }
+
+    function clearCart() {
+      if (cart.length === 0) return;
+      if (confirm(`Clear all ${cart.length} comparison item${cart.length > 1 ? 's' : ''}?`)) {
+        cart = [];
+        renderCart();
+        update();
+        showToast('Comparison cart cleared');
+      }
+    }
+
+    function renderCart() {
+      const count = cart.length;
+      els.cartCount.textContent = count === 0 ? '(empty)' : `(${count} config${count > 1 ? 's' : ''})`;
+      els.btnClearCart.style.display = count > 0 ? '' : 'none';
+
+      if (count === 0) {
+        els.cartContent.innerHTML = `
+          <div class="cart-empty">
+            <span class="empty-icon">📊</span>
+            <strong>Build a comparison</strong>
+            Configure a service above, then press <em>Add to Cart</em> to overlay its curve on the chart.
+          </div>
+        `;
+        return;
+      }
+
+      const sumByHour = [];
+      for (let h = 0; h < 24; h++) {
+        let sum = 0;
+        cart.forEach(item => { sum += item.data[h].cost; });
+        sumByHour.push({ hour: h, sum });
+      }
+      const bestSum = Math.min(...sumByHour.map(s => s.sum));
+      const worstSum = Math.max(...sumByHour.map(s => s.sum));
+      const bestHours = sumByHour.filter(s => s.sum === bestSum).map(s => s.hour);
+      const totalBaseline = cart.reduce((sum, item) => sum + item.baseline, 0);
+
+      const bestDelta = bestSum - totalBaseline;
+      const bestSign = bestDelta >= 0 ? '+' : '';
+
+      const itemsHtml = cart.map((item, idx) => {
+        const costs = item.data.map(d => d.cost);
+        const min = Math.min(...costs);
+        const max = Math.max(...costs);
+        const svc = SERVICES[item.cfg.serviceId];
+        const durationLabel = svc.type === 'task' ? '1 hr task' : `${item.cfg.duration} hr`;
+
+        const flags = [];
+        if (item.cfg.recurring) flags.push('Recurring');
+        if (item.cfg.urgent) flags.push('Urgent');
+        if (item.cfg.miles > 0) flags.push(`${item.cfg.miles} mi`);
+
+        const justAdded = (item.id === justAddedId) ? 'just-added' : '';
+
+        return `
+          <div class="cart-item ${justAdded}">
+            <div class="ci-color-bar" style="background:${item.color};"></div>
+            <div class="ci-content">
+              <div class="ci-name">${idx + 1}. ${svc.name} · ${durationLabel}</div>
+              <div class="ci-meta">${flags.length ? flags.join(' · ') : 'Standard booking'}</div>
+              <div class="ci-stats">
+                <span>Min: <strong>$${min}</strong></span>
+                <span>Max: <strong>$${max}</strong></span>
+                <span>Range: <strong>$${max - min}</strong></span>
+                <span>Base: <strong>$${item.baseline}</strong></span>
+              </div>
+            </div>
+            <button class="ci-remove" onclick="removeFromCart('${item.id}')" title="Remove">×</button>
+          </div>
+        `;
+      }).join('');
+
+      const bestHoursLabel = bestHours.length === 1
+        ? formatHour(bestHours[0])
+        : `${formatHour(bestHours[0])} to ${formatHour(bestHours[bestHours.length - 1])}`;
+
+      els.cartContent.innerHTML = `
+        <div class="cart-grid">${itemsHtml}</div>
+        <div class="cart-totals">
+          <div class="ct-block">
+            <div class="ct-label">Combined · Cheapest</div>
+            <div class="ct-value">$${bestSum.toFixed(0)}</div>
+            <div class="ct-sub">Best time: ${bestHoursLabel}</div>
+          </div>
+          <div class="ct-block">
+            <div class="ct-label">Combined · Worst Case</div>
+            <div class="ct-value">$${worstSum.toFixed(0)}</div>
+            <div class="ct-sub">Range: $${(worstSum - bestSum).toFixed(0)} variance</div>
+          </div>
+          <div class="ct-block">
+            <div class="ct-label">Old Pricing (Baseline)</div>
+            <div class="ct-value" style="color:#475569;">$${totalBaseline.toFixed(0)}</div>
+            <div class="ct-sub">
+              vs cheapest:
+              <span class="${bestDelta >= 0 ? 'ct-overage' : 'ct-savings'}">
+                ${bestSign}$${bestDelta.toFixed(0)}
+              </span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function showToast(message) {
+      els.toastMessage.textContent = message;
+      els.toast.classList.add('show');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => els.toast.classList.remove('show'), 1800);
+    }
+
+    window.removeFromCart = removeFromCart;
+
+    init();
+  </script>
+</body>
+</html>
