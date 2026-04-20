@@ -1508,6 +1508,60 @@
       return { total: base, overnightHours };
     }
 
+    // Itemized revenue breakdown: lists every component that stacks into the total.
+    // Used by the tooltip so users can see urgent + overnight + short-shift all adding together.
+    function calcRevenueBreakdown(serviceId, duration, startHour, urgent, recurring, miles) {
+      const service = SERVICES[serviceId];
+      const parts = [];
+      let running = 0;
+
+      if (serviceId === '100') {
+        if (duration === 1) {
+          parts.push({ name: 'Companionship base (1 hr)', amount: PRICING.baseCompanion });
+          running += PRICING.baseCompanion;
+          if (PRICING.shortHour1 > 0) {
+            parts.push({ name: '1-hour short-visit premium', amount: PRICING.shortHour1 });
+            running += PRICING.shortHour1;
+          }
+        } else if (duration <= 3) {
+          parts.push({ name: `Companionship base ($${PRICING.baseCompanion} × ${duration} hr)`, amount: PRICING.baseCompanion * duration });
+          running += PRICING.baseCompanion * duration;
+          if (PRICING.shortHour2 > 0) {
+            parts.push({ name: '2-3 hour first-hour premium', amount: PRICING.shortHour2 });
+            running += PRICING.shortHour2;
+          }
+        } else {
+          const rate = recurring ? Math.max(0, PRICING.baseCompanion - 5) : PRICING.baseCompanion;
+          parts.push({ name: `Companionship ${recurring ? 'recurring' : 'standard'} ($${rate} × ${duration} hr)`, amount: rate * duration });
+          running += rate * duration;
+        }
+      } else if (serviceId === '610') {
+        parts.push({ name: `Transportation ($55 × ${duration} hr)`, amount: 55 * duration });
+        running += 55 * duration;
+        if (miles > 0) {
+          parts.push({ name: `Mileage ($1 × ${miles} mi)`, amount: miles });
+          running += miles;
+        }
+      } else {
+        parts.push({ name: `${service.name} (1 hr task)`, amount: service.price });
+        running += service.price;
+      }
+
+      if (urgent && PRICING.urgent > 0) {
+        parts.push({ name: 'Urgent (<24hr)', amount: PRICING.urgent });
+        running += PRICING.urgent;
+      }
+
+      const effHours = service.type === 'task' ? 1 : duration;
+      const overnightHours = countOvernightHours(startHour, effHours);
+      if (overnightHours > 0 && PRICING.night > 0) {
+        parts.push({ name: `Night shift (${overnightHours} × $${PRICING.night})`, amount: overnightHours * PRICING.night });
+        running += overnightHours * PRICING.night;
+      }
+
+      return { parts, total: running };
+    }
+
     function calcBaseline(serviceId, duration, miles) {
       // Baseline = old flat-rate model (no modifiers at all)
       if (serviceId === '100') return PRICING.baseCompanion * duration;
@@ -2005,6 +2059,8 @@
       const activeServiceId = els.service.value;
       const activeDuration = SERVICES[activeServiceId].type === 'task' ? 1 : parseInt(els.duration.value, 10);
       const activeUrgent = els.urgent.checked;
+      const activeRecurring = els.recurring.checked;
+      const activeMiles = parseInt(els.miles.value, 10) || 0;
       const cgRateVal = parseFloat(els.cgRate.value);
       const cgBonusVal = parseInt(els.cgBonus.value, 10);
 
@@ -2025,6 +2081,9 @@
           ? calcCaregiverBreakdown(activeServiceId, activeDuration, activeUrgent, cgRateVal, cgBonusVal, d.hour)
           : null;
 
+        // Per-hour revenue breakdown (shows each premium that stacked into the total)
+        const revBd = calcRevenueBreakdown(activeServiceId, activeDuration, d.hour, activeUrgent, activeRecurring, activeMiles);
+
         return `
           <rect x="${xScale(d.hour) - 16}" y="${PAD.top}"
                 width="32" height="${H}"
@@ -2039,6 +2098,7 @@
                 data-cg-pool="${bdAtHour ? bdAtHour.bonusPool : ''}"
                 data-cg-triggers="${bdAtHour ? bdAtHour.triggers : ''}"
                 data-cg-parts='${bdAtHour ? JSON.stringify(bdAtHour.premiumParts) : "[]"}'
+                data-rev-parts='${JSON.stringify(revBd.parts)}'
                 data-margin="${margin !== null ? margin : ''}"
                 data-margin-pct="${marginPct !== null ? marginPct : ''}"
                 data-on="${d.overnightHours}"
@@ -2183,13 +2243,21 @@
       const marginPct = marginPctStr !== '' ? parseFloat(marginPctStr) : null;
       const on = parseInt(zone.dataset.on);
       const cartVals = JSON.parse(zone.dataset.cart || '[]');
+      const revParts = JSON.parse(zone.dataset.revParts || '[]');
 
       const tt = els.tooltip;
       let html = `
         <div class="tt-time">Start: ${formatHour(hour)}</div>
         <div class="tt-amount">$${std.toFixed(2)}</div>
-        <div class="tt-detail">${on > 0 ? `Overnight: <strong>${on} hr</strong>` : 'All daytime'}</div>
       `;
+
+      // Itemized revenue breakdown (shows every premium stacking into the total)
+      if (revParts.length > 0) {
+        html += `<div class="tt-detail" style="opacity:0.75;font-size:9.5px;text-transform:uppercase;letter-spacing:0.3px;margin-top:2px;">Revenue breakdown</div>`;
+        revParts.forEach(p => {
+          html += `<div class="tt-detail" style="opacity:0.9;">${p.name}: <strong>$${p.amount}</strong></div>`;
+        });
+      }
 
       if (caregiver !== null) {
         const marginClass = margin !== null && margin < 0 ? 'negative' : '';
