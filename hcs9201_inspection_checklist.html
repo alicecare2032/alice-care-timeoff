@@ -115,19 +115,244 @@
     }
     .org-item .val.orange { color: #F57600; }
 
+    /* Shared folder hero strip */
+    .folder-hero {
+      background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+      padding: 18px 36px;
+      border-bottom: 1px solid #6EE7B7;
+    }
+    .folder-hero.unconfigured {
+      background: linear-gradient(135deg, #FFF9F0 0%, #FFF3E8 100%);
+      border-bottom-color: #F5C992;
+    }
+    .fh-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #065F46;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .folder-hero.unconfigured .fh-label { color: #B85300; }
+    .fh-label::before {
+      content: '';
+      width: 3px;
+      height: 12px;
+      background: #0F766E;
+      border-radius: 2px;
+    }
+    .folder-hero.unconfigured .fh-label::before { background: #F57600; }
+    .fh-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 10px;
+      align-items: center;
+    }
+    .fh-folder-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: #064E3B;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .folder-hero.unconfigured .fh-folder-name { color: #5A3410; }
+    .fh-folder-name .fh-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: #0F766E;
+      color: #FFFFFF;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .folder-hero.unconfigured .fh-folder-name .fh-icon { background: #F57600; }
+    .fh-folder-name .fh-text { min-width: 0; }
+    .fh-folder-name .fh-title { font-size: 14px; font-weight: 700; line-height: 1.2; }
+    .fh-folder-name .fh-sub {
+      font-size: 11.5px;
+      font-weight: 500;
+      color: #047857;
+      opacity: 0.9;
+      line-height: 1.3;
+      margin-top: 2px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 540px;
+    }
+    .folder-hero.unconfigured .fh-folder-name .fh-sub { color: #B85300; }
+
+    .fh-open-btn {
+      padding: 12px 22px;
+      background: #0F766E;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 9px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .fh-open-btn:hover {
+      background: #115E59;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);
+    }
+    .fh-open-btn:disabled {
+      background: #D1FAE5;
+      color: #065F46;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+      opacity: 0.6;
+    }
+    .fh-configure-btn {
+      padding: 12px 22px;
+      background: #F57600;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 9px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .fh-configure-btn:hover {
+      background: #E06900;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(245, 118, 0, 0.25);
+    }
+    .fh-edit-btn {
+      padding: 10px 14px;
+      background: #FFFFFF;
+      color: #0F766E;
+      border: 1.5px solid #6EE7B7;
+      border-radius: 9px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .fh-edit-btn:hover { border-color: #0F766E; }
+
+    /* Inline edit */
+    .fh-edit-panel {
+      display: none;
+      margin-top: 12px;
+      padding: 14px;
+      background: #FFFFFF;
+      border: 1.5px solid #6EE7B7;
+      border-radius: 9px;
+    }
+    .folder-hero.unconfigured .fh-edit-panel { border-color: #F5C992; }
+    .fh-edit-panel.open { display: block; }
+    .fh-edit-panel label {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #1A365C;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .fh-edit-panel input {
+      width: 100%;
+      padding: 10px 12px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 12.5px;
+      color: #1A365C;
+      background: #FFFFFF;
+      border: 1.5px solid #D0DDF0;
+      border-radius: 7px;
+      outline: none;
+      transition: all 0.15s;
+    }
+    .fh-edit-panel input:focus {
+      border-color: #0F766E;
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+    }
+    .fh-edit-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .fh-save, .fh-cancel {
+      padding: 8px 16px;
+      border-radius: 7px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: all 0.15s;
+    }
+    .fh-save {
+      background: #1B7A3D;
+      color: #FFFFFF;
+    }
+    .fh-save:hover { background: #166530; }
+    .fh-cancel {
+      background: #FFFFFF;
+      color: #4A5F7F;
+      border-color: #D0DDF0;
+    }
+    .fh-cancel:hover { border-color: #7A8BA3; }
+
+    /* Setup banner */
+    .setup-banner {
+      margin: 16px 36px 0;
+      padding: 14px 18px;
+      background: #FFFBF0;
+      border: 1px solid #F5DFA0;
+      border-left: 4px solid #F57600;
+      border-radius: 8px;
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: #5A4A1E;
+    }
+    .setup-banner.hidden { display: none; }
+    .setup-banner strong { color: #B85300; }
+    .setup-banner ol { padding-left: 22px; margin-top: 6px; }
+    .setup-banner ol li { margin-bottom: 3px; }
+    .setup-banner .close-banner {
+      float: right;
+      background: transparent;
+      border: none;
+      color: #B85300;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 0 4px;
+      font-weight: 700;
+    }
+
     /* Stats bar */
     .stats-bar {
       padding: 20px 36px;
       border-bottom: 1px solid #E2E8F0;
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 12px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
     }
     .stat-card {
       background: #F0F7FF;
       border: 1px solid #D0DDF0;
       border-radius: 10px;
-      padding: 14px 16px;
+      padding: 14px 18px;
       display: flex;
       flex-direction: column;
       gap: 4px;
@@ -140,15 +365,12 @@
       letter-spacing: 0.5px;
     }
     .stat-card .stat-value {
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 700;
       color: #1A365C;
       line-height: 1;
     }
-    .stat-card .stat-sub {
-      font-size: 10.5px;
-      color: #7A8BA3;
-    }
+    .stat-card .stat-sub { font-size: 11px; color: #7A8BA3; }
     .stat-card.complete {
       background: linear-gradient(135deg, #F0FAF3 0%, #E6F4EA 100%);
       border-color: #B7DFC6;
@@ -163,19 +385,12 @@
     .stat-card.pending .stat-value { color: #B85300; }
     .stat-card.pending .stat-label { color: #B85300; }
 
-    .stat-card.progress {
+    .stat-card.hints {
       background: linear-gradient(135deg, #F0F9FF 0%, #DBEAFE 100%);
       border-color: #93C5FD;
     }
-    .stat-card.progress .stat-value { color: #1D4ED8; }
-    .stat-card.progress .stat-label { color: #1D4ED8; }
-
-    .stat-card.storage {
-      background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
-      border-color: #6EE7B7;
-    }
-    .stat-card.storage .stat-value { color: #0F766E; font-size: 22px; }
-    .stat-card.storage .stat-label { color: #0F766E; }
+    .stat-card.hints .stat-value { color: #1D4ED8; }
+    .stat-card.hints .stat-label { color: #1D4ED8; }
 
     /* Action bar */
     .action-bar {
@@ -188,11 +403,7 @@
       align-items: center;
       justify-content: space-between;
     }
-    .action-bar .filter-group {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+    .filter-group { display: flex; gap: 8px; flex-wrap: wrap; }
     .filter-chip {
       padding: 7px 14px;
       background: #FFFFFF;
@@ -211,12 +422,7 @@
       border-color: #F57600;
       color: #FFFFFF;
     }
-
-    .action-buttons {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+    .action-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
     .btn {
       padding: 8px 14px;
       font-family: 'Poppins', sans-serif;
@@ -231,33 +437,18 @@
       gap: 6px;
       white-space: nowrap;
     }
-    .btn-primary {
-      background: #1B7A3D;
-      color: #FFFFFF;
-    }
-    .btn-primary:hover {
-      background: #166530;
-      transform: translateY(-1px);
-      box-shadow: 0 3px 8px rgba(27, 122, 61, 0.25);
-    }
     .btn-secondary {
       background: #FFFFFF;
       color: #1A365C;
       border: 1.5px solid #D0DDF0;
     }
-    .btn-secondary:hover {
-      border-color: #F57600;
-      color: #F57600;
-    }
+    .btn-secondary:hover { border-color: #F57600; color: #F57600; }
     .btn-danger {
       background: #FFFFFF;
       color: #B91C1C;
       border: 1.5px solid #FCA5A5;
     }
-    .btn-danger:hover {
-      background: #FEF2F2;
-      border-color: #DC2626;
-    }
+    .btn-danger:hover { background: #FEF2F2; border-color: #DC2626; }
 
     /* Sections */
     .checklist-section {
@@ -287,7 +478,6 @@
     .section-icon.blue { background: linear-gradient(135deg, #1A365C 0%, #2D4A6F 100%); }
     .section-icon.orange { background: linear-gradient(135deg, #F57600 0%, #E06900 100%); }
     .section-icon.green { background: linear-gradient(135deg, #1B7A3D 0%, #166530 100%); }
-    .section-icon.teal { background: linear-gradient(135deg, #0F766E 0%, #115E59 100%); }
 
     .section-title-group { flex: 1; min-width: 0; }
     .section-title {
@@ -296,10 +486,7 @@
       color: #1A365C;
       margin-bottom: 2px;
     }
-    .section-subtitle {
-      font-size: 11.5px;
-      color: #7A8BA3;
-    }
+    .section-subtitle { font-size: 11.5px; color: #7A8BA3; }
     .section-progress {
       font-size: 12px;
       font-weight: 700;
@@ -432,45 +619,86 @@
       border: 1px solid #B7DFC6;
     }
 
-    /* ===== Attachments area ===== */
-    .attachments-block {
-      margin-top: 14px;
-      padding-top: 14px;
+    /* Item footer: reference + open */
+    .item-footer {
+      margin-top: 12px;
+      padding-top: 12px;
       border-top: 1px dashed #E2E8F0;
-    }
-    .att-header {
-      display: flex;
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
       align-items: center;
-      margin-bottom: 10px;
-      gap: 8px;
     }
-    .att-header-left {
-      font-size: 11px;
-      font-weight: 700;
+    .ref-display {
+      font-size: 12px;
       color: #1A365C;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .ref-display .ref-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: #DBEAFE;
+      color: #1D4ED8;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+    .ref-display .ref-text {
+      font-weight: 500;
+      color: #1D4ED8;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .ref-display .ref-prefix {
+      font-size: 10px;
+      color: #7A8BA3;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      font-weight: 700;
+      margin-right: 4px;
     }
-    .att-count-pill {
+    .ref-display .ref-edit {
+      background: transparent;
+      border: none;
+      color: #7A8BA3;
+      cursor: pointer;
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Poppins', sans-serif;
+    }
+    .ref-display .ref-edit:hover {
       background: #F0F7FF;
       color: #1A365C;
-      padding: 2px 8px;
-      border-radius: 10px;
-      font-size: 10px;
-      border: 1px solid #D0DDF0;
     }
-    .att-count-pill.has-items {
-      background: #FFF3E8;
-      color: #B85300;
-      border-color: #F5C992;
+    .ref-empty {
+      font-size: 11.5px;
+      color: #7A8BA3;
+      font-style: italic;
     }
-    .btn-add-att {
-      padding: 7px 12px;
-      background: #F57600;
+    .ref-empty button {
+      background: transparent;
+      border: none;
+      color: #F57600;
+      cursor: pointer;
+      font-size: 11.5px;
+      font-weight: 600;
+      font-family: 'Poppins', sans-serif;
+      text-decoration: underline;
+      padding: 0;
+    }
+    .ref-empty button:hover { color: #E06900; }
+
+    .item-open-btn {
+      padding: 8px 14px;
+      background: #0F766E;
       color: #FFFFFF;
       border: none;
       border-radius: 7px;
@@ -479,303 +707,90 @@
       font-weight: 600;
       cursor: pointer;
       transition: all 0.15s;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .btn-add-att:hover {
-      background: #E06900;
-      transform: translateY(-1px);
-      box-shadow: 0 3px 8px rgba(245, 118, 0, 0.25);
-    }
-    .btn-add-att .plus {
+      white-space: nowrap;
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      width: 16px;
-      height: 16px;
-      background: rgba(255,255,255,0.25);
-      border-radius: 50%;
-      font-size: 12px;
-      font-weight: 700;
-      line-height: 1;
-    }
-
-    .att-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .att-empty {
-      font-size: 11.5px;
-      color: #7A8BA3;
-      font-style: italic;
-      padding: 10px 12px;
-      background: #FAFCFF;
-      border: 1px dashed #D0DDF0;
-      border-radius: 7px;
-      text-align: center;
-    }
-
-    .att-card {
-      background: #FFFFFF;
-      border: 1px solid #E2E8F0;
-      border-radius: 8px;
-      padding: 10px 12px;
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      gap: 10px;
-      align-items: center;
-    }
-    .att-card.type-link { border-left: 3px solid #1D4ED8; }
-    .att-card.type-file { border-left: 3px solid #0F766E; }
-
-    .att-icon {
-      width: 34px;
-      height: 34px;
-      border-radius: 7px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 15px;
-      flex-shrink: 0;
-    }
-    .att-card.type-link .att-icon {
-      background: #DBEAFE;
-      color: #1D4ED8;
-    }
-    .att-card.type-file .att-icon {
-      background: #D1FAE5;
-      color: #0F766E;
-    }
-
-    .att-info { min-width: 0; }
-    .att-title {
-      font-size: 12.5px;
-      font-weight: 600;
-      color: #1A365C;
-      line-height: 1.3;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .att-details {
-      font-size: 11px;
-      color: #4A5F7F;
-      line-height: 1.4;
-      margin-top: 2px;
-      word-break: break-word;
-    }
-    .att-meta {
-      font-size: 10px;
-      color: #7A8BA3;
-      margin-top: 3px;
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .att-meta .mini-chip {
-      background: #F0F7FF;
-      padding: 1px 6px;
-      border-radius: 8px;
-      font-weight: 600;
-      color: #4A5F7F;
-      border: 1px solid #D0DDF0;
-    }
-
-    .att-actions {
-      display: flex;
       gap: 5px;
-      flex-shrink: 0;
     }
-    .att-btn {
-      padding: 6px 10px;
+    .item-open-btn:hover {
+      background: #115E59;
+      transform: translateY(-1px);
+    }
+    .item-open-btn:disabled {
+      background: #D0DDF0;
+      color: #7A8BA3;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Reference edit inline */
+    .ref-edit-panel {
+      display: none;
+      margin-top: 10px;
+      padding: 10px 12px;
+      background: #FFFBF0;
+      border: 1.5px solid #F5DFA0;
+      border-radius: 7px;
+      grid-column: 1 / -1;
+    }
+    .ref-edit-panel.open { display: block; }
+    .ref-edit-panel label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #5A4A1E;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .ref-edit-panel input {
+      width: 100%;
+      padding: 8px 10px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 12px;
+      color: #1A365C;
+      background: #FFFFFF;
+      border: 1.5px solid #F5DFA0;
+      border-radius: 6px;
+      outline: none;
+    }
+    .ref-edit-panel input:focus {
+      border-color: #F57600;
+      box-shadow: 0 0 0 3px rgba(245, 118, 0, 0.1);
+    }
+    .ref-edit-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .ref-edit-actions button {
+      padding: 6px 12px;
       border-radius: 6px;
       font-family: 'Poppins', sans-serif;
       font-size: 11px;
       font-weight: 600;
       cursor: pointer;
-      border: 1px solid transparent;
+      border: 1.5px solid transparent;
       transition: all 0.15s;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      white-space: nowrap;
     }
-    .att-btn.open-btn {
-      background: #1A365C;
+    .ref-save {
+      background: #1B7A3D;
       color: #FFFFFF;
     }
-    .att-btn.open-btn:hover {
-      background: #F57600;
+    .ref-save:hover { background: #166530; }
+    .ref-cancel {
+      background: #FFFFFF;
+      color: #4A5F7F;
+      border-color: #D0DDF0;
     }
-    .att-btn.delete-btn {
+    .ref-cancel:hover { border-color: #7A8BA3; }
+    .ref-clear {
       background: #FFFFFF;
       color: #B91C1C;
       border-color: #FCA5A5;
-      padding: 6px 9px;
     }
-    .att-btn.delete-btn:hover {
-      background: #FEF2F2;
-      border-color: #DC2626;
-    }
-
-    /* Add form */
-    .att-form {
-      background: linear-gradient(135deg, #FFF9F0 0%, #FFF3E8 100%);
-      border: 1.5px solid #F5C992;
-      border-radius: 9px;
-      padding: 14px 16px;
-      display: none;
-      margin-top: 8px;
-    }
-    .att-form.open { display: block; }
-    .att-form-title {
-      font-size: 12px;
-      font-weight: 700;
-      color: #B85300;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 10px;
-    }
-    .att-form-grid {
-      display: grid;
-      gap: 10px;
-    }
-    .att-field { display: flex; flex-direction: column; gap: 4px; }
-    .att-field label {
-      font-size: 10.5px;
-      font-weight: 700;
-      color: #1A365C;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-    }
-    .att-field label .required { color: #DC2626; }
-    .att-field input[type="text"],
-    .att-field input[type="url"],
-    .att-field textarea {
-      padding: 9px 12px;
-      font-family: 'Poppins', sans-serif;
-      font-size: 12.5px;
-      color: #1A365C;
-      background: #FFFFFF;
-      border: 1.5px solid #D0DDF0;
-      border-radius: 7px;
-      outline: none;
-      transition: all 0.15s;
-      width: 100%;
-    }
-    .att-field textarea { resize: vertical; min-height: 50px; line-height: 1.5; }
-    .att-field input:focus, .att-field textarea:focus {
-      border-color: #F57600;
-      box-shadow: 0 0 0 3px rgba(245, 118, 0, 0.1);
-    }
-
-    .type-switcher {
-      display: flex;
-      gap: 0;
-      background: #FFFFFF;
-      border: 1.5px solid #D0DDF0;
-      border-radius: 7px;
-      padding: 3px;
-      width: fit-content;
-    }
-    .type-btn {
-      padding: 6px 14px;
-      background: transparent;
-      border: none;
-      border-radius: 5px;
-      font-family: 'Poppins', sans-serif;
-      font-size: 11.5px;
-      font-weight: 600;
-      color: #4A5F7F;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .type-btn.active {
-      background: #1A365C;
-      color: #FFFFFF;
-    }
-    .type-btn:not(.active):hover { background: #F0F7FF; }
-
-    .source-slot .source-link,
-    .source-slot .source-file { display: none; }
-    .source-slot.show-link .source-link { display: block; }
-    .source-slot.show-file .source-file { display: block; }
-
-    .file-drop {
-      border: 2px dashed #D0DDF0;
-      border-radius: 8px;
-      padding: 18px;
-      text-align: center;
-      background: #FAFCFF;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .file-drop:hover, .file-drop.dragover {
-      border-color: #F57600;
-      background: #FFF9F0;
-    }
-    .file-drop .drop-icon {
-      font-size: 24px;
-      margin-bottom: 5px;
-    }
-    .file-drop .drop-text {
-      font-size: 12px;
-      color: #4A5F7F;
-      font-weight: 500;
-    }
-    .file-drop .drop-sub {
-      font-size: 10.5px;
-      color: #7A8BA3;
-      margin-top: 3px;
-    }
-    .file-drop.has-file {
-      border-color: #0F766E;
-      background: #ECFDF5;
-      border-style: solid;
-    }
-    .file-drop.has-file .drop-icon { color: #0F766E; }
-    .file-drop.has-file .drop-text { color: #0F766E; font-weight: 700; }
-
-    .att-form-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-      margin-top: 6px;
-    }
-    .btn-save-att {
-      padding: 8px 16px;
-      background: #1B7A3D;
-      color: #FFFFFF;
-      border: none;
-      border-radius: 7px;
-      font-family: 'Poppins', sans-serif;
-      font-size: 11.5px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .btn-save-att:hover {
-      background: #166530;
-      transform: translateY(-1px);
-    }
-    .btn-cancel-att {
-      padding: 8px 16px;
-      background: #FFFFFF;
-      color: #4A5F7F;
-      border: 1.5px solid #D0DDF0;
-      border-radius: 7px;
-      font-family: 'Poppins', sans-serif;
-      font-size: 11.5px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .btn-cancel-att:hover {
-      border-color: #7A8BA3;
-    }
+    .ref-clear:hover { background: #FEF2F2; border-color: #DC2626; }
 
     /* Footer */
     .app-footer {
@@ -821,30 +836,29 @@
     .toast.success { background: #1B7A3D; }
     .toast.error { background: #DC2626; }
 
-    /* Print styles */
+    /* Print */
     @media print {
       body { background: #FFFFFF; }
       .page-wrapper { padding: 0; }
       .app-container { box-shadow: none; border-radius: 0; }
-      .action-bar, .btn-add-att, .att-actions, .att-form { display: none !important; }
+      .action-bar, .item-open-btn, .fh-open-btn, .fh-configure-btn, .fh-edit-btn, .fh-edit-panel, .ref-edit-panel, .ref-display .ref-edit, .ref-empty button, .setup-banner { display: none !important; }
       .checklist-item { break-inside: avoid; page-break-inside: avoid; }
-      .att-card { grid-template-columns: auto 1fr; }
     }
 
     /* Responsive */
-    @media (max-width: 860px) {
-      .stats-bar { grid-template-columns: repeat(2, 1fr); }
-    }
     @media (max-width: 768px) {
       .page-wrapper { padding: 15px 8px 30px; }
-      .app-header, .title-section, .org-strip, .stats-bar, .action-bar, .checklist-section, .app-footer {
+      .app-header, .title-section, .org-strip, .folder-hero, .stats-bar, .action-bar, .checklist-section, .app-footer {
         padding-left: 18px;
         padding-right: 18px;
       }
+      .setup-banner { margin-left: 18px; margin-right: 18px; }
+      .stats-bar { grid-template-columns: repeat(2, 1fr); }
+      .fh-row { grid-template-columns: 1fr; }
       .item-top { grid-template-columns: auto 1fr; }
       .item-top .status-chip { grid-column: 1 / -1; justify-self: start; margin-left: 36px; }
-      .att-card { grid-template-columns: auto 1fr; }
-      .att-actions { grid-column: 1 / -1; justify-content: flex-end; margin-top: 6px; }
+      .item-footer { grid-template-columns: 1fr; }
+      .item-open-btn { justify-self: stretch; justify-content: center; }
     }
   </style>
 </head>
@@ -867,7 +881,7 @@
       <!-- Title -->
       <div class="title-section">
         <h1>Home Care Organization <span>Inspection Checklist</span></h1>
-        <p>Track each statutory requirement under the Home Care Services Consumer Protection Act. Attach as many supporting materials as you need per item so your team can surface proof instantly during an unannounced CDSS inspection under Health and Safety Code section 1796.52(b). Each attachment captures a title, details, and either a link or an uploaded document.</p>
+        <p>Track each statutory requirement under the Home Care Services Consumer Protection Act. All supporting material lives in one shared Google Drive folder. Click any Open Folder button to jump straight to it on inspection day.</p>
       </div>
 
       <!-- Org strip -->
@@ -894,6 +908,41 @@
         </div>
       </div>
 
+      <!-- Shared folder hero -->
+      <div class="folder-hero" id="folderHero">
+        <div class="fh-label" id="fhLabel">Shared Drive folder</div>
+        <div class="fh-row">
+          <div class="fh-folder-name">
+            <div class="fh-icon">📁</div>
+            <div class="fh-text">
+              <div class="fh-title">HCS 9201 Supporting Materials</div>
+              <div class="fh-sub" id="fhSub">No URL configured yet. Click Configure to link your shared Drive folder.</div>
+            </div>
+          </div>
+          <button class="fh-open-btn" id="fhOpenBtn">↗ Open Folder</button>
+          <button class="fh-edit-btn" id="fhEditBtn">Edit</button>
+        </div>
+        <div class="fh-edit-panel" id="fhEditPanel">
+          <label>Drive Folder URL</label>
+          <input type="url" id="fhUrlInput" placeholder="https://drive.google.com/drive/folders/...">
+          <div class="fh-edit-actions">
+            <button class="fh-cancel" id="fhCancelBtn">Cancel</button>
+            <button class="fh-save" id="fhSaveBtn">Save</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Setup banner -->
+      <div class="setup-banner" id="setupBanner">
+        <button class="close-banner" onclick="hideBanner()">×</button>
+        <strong>First time setup, three steps:</strong>
+        <ol>
+          <li>Create one folder in Google Drive named "HCS 9201 Supporting Materials" and share it with your Alice Care team. Drop every certificate, training log, and policy directly inside, no subfolders needed.</li>
+          <li>Copy the folder URL and paste it into the green strip above. Click Save. Every Open Folder button on this page now routes to that folder.</li>
+          <li>Add optional file reference hints per requirement (for example "workers_comp_2026.pdf") so staff know which file in the folder satisfies which statute. Export Backup and share the JSON with your team.</li>
+        </ol>
+      </div>
+
       <!-- Stats -->
       <div class="stats-bar">
         <div class="stat-card">
@@ -909,17 +958,12 @@
         <div class="stat-card pending">
           <span class="stat-label">Outstanding</span>
           <span class="stat-value" id="statPending">0</span>
-          <span class="stat-sub">Need material</span>
+          <span class="stat-sub">Still need review</span>
         </div>
-        <div class="stat-card progress">
-          <span class="stat-label">Attachments</span>
-          <span class="stat-value" id="statAttachments">0</span>
-          <span class="stat-sub">Links and files total</span>
-        </div>
-        <div class="stat-card storage">
-          <span class="stat-label">Storage Used</span>
-          <span class="stat-value" id="statStorage">0 KB</span>
-          <span class="stat-sub">Browser local limit ~5 MB</span>
+        <div class="stat-card hints">
+          <span class="stat-label">File Hints</span>
+          <span class="stat-value" id="statHints">0</span>
+          <span class="stat-sub">Items with reference</span>
         </div>
       </div>
 
@@ -929,7 +973,7 @@
           <button class="filter-chip active" data-filter="all">All Items</button>
           <button class="filter-chip" data-filter="pending">Outstanding</button>
           <button class="filter-chip" data-filter="complete">Verified</button>
-          <button class="filter-chip" data-filter="noatt">Missing Material</button>
+          <button class="filter-chip" data-filter="noref">Missing Hint</button>
         </div>
         <div class="action-buttons">
           <button class="btn btn-secondary" onclick="exportJSON()">📥 Export Backup</button>
@@ -945,7 +989,7 @@
       <!-- Footer -->
       <div class="app-footer">
         <div>
-          Source: California Department of Social Services, Form HCS 9201 (11/25). Data and files save to this browser only. Export a backup regularly.
+          Source: California Department of Social Services, Form HCS 9201 (11/25). Folder URL, file hints, and checkbox state save to this browser only. Export a backup to share with your team.
           Visit <a href="https://www.Alicecare.com" target="_blank" rel="noopener">www.Alicecare.com</a> for the operations home page.
         </div>
         <div class="footer-right">alice.care &copy; 2026 &middot; TEKKS LLC</div>
@@ -981,39 +1025,14 @@
         iconColor: 'orange',
         iconLetter: 'O',
         items: [
-          {
-            code: '1796.42(a)',
-            text: 'Post the HCO license in a conspicuous location inside the place of business.'
-          },
-          {
-            code: '1796.42(a)',
-            text: 'Post business hours in a conspicuous location inside the place of business.'
-          },
-          {
-            code: '1796.42(b)',
-            text: 'Maintain and abide by a valid workers compensation policy covering every affiliated Home Care Aide.'
-          },
-          {
-            code: '1796.42(c)',
-            text: 'Maintain and abide by an employee dishonesty bond that includes third party coverage with a minimum limit of ten thousand dollars ($10,000).'
-          },
-          {
-            code: '1796.42(d)',
-            text: 'Maintain proof of general and professional liability insurance of at least one million dollars ($1,000,000) per occurrence and three million dollars ($3,000,000) in the aggregate.'
-          },
-          {
-            code: '1796.43(a)(1)',
-            text: 'Confirm every staff person, volunteer, or employee who contacts clients, prospective clients, or confidential client information completes the requirements of Sections 1796.23, 1796.24, 1796.25, 1796.26, and 1796.28 before that contact or access occurs.'
-          },
-          {
-            code: '1796.43(a)(3)',
-            text: 'Notify the Department immediately once the HCO stops employing an individual as an affiliated Home Care Aide.'
-          },
-          {
-            code: '1796.52(c)',
-            text: 'Make the HCO records, books, and premises available on request. Refusal triggers cause for license revocation.',
-            subtext: 'Inspections under the Act may cover books, records, or premises without advance notice.'
-          }
+          { code: '1796.42(a)', text: 'Post the HCO license in a conspicuous location inside the place of business.' },
+          { code: '1796.42(a)', text: 'Post business hours in a conspicuous location inside the place of business.' },
+          { code: '1796.42(b)', text: 'Maintain and abide by a valid workers compensation policy covering every affiliated Home Care Aide.' },
+          { code: '1796.42(c)', text: 'Maintain and abide by an employee dishonesty bond that includes third party coverage with a minimum limit of ten thousand dollars ($10,000).' },
+          { code: '1796.42(d)', text: 'Maintain proof of general and professional liability insurance of at least one million dollars ($1,000,000) per occurrence and three million dollars ($3,000,000) in the aggregate.' },
+          { code: '1796.43(a)(1)', text: 'Confirm every staff person, volunteer, or employee who contacts clients, prospective clients, or confidential client information completes the requirements of Sections 1796.23, 1796.24, 1796.25, 1796.26, and 1796.28 before that contact or access occurs.' },
+          { code: '1796.43(a)(3)', text: 'Notify the Department immediately once the HCO stops employing an individual as an affiliated Home Care Aide.' },
+          { code: '1796.52(c)', text: 'Make the HCO records, books, and premises available on request. Refusal triggers cause for license revocation.', subtext: 'Inspections under the Act may cover books, records, or premises without advance notice.' }
         ]
       },
       {
@@ -1023,40 +1042,25 @@
         iconColor: 'green',
         iconLetter: 'A',
         items: [
-          {
-            code: '1796.43(a)',
-            text: 'Verify every affiliated Home Care Aide holds a cleared status on the Home Care Aide Registry.'
-          },
-          {
-            code: '1796.43(a)(1)',
-            text: 'Confirm each aide completes the requirements of Sections 1796.23, 1796.24, 1796.25, 1796.26, and 1796.28 before any client contact or access to confidential client information.'
-          },
-          {
-            code: '1796.43(a)(2)',
-            text: 'Demonstrate each aide remains free of active tuberculosis disease under Section 1796.45.'
-          },
-          {
-            code: '1796.44(b)(1)',
-            text: 'Deliver two hours of orientation training covering the caregiver role and the applicable terms of employment.'
-          },
-          {
-            code: '1796.44(b)(2)',
-            text: 'Deliver three hours of safety training that covers basic safety precautions, emergency procedures, and infection control.'
-          },
-          {
-            code: '1796.44(c)',
-            text: 'Deliver a minimum of five hours of annual training to every affiliated Home Care Aide.'
-          }
+          { code: '1796.43(a)', text: 'Verify every affiliated Home Care Aide holds a cleared status on the Home Care Aide Registry.' },
+          { code: '1796.43(a)(1)', text: 'Confirm each aide completes the requirements of Sections 1796.23, 1796.24, 1796.25, 1796.26, and 1796.28 before any client contact or access to confidential client information.' },
+          { code: '1796.43(a)(2)', text: 'Demonstrate each aide remains free of active tuberculosis disease under Section 1796.45.' },
+          { code: '1796.44(b)(1)', text: 'Deliver two hours of orientation training covering the caregiver role and the applicable terms of employment.' },
+          { code: '1796.44(b)(2)', text: 'Deliver three hours of safety training that covers basic safety precautions, emergency procedures, and infection control.' },
+          { code: '1796.44(c)', text: 'Deliver a minimum of five hours of annual training to every affiliated Home Care Aide.' }
         ]
       }
     ];
 
-    const STORAGE_KEY = 'alicecare_hcs9201_checklist_v2';
-    const LEGACY_KEY = 'alicecare_hcs9201_checklist_v1';
-    const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4 MB per file
+    const STORAGE_KEY = 'alicecare_hcs9201_checklist_v4';
 
     // ===== State =====
-    let state = { items: {}, lastUpdated: null };
+    let state = {
+      sharedFolderUrl: '',
+      items: {},
+      bannerDismissed: false,
+      lastUpdated: null
+    };
     let currentFilter = 'all';
 
     // ===== Storage =====
@@ -1064,40 +1068,13 @@
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) {
-          state = JSON.parse(raw);
+          const loaded = JSON.parse(raw);
+          state = Object.assign(state, loaded);
           if (!state.items) state.items = {};
-          return;
-        }
-        const legacy = localStorage.getItem(LEGACY_KEY);
-        if (legacy) {
-          const old = JSON.parse(legacy);
-          migrateLegacy(old);
-          saveState(true);
-          showToast('Migrated earlier checklist data', 'success');
         }
       } catch (e) {
-        state = { items: {}, lastUpdated: null };
+        // Keep default state
       }
-    }
-
-    function migrateLegacy(old) {
-      if (!old || !old.items) return;
-      Object.keys(old.items).forEach(key => {
-        const o = old.items[key];
-        const newItem = { complete: !!o.complete, attachments: [] };
-        if (o.link || o.notes) {
-          newItem.attachments.push({
-            id: newId(),
-            title: o.link ? 'Imported link' : 'Imported note',
-            details: o.notes || '',
-            type: 'link',
-            url: o.link || '',
-            createdAt: new Date().toISOString()
-          });
-        }
-        state.items[key] = newItem;
-      });
-      state.lastUpdated = old.lastUpdated || null;
     }
 
     function saveState(silent) {
@@ -1106,8 +1083,7 @@
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         if (!silent) showToast('Saved', 'success');
       } catch (e) {
-        showToast('Save failed. Browser storage may be full. Export a backup and remove large files.', 'error');
-        throw e;
+        showToast('Save failed', 'error');
       }
       renderLastUpdated();
       renderStats();
@@ -1116,14 +1092,75 @@
     function getItem(sectionId, idx) {
       const key = sectionId + '_' + idx;
       if (!state.items[key]) {
-        state.items[key] = { complete: false, attachments: [] };
+        state.items[key] = { complete: false, fileRef: '' };
       }
-      if (!state.items[key].attachments) state.items[key].attachments = [];
       return state.items[key];
     }
 
-    function newId() {
-      return Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+    // ===== Shared folder hero =====
+    function renderFolderHero() {
+      const hero = document.getElementById('folderHero');
+      const label = document.getElementById('fhLabel');
+      const sub = document.getElementById('fhSub');
+      const openBtn = document.getElementById('fhOpenBtn');
+      const editBtn = document.getElementById('fhEditBtn');
+      const configured = isValidDriveURL(state.sharedFolderUrl);
+
+      if (configured) {
+        hero.classList.remove('unconfigured');
+        label.textContent = 'Shared Drive folder';
+        sub.textContent = state.sharedFolderUrl;
+        openBtn.disabled = false;
+        openBtn.style.display = '';
+        editBtn.style.display = '';
+        editBtn.textContent = 'Edit';
+      } else {
+        hero.classList.add('unconfigured');
+        label.textContent = 'Shared Drive folder · not configured';
+        sub.textContent = 'No URL linked yet. Configure below to enable every Open button.';
+        openBtn.disabled = true;
+        editBtn.textContent = 'Configure';
+      }
+    }
+
+    function openSharedFolder() {
+      if (!isValidDriveURL(state.sharedFolderUrl)) {
+        showToast('Configure the Drive folder URL first', 'error');
+        toggleFolderEdit(true);
+        return;
+      }
+      window.open(state.sharedFolderUrl, '_blank', 'noopener,noreferrer');
+    }
+
+    function toggleFolderEdit(forceOpen) {
+      const panel = document.getElementById('fhEditPanel');
+      const input = document.getElementById('fhUrlInput');
+      input.value = state.sharedFolderUrl;
+      if (forceOpen) {
+        panel.classList.add('open');
+      } else {
+        panel.classList.toggle('open');
+      }
+      if (panel.classList.contains('open')) {
+        setTimeout(() => input.focus(), 50);
+      }
+    }
+
+    function saveFolder() {
+      const input = document.getElementById('fhUrlInput');
+      const url = input.value.trim();
+      if (!isValidDriveURL(url)) {
+        showToast('Enter a valid Google Drive folder URL', 'error');
+        return;
+      }
+      state.sharedFolderUrl = url;
+      saveState(true);
+      document.getElementById('fhEditPanel').classList.remove('open');
+      renderFolderHero();
+      renderBanner();
+      // Re-render items so Open buttons enable
+      render();
+      showToast('Shared folder linked', 'success');
     }
 
     // ===== Rendering =====
@@ -1140,7 +1177,7 @@
           if (currentFilter === 'all') return true;
           if (currentFilter === 'pending') return !s.complete;
           if (currentFilter === 'complete') return s.complete;
-          if (currentFilter === 'noatt') return (s.attachments || []).length === 0;
+          if (currentFilter === 'noref') return !s.fileRef;
           return true;
         });
 
@@ -1158,7 +1195,7 @@
             </div>
             <div class="section-progress">${completedCount} of ${sectionItems.length}</div>
           </div>
-          <div class="section-items" id="items_${section.id}"></div>
+          <div class="section-items"></div>
         `;
         root.appendChild(sec);
 
@@ -1179,8 +1216,21 @@
         ? '<span class="status-chip done">✓ Verified</span>'
         : '<span class="status-chip pending">Outstanding</span>';
 
-      const attCount = (s.attachments || []).length;
-      const attCountClass = attCount > 0 ? 'has-items' : '';
+      const refHTML = s.fileRef
+        ? `
+          <div class="ref-display">
+            <span class="ref-icon">📎</span>
+            <span class="ref-prefix">Look for</span>
+            <span class="ref-text">${escapeHTML(s.fileRef)}</span>
+            <button class="ref-edit" title="Edit hint">Edit</button>
+          </div>`
+        : `
+          <div class="ref-empty">
+            No file hint yet. <button>Add one</button>
+          </div>`;
+
+      const folderReady = isValidDriveURL(state.sharedFolderUrl);
+      const openBtn = `<button class="item-open-btn" ${folderReady ? '' : 'disabled title="Configure the shared folder URL first"'}>↗ Open Folder</button>`;
 
       el.innerHTML = `
         <div class="item-top">
@@ -1195,365 +1245,96 @@
           </div>
           ${statusChip}
         </div>
-        <div class="attachments-block">
-          <div class="att-header">
-            <div class="att-header-left">
-              Supporting Materials
-              <span class="att-count-pill ${attCountClass}">${attCount}</span>
-            </div>
-            <button class="btn-add-att"><span class="plus">+</span> Add Item</button>
-          </div>
-          <div class="att-list"></div>
-          <div class="att-form">
-            <div class="att-form-title">New supporting item</div>
-            <div class="att-form-grid">
-              <div class="att-field">
-                <label>Title <span class="required">*</span></label>
-                <input type="text" class="field-title" placeholder="e.g. Workers Comp Certificate 2026, Aide Training Log, Liability Insurance Policy" maxlength="120">
-              </div>
-              <div class="att-field">
-                <label>Details</label>
-                <textarea class="field-details" placeholder="Context, custodian name, renewal date, binder location, inspector talking points. Keep it short." maxlength="500"></textarea>
-              </div>
-              <div class="att-field">
-                <label>Source</label>
-                <div class="type-switcher">
-                  <button type="button" class="type-btn active" data-type="link">🔗 Link</button>
-                  <button type="button" class="type-btn" data-type="file">📎 File</button>
-                </div>
-              </div>
-              <div class="att-field source-slot show-link">
-                <div class="source-link">
-                  <label>URL</label>
-                  <input type="url" class="field-url" placeholder="https://...">
-                </div>
-                <div class="source-file">
-                  <label>Upload document</label>
-                  <div class="file-drop">
-                    <div class="drop-icon">📄</div>
-                    <div class="drop-text">Click or drop a file here</div>
-                    <div class="drop-sub">PDF, image, doc up to 4 MB. File saves to this browser only.</div>
-                    <input type="file" class="field-file" style="display:none;">
-                  </div>
-                </div>
-              </div>
-              <div class="att-form-actions">
-                <button class="btn-cancel-att">Cancel</button>
-                <button class="btn-save-att">Save</button>
-              </div>
+        <div class="item-footer">
+          ${refHTML}
+          ${openBtn}
+          <div class="ref-edit-panel">
+            <label>File hint (what to look for in the shared folder)</label>
+            <input type="text" class="field-ref" placeholder="e.g. workers_comp_certificate_2026.pdf" maxlength="160" value="${escapeAttr(s.fileRef)}">
+            <div class="ref-edit-actions">
+              ${s.fileRef ? '<button class="ref-clear">Clear</button>' : ''}
+              <button class="ref-cancel">Cancel</button>
+              <button class="ref-save">Save</button>
             </div>
           </div>
         </div>
       `;
 
-      const checkbox = el.querySelector('input[type="checkbox"]');
-      checkbox.addEventListener('change', (e) => {
+      // Checkbox
+      el.querySelector('input[type="checkbox"]').addEventListener('change', (e) => {
         s.complete = e.target.checked;
-        try { saveState(true); } catch (err) { return; }
+        saveState(true);
         el.classList.toggle('complete', s.complete);
         const chip = el.querySelector('.status-chip');
         chip.className = 'status-chip ' + (s.complete ? 'done' : 'pending');
         chip.innerHTML = s.complete ? '✓ Verified' : 'Outstanding';
       });
 
-      const listEl = el.querySelector('.att-list');
-      renderAttachmentList(listEl, sectionId, idx);
-      wireAddForm(el, sectionId, idx);
+      // Open folder
+      const openBtnEl = el.querySelector('.item-open-btn');
+      if (openBtnEl && !openBtnEl.disabled) {
+        openBtnEl.addEventListener('click', openSharedFolder);
+      }
+
+      // File reference edit
+      const editPanel = el.querySelector('.ref-edit-panel');
+      const refInput = el.querySelector('.field-ref');
+      const editTrigger = el.querySelector('.ref-edit, .ref-empty button');
+      if (editTrigger) {
+        editTrigger.addEventListener('click', () => {
+          editPanel.classList.toggle('open');
+          if (editPanel.classList.contains('open')) {
+            setTimeout(() => refInput.focus(), 50);
+          }
+        });
+      }
+
+      const refSave = el.querySelector('.ref-save');
+      refSave.addEventListener('click', () => {
+        s.fileRef = refInput.value.trim();
+        saveState(true);
+        render();
+        showToast('File hint saved', 'success');
+      });
+
+      const refCancel = el.querySelector('.ref-cancel');
+      refCancel.addEventListener('click', () => {
+        editPanel.classList.remove('open');
+        refInput.value = s.fileRef;
+      });
+
+      const refClear = el.querySelector('.ref-clear');
+      if (refClear) {
+        refClear.addEventListener('click', () => {
+          s.fileRef = '';
+          saveState(true);
+          render();
+          showToast('Hint cleared', 'success');
+        });
+      }
+
+      refInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); refSave.click(); }
+        else if (e.key === 'Escape') { refCancel.click(); }
+      });
 
       return el;
     }
 
-    function renderAttachmentList(listEl, sectionId, idx) {
-      const s = getItem(sectionId, idx);
-      const atts = s.attachments || [];
-      listEl.innerHTML = '';
-
-      if (atts.length === 0) {
-        const empty = document.createElement('div');
-        empty.className = 'att-empty';
-        empty.textContent = 'No supporting materials attached yet. Click Add Item to attach a link or document.';
-        listEl.appendChild(empty);
-        return;
-      }
-
-      atts.forEach(att => {
-        listEl.appendChild(buildAttachmentCard(att, sectionId, idx));
-      });
-    }
-
-    function buildAttachmentCard(att, sectionId, idx) {
-      const card = document.createElement('div');
-      card.className = 'att-card type-' + att.type;
-
-      const icon = att.type === 'link' ? '🔗' : fileEmoji(att.fileType || '', att.fileName || '');
-      const title = escapeHTML(att.title || 'Untitled');
-      const details = att.details ? `<div class="att-details">${escapeHTML(att.details)}</div>` : '';
-
-      const metaBits = [];
-      if (att.type === 'link') {
-        try {
-          const host = new URL(att.url).hostname.replace(/^www\./, '');
-          metaBits.push(`<span class="mini-chip">${escapeHTML(host)}</span>`);
-        } catch (e) {
-          metaBits.push('<span class="mini-chip">Link</span>');
-        }
-      } else {
-        metaBits.push(`<span class="mini-chip">${escapeHTML(att.fileName || 'file')}</span>`);
-        metaBits.push(`<span class="mini-chip">${formatSize(att.fileSize || 0)}</span>`);
-      }
-      if (att.createdAt) {
-        const d = new Date(att.createdAt);
-        metaBits.push(`<span>${d.toLocaleDateString()}</span>`);
-      }
-
-      card.innerHTML = `
-        <div class="att-icon">${icon}</div>
-        <div class="att-info">
-          <div class="att-title">${title}</div>
-          ${details}
-          <div class="att-meta">${metaBits.join('')}</div>
-        </div>
-        <div class="att-actions">
-          <button class="att-btn open-btn">${att.type === 'link' ? '↗ Open' : '⇓ View'}</button>
-          <button class="att-btn delete-btn" title="Remove">×</button>
-        </div>
-      `;
-
-      card.querySelector('.open-btn').addEventListener('click', () => openAttachment(att));
-      card.querySelector('.delete-btn').addEventListener('click', () => {
-        if (confirm(`Remove "${att.title}"?`)) {
-          removeAttachment(sectionId, idx, att.id);
-        }
-      });
-
-      return card;
-    }
-
-    function wireAddForm(itemEl, sectionId, idx) {
-      const form = itemEl.querySelector('.att-form');
-      const addBtn = itemEl.querySelector('.btn-add-att');
-      const cancelBtn = itemEl.querySelector('.btn-cancel-att');
-      const saveBtn = itemEl.querySelector('.btn-save-att');
-      const titleInput = itemEl.querySelector('.field-title');
-      const detailsInput = itemEl.querySelector('.field-details');
-      const urlInput = itemEl.querySelector('.field-url');
-      const fileInput = itemEl.querySelector('.field-file');
-      const fileDrop = itemEl.querySelector('.file-drop');
-      const sourceSlot = itemEl.querySelector('.source-slot');
-      const typeBtns = itemEl.querySelectorAll('.type-btn');
-
-      let pendingFile = null;
-
-      addBtn.addEventListener('click', () => {
-        form.classList.toggle('open');
-        if (form.classList.contains('open')) {
-          setTimeout(() => titleInput.focus(), 100);
-        }
-      });
-
-      cancelBtn.addEventListener('click', () => resetForm());
-
-      typeBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          typeBtns.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          const type = btn.dataset.type;
-          sourceSlot.classList.remove('show-link', 'show-file');
-          sourceSlot.classList.add('show-' + type);
-        });
-      });
-
-      fileDrop.addEventListener('click', (e) => {
-        if (e.target === fileInput) return;
-        fileInput.click();
-      });
-      fileInput.addEventListener('change', (e) => {
-        const f = e.target.files[0];
-        if (f) handleFile(f);
-      });
-      fileDrop.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        fileDrop.classList.add('dragover');
-      });
-      fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('dragover'));
-      fileDrop.addEventListener('drop', (e) => {
-        e.preventDefault();
-        fileDrop.classList.remove('dragover');
-        const f = e.dataTransfer.files[0];
-        if (f) handleFile(f);
-      });
-
-      function handleFile(f) {
-        if (f.size > MAX_FILE_SIZE) {
-          showToast(`File too large. Max ${formatSize(MAX_FILE_SIZE)}. Use the Link option for big files.`, 'error');
-          return;
-        }
-        pendingFile = f;
-        fileDrop.classList.add('has-file');
-        fileDrop.querySelector('.drop-icon').textContent = fileEmoji(f.type, f.name);
-        fileDrop.querySelector('.drop-text').textContent = f.name;
-        fileDrop.querySelector('.drop-sub').textContent = formatSize(f.size) + ' · Click to replace';
-        if (!titleInput.value) {
-          titleInput.value = f.name.replace(/\.[^.]+$/, '').slice(0, 80);
-        }
-      }
-
-      saveBtn.addEventListener('click', async () => {
-        const title = titleInput.value.trim();
-        const details = detailsInput.value.trim();
-        const type = itemEl.querySelector('.type-btn.active').dataset.type;
-
-        if (!title) {
-          showToast('Title is required', 'error');
-          titleInput.focus();
-          return;
-        }
-
-        const att = {
-          id: newId(),
-          title,
-          details,
-          type,
-          createdAt: new Date().toISOString()
-        };
-
-        if (type === 'link') {
-          const url = urlInput.value.trim();
-          if (!isValidURL(url)) {
-            showToast('Enter a valid http or https URL', 'error');
-            urlInput.focus();
-            return;
-          }
-          att.url = url;
-        } else {
-          if (!pendingFile) {
-            showToast('Select a file to upload', 'error');
-            return;
-          }
-          saveBtn.disabled = true;
-          saveBtn.textContent = 'Encoding...';
-          try {
-            att.fileData = await fileToDataURL(pendingFile);
-            att.fileName = pendingFile.name;
-            att.fileSize = pendingFile.size;
-            att.fileType = pendingFile.type || '';
-          } catch (err) {
-            showToast('Could not read file', 'error');
-            saveBtn.disabled = false;
-            saveBtn.textContent = 'Save';
-            return;
-          }
-        }
-
-        const s = getItem(sectionId, idx);
-        s.attachments.push(att);
-        try {
-          saveState(true);
-          showToast(`"${title}" attached`, 'success');
-          resetForm();
-          const listEl = itemEl.querySelector('.att-list');
-          renderAttachmentList(listEl, sectionId, idx);
-          updateItemCount(itemEl, sectionId, idx);
-        } catch (e) {
-          s.attachments.pop();
-          saveBtn.disabled = false;
-          saveBtn.textContent = 'Save';
-        }
-      });
-
-      function resetForm() {
-        form.classList.remove('open');
-        titleInput.value = '';
-        detailsInput.value = '';
-        urlInput.value = '';
-        fileInput.value = '';
-        pendingFile = null;
-        fileDrop.classList.remove('has-file');
-        fileDrop.querySelector('.drop-icon').textContent = '📄';
-        fileDrop.querySelector('.drop-text').textContent = 'Click or drop a file here';
-        fileDrop.querySelector('.drop-sub').textContent = 'PDF, image, doc up to 4 MB. File saves to this browser only.';
-        typeBtns.forEach(b => b.classList.toggle('active', b.dataset.type === 'link'));
-        sourceSlot.classList.remove('show-file');
-        sourceSlot.classList.add('show-link');
-        saveBtn.disabled = false;
-        saveBtn.textContent = 'Save';
-      }
-    }
-
-    function updateItemCount(itemEl, sectionId, idx) {
-      const s = getItem(sectionId, idx);
-      const count = (s.attachments || []).length;
-      const pill = itemEl.querySelector('.att-count-pill');
-      pill.textContent = count;
-      pill.classList.toggle('has-items', count > 0);
-    }
-
-    function removeAttachment(sectionId, idx, attId) {
-      const s = getItem(sectionId, idx);
-      const removed = (s.attachments || []).find(a => a.id === attId);
-      s.attachments = (s.attachments || []).filter(a => a.id !== attId);
-      try {
-        saveState(true);
-      } catch (e) {
-        if (removed) s.attachments.push(removed);
-        return;
-      }
-      const itemEl = document.querySelector(`.checklist-item[data-section="${sectionId}"][data-idx="${idx}"]`);
-      if (itemEl) {
-        renderAttachmentList(itemEl.querySelector('.att-list'), sectionId, idx);
-        updateItemCount(itemEl, sectionId, idx);
-      }
-      showToast('Attachment removed', 'success');
-    }
-
-    function openAttachment(att) {
-      if (att.type === 'link') {
-        window.open(att.url, '_blank', 'noopener,noreferrer');
-        return;
-      }
-      const previewableTypes = /^(application\/pdf|image\/|text\/)/;
-      if (att.fileType && previewableTypes.test(att.fileType)) {
-        const win = window.open();
-        if (win) {
-          win.document.write(`
-            <html><head><title>${escapeHTML(att.fileName || 'Document')}</title></head>
-            <body style="margin:0;background:#1A365C;">
-              <embed src="${att.fileData}" type="${att.fileType}" style="width:100vw;height:100vh;">
-            </body></html>
-          `);
-          win.document.close();
-        }
-      } else {
-        const a = document.createElement('a');
-        a.href = att.fileData;
-        a.download = att.fileName || 'download';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      }
-    }
-
     function renderStats() {
-      let total = 0, complete = 0, attachments = 0;
+      let total = 0, complete = 0, hints = 0;
       SECTIONS.forEach(section => {
         section.items.forEach((_, idx) => {
           total++;
           const s = getItem(section.id, idx);
           if (s.complete) complete++;
-          attachments += (s.attachments || []).length;
+          if (s.fileRef) hints++;
         });
       });
       document.getElementById('statTotal').textContent = total;
       document.getElementById('statComplete').textContent = complete;
       document.getElementById('statPending').textContent = total - complete;
-      document.getElementById('statAttachments').textContent = attachments;
-
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY) || '';
-        document.getElementById('statStorage').textContent = formatSize(raw.length);
-      } catch (e) {
-        document.getElementById('statStorage').textContent = '—';
-      }
+      document.getElementById('statHints').textContent = hints + ' / ' + total;
     }
 
     function renderLastUpdated() {
@@ -1567,6 +1348,22 @@
       el.textContent = d.toLocaleString('en-US', opts);
     }
 
+    function renderBanner() {
+      const banner = document.getElementById('setupBanner');
+      const configured = isValidDriveURL(state.sharedFolderUrl);
+      if (state.bannerDismissed || configured) {
+        banner.classList.add('hidden');
+      } else {
+        banner.classList.remove('hidden');
+      }
+    }
+
+    function hideBanner() {
+      state.bannerDismissed = true;
+      saveState(true);
+      renderBanner();
+    }
+
     // ===== Helpers =====
     function escapeHTML(str) {
       if (!str) return '';
@@ -1577,38 +1374,21 @@
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
     }
+    function escapeAttr(str) { return escapeHTML(str); }
+
     function isValidURL(str) {
       if (!str) return false;
       try {
         const u = new URL(str);
         return u.protocol === 'http:' || u.protocol === 'https:';
-      } catch (e) {
-        return false;
-      }
+      } catch (e) { return false; }
     }
-    function fileToDataURL(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = () => reject(reader.error);
-        reader.readAsDataURL(file);
-      });
-    }
-    function formatSize(bytes) {
-      if (bytes < 1024) return bytes + ' B';
-      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-      return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
-    }
-    function fileEmoji(mime, name) {
-      if (mime.startsWith('image/')) return '🖼️';
-      if (mime === 'application/pdf') return '📕';
-      if (mime.startsWith('video/')) return '🎬';
-      if (mime.startsWith('audio/')) return '🎵';
-      if (/\.(docx?|odt|rtf)$/i.test(name)) return '📄';
-      if (/\.(xlsx?|csv|ods)$/i.test(name)) return '📊';
-      if (/\.(pptx?|odp)$/i.test(name)) return '📈';
-      if (/\.(zip|rar|7z|tar|gz)$/i.test(name)) return '🗜️';
-      return '📄';
+    function isValidDriveURL(str) {
+      if (!isValidURL(str)) return false;
+      try {
+        const u = new URL(str);
+        return /(drive|docs)\.google\.com$/.test(u.hostname);
+      } catch (e) { return false; }
     }
 
     function showToast(msg, type) {
@@ -1620,6 +1400,20 @@
         t.className = 'toast';
       }, 2200);
     }
+
+    // ===== Wire folder hero =====
+    document.getElementById('fhOpenBtn').addEventListener('click', openSharedFolder);
+    document.getElementById('fhEditBtn').addEventListener('click', () => toggleFolderEdit());
+    document.getElementById('fhSaveBtn').addEventListener('click', saveFolder);
+    document.getElementById('fhCancelBtn').addEventListener('click', () => {
+      document.getElementById('fhEditPanel').classList.remove('open');
+    });
+    document.getElementById('fhUrlInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); saveFolder(); }
+      else if (e.key === 'Escape') {
+        document.getElementById('fhEditPanel').classList.remove('open');
+      }
+    });
 
     // ===== Filters =====
     document.querySelectorAll('.filter-chip').forEach(chip => {
@@ -1638,7 +1432,7 @@
         licensee: 'TEKKS LLC DBA alice.care',
         licenseNumber: '344700080',
         form: 'HCS 9201 (11/25)',
-        version: 2,
+        version: 4,
         state: state
       };
       const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -1651,12 +1445,13 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      showToast('Backup downloaded with all files embedded', 'success');
+      showToast('Backup downloaded', 'success');
     }
 
     function importJSON() {
       document.getElementById('importFile').click();
     }
+
     document.getElementById('importFile').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
@@ -1665,12 +1460,16 @@
         try {
           const data = JSON.parse(evt.target.result);
           if (!data.state || !data.state.items) throw new Error('Invalid backup format');
-          if (!confirm('Importing will overwrite current data. Continue?')) return;
-          state = data.state;
-          Object.keys(state.items).forEach(k => {
-            if (!state.items[k].attachments) state.items[k].attachments = [];
-          });
+          if (!confirm('Importing will overwrite the shared folder URL, file hints, and checkboxes. Continue?')) return;
+          state = Object.assign({
+            sharedFolderUrl: '',
+            items: {},
+            bannerDismissed: false,
+            lastUpdated: null
+          }, data.state);
           saveState();
+          renderFolderHero();
+          renderBanner();
           render();
           showToast('Backup imported', 'success');
         } catch (err) {
@@ -1682,9 +1481,11 @@
     });
 
     function resetAll() {
-      if (!confirm('Reset every checkbox and remove every attachment? This cannot be undone. Export a backup first if you need one.')) return;
-      state = { items: {}, lastUpdated: null };
+      if (!confirm('Reset every checkbox, file hint, and the shared folder URL? This cannot be undone. Export a backup first if you need one.')) return;
+      state = { sharedFolderUrl: '', items: {}, bannerDismissed: false, lastUpdated: null };
       localStorage.removeItem(STORAGE_KEY);
+      renderFolderHero();
+      renderBanner();
       render();
       renderStats();
       renderLastUpdated();
@@ -1694,9 +1495,12 @@
     window.exportJSON = exportJSON;
     window.importJSON = importJSON;
     window.resetAll = resetAll;
+    window.hideBanner = hideBanner;
 
     // ===== Init =====
     loadState();
+    renderFolderHero();
+    renderBanner();
     render();
     renderStats();
     renderLastUpdated();
