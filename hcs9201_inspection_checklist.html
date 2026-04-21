@@ -641,6 +641,65 @@
       border-color: #1D4ED8;
       box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
     }
+    /* Combined text + calendar date picker */
+    .exp-date-wrapper {
+      display: inline-flex;
+      align-items: stretch;
+      gap: 0;
+      position: relative;
+    }
+    .exp-date-text {
+      padding: 5px 9px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #1A365C;
+      background: #FFFFFF;
+      border: 1.5px solid #D0DDF0;
+      border-right: none;
+      border-radius: 6px 0 0 6px;
+      outline: none;
+      width: 110px;
+      letter-spacing: 0.3px;
+      text-align: center;
+    }
+    .exp-date-text::placeholder {
+      color: #93A0B4;
+      font-weight: 400;
+      letter-spacing: 0.2px;
+    }
+    .exp-date-text:focus {
+      border-color: #1D4ED8;
+      box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
+      position: relative;
+      z-index: 2;
+    }
+    .exp-cal-btn {
+      padding: 5px 9px;
+      background: #F0F7FF;
+      color: #1D4ED8;
+      border: 1.5px solid #D0DDF0;
+      border-radius: 0 6px 6px 0;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .exp-cal-btn:hover {
+      background: #DBEAFE;
+      border-color: #93C5FD;
+    }
+    .exp-date-picker-hidden {
+      position: absolute;
+      left: 0; top: 100%;
+      opacity: 0;
+      pointer-events: none;
+      width: 1px; height: 1px;
+      border: none;
+      padding: 0;
+    }
     .expiration-display {
       font-size: 11.5px;
       font-weight: 600;
@@ -1864,6 +1923,8 @@
       else if (hasDate) cls += ' active';
       row.className = cls;
 
+      const displayValue = hasDate ? formatDateForInput(rec.expiresAt) : '';
+
       if (hasDate) {
         const daysText = expState.expired
           ? `${Math.abs(expState.daysLeft)}d ago`
@@ -1874,9 +1935,13 @@
             ${formatDate(rec.expiresAt)}
             <span class="expiration-days">${daysText}</span>
           </div>
-          <input type="date" class="expiration-date-input" value="${rec.expiresAt.slice(0,10)}">
+          <div class="exp-date-wrapper">
+            <input type="text" class="exp-date-text" placeholder="MM/DD/YYYY" value="${displayValue}" maxlength="10" inputmode="numeric">
+            <button class="exp-cal-btn" title="Open calendar" type="button">📅</button>
+            <input type="date" class="exp-date-picker-hidden" tabindex="-1">
+          </div>
           <div class="expiration-actions">
-            <button class="exp-btn clear">Clear date</button>
+            <button class="exp-btn clear">Clear</button>
           </div>
         `;
       } else {
@@ -1885,42 +1950,102 @@
           <div class="expiration-display" style="color:#7A8BA3;font-style:italic;font-weight:500">
             No expiration set. Item stays verified until manually un-checked.
           </div>
-          <input type="date" class="expiration-date-input" style="display:none">
+          <div class="exp-date-wrapper" style="display:none">
+            <input type="text" class="exp-date-text" placeholder="MM/DD/YYYY" maxlength="10" inputmode="numeric">
+            <button class="exp-cal-btn" title="Open calendar" type="button">📅</button>
+            <input type="date" class="exp-date-picker-hidden" tabindex="-1">
+          </div>
           <div class="expiration-actions">
             <button class="exp-btn add">+ Set expiration</button>
           </div>
         `;
       }
 
-      const dateInput = row.querySelector('.expiration-date-input');
+      const textInput = row.querySelector('.exp-date-text');
+      const calBtn = row.querySelector('.exp-cal-btn');
+      const datePicker = row.querySelector('.exp-date-picker-hidden');
       const addBtn = row.querySelector('.exp-btn.add');
       const clearBtn = row.querySelector('.exp-btn.clear');
 
-      if (addBtn) {
-        addBtn.addEventListener('click', () => {
-          dateInput.style.display = '';
-          addBtn.style.display = 'none';
-          // Default to one year from today.
-          const oneYear = new Date(); oneYear.setFullYear(oneYear.getFullYear() + 1);
-          dateInput.value = oneYear.toISOString().slice(0,10);
-          dateInput.focus();
-          dateInput.showPicker && dateInput.showPicker();
-        });
-      }
-
-      dateInput.addEventListener('change', (e) => {
-        const newDate = e.target.value;
-        if (!newDate) return;
+      function commitDate(raw) {
+        const iso = parseFlexibleDate(raw);
+        if (!iso) {
+          showToast('Invalid date. Use MM/DD/YYYY (e.g. 04/21/2027).', 'error');
+          textInput.focus();
+          textInput.select();
+          return false;
+        }
         const current = getCheckboxRecord(item.slug);
         state.checkboxes[item.slug] = {
           checked: current.checked,
           completedAt: current.completedAt,
-          expiresAt: new Date(newDate + 'T00:00:00').toISOString()
+          expiresAt: iso
         };
         scheduleSync();
         render();
         renderStats();
         showToast('Expiration updated', 'success');
+        return true;
+      }
+
+      if (addBtn) {
+        addBtn.addEventListener('click', () => {
+          const wrapper = row.querySelector('.exp-date-wrapper');
+          wrapper.style.display = '';
+          addBtn.style.display = 'none';
+          const oneYear = new Date();
+          oneYear.setFullYear(oneYear.getFullYear() + 1);
+          textInput.value = formatDateForInput(oneYear.toISOString());
+          textInput.focus();
+          textInput.select();
+        });
+      }
+
+      // Auto-insert slashes while typing numeric digits
+      textInput.addEventListener('input', (e) => {
+        const digits = e.target.value.replace(/\D/g, '').slice(0, 8);
+        let formatted = digits;
+        if (digits.length >= 5) formatted = digits.slice(0,2) + '/' + digits.slice(2,4) + '/' + digits.slice(4);
+        else if (digits.length >= 3) formatted = digits.slice(0,2) + '/' + digits.slice(2);
+        e.target.value = formatted;
+      });
+
+      textInput.addEventListener('blur', () => {
+        const v = textInput.value.trim();
+        if (!v) return;
+        // Don't commit if the date didn't change (re-render would flicker)
+        if (hasDate && v === displayValue) return;
+        commitDate(v);
+      });
+
+      textInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          commitDate(textInput.value);
+        } else if (e.key === 'Escape') {
+          textInput.value = displayValue;
+          textInput.blur();
+        }
+      });
+
+      // Calendar button opens the native date picker
+      calBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const iso = parseFlexibleDate(textInput.value) || (hasDate ? rec.expiresAt : new Date(Date.now() + 365 * 86400000).toISOString());
+        if (iso) datePicker.value = iso.slice(0, 10);
+        try {
+          datePicker.showPicker();
+        } catch (err) {
+          datePicker.focus();
+          datePicker.click();
+        }
+      });
+
+      datePicker.addEventListener('change', (e) => {
+        const val = e.target.value;
+        if (!val) return;
+        textInput.value = formatDateForInput(val + 'T00:00:00');
+        commitDate(textInput.value);
       });
 
       if (clearBtn) {
@@ -1939,6 +2064,35 @@
       }
 
       return row;
+    }
+
+    // ===== Flexible date parsing =====
+    // Accepts MM/DD/YYYY, M/D/YYYY, MM-DD-YYYY, YYYY-MM-DD, and 2-digit years (assumed 20xx).
+    function parseFlexibleDate(input) {
+      if (!input) return null;
+      const s = String(input).trim();
+      let y, m, d;
+      let match = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+      if (match) { y = +match[1]; m = +match[2]; d = +match[3]; }
+      else {
+        match = s.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2}|\d{4})$/);
+        if (!match) return null;
+        m = +match[1]; d = +match[2]; y = +match[3];
+        if (y < 100) y += 2000;
+      }
+      if (y < 1900 || y > 2200 || m < 1 || m > 12 || d < 1 || d > 31) return null;
+      const dt = new Date(y, m - 1, d);
+      if (dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== d) return null;
+      const pad = n => String(n).padStart(2, '0');
+      return `${y}-${pad(m)}-${pad(d)}T00:00:00.000Z`;
+    }
+
+    function formatDateForInput(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return '';
+      const pad = n => String(n).padStart(2, '0');
+      return `${pad(d.getMonth() + 1)}/${pad(d.getDate())}/${d.getFullYear()}`;
     }
 
     function buildRefLinkRow(item, refLink) {
