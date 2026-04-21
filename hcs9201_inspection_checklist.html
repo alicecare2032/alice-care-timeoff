@@ -800,7 +800,7 @@
       50% { opacity: 0.3; }
     }
 
-    /* Reference link row */
+    /* Reference links container */
     .reflink-row {
       margin-top: 12px;
       padding: 10px 12px;
@@ -808,66 +808,111 @@
       border: 1px solid #93C5FD;
       border-left: 3px solid #1D4ED8;
       border-radius: 8px;
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      gap: 10px;
-      align-items: center;
     }
     .reflink-row.empty {
       background: #FAFCFF;
       border: 1px dashed #D0DDF0;
-      border-left: 1px dashed #D0DDF0;
-      grid-template-columns: 1fr auto;
     }
-    .reflink-icon {
-      width: 30px;
-      height: 30px;
-      border-radius: 7px;
-      background: #DBEAFE;
-      color: #1D4ED8;
+    .reflink-header {
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      flex-shrink: 0;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      gap: 10px;
     }
-    .reflink-info { min-width: 0; }
-    .reflink-label {
+    .reflink-header-label {
       font-size: 10px;
       font-weight: 700;
       color: #1D4ED8;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .reflink-empty-label {
+    .reflink-row.empty .reflink-header-label { color: #7A8BA3; }
+    .reflink-count {
+      background: #DBEAFE;
+      color: #1D4ED8;
+      padding: 1px 7px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 700;
+      border: 1px solid #93C5FD;
+    }
+    .reflink-empty-msg {
       font-size: 11.5px;
       color: #7A8BA3;
       font-style: italic;
+      padding: 4px 0 8px;
     }
-    .reflink-host {
-      font-size: 12.5px;
-      font-weight: 600;
-      color: #1A365C;
+    .reflink-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .reflink-item {
+      background: #FFFFFF;
+      border: 1px solid #BFDBFE;
+      border-radius: 6px;
+      padding: 7px 10px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+    .reflink-item-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 5px;
+      background: #DBEAFE;
+      color: #1D4ED8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+    .reflink-item-info {
+      min-width: 0;
+      overflow: hidden;
+    }
+    .reflink-item .domain {
+      color: #1D4ED8;
+      font-weight: 700;
+      font-size: 12px;
+      display: block;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .reflink-host .domain { color: #1D4ED8; font-weight: 700; }
-    .reflink-host .desc { color: #4A5F7F; font-weight: 500; margin-left: 6px; }
-    .reflink-actions { display: flex; gap: 5px; flex-shrink: 0; }
-    .reflink-btn {
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-family: 'Poppins', sans-serif;
+    .reflink-item .desc {
+      color: #4A5F7F;
+      font-weight: 500;
       font-size: 11px;
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-top: 1px;
+    }
+    .reflink-item-actions {
+      display: flex;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .reflink-btn {
+      padding: 5px 9px;
+      border-radius: 5px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 10.5px;
       font-weight: 600;
       cursor: pointer;
       border: 1.5px solid transparent;
       transition: all 0.15s;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
       white-space: nowrap;
     }
     .reflink-btn.open {
@@ -881,28 +926,50 @@
       border-color: #93C5FD;
     }
     .reflink-btn.edit:hover { border-color: #1D4ED8; }
-    .reflink-btn.add {
+    .reflink-btn.delete {
+      background: #FFFFFF;
+      color: #B91C1C;
+      border-color: #FCA5A5;
+      padding: 5px 8px;
+    }
+    .reflink-btn.delete:hover { background: #FEF2F2; border-color: #DC2626; }
+    .reflink-add-btn {
+      margin-top: 8px;
+      width: 100%;
+      padding: 8px 10px;
       background: transparent;
       color: #1D4ED8;
-      padding: 6px 10px;
+      border: 1px dashed #93C5FD;
+      border-radius: 6px;
+      font-family: 'Poppins', sans-serif;
       font-size: 11.5px;
       font-weight: 600;
-      border: 1px dashed #93C5FD;
+      cursor: pointer;
+      transition: all 0.15s;
     }
-    .reflink-btn.add:hover {
+    .reflink-add-btn:hover {
       background: #F0F9FF;
       border-style: solid;
+    }
+    .reflink-row.empty .reflink-add-btn {
+      margin-top: 0;
+      border-color: #D0DDF0;
+      color: #4A5F7F;
+    }
+    .reflink-row.empty .reflink-add-btn:hover {
+      border-color: #1D4ED8;
+      color: #1D4ED8;
     }
 
     .reflink-edit {
       display: none;
-      grid-column: 1 / -1;
-      padding-top: 10px;
-      margin-top: 6px;
-      border-top: 1px dashed #93C5FD;
+      margin-top: 8px;
+      padding: 10px;
+      background: #FFFFFF;
+      border: 1.5px solid #93C5FD;
+      border-radius: 7px;
     }
     .reflink-edit.open { display: block; }
-    .reflink-row.empty .reflink-edit { border-top: 1px dashed #D0DDF0; }
     .reflink-edit .field-group { display: grid; gap: 8px; }
     .reflink-edit label {
       font-size: 10px;
@@ -932,7 +999,7 @@
       display: flex;
       justify-content: flex-end;
       gap: 6px;
-      margin-top: 8px;
+      margin-top: 4px;
     }
     .reflink-edit-actions button {
       padding: 6px 12px;
@@ -952,12 +1019,6 @@
       border-color: #D0DDF0;
     }
     .reflink-cancel:hover { border-color: #7A8BA3; }
-    .reflink-clear {
-      background: #FFFFFF;
-      color: #B91C1C;
-      border-color: #FCA5A5;
-    }
-    .reflink-clear:hover { background: #FEF2F2; border-color: #DC2626; }
 
     .files-block {
       margin-top: 12px;
@@ -1312,8 +1373,8 @@
       .item-top .status-chip { grid-column: 1 / -1; justify-self: start; margin-left: 36px; }
       .file-card { grid-template-columns: auto 1fr; }
       .file-actions { grid-column: 1 / -1; justify-content: flex-end; margin-top: 6px; }
-      .reflink-row { grid-template-columns: auto 1fr; }
-      .reflink-actions { grid-column: 1 / -1; justify-content: flex-end; margin-top: 4px; }
+      .reflink-item { grid-template-columns: auto 1fr; }
+      .reflink-item-actions { grid-column: 1 / -1; justify-content: flex-end; margin-top: 4px; }
       .preview-modal { height: 95vh; }
     }
   </style>
@@ -1524,8 +1585,30 @@
               };
             }
           });
+          normalizeRefLinks();
         }
       } catch (e) { /* keep default */ }
+    }
+
+    // Normalize refLinks: single-object legacy format becomes a one-element array.
+    function normalizeRefLinks() {
+      if (!state.refLinks) { state.refLinks = {}; return; }
+      Object.keys(state.refLinks).forEach(slug => {
+        const v = state.refLinks[slug];
+        if (Array.isArray(v)) return;
+        if (v && v.url) {
+          state.refLinks[slug] = [{ url: v.url, label: v.label || '' }];
+        } else {
+          delete state.refLinks[slug];
+        }
+      });
+    }
+
+    function getRefLinks(slug) {
+      const v = state.refLinks[slug];
+      if (Array.isArray(v)) return v;
+      if (v && v.url) return [{ url: v.url, label: v.label || '' }];
+      return [];
     }
 
     function saveLocal() {
@@ -1574,6 +1657,7 @@
         state.refLinks = data.refLinks || {};
         state.lastModified = data.lastModified || null;
         state.lastModifiedBy = data.lastModifiedBy || null;
+        normalizeRefLinks();
         saveLocal();
       } catch (err) {
         showToast('Could not load team state: ' + err.message, 'error');
@@ -1742,7 +1826,7 @@
           if (currentFilter === 'complete') return effectivelyChecked;
           if (currentFilter === 'action') return effectivelyChecked && (expState.warning || expState.expired) || (rec.checked && expState.expired);
           if (currentFilter === 'nofiles') return !(filesBySlug[item.slug] || []).length;
-          if (currentFilter === 'nolinks') return !state.refLinks[item.slug] || !state.refLinks[item.slug].url;
+          if (currentFilter === 'nolinks') return getRefLinks(item.slug).length === 0;
           return true;
         });
 
@@ -1811,7 +1895,7 @@
       el.dataset.slug = item.slug;
 
       const files = filesBySlug[item.slug] || [];
-      const refLink = state.refLinks[item.slug] || { url: '', label: '' };
+      const refLinks = getRefLinks(item.slug);
       const canUpload = backendStatus === 'connected';
 
       let statusChip;
@@ -1881,7 +1965,7 @@
       }
 
       // Reference link
-      el.querySelector('.reflink-container').appendChild(buildRefLinkRow(item, refLink));
+      el.querySelector('.reflink-container').appendChild(buildRefLinkRow(item, refLinks));
 
       // Upload
       const uploadBtn = el.querySelector('.btn-upload');
@@ -2095,120 +2179,158 @@
       return `${pad(d.getMonth() + 1)}/${pad(d.getDate())}/${d.getFullYear()}`;
     }
 
-    function buildRefLinkRow(item, refLink) {
+    function buildRefLinkRow(item, refLinks) {
       const row = document.createElement('div');
-      const hasLink = !!refLink.url;
-      row.className = 'reflink-row' + (hasLink ? '' : ' empty');
+      // Local UI state: -1 = not editing, 'new' = adding, number = editing that index
+      let editingIdx = -1;
 
-      if (hasLink) {
-        const host = getHostname(refLink.url);
-        const label = refLink.label || '';
-        row.innerHTML = `
-          <div class="reflink-icon">🔗</div>
-          <div class="reflink-info">
-            <div class="reflink-label">Source link</div>
-            <div class="reflink-host">
-              <span class="domain">${escapeHTML(host)}</span>
-              ${label ? `<span class="desc">${escapeHTML(label)}</span>` : ''}
-            </div>
+      function rerender() {
+        row.innerHTML = '';
+        row.className = 'reflink-row' + (refLinks.length > 0 ? '' : ' empty');
+
+        // Header
+        const header = document.createElement('div');
+        header.className = 'reflink-header';
+        header.innerHTML = `
+          <div class="reflink-header-label">
+            🔗 Source Links
+            ${refLinks.length > 0 ? `<span class="reflink-count">${refLinks.length}</span>` : ''}
           </div>
-          <div class="reflink-actions">
+        `;
+        row.appendChild(header);
+
+        // List or empty message
+        if (refLinks.length > 0) {
+          const list = document.createElement('div');
+          list.className = 'reflink-list';
+          refLinks.forEach((link, idx) => list.appendChild(buildLinkItem(link, idx)));
+          row.appendChild(list);
+        } else if (editingIdx === -1) {
+          const empty = document.createElement('div');
+          empty.className = 'reflink-empty-msg';
+          empty.textContent = 'No source links yet. Add URLs where this data lives (CareAcademy, HCA Tracker, Paychex, etc.).';
+          row.appendChild(empty);
+        }
+
+        // Add button or edit form
+        if (editingIdx === -1) {
+          const addBtn = document.createElement('button');
+          addBtn.className = 'reflink-add-btn';
+          addBtn.textContent = refLinks.length > 0 ? '+ Add another link' : '+ Add source link';
+          addBtn.addEventListener('click', () => {
+            editingIdx = 'new';
+            rerender();
+          });
+          row.appendChild(addBtn);
+        } else {
+          row.appendChild(buildEditForm());
+        }
+      }
+
+      function buildLinkItem(link, idx) {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'reflink-item';
+        const host = getHostname(link.url);
+        itemEl.innerHTML = `
+          <div class="reflink-item-icon">🔗</div>
+          <div class="reflink-item-info">
+            <span class="domain">${escapeHTML(host)}</span>
+            ${link.label ? `<span class="desc">${escapeHTML(link.label)}</span>` : ''}
+          </div>
+          <div class="reflink-item-actions">
             <button class="reflink-btn open">↗ Open</button>
             <button class="reflink-btn edit">Edit</button>
+            <button class="reflink-btn delete" title="Remove">×</button>
           </div>
-          <div class="reflink-edit"></div>
         `;
-      } else {
-        row.innerHTML = `
-          <div class="reflink-empty-label">No source link yet. Add the URL where this data lives (e.g. CareAcademy, HCA Tracker, Paychex).</div>
-          <div class="reflink-actions">
-            <button class="reflink-btn add">+ Add Source Link</button>
-          </div>
-          <div class="reflink-edit"></div>
-        `;
-      }
-
-      const editPanel = row.querySelector('.reflink-edit');
-      editPanel.innerHTML = `
-        <div class="field-group">
-          <div>
-            <label>Source URL <span style="color:#DC2626">*</span></label>
-            <input type="url" class="field-ref-url" placeholder="https://alicecare1234.careacademy.com/..." value="${escapeAttr(refLink.url)}">
-          </div>
-          <div>
-            <label>Description (optional)</label>
-            <input type="text" class="field-ref-label" placeholder="e.g. Annual training dashboard, Registry lookup" maxlength="120" value="${escapeAttr(refLink.label)}">
-          </div>
-          <div class="reflink-edit-actions">
-            ${hasLink ? '<button class="reflink-clear">Clear</button>' : ''}
-            <button class="reflink-cancel">Cancel</button>
-            <button class="reflink-save">Save</button>
-          </div>
-        </div>
-      `;
-
-      const openBtn = row.querySelector('.reflink-btn.open');
-      const editBtn = row.querySelector('.reflink-btn.edit');
-      const addBtn = row.querySelector('.reflink-btn.add');
-      const urlInput = row.querySelector('.field-ref-url');
-      const labelInput = row.querySelector('.field-ref-label');
-      const saveBtn = row.querySelector('.reflink-save');
-      const cancelBtn = row.querySelector('.reflink-cancel');
-      const clearBtn = row.querySelector('.reflink-clear');
-
-      function togglePanel(forceOpen) {
-        if (forceOpen === undefined) {
-          editPanel.classList.toggle('open');
-        } else {
-          editPanel.classList.toggle('open', forceOpen);
-        }
-        if (editPanel.classList.contains('open')) {
-          setTimeout(() => urlInput.focus(), 50);
-        }
-      }
-
-      if (openBtn) openBtn.addEventListener('click', () => window.open(refLink.url, '_blank', 'noopener,noreferrer'));
-      if (editBtn) editBtn.addEventListener('click', () => togglePanel());
-      if (addBtn) addBtn.addEventListener('click', () => togglePanel(true));
-
-      cancelBtn.addEventListener('click', () => {
-        urlInput.value = refLink.url;
-        labelInput.value = refLink.label || '';
-        editPanel.classList.remove('open');
-      });
-
-      saveBtn.addEventListener('click', () => {
-        const url = urlInput.value.trim();
-        const label = labelInput.value.trim();
-        if (!isValidURL(url)) {
-          showToast('Enter a valid http or https URL', 'error');
-          return;
-        }
-        state.refLinks[item.slug] = { url, label };
-        scheduleSync();
-        render();
-        showToast('Source link saved', 'success');
-      });
-
-      if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-          if (!confirm('Remove the source link for this requirement?')) return;
-          delete state.refLinks[item.slug];
+        itemEl.querySelector('.open').addEventListener('click', () => {
+          window.open(link.url, '_blank', 'noopener,noreferrer');
+        });
+        itemEl.querySelector('.edit').addEventListener('click', () => {
+          editingIdx = idx;
+          rerender();
+        });
+        itemEl.querySelector('.delete').addEventListener('click', () => {
+          const desc = link.label ? host + ' — ' + link.label : host;
+          if (!confirm(`Remove link "${desc}"?`)) return;
+          refLinks.splice(idx, 1);
+          if (refLinks.length === 0) {
+            delete state.refLinks[item.slug];
+          } else {
+            state.refLinks[item.slug] = refLinks;
+          }
           scheduleSync();
           render();
-          showToast('Source link removed', 'success');
+          showToast('Link removed', 'success');
         });
+        return itemEl;
       }
 
-      urlInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') { e.preventDefault(); saveBtn.click(); }
-        else if (e.key === 'Escape') { cancelBtn.click(); }
-      });
-      labelInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') { e.preventDefault(); saveBtn.click(); }
-        else if (e.key === 'Escape') { cancelBtn.click(); }
-      });
+      function buildEditForm() {
+        const form = document.createElement('div');
+        form.className = 'reflink-edit open';
+        const isNew = editingIdx === 'new';
+        const current = isNew ? { url: '', label: '' } : refLinks[editingIdx];
+        form.innerHTML = `
+          <div class="field-group">
+            <div>
+              <label>Source URL <span style="color:#DC2626">*</span></label>
+              <input type="url" class="field-ref-url" placeholder="https://alicecare1234.careacademy.com/..." value="${escapeAttr(current.url)}">
+            </div>
+            <div>
+              <label>Description (optional)</label>
+              <input type="text" class="field-ref-label" placeholder="e.g. Annual training dashboard, Registry lookup" maxlength="120" value="${escapeAttr(current.label)}">
+            </div>
+            <div class="reflink-edit-actions">
+              <button class="reflink-cancel">Cancel</button>
+              <button class="reflink-save">${isNew ? 'Add link' : 'Save changes'}</button>
+            </div>
+          </div>
+        `;
 
+        const urlInput = form.querySelector('.field-ref-url');
+        const labelInput = form.querySelector('.field-ref-label');
+        const saveBtn = form.querySelector('.reflink-save');
+        const cancelBtn = form.querySelector('.reflink-cancel');
+
+        setTimeout(() => urlInput.focus(), 50);
+
+        cancelBtn.addEventListener('click', () => {
+          editingIdx = -1;
+          rerender();
+        });
+
+        saveBtn.addEventListener('click', () => {
+          const url = urlInput.value.trim();
+          const label = labelInput.value.trim();
+          if (!isValidURL(url)) {
+            showToast('Enter a valid http or https URL', 'error');
+            return;
+          }
+          const payload = { url, label };
+          if (isNew) {
+            refLinks.push(payload);
+          } else {
+            refLinks[editingIdx] = payload;
+          }
+          state.refLinks[item.slug] = refLinks;
+          editingIdx = -1;
+          scheduleSync();
+          render();
+          showToast(isNew ? 'Link added' : 'Link updated', 'success');
+        });
+
+        [urlInput, labelInput].forEach(inp => {
+          inp.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); saveBtn.click(); }
+            else if (e.key === 'Escape') { cancelBtn.click(); }
+          });
+        });
+
+        return form;
+      }
+
+      rerender();
       return row;
     }
 
