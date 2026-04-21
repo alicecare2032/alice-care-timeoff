@@ -1352,6 +1352,164 @@
     .toast.success { background: #1B7A3D; }
     .toast.error { background: #DC2626; }
 
+    /* ===== Edit Mode (PIN protection) ===== */
+    .lock-btn {
+      padding: 10px 14px;
+      border-radius: 9px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+    .lock-btn.locked {
+      background: #FFFFFF;
+      color: #4A5F7F;
+      border: 1.5px solid #D0DDF0;
+    }
+    .lock-btn.locked:hover {
+      border-color: #F57600;
+      color: #F57600;
+      transform: translateY(-1px);
+    }
+    .lock-btn.unlocked {
+      background: linear-gradient(135deg, #F57600 0%, #E06900 100%);
+      color: #FFFFFF;
+      box-shadow: 0 2px 6px rgba(245, 118, 0, 0.25);
+    }
+    .lock-btn.unlocked:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(245, 118, 0, 0.35);
+    }
+
+    .pin-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(26, 54, 92, 0.78);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2500;
+      backdrop-filter: blur(4px);
+      padding: 20px;
+    }
+    .pin-overlay.open { display: flex; }
+    .pin-modal {
+      background: #FFFFFF;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 420px;
+      padding: 28px 28px 22px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      animation: pinModalIn 0.18s ease-out;
+    }
+    @keyframes pinModalIn {
+      from { opacity: 0; transform: translateY(-10px) scale(0.98); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .pin-header { text-align: center; margin-bottom: 20px; }
+    .pin-icon-wrap {
+      width: 60px; height: 60px;
+      background: linear-gradient(135deg, #F57600 0%, #E06900 100%);
+      border-radius: 15px;
+      color: #FFFFFF;
+      font-size: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+      box-shadow: 0 6px 18px rgba(245, 118, 0, 0.3);
+    }
+    .pin-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1A365C;
+      margin-bottom: 6px;
+    }
+    .pin-subtitle {
+      font-size: 12.5px;
+      color: #7A8BA3;
+      line-height: 1.5;
+    }
+    .pin-input {
+      width: 100%;
+      padding: 14px 16px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 6px;
+      text-align: center;
+      color: #1A365C;
+      background: #F0F7FF;
+      border: 2px solid #D0DDF0;
+      border-radius: 9px;
+      outline: none;
+      margin-bottom: 14px;
+      transition: all 0.15s;
+    }
+    .pin-input:focus {
+      border-color: #F57600;
+      box-shadow: 0 0 0 4px rgba(245, 118, 0, 0.12);
+      background: #FFFFFF;
+    }
+    .pin-input::placeholder { color: #B5C0D1; letter-spacing: 4px; }
+    .pin-hint {
+      font-size: 11px;
+      color: #7A8BA3;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+    .pin-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .pin-actions button {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: all 0.15s;
+    }
+    .pin-cancel {
+      background: #FFFFFF;
+      color: #4A5F7F;
+      border-color: #D0DDF0;
+    }
+    .pin-cancel:hover { border-color: #7A8BA3; }
+    .pin-submit {
+      background: #F57600;
+      color: #FFFFFF;
+    }
+    .pin-submit:hover { background: #E06900; }
+
+    /* View-mode: hide edit-only controls, disable checkboxes */
+    body:not(.edit-mode) .edit-only { display: none !important; }
+    body:not(.edit-mode) .item-check { cursor: default; }
+    body:not(.edit-mode) .item-check input[type="checkbox"] {
+      pointer-events: none;
+      cursor: default;
+    }
+    body:not(.edit-mode) .item-check .checkmark {
+      opacity: 0.75;
+    }
+    body:not(.edit-mode) .item-check input:not(:checked) ~ .checkmark {
+      background: #F5F7FA;
+      border-color: #E2E8F0;
+    }
+    body:not(.edit-mode) .checklist-item:hover {
+      border-color: #E2E8F0;
+      box-shadow: none;
+    }
+
     @media print {
       body { background: #FFFFFF; }
       .page-wrapper { padding: 0; }
@@ -1416,6 +1574,7 @@
             </div>
           </div>
           <span class="sync-indicator syncing" id="syncIndicator">Syncing</span>
+          <button class="lock-btn locked" id="lockBtn" title="Unlock edit mode">🔒 View Mode</button>
           <button class="fh-btn fh-btn-refresh" id="fhRefreshBtn" title="Refresh files and state">⟳ Refresh</button>
           <button class="fh-btn fh-btn-open" id="fhOpenBtn" disabled>↗ Open Folder</button>
         </div>
@@ -1455,9 +1614,9 @@
         </div>
         <div class="action-buttons">
           <button class="btn btn-secondary" onclick="exportJSON()">📥 Export Backup</button>
-          <button class="btn btn-secondary" onclick="importJSON()">📤 Import Backup</button>
+          <button class="btn btn-secondary edit-only" onclick="importJSON()">📤 Import Backup</button>
           <button class="btn btn-secondary" onclick="window.print()">🖨 Print View</button>
-          <button class="btn btn-danger" onclick="resetAll()">♻ Reset Checkboxes</button>
+          <button class="btn btn-danger edit-only" onclick="resetAll()">♻ Reset Checkboxes</button>
         </div>
       </div>
 
@@ -1475,6 +1634,23 @@
 
   <input type="file" id="importFile" accept=".json" style="display:none;">
   <div class="toast" id="toast"></div>
+
+  <!-- PIN modal -->
+  <div class="pin-overlay" id="pinOverlay">
+    <div class="pin-modal">
+      <div class="pin-header">
+        <div class="pin-icon-wrap">🔐</div>
+        <div class="pin-title">Enter Edit Code</div>
+        <div class="pin-subtitle">Unlock editing to check boxes, upload files, set expiration dates, and manage reference links.</div>
+      </div>
+      <input type="password" class="pin-input" id="pinInput" placeholder="••••••••" maxlength="20" autocomplete="off" inputmode="numeric">
+      <div class="pin-hint">Contact your Alice Care administrator if you do not have the code.</div>
+      <div class="pin-actions">
+        <button class="pin-cancel" id="pinCancelBtn">Cancel</button>
+        <button class="pin-submit" id="pinSubmitBtn">Unlock</button>
+      </div>
+    </div>
+  </div>
 
   <div class="preview-overlay" id="previewOverlay">
     <div class="preview-modal">
@@ -1930,7 +2106,7 @@
               Supporting Files
               <span class="files-count ${files.length > 0 ? 'has' : ''}">${files.length}</span>
             </div>
-            <button class="btn-upload" ${canUpload ? '' : 'disabled title="Backend not connected"'}>
+            <button class="btn-upload edit-only" ${canUpload ? '' : 'disabled title="Backend not connected"'}>
               <span class="plus">+</span> Upload Files
             </button>
           </div>
@@ -2019,12 +2195,12 @@
             ${formatDate(rec.expiresAt)}
             <span class="expiration-days">${daysText}</span>
           </div>
-          <div class="exp-date-wrapper">
+          <div class="exp-date-wrapper edit-only">
             <input type="text" class="exp-date-text" placeholder="MM/DD/YYYY" value="${displayValue}" maxlength="10" inputmode="numeric">
             <button class="exp-cal-btn" title="Open calendar" type="button">📅</button>
             <input type="date" class="exp-date-picker-hidden" tabindex="-1">
           </div>
-          <div class="expiration-actions">
+          <div class="expiration-actions edit-only">
             <button class="exp-btn clear">Clear</button>
           </div>
         `;
@@ -2034,12 +2210,12 @@
           <div class="expiration-display" style="color:#7A8BA3;font-style:italic;font-weight:500">
             No expiration set. Item stays verified until manually un-checked.
           </div>
-          <div class="exp-date-wrapper" style="display:none">
+          <div class="exp-date-wrapper edit-only" style="display:none">
             <input type="text" class="exp-date-text" placeholder="MM/DD/YYYY" maxlength="10" inputmode="numeric">
             <button class="exp-cal-btn" title="Open calendar" type="button">📅</button>
             <input type="date" class="exp-date-picker-hidden" tabindex="-1">
           </div>
-          <div class="expiration-actions">
+          <div class="expiration-actions edit-only">
             <button class="exp-btn add">+ Set expiration</button>
           </div>
         `;
@@ -2215,7 +2391,7 @@
         // Add button or edit form
         if (editingIdx === -1) {
           const addBtn = document.createElement('button');
-          addBtn.className = 'reflink-add-btn';
+          addBtn.className = 'reflink-add-btn edit-only';
           addBtn.textContent = refLinks.length > 0 ? '+ Add another link' : '+ Add source link';
           addBtn.addEventListener('click', () => {
             editingIdx = 'new';
@@ -2239,8 +2415,8 @@
           </div>
           <div class="reflink-item-actions">
             <button class="reflink-btn open">↗ Open</button>
-            <button class="reflink-btn edit">Edit</button>
-            <button class="reflink-btn delete" title="Remove">×</button>
+            <button class="reflink-btn edit edit-only">Edit</button>
+            <button class="reflink-btn delete edit-only" title="Remove">×</button>
           </div>
         `;
         itemEl.querySelector('.open').addEventListener('click', () => {
@@ -2351,7 +2527,7 @@
         <div class="file-actions">
           <button class="file-btn preview-btn">👁 Preview</button>
           <button class="file-btn open-btn">↗ Open</button>
-          <button class="file-btn delete-btn" title="Remove">×</button>
+          <button class="file-btn delete-btn edit-only" title="Remove">×</button>
         </div>
       `;
 
@@ -2620,6 +2796,87 @@
     window.exportJSON = exportJSON;
     window.importJSON = importJSON;
     window.resetAll = resetAll;
+
+    // ===== Edit mode (PIN protection) =====
+    const EDIT_PIN = '19731972';
+    const EDIT_MODE_KEY = 'alicecare_hcs9201_edit_mode';
+
+    function isEditMode() {
+      return sessionStorage.getItem(EDIT_MODE_KEY) === '1';
+    }
+
+    function applyEditMode(on) {
+      if (on) sessionStorage.setItem(EDIT_MODE_KEY, '1');
+      else sessionStorage.removeItem(EDIT_MODE_KEY);
+      document.body.classList.toggle('edit-mode', on);
+      updateLockButton();
+    }
+
+    function updateLockButton() {
+      const btn = document.getElementById('lockBtn');
+      if (!btn) return;
+      if (isEditMode()) {
+        btn.className = 'lock-btn unlocked';
+        btn.innerHTML = '🔓 Edit Mode';
+        btn.title = 'Click to lock';
+      } else {
+        btn.className = 'lock-btn locked';
+        btn.innerHTML = '🔒 View Mode';
+        btn.title = 'Click to unlock edit mode';
+      }
+    }
+
+    function showPinModal() {
+      const overlay = document.getElementById('pinOverlay');
+      const input = document.getElementById('pinInput');
+      input.value = '';
+      overlay.classList.add('open');
+      setTimeout(() => input.focus(), 60);
+    }
+
+    function hidePinModal() {
+      document.getElementById('pinOverlay').classList.remove('open');
+    }
+
+    function tryUnlock(pin) {
+      if (String(pin).trim() === EDIT_PIN) {
+        applyEditMode(true);
+        hidePinModal();
+        showToast('Edit mode unlocked', 'success');
+      } else {
+        showToast('Incorrect code', 'error');
+        const input = document.getElementById('pinInput');
+        input.value = '';
+        input.focus();
+      }
+    }
+
+    document.getElementById('lockBtn').addEventListener('click', () => {
+      if (isEditMode()) {
+        if (confirm('Lock edit mode? You will need to re-enter the code to make further changes.')) {
+          applyEditMode(false);
+          showToast('Locked', 'success');
+        }
+      } else {
+        showPinModal();
+      }
+    });
+
+    document.getElementById('pinSubmitBtn').addEventListener('click', () => {
+      tryUnlock(document.getElementById('pinInput').value);
+    });
+    document.getElementById('pinCancelBtn').addEventListener('click', hidePinModal);
+    document.getElementById('pinOverlay').addEventListener('click', (e) => {
+      if (e.target.id === 'pinOverlay') hidePinModal();
+    });
+    document.getElementById('pinInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); tryUnlock(e.target.value); }
+      else if (e.key === 'Escape') { e.preventDefault(); hidePinModal(); }
+    });
+
+    // Apply current edit mode state to body on load
+    document.body.classList.toggle('edit-mode', isEditMode());
+    updateLockButton();
 
     loadState();
     renderFolderHero();
