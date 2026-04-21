@@ -574,6 +574,172 @@
       color: #1B7A3D;
       border: 1px solid #B7DFC6;
     }
+    .status-chip.warning {
+      background: #FEF3C7;
+      color: #92400E;
+      border: 1px solid #FCD34D;
+    }
+    .status-chip.expired {
+      background: #FEE2E2;
+      color: #991B1B;
+      border: 1px solid #FCA5A5;
+    }
+
+    /* Expiration row */
+    .expiration-row {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: #FAFCFF;
+      border: 1px dashed #D0DDF0;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .expiration-row.active {
+      background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+      border: 1px solid #93C5FD;
+      border-style: solid;
+    }
+    .expiration-row.warning {
+      background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+      border: 1px solid #FCD34D;
+      border-style: solid;
+    }
+    .expiration-row.expired {
+      background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%);
+      border: 1px solid #FCA5A5;
+      border-style: solid;
+    }
+    .expiration-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #7A8BA3;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .expiration-row.active .expiration-label { color: #1D4ED8; }
+    .expiration-row.warning .expiration-label { color: #92400E; }
+    .expiration-row.expired .expiration-label { color: #991B1B; }
+    .expiration-date-input {
+      padding: 5px 9px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: #1A365C;
+      background: #FFFFFF;
+      border: 1.5px solid #D0DDF0;
+      border-radius: 6px;
+      outline: none;
+      cursor: pointer;
+    }
+    .expiration-date-input:focus {
+      border-color: #1D4ED8;
+      box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
+    }
+    .expiration-display {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #1A365C;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex: 1;
+      min-width: 0;
+    }
+    .expiration-row.warning .expiration-display { color: #92400E; }
+    .expiration-row.expired .expiration-display { color: #991B1B; }
+    .expiration-days {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .expiration-row.active .expiration-days {
+      background: #DBEAFE;
+      color: #1D4ED8;
+      border: 1px solid #93C5FD;
+    }
+    .expiration-row.warning .expiration-days {
+      background: #FDE68A;
+      color: #78350F;
+      border: 1px solid #F59E0B;
+    }
+    .expiration-row.expired .expiration-days {
+      background: #FCA5A5;
+      color: #7F1D1D;
+      border: 1px solid #DC2626;
+    }
+    .expiration-actions {
+      display: flex;
+      gap: 5px;
+      margin-left: auto;
+    }
+    .exp-btn {
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 10.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .exp-btn.save { background: #1B7A3D; color: #FFFFFF; }
+    .exp-btn.save:hover { background: #166530; }
+    .exp-btn.clear {
+      background: #FFFFFF;
+      color: #B91C1C;
+      border-color: #FCA5A5;
+    }
+    .exp-btn.clear:hover { background: #FEF2F2; border-color: #DC2626; }
+    .exp-btn.add {
+      background: transparent;
+      color: #1D4ED8;
+      border: 1px dashed #93C5FD;
+    }
+    .exp-btn.add:hover { background: #F0F9FF; border-style: solid; }
+
+    /* Sync indicator */
+    .sync-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 10px;
+      background: #E6F4EA;
+      color: #1B7A3D;
+      border: 1px solid #B7DFC6;
+      white-space: nowrap;
+    }
+    .sync-indicator.syncing {
+      background: #FFF3E8;
+      color: #B85300;
+      border-color: #F5C992;
+    }
+    .sync-indicator.error {
+      background: #FEE2E2;
+      color: #991B1B;
+      border-color: #FCA5A5;
+    }
+    .sync-indicator::before {
+      content: '●';
+      font-size: 9px;
+    }
+    .sync-indicator.syncing::before { animation: pulse 1.2s infinite; }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
 
     /* Reference link row */
     .reflink-row {
@@ -1120,39 +1286,19 @@
       </div>
 
       <div class="folder-hero unconfigured" id="folderHero">
-        <div class="fh-label" id="fhLabel">Backend not configured</div>
+        <div class="fh-label" id="fhLabel">Connecting to backend...</div>
         <div class="fh-row">
           <div class="fh-folder-name">
             <div class="fh-icon">📁</div>
             <div class="fh-text">
               <div class="fh-title" id="fhTitle">HCS 9201 Supporting Materials</div>
-              <div class="fh-sub" id="fhSub">Paste your Apps Script backend URL to connect to the shared Drive folder</div>
+              <div class="fh-sub" id="fhSub">Loading...</div>
             </div>
           </div>
-          <button class="fh-btn fh-btn-refresh" id="fhRefreshBtn" title="Refresh files" style="display:none">⟳ Refresh</button>
+          <span class="sync-indicator syncing" id="syncIndicator">Syncing</span>
+          <button class="fh-btn fh-btn-refresh" id="fhRefreshBtn" title="Refresh files and state">⟳ Refresh</button>
           <button class="fh-btn fh-btn-open" id="fhOpenBtn" disabled>↗ Open Folder</button>
-          <button class="fh-btn fh-btn-config" id="fhEditBtn">Configure Backend</button>
         </div>
-        <div class="fh-edit-panel" id="fhEditPanel">
-          <label>Apps Script Web App URL</label>
-          <input type="url" id="fhUrlInput" placeholder="https://script.google.com/macros/s/AKfycb.../exec">
-          <div class="helper">Deploy the Code.gs file as a Web App, set access to Anyone, then paste the URL above. See SETUP.md for the full walkthrough.</div>
-          <div class="fh-edit-actions">
-            <button class="fh-cancel" id="fhCancelBtn">Cancel</button>
-            <button class="fh-save" id="fhSaveBtn">Test & Save</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="setup-banner" id="setupBanner">
-        <button class="close-banner" onclick="hideBanner()">×</button>
-        <strong>Quick start:</strong>
-        <ol>
-          <li>Create the Drive folder, name it "HCS 9201 Supporting Materials", share with your team.</li>
-          <li>Deploy the Apps Script (Code.gs) as a Web App with Anyone access, paste your folder ID into ROOT_FOLDER_ID first.</li>
-          <li>Click Configure Backend above and paste the Web App URL.</li>
-          <li>Upload files, add reference links per requirement. Export Backup shares reference links and checkboxes with your team.</li>
-        </ol>
       </div>
 
       <div class="stats-bar">
@@ -1183,6 +1329,7 @@
           <button class="filter-chip active" data-filter="all">All Items</button>
           <button class="filter-chip" data-filter="pending">Outstanding</button>
           <button class="filter-chip" data-filter="complete">Verified</button>
+          <button class="filter-chip" data-filter="action">Action Needed</button>
           <button class="filter-chip" data-filter="nofiles">No Files Yet</button>
           <button class="filter-chip" data-filter="nolinks">No Reference Link</button>
         </div>
@@ -1279,21 +1426,25 @@
       }
     ];
 
-    const STORAGE_KEY = 'alicecare_hcs9201_checklist_v6';
+    // ===== Hard-coded backend =====
+    const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwMVu3U_2aAi8CU2HwzAtOo83wnQzqISYJkoiTkLBXHswOch34LvSQ1kRDwpy9GXFtxMg/exec';
+    const STORAGE_KEY = 'alicecare_hcs9201_checklist_v7';
     const MAX_FILE_SIZE = 25 * 1024 * 1024;
+    const EXPIRATION_WARNING_DAYS = 30;
 
     let state = {
-      backendUrl: '',
       folderUrl: '',
       folderName: 'HCS 9201 Supporting Materials',
       checkboxes: {},
       refLinks: {},
-      bannerDismissed: false,
-      lastUpdated: null
+      lastModified: null,
+      lastModifiedBy: null
     };
     let filesBySlug = {};
     let currentFilter = 'all';
     let backendStatus = 'disconnected';
+    let syncStatus = 'idle'; // idle, syncing, error, saved
+    let syncTimer = null;
     let previewList = [];
     let previewIndex = 0;
 
@@ -1304,25 +1455,75 @@
           state = Object.assign(state, JSON.parse(raw));
           if (!state.checkboxes) state.checkboxes = {};
           if (!state.refLinks) state.refLinks = {};
+          // Migrate any legacy boolean checkboxes into the object schema.
+          Object.keys(state.checkboxes).forEach(slug => {
+            if (typeof state.checkboxes[slug] === 'boolean') {
+              state.checkboxes[slug] = {
+                checked: state.checkboxes[slug],
+                completedAt: null,
+                expiresAt: null
+              };
+            }
+          });
         }
       } catch (e) { /* keep default */ }
     }
 
-    function saveState(silent) {
-      state.lastUpdated = new Date().toISOString();
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        if (!silent) showToast('Saved', 'success');
-      } catch (e) {
-        showToast('Save failed', 'error');
-      }
+    function saveLocal() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) { /* ignore */ }
       renderLastUpdated();
     }
 
+    function scheduleSync() {
+      saveLocal();
+      if (syncTimer) clearTimeout(syncTimer);
+      syncTimer = setTimeout(pushSharedState, 500);
+    }
+
+    function setSyncStatus(next) {
+      syncStatus = next;
+      const ind = document.getElementById('syncIndicator');
+      if (!ind) return;
+      ind.className = 'sync-indicator ' + (next === 'syncing' ? 'syncing' : next === 'error' ? 'error' : '');
+      ind.textContent = next === 'syncing' ? 'Saving...' : next === 'error' ? 'Save failed' : next === 'saved' ? 'All saved' : 'Connected';
+    }
+
+    async function pushSharedState() {
+      if (backendStatus !== 'connected') return;
+      try {
+        setSyncStatus('syncing');
+        const resp = await apiCall('setState', {
+          checkboxes: state.checkboxes,
+          refLinks: state.refLinks
+        });
+        state.lastModified = resp.lastModified;
+        state.lastModifiedBy = resp.lastModifiedBy;
+        saveLocal();
+        setSyncStatus('saved');
+        setTimeout(() => { if (syncStatus === 'saved') setSyncStatus('idle'); }, 2000);
+      } catch (err) {
+        setSyncStatus('error');
+        showToast('Sync failed: ' + err.message, 'error');
+      }
+    }
+
+    async function fetchSharedState() {
+      try {
+        const data = await apiCall('getState');
+        // Server is source of truth. Merge into local state.
+        state.checkboxes = data.checkboxes || {};
+        state.refLinks = data.refLinks || {};
+        state.lastModified = data.lastModified || null;
+        state.lastModifiedBy = data.lastModifiedBy || null;
+        saveLocal();
+      } catch (err) {
+        showToast('Could not load team state: ' + err.message, 'error');
+      }
+    }
+
     async function apiCall(action, payload) {
-      if (!state.backendUrl) throw new Error('Backend not configured');
       const body = Object.assign({ action }, payload || {});
-      const resp = await fetch(state.backendUrl, {
+      const resp = await fetch(BACKEND_URL, {
         method: 'POST',
         mode: 'cors',
         redirect: 'follow',
@@ -1344,11 +1545,16 @@
         state.folderName = data.folderName || 'HCS 9201 Supporting Materials';
         backendStatus = 'connected';
         renderFolderHero();
-        await refreshFiles();
+        // Fetch files and shared state in parallel.
+        await Promise.all([refreshFiles(), fetchSharedState()]);
+        render();
+        renderStats();
+        setSyncStatus('idle');
         return true;
       } catch (err) {
         backendStatus = 'error';
         renderFolderHero(err.message);
+        setSyncStatus('error');
         return false;
       }
     }
@@ -1436,39 +1642,27 @@
       const title = document.getElementById('fhTitle');
       const sub = document.getElementById('fhSub');
       const openBtn = document.getElementById('fhOpenBtn');
-      const editBtn = document.getElementById('fhEditBtn');
-      const refreshBtn = document.getElementById('fhRefreshBtn');
 
       hero.className = 'folder-hero';
-      refreshBtn.style.display = 'none';
 
-      if (!state.backendUrl) {
+      if (backendStatus === 'connecting' || backendStatus === 'disconnected') {
         hero.classList.add('unconfigured');
-        label.textContent = 'Backend not configured';
-        title.textContent = 'HCS 9201 Supporting Materials';
-        sub.textContent = 'Paste your Apps Script Web App URL to connect';
-        openBtn.disabled = true;
-        editBtn.textContent = 'Configure Backend';
-      } else if (backendStatus === 'connecting') {
         label.textContent = 'Connecting...';
         title.textContent = state.folderName;
-        sub.textContent = 'Testing backend and fetching file list';
+        sub.textContent = 'Testing backend and fetching team state';
         openBtn.disabled = true;
-        editBtn.textContent = 'Edit';
       } else if (backendStatus === 'connected') {
-        label.textContent = 'Connected · Live Drive folder';
+        label.textContent = 'Connected · Live Drive folder · Team-synced state';
         title.textContent = state.folderName;
-        sub.textContent = state.folderUrl || state.backendUrl;
+        const modBy = state.lastModifiedBy ? ` · last updated by ${state.lastModifiedBy}` : '';
+        sub.textContent = (state.folderUrl || '') + modBy;
         openBtn.disabled = !state.folderUrl;
-        editBtn.textContent = 'Edit';
-        refreshBtn.style.display = '';
       } else {
         hero.classList.add('error');
         label.textContent = 'Backend error';
         title.textContent = 'Connection failed';
         sub.textContent = errorMsg || 'Unable to reach the Apps Script backend';
         openBtn.disabled = true;
-        editBtn.textContent = 'Edit';
       }
     }
 
@@ -1477,14 +1671,17 @@
       root.innerHTML = '';
 
       SECTIONS.forEach(section => {
-        const sectionItems = section.items.map((item, idx) => ({
-          item, idx, checked: !!state.checkboxes[item.slug]
-        }));
+        const sectionItems = section.items.map((item, idx) => {
+          const rec = getCheckboxRecord(item.slug);
+          const expState = expirationState(rec);
+          return { item, idx, rec, expState, effectivelyChecked: rec.checked && !expState.expired };
+        });
 
-        const visibleItems = sectionItems.filter(({ item, checked }) => {
+        const visibleItems = sectionItems.filter(({ item, rec, expState, effectivelyChecked }) => {
           if (currentFilter === 'all') return true;
-          if (currentFilter === 'pending') return !checked;
-          if (currentFilter === 'complete') return checked;
+          if (currentFilter === 'pending') return !effectivelyChecked;
+          if (currentFilter === 'complete') return effectivelyChecked;
+          if (currentFilter === 'action') return effectivelyChecked && (expState.warning || expState.expired) || (rec.checked && expState.expired);
           if (currentFilter === 'nofiles') return !(filesBySlug[item.slug] || []).length;
           if (currentFilter === 'nolinks') return !state.refLinks[item.slug] || !state.refLinks[item.slug].url;
           return true;
@@ -1492,7 +1689,7 @@
 
         if (visibleItems.length === 0) return;
 
-        const completedCount = sectionItems.filter(x => x.checked).length;
+        const completedCount = sectionItems.filter(x => x.effectivelyChecked).length;
         const sec = document.createElement('div');
         sec.className = 'checklist-section';
         sec.innerHTML = `
@@ -1509,15 +1706,47 @@
         root.appendChild(sec);
 
         const itemsContainer = sec.querySelector('.section-items');
-        visibleItems.forEach(({ item, idx, checked }) => {
-          itemsContainer.appendChild(buildItem(section.id, idx, item, checked));
+        visibleItems.forEach(({ item, idx, rec, expState, effectivelyChecked }) => {
+          itemsContainer.appendChild(buildItem(section.id, idx, item, rec, expState, effectivelyChecked));
         });
       });
     }
 
-    function buildItem(sectionId, idx, item, checked) {
+    // ===== Expiration + checkbox helpers =====
+    function getCheckboxRecord(slug) {
+      const rec = state.checkboxes[slug];
+      if (!rec) return { checked: false, completedAt: null, expiresAt: null };
+      if (typeof rec === 'boolean') return { checked: rec, completedAt: null, expiresAt: null };
+      return {
+        checked: !!rec.checked,
+        completedAt: rec.completedAt || null,
+        expiresAt: rec.expiresAt || null
+      };
+    }
+
+    function expirationState(rec) {
+      if (!rec.expiresAt) return { hasDate: false, expired: false, warning: false, daysLeft: null };
+      const today = new Date(); today.setHours(0,0,0,0);
+      const exp = new Date(rec.expiresAt); exp.setHours(0,0,0,0);
+      const msPerDay = 86400000;
+      const daysLeft = Math.round((exp - today) / msPerDay);
+      return {
+        hasDate: true,
+        expired: daysLeft < 0,
+        warning: daysLeft >= 0 && daysLeft <= EXPIRATION_WARNING_DAYS,
+        daysLeft
+      };
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    function buildItem(sectionId, idx, item, rec, expState, effectivelyChecked) {
       const el = document.createElement('div');
-      el.className = 'checklist-item' + (checked ? ' complete' : '');
+      el.className = 'checklist-item' + (effectivelyChecked ? ' complete' : '');
       el.dataset.section = sectionId;
       el.dataset.idx = idx;
       el.dataset.slug = item.slug;
@@ -1525,14 +1754,22 @@
       const files = filesBySlug[item.slug] || [];
       const refLink = state.refLinks[item.slug] || { url: '', label: '' };
       const canUpload = backendStatus === 'connected';
-      const statusChip = checked
-        ? '<span class="status-chip done">✓ Verified</span>'
-        : '<span class="status-chip pending">Outstanding</span>';
+
+      let statusChip;
+      if (effectivelyChecked && expState.warning) {
+        statusChip = `<span class="status-chip warning">⚠ Expires in ${expState.daysLeft}d</span>`;
+      } else if (rec.checked && expState.expired) {
+        statusChip = '<span class="status-chip expired">⚠ Expired · Re-verify</span>';
+      } else if (effectivelyChecked) {
+        statusChip = '<span class="status-chip done">✓ Verified</span>';
+      } else {
+        statusChip = '<span class="status-chip pending">Outstanding</span>';
+      }
 
       el.innerHTML = `
         <div class="item-top">
           <label class="item-check">
-            <input type="checkbox" ${checked ? 'checked' : ''}>
+            <input type="checkbox" ${effectivelyChecked ? 'checked' : ''}>
             <span class="checkmark"></span>
           </label>
           <div class="item-content">
@@ -1542,6 +1779,7 @@
           </div>
           ${statusChip}
         </div>
+        <div class="expiration-container"></div>
         <div class="reflink-container"></div>
         <div class="files-block">
           <div class="files-header">
@@ -1549,7 +1787,7 @@
               Supporting Files
               <span class="files-count ${files.length > 0 ? 'has' : ''}">${files.length}</span>
             </div>
-            <button class="btn-upload" ${canUpload ? '' : 'disabled title="Configure the backend to enable uploads"'}>
+            <button class="btn-upload" ${canUpload ? '' : 'disabled title="Backend not connected"'}>
               <span class="plus">+</span> Upload Files
             </button>
           </div>
@@ -1558,19 +1796,35 @@
         </div>
       `;
 
+      // Checkbox handler
       el.querySelector('input[type="checkbox"]').addEventListener('change', (e) => {
-        state.checkboxes[item.slug] = e.target.checked;
-        saveState(true);
-        el.classList.toggle('complete', e.target.checked);
-        const chip = el.querySelector('.status-chip');
-        chip.className = 'status-chip ' + (e.target.checked ? 'done' : 'pending');
-        chip.innerHTML = e.target.checked ? '✓ Verified' : 'Outstanding';
+        const nowChecked = e.target.checked;
+        const current = getCheckboxRecord(item.slug);
+        if (nowChecked) {
+          state.checkboxes[item.slug] = {
+            checked: true,
+            completedAt: new Date().toISOString(),
+            // If re-verifying an expired item, clear the old expiration so the user sets a fresh one.
+            expiresAt: current.expired ? null : current.expiresAt
+          };
+        } else {
+          state.checkboxes[item.slug] = { checked: false, completedAt: null, expiresAt: null };
+        }
+        scheduleSync();
+        render();
         renderStats();
       });
 
-      const refContainer = el.querySelector('.reflink-container');
-      refContainer.appendChild(buildRefLinkRow(item, refLink));
+      // Expiration UI
+      const expContainer = el.querySelector('.expiration-container');
+      if (rec.checked) {
+        expContainer.appendChild(buildExpirationRow(item, rec, expState));
+      }
 
+      // Reference link
+      el.querySelector('.reflink-container').appendChild(buildRefLinkRow(item, refLink));
+
+      // Upload
       const uploadBtn = el.querySelector('.btn-upload');
       const picker = el.querySelector('.file-picker');
       if (!uploadBtn.disabled) {
@@ -1583,16 +1837,13 @@
         });
       }
 
+      // Files list
       const listEl = el.querySelector('.files-list');
       if (files.length === 0) {
         const empty = document.createElement('div');
         empty.className = 'files-empty';
-        if (!state.backendUrl) {
-          empty.textContent = 'Connect the backend to see uploaded files here.';
-        } else if (backendStatus === 'error') {
+        if (backendStatus !== 'connected') {
           empty.textContent = 'Backend unavailable. Check configuration.';
-        } else if (backendStatus === 'connecting') {
-          empty.textContent = 'Loading...';
         } else {
           empty.innerHTML = 'No files uploaded yet.<span class="hint">Click Upload Files to add one or more documents at once.</span>';
         }
@@ -1602,6 +1853,92 @@
       }
 
       return el;
+    }
+
+    function buildExpirationRow(item, rec, expState) {
+      const row = document.createElement('div');
+      const hasDate = !!rec.expiresAt;
+      let cls = 'expiration-row';
+      if (expState.expired) cls += ' expired';
+      else if (expState.warning) cls += ' warning';
+      else if (hasDate) cls += ' active';
+      row.className = cls;
+
+      if (hasDate) {
+        const daysText = expState.expired
+          ? `${Math.abs(expState.daysLeft)}d ago`
+          : expState.daysLeft === 0 ? 'Today' : `${expState.daysLeft}d left`;
+        row.innerHTML = `
+          <div class="expiration-label">📅 Expires</div>
+          <div class="expiration-display">
+            ${formatDate(rec.expiresAt)}
+            <span class="expiration-days">${daysText}</span>
+          </div>
+          <input type="date" class="expiration-date-input" value="${rec.expiresAt.slice(0,10)}">
+          <div class="expiration-actions">
+            <button class="exp-btn clear">Clear date</button>
+          </div>
+        `;
+      } else {
+        row.innerHTML = `
+          <div class="expiration-label">📅 Expiration</div>
+          <div class="expiration-display" style="color:#7A8BA3;font-style:italic;font-weight:500">
+            No expiration set. Item stays verified until manually un-checked.
+          </div>
+          <input type="date" class="expiration-date-input" style="display:none">
+          <div class="expiration-actions">
+            <button class="exp-btn add">+ Set expiration</button>
+          </div>
+        `;
+      }
+
+      const dateInput = row.querySelector('.expiration-date-input');
+      const addBtn = row.querySelector('.exp-btn.add');
+      const clearBtn = row.querySelector('.exp-btn.clear');
+
+      if (addBtn) {
+        addBtn.addEventListener('click', () => {
+          dateInput.style.display = '';
+          addBtn.style.display = 'none';
+          // Default to one year from today.
+          const oneYear = new Date(); oneYear.setFullYear(oneYear.getFullYear() + 1);
+          dateInput.value = oneYear.toISOString().slice(0,10);
+          dateInput.focus();
+          dateInput.showPicker && dateInput.showPicker();
+        });
+      }
+
+      dateInput.addEventListener('change', (e) => {
+        const newDate = e.target.value;
+        if (!newDate) return;
+        const current = getCheckboxRecord(item.slug);
+        state.checkboxes[item.slug] = {
+          checked: current.checked,
+          completedAt: current.completedAt,
+          expiresAt: new Date(newDate + 'T00:00:00').toISOString()
+        };
+        scheduleSync();
+        render();
+        renderStats();
+        showToast('Expiration updated', 'success');
+      });
+
+      if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+          if (!confirm('Remove the expiration date for this requirement?')) return;
+          const current = getCheckboxRecord(item.slug);
+          state.checkboxes[item.slug] = {
+            checked: current.checked,
+            completedAt: current.completedAt,
+            expiresAt: null
+          };
+          scheduleSync();
+          render();
+          renderStats();
+        });
+      }
+
+      return row;
     }
 
     function buildRefLinkRow(item, refLink) {
@@ -1694,7 +2031,7 @@
           return;
         }
         state.refLinks[item.slug] = { url, label };
-        saveState(true);
+        scheduleSync();
         render();
         showToast('Source link saved', 'success');
       });
@@ -1703,7 +2040,7 @@
         clearBtn.addEventListener('click', () => {
           if (!confirm('Remove the source link for this requirement?')) return;
           delete state.refLinks[item.slug];
-          saveState(true);
+          scheduleSync();
           render();
           showToast('Source link removed', 'success');
         });
@@ -1767,11 +2104,15 @@
     }
 
     function renderStats() {
-      let total = 0, complete = 0;
+      let total = 0, complete = 0, needAction = 0;
       SECTIONS.forEach(section => {
         section.items.forEach(item => {
           total++;
-          if (state.checkboxes[item.slug]) complete++;
+          const rec = getCheckboxRecord(item.slug);
+          const expState = expirationState(rec);
+          const effective = rec.checked && !expState.expired;
+          if (effective) complete++;
+          if ((effective && expState.warning) || (rec.checked && expState.expired)) needAction++;
         });
       });
       let totalFiles = 0;
@@ -1781,6 +2122,12 @@
       document.getElementById('statComplete').textContent = complete;
       document.getElementById('statPending').textContent = total - complete;
       document.getElementById('statFiles').textContent = totalFiles;
+      const pendingSub = document.querySelector('.stat-card.pending .stat-sub');
+      if (pendingSub) {
+        pendingSub.textContent = needAction > 0
+          ? `${needAction} expiring or expired`
+          : 'Still need review';
+      }
       document.getElementById('statFilesSub').textContent = backendStatus === 'connected'
         ? (totalFiles === 0 ? 'Upload your first file' : 'Across all requirements')
         : 'Not yet connected';
@@ -1788,25 +2135,24 @@
 
     function renderLastUpdated() {
       const el = document.getElementById('lastReviewed');
-      if (!state.lastUpdated) { el.textContent = 'Not yet saved'; return; }
-      const d = new Date(state.lastUpdated);
+      if (!state.lastModified) { el.textContent = 'Not yet saved'; return; }
+      const d = new Date(state.lastModified);
       el.textContent = d.toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
     }
 
-    function renderBanner() {
-      const banner = document.getElementById('setupBanner');
-      if (state.bannerDismissed || backendStatus === 'connected') {
-        banner.classList.add('hidden');
-      } else {
-        banner.classList.remove('hidden');
-      }
-    }
-
-    function hideBanner() {
-      state.bannerDismissed = true;
-      saveState(true);
-      renderBanner();
-    }
+    document.getElementById('fhOpenBtn').addEventListener('click', () => {
+      if (state.folderUrl) window.open(state.folderUrl, '_blank', 'noopener,noreferrer');
+    });
+    document.getElementById('fhRefreshBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('fhRefreshBtn');
+      btn.textContent = '⟳ Refreshing...';
+      await Promise.all([refreshFiles(), fetchSharedState()]);
+      render();
+      renderStats();
+      renderFolderHero();
+      btn.textContent = '⟳ Refresh';
+      showToast('Refreshed', 'success');
+    });
 
     function buildPreviewList() {
       previewList = [];
@@ -1916,56 +2262,6 @@
       window._toastTimer = setTimeout(() => { t.className = 'toast'; }, 2800);
     }
 
-    document.getElementById('fhOpenBtn').addEventListener('click', () => {
-      if (state.folderUrl) window.open(state.folderUrl, '_blank', 'noopener,noreferrer');
-    });
-    document.getElementById('fhRefreshBtn').addEventListener('click', async () => {
-      const btn = document.getElementById('fhRefreshBtn');
-      btn.textContent = '⟳ Refreshing...';
-      await refreshFiles();
-      btn.textContent = '⟳ Refresh';
-    });
-    document.getElementById('fhEditBtn').addEventListener('click', () => {
-      const panel = document.getElementById('fhEditPanel');
-      panel.classList.toggle('open');
-      if (panel.classList.contains('open')) {
-        document.getElementById('fhUrlInput').value = state.backendUrl;
-        setTimeout(() => document.getElementById('fhUrlInput').focus(), 50);
-      }
-    });
-    document.getElementById('fhCancelBtn').addEventListener('click', () => {
-      document.getElementById('fhEditPanel').classList.remove('open');
-    });
-    document.getElementById('fhSaveBtn').addEventListener('click', async () => {
-      const input = document.getElementById('fhUrlInput');
-      const saveBtn = document.getElementById('fhSaveBtn');
-      const url = input.value.trim();
-      if (!isValidURL(url)) {
-        showToast('Enter a valid https URL', 'error');
-        return;
-      }
-      saveBtn.disabled = true;
-      saveBtn.textContent = 'Testing...';
-      const prevUrl = state.backendUrl;
-      state.backendUrl = url;
-      const ok = await pingBackend();
-      saveBtn.disabled = false;
-      saveBtn.textContent = 'Test & Save';
-      if (ok) {
-        saveState(true);
-        document.getElementById('fhEditPanel').classList.remove('open');
-        renderBanner();
-        showToast('Backend connected', 'success');
-      } else {
-        state.backendUrl = prevUrl;
-        showToast('Backend unreachable. Check the URL and deployment settings.', 'error');
-      }
-    });
-    document.getElementById('fhUrlInput').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') { e.preventDefault(); document.getElementById('fhSaveBtn').click(); }
-      else if (e.key === 'Escape') { document.getElementById('fhCancelBtn').click(); }
-    });
-
     document.querySelectorAll('.filter-chip').forEach(chip => {
       chip.addEventListener('click', () => {
         document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
@@ -1981,13 +2277,14 @@
         licensee: 'TEKKS LLC DBA alice.care',
         licenseNumber: '344700080',
         form: 'HCS 9201 (11/25)',
-        version: 6,
+        version: 7,
         state: {
-          backendUrl: state.backendUrl,
           folderUrl: state.folderUrl,
           folderName: state.folderName,
           checkboxes: state.checkboxes,
-          refLinks: state.refLinks
+          refLinks: state.refLinks,
+          lastModified: state.lastModified,
+          lastModifiedBy: state.lastModifiedBy
         }
       };
       const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -2013,24 +2310,22 @@
         try {
           const data = JSON.parse(evt.target.result);
           if (!data.state) throw new Error('Invalid backup format');
-          if (!confirm('Importing will overwrite the backend URL, reference links, and checkboxes. Continue?')) return;
-          state = Object.assign({
-            backendUrl: '',
-            folderUrl: '',
-            folderName: 'HCS 9201 Supporting Materials',
-            checkboxes: {},
-            refLinks: {},
-            bannerDismissed: false,
-            lastUpdated: null
-          }, data.state);
-          if (!state.refLinks) state.refLinks = {};
-          saveState();
-          if (state.backendUrl) await pingBackend();
-          else { renderFolderHero(); render(); renderStats(); }
-          renderBanner();
-          showToast('Backup imported', 'success');
+          if (!confirm('Importing replaces the team-wide state (checkboxes, expirations, reference links). Continue?')) return;
+          state.checkboxes = data.state.checkboxes || {};
+          state.refLinks = data.state.refLinks || {};
+          // Normalize legacy boolean checkboxes.
+          Object.keys(state.checkboxes).forEach(slug => {
+            if (typeof state.checkboxes[slug] === 'boolean') {
+              state.checkboxes[slug] = { checked: state.checkboxes[slug], completedAt: null, expiresAt: null };
+            }
+          });
+          saveLocal();
+          await pushSharedState();
+          render();
+          renderStats();
+          showToast('Backup imported and synced', 'success');
         } catch (err) {
-          showToast('Could not read backup file', 'error');
+          showToast('Could not read backup file: ' + err.message, 'error');
         }
       };
       reader.readAsText(file);
@@ -2038,9 +2333,9 @@
     });
 
     function resetAll() {
-      if (!confirm('Reset every checkbox on this device? Reference links and files in Drive are not affected.')) return;
+      if (!confirm('Reset every checkbox and expiration date for the whole team? Reference links and files in Drive stay untouched. This syncs to everyone immediately.')) return;
       state.checkboxes = {};
-      saveState(true);
+      scheduleSync();
       render();
       renderStats();
       showToast('Checkboxes cleared', 'success');
@@ -2049,15 +2344,13 @@
     window.exportJSON = exportJSON;
     window.importJSON = importJSON;
     window.resetAll = resetAll;
-    window.hideBanner = hideBanner;
 
     loadState();
     renderFolderHero();
-    renderBanner();
     render();
     renderStats();
     renderLastUpdated();
-    if (state.backendUrl) pingBackend();
+    pingBackend(); // Auto-connect on load
   </script>
 </body>
 </html>
