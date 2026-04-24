@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>alice.care — Operations Console (Slides)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles/tokens.css"/>
+  <link rel="stylesheet" href="styles/extras.css"/>
+  <style>
+    html, body { margin: 0; padding: 0; background: #0a1322; }
+    body { font-family: 'Poppins', system-ui, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
+
+    /* Each slide is a fixed 1280x820 board. Only the active one is shown. */
+    .slide {
+      width: 1280px;
+      height: 820px;
+      background: #fff;
+      overflow: hidden;
+      position: relative;
+      display: none;
+      margin: 0 auto;
+    }
+    .slide.active { display: block; }
+    .slide > .ac-screen { box-shadow: none !important; border-radius: 0 !important; margin: 0 !important; width: 1280px !important; height: 820px !important; }
+
+    /* Cover */
+    .cover {
+      width: 1280px; height: 820px; background: #fff; position: relative;
+      padding: 80px;
+      box-sizing: border-box;
+      display: none;
+    }
+    .cover.active { display: block; }
+    .cover h1 { font-size: 88px; font-weight: 700; color: #1A365C; letter-spacing: -2.2px; margin: 0; line-height: 0.95; }
+    .cover h1 .dot { color: #F57600; }
+    .cover .sub { font-size: 28px; font-weight: 500; color: rgba(40,30,20,0.7); margin-top: 14px; letter-spacing: -0.4px; }
+    .cover .body { font-size: 16px; color: rgba(60,50,40,0.78); line-height: 1.6; margin-top: 38px; max-width: 920px; }
+    .cover .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px 40px; margin-top: 44px; font-size: 14px; color: rgba(60,50,40,0.65); max-width: 900px; }
+    .cover .grid strong { color: #1A365C; }
+    .cover .footer { position: absolute; left: 80px; right: 80px; bottom: 50px; display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; color: rgba(60,50,40,0.55); letter-spacing: 0.5px; text-transform: uppercase; font-weight: 600; border-top: 1px solid rgba(0,0,0,0.08); padding-top: 18px; }
+
+    /* Nav (hidden during capture) */
+    .nav {
+      position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%);
+      display: flex; align-items: center; gap: 12px;
+      background: rgba(255,255,255,0.95); backdrop-filter: blur(8px);
+      padding: 8px 14px; border-radius: 100px; box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+      font-family: 'Poppins', sans-serif; font-size: 13px; z-index: 1000;
+    }
+    .nav button { all: unset; cursor: pointer; padding: 4px 12px; border-radius: 6px; font-weight: 600; color: #1A365C; }
+    .nav button:hover { background: #f0eee9; }
+    .nav .count { color: rgba(40,30,20,0.6); font-variant-numeric: tabular-nums; }
+    .nav .label { color: #1A365C; font-weight: 500; max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <div class="nav">
+    <button onclick="goToSlide(currentSlide - 1)">‹</button>
+    <span class="count" id="nav-count">1 / 18</span>
+    <span class="label" id="nav-label">Cover</span>
+    <button onclick="goToSlide(currentSlide + 1)">›</button>
+  </div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script type="text/babel" src="components/shell.jsx"></script>
+  <script type="text/babel" src="components/ops-view.jsx"></script>
+  <script type="text/babel" src="components/dashboard.jsx"></script>
+  <script type="text/babel" src="components/appointments.jsx"></script>
+  <script type="text/babel" src="components/clients-providers.jsx"></script>
+  <script type="text/babel" src="components/customer-detail.jsx"></script>
+
+  <script type="text/babel">
+    const { OpsView, Dashboard, MapView, Scheduled, CalendarView,
+            ClientsList, AddClient, ProvidersList, CustomerDetail } = window;
+
+    const Cover = () => (
+      <div className="cover active" id="slide-cover">
+        <h1>alice<span className="dot">.</span>care</h1>
+        <div className="sub">Operations console — a design exploration</div>
+        <div className="body">
+          The current console is a dense React-Bootstrap grid with raw log output, colored severity text, and little visual hierarchy. This exploration keeps every function and every data field in place — operators can still scan events, triage delays, assign providers, manage clients &amp; providers — but rebuilds the surface around a clearer information architecture: a persistent <strong>navy sidebar</strong>, zone-aware topbar, <strong>triage-first Ops View</strong>, KPI-led Dashboard, and a focused Customer 360° with tabbed detail.
+        </div>
+        <div className="grid">
+          <div><strong>Navy 900 + warm orange 500</strong> · restrained status palette</div>
+          <div><strong>Poppins</strong> · tight letter-spacing for titles</div>
+          <div><strong>13px base</strong> · 56px topbar · 232px sidebar</div>
+          <div><strong>1280 × 820</strong> · 17 screens + cover</div>
+        </div>
+        <div className="footer">
+          <span>alice.care · ops console</span>
+          <span>design exploration v1</span>
+        </div>
+      </div>
+    );
+
+    const slides = [
+      { label: 'Cover', el: <Cover/> },
+      { label: '01 · Ops View', el: <OpsView/> },
+      { label: '02 · Dashboard', el: <Dashboard/> },
+      { label: '03 · Map View', el: <MapView/> },
+      { label: '04 · Scheduled Appointments', el: <Scheduled/> },
+      { label: '05 · Calendar', el: <CalendarView/> },
+      { label: '06 · Client List', el: <ClientsList/> },
+      { label: '07 · Add Client', el: <AddClient/> },
+      { label: '08 · Provider List', el: <ProvidersList/> },
+      { label: '09 · Customer · Service Recipient', el: <CustomerDetail initialTab={0} label="Service Recipient"/> },
+      { label: '10 · Customer · Responsible Party', el: <CustomerDetail initialTab={1} label="Responsible Party"/> },
+      { label: '11 · Customer · Care Plan', el: <CustomerDetail initialTab={2} label="Care Plan"/> },
+      { label: '12 · Customer · Provider Preferences', el: <CustomerDetail initialTab={4} label="Provider Preferences"/> },
+      { label: '13 · Customer · Recurring', el: <CustomerDetail initialTab={5} label="Recurring"/> },
+      { label: '14 · Customer · Scheduled Appointments', el: <CustomerDetail initialTab={6} label="Scheduled Appointments"/> },
+      { label: '15 · Customer · Device', el: <CustomerDetail initialTab={7} label="Device"/> },
+      { label: '16 · Customer · Payment', el: <CustomerDetail initialTab={8} label="Payment"/> },
+      { label: '17 · Customer · Documents', el: <CustomerDetail initialTab={9} label="Documents"/> },
+    ];
+
+    const App = () => (
+      <>
+        {slides.map((s, i) => (
+          i === 0
+            ? React.cloneElement(s.el, { key: i })
+            : <div className={"slide" + (i === 0 ? ' active' : '')} id={`slide-${i}`} data-idx={i} key={i}>{s.el}</div>
+        ))}
+      </>
+    );
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+
+    // Navigation
+    window.currentSlide = 0;
+    window.goToSlide = function(n) {
+      const total = slides.length;
+      n = Math.max(0, Math.min(total - 1, n));
+      window.currentSlide = n;
+      // hide all
+      document.querySelectorAll('.slide, .cover').forEach(el => el.classList.remove('active'));
+      if (n === 0) {
+        const c = document.getElementById('slide-cover');
+        if (c) c.classList.add('active');
+      } else {
+        const s = document.getElementById(`slide-${n}`);
+        if (s) s.classList.add('active');
+      }
+      const cnt = document.getElementById('nav-count');
+      const lbl = document.getElementById('nav-label');
+      if (cnt) cnt.textContent = `${n + 1} / ${total}`;
+      if (lbl) lbl.textContent = slides[n].label;
+    };
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); window.goToSlide(window.currentSlide + 1); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); window.goToSlide(window.currentSlide - 1); }
+    });
+  </script>
+</body>
+</html>

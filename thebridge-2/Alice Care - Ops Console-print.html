@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>alice.care — Operations Console (Print)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles/tokens.css"/>
+  <link rel="stylesheet" href="styles/extras.css"/>
+  <style>
+    html, body { background: #f0eee9; margin: 0; padding: 0; }
+    body { font-family: 'Poppins', system-ui, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
+
+    .page {
+      width: 1280px;
+      background: #fff;
+      margin: 24px auto;
+      position: relative;
+      break-inside: avoid;
+      page-break-inside: avoid;
+      break-after: page;
+      page-break-after: always;
+    }
+    .page:last-child { break-after: auto; page-break-after: auto; }
+    .page-label {
+      padding: 10px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(60,50,40,0.7);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      background: #f0eee9;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+    .ac-screen {
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      margin: 0 !important;
+    }
+    /* Remove hover states for print */
+    .ac-table tbody tr:hover { background: transparent !important; }
+    .ac-nav-item:hover { background: transparent !important; }
+    .ac-btn:hover { transform: none !important; }
+
+    .cover {
+      width: 1280px;
+      background: #fff;
+      margin: 24px auto;
+      padding: 80px 80px 70px;
+      break-after: page;
+      page-break-after: always;
+    }
+    .cover h1 { font-size: 64px; font-weight: 700; color: #1A365C; letter-spacing: -1.6px; margin: 0; line-height: 1; }
+    .cover h1 .dot { color: #F57600; }
+    .cover .sub { font-size: 26px; font-weight: 500; color: rgba(40,30,20,0.7); margin-top: 10px; letter-spacing: -0.4px; }
+    .cover .body { font-size: 15px; color: rgba(60,50,40,0.75); line-height: 1.6; margin-top: 36px; max-width: 820px; }
+    .cover .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px 28px; margin-top: 40px; font-size: 13px; color: rgba(60,50,40,0.6); }
+    .cover .grid strong { color: #1A365C; }
+    .cover .index { margin-top: 50px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 24px; }
+    .cover .index h3 { font-size: 13px; font-weight: 700; color: #1A365C; letter-spacing: 0.5px; text-transform: uppercase; margin: 0 0 14px; }
+    .cover .index ol { margin: 0; padding-left: 20px; columns: 2; column-gap: 40px; font-size: 13px; color: #2a251f; line-height: 1.9; }
+    .cover .index li::marker { color: #F57600; font-weight: 700; }
+
+    @page { size: 1328px 868px; margin: 0; }
+    @media print {
+      html, body { background: #fff; }
+      .page, .cover { margin: 0 auto; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="cover">
+    <h1>alice<span class="dot">.</span>care</h1>
+    <div class="sub">Operations console — a design exploration</div>
+    <div class="body">
+      The current console is a dense React-Bootstrap grid with raw log output, colored severity text, and little visual hierarchy. This exploration keeps every function and every data field in place — operators can still scan events, triage delays, assign providers, manage clients &amp; providers — but rebuilds the surface around a clearer information architecture: a persistent <strong>navy sidebar</strong>, zone-aware topbar, <strong>triage-first Ops View</strong>, KPI-led Dashboard, and a focused Customer 360° with tabbed detail.
+    </div>
+    <div class="grid">
+      <div><strong>Navy 900 + warm orange 500</strong> · restrained status palette</div>
+      <div><strong>Poppins</strong> · tight letter-spacing for titles</div>
+      <div><strong>13px base</strong> · 56px topbar · 232px sidebar</div>
+      <div><strong>1280 × 820</strong> artboards · 17 screens</div>
+    </div>
+    <div class="index">
+      <h3>Screens</h3>
+      <ol>
+        <li>Ops View</li>
+        <li>Dashboard</li>
+        <li>Map View</li>
+        <li>Scheduled Appointments</li>
+        <li>Calendar</li>
+        <li>Client List</li>
+        <li>Add Client</li>
+        <li>Provider List</li>
+        <li>Customer · Service Recipient</li>
+        <li>Customer · Responsible Party</li>
+        <li>Customer · Care Plan</li>
+        <li>Customer · Provider Preferences</li>
+        <li>Customer · Recurring</li>
+        <li>Customer · Scheduled Appointments</li>
+        <li>Customer · Device</li>
+        <li>Customer · Payment</li>
+        <li>Customer · Documents</li>
+      </ol>
+    </div>
+  </div>
+
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script type="text/babel" src="components/shell.jsx"></script>
+  <script type="text/babel" src="components/ops-view.jsx"></script>
+  <script type="text/babel" src="components/dashboard.jsx"></script>
+  <script type="text/babel" src="components/appointments.jsx"></script>
+  <script type="text/babel" src="components/clients-providers.jsx"></script>
+  <script type="text/babel" src="components/customer-detail.jsx"></script>
+
+  <script type="text/babel">
+    const { OpsView, Dashboard, MapView, Scheduled, CalendarView,
+            ClientsList, AddClient, ProvidersList, CustomerDetail } = window;
+
+    const screens = [
+      { label: '01 · Ops View', el: <OpsView/> },
+      { label: '02 · Dashboard', el: <Dashboard/> },
+      { label: '03 · Map View', el: <MapView/> },
+      { label: '04 · Scheduled Appointments', el: <Scheduled/> },
+      { label: '05 · Calendar', el: <CalendarView/> },
+      { label: '06 · Client List', el: <ClientsList/> },
+      { label: '07 · Add Client', el: <AddClient/> },
+      { label: '08 · Provider List', el: <ProvidersList/> },
+      { label: '09 · Customer · Service Recipient', el: <CustomerDetail initialTab={0} label="Service Recipient"/> },
+      { label: '10 · Customer · Responsible Party', el: <CustomerDetail initialTab={1} label="Responsible Party"/> },
+      { label: '11 · Customer · Care Plan', el: <CustomerDetail initialTab={2} label="Care Plan"/> },
+      { label: '12 · Customer · Provider Preferences', el: <CustomerDetail initialTab={4} label="Provider Preferences"/> },
+      { label: '13 · Customer · Recurring', el: <CustomerDetail initialTab={5} label="Recurring"/> },
+      { label: '14 · Customer · Scheduled Appointments', el: <CustomerDetail initialTab={6} label="Scheduled Appointments"/> },
+      { label: '15 · Customer · Device', el: <CustomerDetail initialTab={7} label="Device"/> },
+      { label: '16 · Customer · Payment', el: <CustomerDetail initialTab={8} label="Payment"/> },
+      { label: '17 · Customer · Documents', el: <CustomerDetail initialTab={9} label="Documents"/> },
+    ];
+
+    const App = () => (
+      <>
+        {screens.map((s, i) => (
+          <div className="page" key={i}>
+            <div className="page-label">{s.label}</div>
+            {s.el}
+          </div>
+        ))}
+      </>
+    );
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+
+    // Wait for fonts + Babel scripts + layout, then print
+    (async () => {
+      try { await document.fonts.ready; } catch (e) {}
+      // Wait an extra beat so all Babel-transformed scripts finish and React renders
+      setTimeout(() => { window.print(); }, 1200);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>alice.care — Operations Console</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles/tokens.css"/>
+  <link rel="stylesheet" href="styles/extras.css"/>
+  <style>
+    html, body { background: #f0eee9; }
+    /* Soft shadow around each artboard screen */
+    .ac-screen { box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 12px 40px rgba(10,30,60,0.12); }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script type="text/babel" src="design-canvas.jsx"></script>
+  <script type="text/babel" src="components/shell.jsx"></script>
+  <script type="text/babel" src="components/ops-view.jsx"></script>
+  <script type="text/babel" src="components/dashboard.jsx"></script>
+  <script type="text/babel" src="components/appointments.jsx"></script>
+  <script type="text/babel" src="components/clients-providers.jsx"></script>
+  <script type="text/babel" src="components/customer-detail.jsx"></script>
+
+  <script type="text/babel">
+    const { OpsView, Dashboard, MapView, Scheduled, CalendarView,
+            ClientsList, AddClient, ProvidersList, CustomerDetail } = window;
+
+    const SCREEN_W = 1280;
+    const SCREEN_H = 820;
+
+    // Assumption / reasoning note — shown once at the top of the canvas
+    const Intro = () => (
+      <div style={{padding:'60px 60px 0', maxWidth: 1000}}>
+        <div style={{fontSize:48, fontWeight:700, color:'#1A365C', letterSpacing:-1, lineHeight:1.05}}>alice<span style={{color:'#F57600'}}>.</span>care</div>
+        <div style={{fontSize:22, fontWeight:500, color:'rgba(40,30,20,0.7)', marginTop:6, letterSpacing:-0.3}}>Operations console — a design exploration</div>
+        <div style={{fontSize:15, color:'rgba(60,50,40,0.7)', lineHeight:1.55, marginTop:24, maxWidth:760}}>
+          The current console is a dense React-Bootstrap grid with raw log output, colored severity text, and little visual hierarchy. This exploration keeps every function and every data field in place — operators can still scan events, triage delays, assign providers, manage clients &amp; providers — but rebuilds the surface around a clearer information architecture: a persistent <strong>navy sidebar</strong>, zone-aware topbar, <strong>triage-first Ops View</strong>, KPI-led Dashboard, and a focused Customer 360° with tabbed detail.
+        </div>
+        <div style={{fontSize:13, color:'rgba(60,50,40,0.55)', marginTop:18, display:'flex', gap:28, flexWrap:'wrap'}}>
+          <div><strong style={{color:'#1A365C'}}>Navy 900 + warm orange 500</strong> · restrained status palette</div>
+          <div><strong style={{color:'#1A365C'}}>Poppins</strong> · tight letter-spacing for titles</div>
+          <div><strong style={{color:'#1A365C'}}>13px base</strong> · 56px topbar · 232px sidebar</div>
+          <div><strong style={{color:'#1A365C'}}>1280 × 820</strong> artboards</div>
+        </div>
+      </div>
+    );
+
+    const App = () => (
+      <>
+        <Intro/>
+        <DesignCanvas>
+          <DCSection id="home" title="Home" subtitle="Triage, KPIs, and live location — what ops needs in the first 10 seconds">
+            <DCArtboard id="ops" label="01 · Ops View" width={SCREEN_W} height={SCREEN_H}><OpsView/></DCArtboard>
+            <DCArtboard id="dashboard" label="02 · Dashboard" width={SCREEN_W} height={SCREEN_H}><Dashboard/></DCArtboard>
+            <DCArtboard id="map" label="03 · Map View" width={SCREEN_W} height={SCREEN_H}><MapView/></DCArtboard>
+          </DCSection>
+
+          <DCSection id="appointments" title="Appointments" subtitle="Scheduled list and weekly calendar">
+            <DCArtboard id="scheduled" label="04 · Scheduled" width={SCREEN_W} height={SCREEN_H}><Scheduled/></DCArtboard>
+            <DCArtboard id="calendar" label="05 · Calendar" width={SCREEN_W} height={SCREEN_H}><CalendarView/></DCArtboard>
+          </DCSection>
+
+          <DCSection id="people" title="Clients & Providers" subtitle="Directory + creation flow">
+            <DCArtboard id="clients" label="06 · Client List" width={SCREEN_W} height={SCREEN_H}><ClientsList/></DCArtboard>
+            <DCArtboard id="add-client" label="07 · Add Client" width={SCREEN_W} height={SCREEN_H}><AddClient/></DCArtboard>
+            <DCArtboard id="providers" label="08 · Provider List" width={SCREEN_W} height={SCREEN_H}><ProvidersList/></DCArtboard>
+          </DCSection>
+
+          <DCSection id="customer-360" title="Customer 360°" subtitle="Tabbed detail for a single care recipient — every tab as its own artboard">
+            <DCArtboard id="cust-recipient" label="09 · Service Recipient" width={SCREEN_W} height={SCREEN_H}><CustomerDetail initialTab={0} label="09 Service Recipient"/></DCArtboard>
+            <DCArtboard id="cust-party" label="10 · Responsible Party" width={SCREEN_W} height={SCREEN_H}><CustomerDetail initialTab={1} label="10 Responsible Party"/></DCArtboard>
+            <DCArtboard id="cust-careplan" label="11 · Care Plan" width={SCREEN_W} height={SCREEN_H}><CustomerDetail initialTab={2} label="11 Care Plan"/></DCArtboard>
+            <DCArtboard id="cust-prefs" label="12 · Provider Preferences" width={SCREEN_W} height={SCREEN_H}><CustomerDetail initialTab={4} label="12 Provider Preferences"/></DCArtboard>
+            <DCArtboard id="cust-recurring" label="13 · Recurring" width={SCREEN_W} height={SCREEN_H}><CustomerDetail initialTab={5} label="13 Recurring"/></DCArtboard>
+            <DCArtboard id="cust-sched" label="14 · Scheduled Appts" width={SCREEN_W} height={SCREEN_H}><CustomerDetail initialTab={6} label="14 Scheduled Appts"/></DCArtboard>
+            <DCArtboard id="cust-device" label="15 · Device" width={SCREEN_W} height={SCREEN_H}><CustomerDetail initialTab={7} label="15 Device"/></DCArtboard>
+            <DCArtboard id="cust-payment" label="16 · Payment" width={SCREEN_W} height={SCREEN_H}><CustomerDetail initialTab={8} label="16 Payment"/></DCArtboard>
+            <DCArtboard id="cust-docs" label="17 · Documents" width={SCREEN_W} height={SCREEN_H}><CustomerDetail initialTab={9} label="17 Documents"/></DCArtboard>
+          </DCSection>
+        </DesignCanvas>
+      </>
+    );
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+  </script>
+</body>
+</html>

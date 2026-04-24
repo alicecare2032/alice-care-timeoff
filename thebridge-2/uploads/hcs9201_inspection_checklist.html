@@ -1,0 +1,2929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HCS 9201 Inspection Checklist | Alice Care</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Poppins', Arial, Helvetica, sans-serif;
+      background-color: #F0F7FF;
+      color: #2D4A6F;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page-wrapper { padding: 30px 15px 50px; }
+
+    .app-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      background: #FFFFFF;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 6px 28px rgba(26, 54, 92, 0.08);
+    }
+
+    .app-header {
+      background: linear-gradient(135deg, #F57600 0%, #E06900 100%);
+      padding: 22px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+    .app-header::before {
+      content: '';
+      position: absolute;
+      width: 200px; height: 200px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 50%;
+      top: -90px; right: 6%;
+    }
+    .logo { font-size: 26px; font-weight: 700; position: relative; z-index: 1; }
+    .logo .alice { color: #FFFFFF; }
+    .logo .care { color: #1A365C; font-weight: 400; }
+    .header-label {
+      color: rgba(255, 255, 255, 0.92);
+      font-size: 12px;
+      font-weight: 500;
+      position: relative;
+      z-index: 1;
+      text-align: right;
+    }
+    .header-label strong {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+    .header-label small {
+      display: block;
+      font-size: 10.5px;
+      opacity: 0.85;
+      font-weight: 400;
+      margin-top: 3px;
+    }
+
+    .title-section {
+      padding: 24px 36px 20px;
+      border-bottom: 1px solid #E2E8F0;
+    }
+    .title-section h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1A365C;
+      margin-bottom: 6px;
+    }
+    .title-section h1 span { color: #F57600; }
+    .title-section p {
+      font-size: 13px;
+      color: #4A5F7F;
+      line-height: 1.55;
+      max-width: 900px;
+    }
+
+    .org-strip {
+      background: #FAFCFF;
+      padding: 14px 36px;
+      border-bottom: 1px solid #E2E8F0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      align-items: center;
+      font-size: 12px;
+    }
+    .org-item { display: flex; flex-direction: column; gap: 2px; }
+    .org-item .lbl {
+      font-size: 10px;
+      font-weight: 700;
+      color: #7A8BA3;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .org-item .val { font-size: 13px; font-weight: 600; color: #1A365C; }
+    .org-item .val.orange { color: #F57600; }
+
+    .folder-hero {
+      background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+      padding: 18px 36px;
+      border-bottom: 1px solid #6EE7B7;
+    }
+    .folder-hero.unconfigured {
+      background: linear-gradient(135deg, #FFF9F0 0%, #FFF3E8 100%);
+      border-bottom-color: #F5C992;
+    }
+    .folder-hero.error {
+      background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%);
+      border-bottom-color: #FCA5A5;
+    }
+    .fh-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #065F46;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .folder-hero.unconfigured .fh-label { color: #B85300; }
+    .folder-hero.error .fh-label { color: #991B1B; }
+    .fh-label::before {
+      content: '';
+      width: 3px;
+      height: 12px;
+      background: #0F766E;
+      border-radius: 2px;
+    }
+    .folder-hero.unconfigured .fh-label::before { background: #F57600; }
+    .folder-hero.error .fh-label::before { background: #DC2626; }
+    .fh-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 10px;
+      align-items: center;
+    }
+    .fh-folder-name { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .fh-icon {
+      width: 36px; height: 36px;
+      border-radius: 9px;
+      background: #0F766E;
+      color: #FFFFFF;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .folder-hero.unconfigured .fh-icon { background: #F57600; }
+    .folder-hero.error .fh-icon { background: #DC2626; }
+    .fh-text { min-width: 0; }
+    .fh-title { font-size: 14px; font-weight: 700; color: #064E3B; line-height: 1.2; }
+    .folder-hero.unconfigured .fh-title { color: #5A3410; }
+    .folder-hero.error .fh-title { color: #7F1D1D; }
+    .fh-sub {
+      font-size: 11.5px;
+      font-weight: 500;
+      color: #047857;
+      line-height: 1.3;
+      margin-top: 2px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 540px;
+    }
+    .folder-hero.unconfigured .fh-sub { color: #B85300; }
+    .folder-hero.error .fh-sub { color: #991B1B; }
+
+    .fh-btn {
+      padding: 11px 20px;
+      border-radius: 9px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+    .fh-btn-open { background: #0F766E; color: #FFFFFF; }
+    .fh-btn-open:hover {
+      background: #115E59;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);
+    }
+    .fh-btn-open:disabled {
+      background: #D1FAE5;
+      color: #065F46;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    .fh-btn-config { background: #F57600; color: #FFFFFF; }
+    .fh-btn-config:hover { background: #E06900; transform: translateY(-1px); }
+    .fh-btn-edit {
+      background: #FFFFFF;
+      color: #0F766E;
+      border: 1.5px solid #6EE7B7;
+      padding: 10px 14px;
+      font-size: 11.5px;
+    }
+    .fh-btn-edit:hover { border-color: #0F766E; }
+    .fh-btn-refresh {
+      background: transparent;
+      color: #0F766E;
+      padding: 10px 12px;
+      border: 1.5px solid transparent;
+      font-size: 11.5px;
+    }
+    .fh-btn-refresh:hover { background: rgba(15, 118, 110, 0.08); }
+
+    .fh-edit-panel {
+      display: none;
+      margin-top: 12px;
+      padding: 14px;
+      background: #FFFFFF;
+      border: 1.5px solid #6EE7B7;
+      border-radius: 9px;
+    }
+    .folder-hero.unconfigured .fh-edit-panel { border-color: #F5C992; }
+    .folder-hero.error .fh-edit-panel { border-color: #FCA5A5; }
+    .fh-edit-panel.open { display: block; }
+    .fh-edit-panel label {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #1A365C;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .fh-edit-panel .helper {
+      font-size: 10.5px;
+      color: #7A8BA3;
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+    .fh-edit-panel input {
+      width: 100%;
+      padding: 10px 12px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 12.5px;
+      color: #1A365C;
+      background: #FFFFFF;
+      border: 1.5px solid #D0DDF0;
+      border-radius: 7px;
+      outline: none;
+      transition: all 0.15s;
+    }
+    .fh-edit-panel input:focus {
+      border-color: #0F766E;
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+    }
+    .fh-edit-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .fh-save, .fh-cancel {
+      padding: 8px 16px;
+      border-radius: 7px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: all 0.15s;
+    }
+    .fh-save { background: #1B7A3D; color: #FFFFFF; }
+    .fh-save:hover { background: #166530; }
+    .fh-save:disabled { background: #B7DFC6; cursor: not-allowed; }
+    .fh-cancel {
+      background: #FFFFFF;
+      color: #4A5F7F;
+      border-color: #D0DDF0;
+    }
+    .fh-cancel:hover { border-color: #7A8BA3; }
+
+    .setup-banner {
+      margin: 16px 36px 0;
+      padding: 14px 18px;
+      background: #FFFBF0;
+      border: 1px solid #F5DFA0;
+      border-left: 4px solid #F57600;
+      border-radius: 8px;
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: #5A4A1E;
+    }
+    .setup-banner.hidden { display: none; }
+    .setup-banner strong { color: #B85300; }
+    .setup-banner ol { padding-left: 22px; margin-top: 6px; }
+    .setup-banner ol li { margin-bottom: 3px; }
+    .setup-banner .close-banner {
+      float: right;
+      background: transparent;
+      border: none;
+      color: #B85300;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 0 4px;
+      font-weight: 700;
+    }
+
+    .stats-bar {
+      padding: 20px 36px;
+      border-bottom: 1px solid #E2E8F0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+    .stat-card {
+      background: #F0F7FF;
+      border: 1px solid #D0DDF0;
+      border-radius: 10px;
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .stat-card .stat-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #4A5F7F;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .stat-card .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1A365C;
+      line-height: 1;
+    }
+    .stat-card .stat-sub { font-size: 11px; color: #7A8BA3; }
+    .stat-card.complete {
+      background: linear-gradient(135deg, #F0FAF3 0%, #E6F4EA 100%);
+      border-color: #B7DFC6;
+    }
+    .stat-card.complete .stat-value { color: #1B7A3D; }
+    .stat-card.complete .stat-label { color: #1B7A3D; }
+    .stat-card.pending {
+      background: linear-gradient(135deg, #FFF3E8 0%, #FFE5CC 100%);
+      border-color: #F5C992;
+    }
+    .stat-card.pending .stat-value { color: #B85300; }
+    .stat-card.pending .stat-label { color: #B85300; }
+    .stat-card.files {
+      background: linear-gradient(135deg, #F0F9FF 0%, #DBEAFE 100%);
+      border-color: #93C5FD;
+    }
+    .stat-card.files .stat-value { color: #1D4ED8; }
+    .stat-card.files .stat-label { color: #1D4ED8; }
+
+    .action-bar {
+      padding: 14px 36px;
+      background: #FAFCFF;
+      border-bottom: 1px solid #E2E8F0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .filter-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .filter-chip {
+      padding: 7px 14px;
+      background: #FFFFFF;
+      border: 1.5px solid #D0DDF0;
+      border-radius: 20px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #4A5F7F;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .filter-chip:hover { border-color: #F5B985; }
+    .filter-chip.active {
+      background: #F57600;
+      border-color: #F57600;
+      color: #FFFFFF;
+    }
+    .action-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      padding: 8px 14px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+    .btn-secondary {
+      background: #FFFFFF;
+      color: #1A365C;
+      border: 1.5px solid #D0DDF0;
+    }
+    .btn-secondary:hover { border-color: #F57600; color: #F57600; }
+    .btn-danger {
+      background: #FFFFFF;
+      color: #B91C1C;
+      border: 1.5px solid #FCA5A5;
+    }
+    .btn-danger:hover { background: #FEF2F2; border-color: #DC2626; }
+
+    .checklist-section {
+      padding: 24px 36px;
+      border-bottom: 1px solid #E2E8F0;
+    }
+    .checklist-section:last-child { border-bottom: none; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .section-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: #FFFFFF;
+      flex-shrink: 0;
+    }
+    .section-icon.blue { background: linear-gradient(135deg, #1A365C 0%, #2D4A6F 100%); }
+    .section-icon.orange { background: linear-gradient(135deg, #F57600 0%, #E06900 100%); }
+    .section-icon.green { background: linear-gradient(135deg, #1B7A3D 0%, #166530 100%); }
+
+    .section-title-group { flex: 1; min-width: 0; }
+    .section-title { font-size: 16px; font-weight: 700; color: #1A365C; margin-bottom: 2px; }
+    .section-subtitle { font-size: 11.5px; color: #7A8BA3; }
+    .section-progress {
+      font-size: 12px;
+      font-weight: 700;
+      color: #4A5F7F;
+      background: #F0F7FF;
+      padding: 5px 10px;
+      border-radius: 14px;
+      border: 1px solid #D0DDF0;
+      white-space: nowrap;
+    }
+
+    .checklist-item {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin-bottom: 10px;
+      transition: border-color 0.18s, box-shadow 0.18s;
+    }
+    .checklist-item:hover {
+      border-color: #F5B985;
+      box-shadow: 0 2px 8px rgba(245, 118, 0, 0.06);
+    }
+    .checklist-item.complete {
+      background: linear-gradient(135deg, #F0FAF3 0%, #F7FCF9 100%);
+      border-color: #B7DFC6;
+    }
+    .checklist-item.complete:hover { border-color: #1B7A3D; }
+
+    .item-top {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 14px;
+      align-items: start;
+    }
+    .item-check {
+      position: relative;
+      width: 22px;
+      height: 22px;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+    .item-check input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+    }
+    .item-check .checkmark {
+      position: absolute;
+      top: 0; left: 0;
+      width: 22px; height: 22px;
+      background: #FFFFFF;
+      border: 2px solid #D0DDF0;
+      border-radius: 6px;
+      transition: all 0.15s;
+    }
+    .item-check input:hover ~ .checkmark { border-color: #F57600; }
+    .item-check input:checked ~ .checkmark {
+      background: #1B7A3D;
+      border-color: #1B7A3D;
+    }
+    .item-check .checkmark::after {
+      content: '';
+      position: absolute;
+      display: none;
+      left: 6px; top: 2px;
+      width: 6px; height: 11px;
+      border: solid white;
+      border-width: 0 2.5px 2.5px 0;
+      transform: rotate(45deg);
+    }
+    .item-check input:checked ~ .checkmark::after { display: block; }
+
+    .item-content { min-width: 0; }
+    .item-code {
+      display: inline-block;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: #F57600;
+      background: #FFF3E8;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 6px;
+      border: 1px solid #F5C992;
+    }
+    .item-text { font-size: 13px; line-height: 1.55; color: #2D4A6F; font-weight: 500; }
+    .item-subtext {
+      font-size: 11.5px;
+      line-height: 1.5;
+      color: #7A8BA3;
+      margin-top: 6px;
+      padding-left: 10px;
+      border-left: 2px solid #D0DDF0;
+    }
+
+    .status-chip {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      padding: 3px 9px;
+      border-radius: 10px;
+      white-space: nowrap;
+    }
+    .status-chip.pending {
+      background: #FFF3E8;
+      color: #B85300;
+      border: 1px solid #F5C992;
+    }
+    .status-chip.done {
+      background: #E6F4EA;
+      color: #1B7A3D;
+      border: 1px solid #B7DFC6;
+    }
+    .status-chip.warning {
+      background: #FEF3C7;
+      color: #92400E;
+      border: 1px solid #FCD34D;
+    }
+    .status-chip.expired {
+      background: #FEE2E2;
+      color: #991B1B;
+      border: 1px solid #FCA5A5;
+    }
+
+    /* Expiration row */
+    .expiration-row {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: #FAFCFF;
+      border: 1px dashed #D0DDF0;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .expiration-row.active {
+      background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+      border: 1px solid #93C5FD;
+      border-style: solid;
+    }
+    .expiration-row.warning {
+      background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+      border: 1px solid #FCD34D;
+      border-style: solid;
+    }
+    .expiration-row.expired {
+      background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%);
+      border: 1px solid #FCA5A5;
+      border-style: solid;
+    }
+    .expiration-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #7A8BA3;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .expiration-row.active .expiration-label { color: #1D4ED8; }
+    .expiration-row.warning .expiration-label { color: #92400E; }
+    .expiration-row.expired .expiration-label { color: #991B1B; }
+    .expiration-date-input {
+      padding: 5px 9px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: #1A365C;
+      background: #FFFFFF;
+      border: 1.5px solid #D0DDF0;
+      border-radius: 6px;
+      outline: none;
+      cursor: pointer;
+    }
+    .expiration-date-input:focus {
+      border-color: #1D4ED8;
+      box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
+    }
+    /* Combined text + calendar date picker */
+    .exp-date-wrapper {
+      display: inline-flex;
+      align-items: stretch;
+      gap: 0;
+      position: relative;
+    }
+    .exp-date-text {
+      padding: 5px 9px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #1A365C;
+      background: #FFFFFF;
+      border: 1.5px solid #D0DDF0;
+      border-right: none;
+      border-radius: 6px 0 0 6px;
+      outline: none;
+      width: 110px;
+      letter-spacing: 0.3px;
+      text-align: center;
+    }
+    .exp-date-text::placeholder {
+      color: #93A0B4;
+      font-weight: 400;
+      letter-spacing: 0.2px;
+    }
+    .exp-date-text:focus {
+      border-color: #1D4ED8;
+      box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
+      position: relative;
+      z-index: 2;
+    }
+    .exp-cal-btn {
+      padding: 5px 9px;
+      background: #F0F7FF;
+      color: #1D4ED8;
+      border: 1.5px solid #D0DDF0;
+      border-radius: 0 6px 6px 0;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .exp-cal-btn:hover {
+      background: #DBEAFE;
+      border-color: #93C5FD;
+    }
+    .exp-date-picker-hidden {
+      position: absolute;
+      left: 0; top: 100%;
+      opacity: 0;
+      pointer-events: none;
+      width: 1px; height: 1px;
+      border: none;
+      padding: 0;
+    }
+    .expiration-display {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #1A365C;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex: 1;
+      min-width: 0;
+    }
+    .expiration-row.warning .expiration-display { color: #92400E; }
+    .expiration-row.expired .expiration-display { color: #991B1B; }
+    .expiration-days {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .expiration-row.active .expiration-days {
+      background: #DBEAFE;
+      color: #1D4ED8;
+      border: 1px solid #93C5FD;
+    }
+    .expiration-row.warning .expiration-days {
+      background: #FDE68A;
+      color: #78350F;
+      border: 1px solid #F59E0B;
+    }
+    .expiration-row.expired .expiration-days {
+      background: #FCA5A5;
+      color: #7F1D1D;
+      border: 1px solid #DC2626;
+    }
+    .expiration-actions {
+      display: flex;
+      gap: 5px;
+      margin-left: auto;
+    }
+    .exp-btn {
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 10.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .exp-btn.save { background: #1B7A3D; color: #FFFFFF; }
+    .exp-btn.save:hover { background: #166530; }
+    .exp-btn.clear {
+      background: #FFFFFF;
+      color: #B91C1C;
+      border-color: #FCA5A5;
+    }
+    .exp-btn.clear:hover { background: #FEF2F2; border-color: #DC2626; }
+    .exp-btn.add {
+      background: transparent;
+      color: #1D4ED8;
+      border: 1px dashed #93C5FD;
+    }
+    .exp-btn.add:hover { background: #F0F9FF; border-style: solid; }
+
+    /* Sync indicator */
+    .sync-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 10px;
+      background: #E6F4EA;
+      color: #1B7A3D;
+      border: 1px solid #B7DFC6;
+      white-space: nowrap;
+    }
+    .sync-indicator.syncing {
+      background: #FFF3E8;
+      color: #B85300;
+      border-color: #F5C992;
+    }
+    .sync-indicator.error {
+      background: #FEE2E2;
+      color: #991B1B;
+      border-color: #FCA5A5;
+    }
+    .sync-indicator::before {
+      content: '●';
+      font-size: 9px;
+    }
+    .sync-indicator.syncing::before { animation: pulse 1.2s infinite; }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* Reference links container */
+    .reflink-row {
+      margin-top: 12px;
+      padding: 10px 12px;
+      background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+      border: 1px solid #93C5FD;
+      border-left: 3px solid #1D4ED8;
+      border-radius: 8px;
+    }
+    .reflink-row.empty {
+      background: #FAFCFF;
+      border: 1px dashed #D0DDF0;
+    }
+    .reflink-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      gap: 10px;
+    }
+    .reflink-header-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #1D4ED8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .reflink-row.empty .reflink-header-label { color: #7A8BA3; }
+    .reflink-count {
+      background: #DBEAFE;
+      color: #1D4ED8;
+      padding: 1px 7px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 700;
+      border: 1px solid #93C5FD;
+    }
+    .reflink-empty-msg {
+      font-size: 11.5px;
+      color: #7A8BA3;
+      font-style: italic;
+      padding: 4px 0 8px;
+    }
+    .reflink-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .reflink-item {
+      background: #FFFFFF;
+      border: 1px solid #BFDBFE;
+      border-radius: 6px;
+      padding: 7px 10px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+    .reflink-item-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 5px;
+      background: #DBEAFE;
+      color: #1D4ED8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+    .reflink-item-info {
+      min-width: 0;
+      overflow: hidden;
+    }
+    .reflink-item .domain {
+      color: #1D4ED8;
+      font-weight: 700;
+      font-size: 12px;
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .reflink-item .desc {
+      color: #4A5F7F;
+      font-weight: 500;
+      font-size: 11px;
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-top: 1px;
+    }
+    .reflink-item-actions {
+      display: flex;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .reflink-btn {
+      padding: 5px 9px;
+      border-radius: 5px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 10.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      white-space: nowrap;
+    }
+    .reflink-btn.open {
+      background: #1D4ED8;
+      color: #FFFFFF;
+    }
+    .reflink-btn.open:hover { background: #1E40AF; }
+    .reflink-btn.edit {
+      background: #FFFFFF;
+      color: #1D4ED8;
+      border-color: #93C5FD;
+    }
+    .reflink-btn.edit:hover { border-color: #1D4ED8; }
+    .reflink-btn.delete {
+      background: #FFFFFF;
+      color: #B91C1C;
+      border-color: #FCA5A5;
+      padding: 5px 8px;
+    }
+    .reflink-btn.delete:hover { background: #FEF2F2; border-color: #DC2626; }
+    .reflink-add-btn {
+      margin-top: 8px;
+      width: 100%;
+      padding: 8px 10px;
+      background: transparent;
+      color: #1D4ED8;
+      border: 1px dashed #93C5FD;
+      border-radius: 6px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .reflink-add-btn:hover {
+      background: #F0F9FF;
+      border-style: solid;
+    }
+    .reflink-row.empty .reflink-add-btn {
+      margin-top: 0;
+      border-color: #D0DDF0;
+      color: #4A5F7F;
+    }
+    .reflink-row.empty .reflink-add-btn:hover {
+      border-color: #1D4ED8;
+      color: #1D4ED8;
+    }
+
+    .reflink-edit {
+      display: none;
+      margin-top: 8px;
+      padding: 10px;
+      background: #FFFFFF;
+      border: 1.5px solid #93C5FD;
+      border-radius: 7px;
+    }
+    .reflink-edit.open { display: block; }
+    .reflink-edit .field-group { display: grid; gap: 8px; }
+    .reflink-edit label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #1A365C;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 3px;
+      display: block;
+    }
+    .reflink-edit input {
+      width: 100%;
+      padding: 8px 10px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 12px;
+      color: #1A365C;
+      background: #FFFFFF;
+      border: 1.5px solid #D0DDF0;
+      border-radius: 6px;
+      outline: none;
+    }
+    .reflink-edit input:focus {
+      border-color: #1D4ED8;
+      box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1);
+    }
+    .reflink-edit-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .reflink-edit-actions button {
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: all 0.15s;
+    }
+    .reflink-save { background: #1B7A3D; color: #FFFFFF; }
+    .reflink-save:hover { background: #166530; }
+    .reflink-cancel {
+      background: #FFFFFF;
+      color: #4A5F7F;
+      border-color: #D0DDF0;
+    }
+    .reflink-cancel:hover { border-color: #7A8BA3; }
+
+    .files-block {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed #E2E8F0;
+    }
+    .files-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 8px;
+    }
+    .files-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #1A365C;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .files-count {
+      background: #F0F7FF;
+      color: #1A365C;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 10px;
+      border: 1px solid #D0DDF0;
+    }
+    .files-count.has { background: #DBEAFE; color: #1D4ED8; border-color: #93C5FD; }
+    .btn-upload {
+      padding: 7px 12px;
+      background: #F57600;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 7px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-upload:hover:not(:disabled) {
+      background: #E06900;
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px rgba(245, 118, 0, 0.25);
+    }
+    .btn-upload:disabled {
+      background: #D0DDF0;
+      color: #7A8BA3;
+      cursor: not-allowed;
+    }
+    .btn-upload .plus {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      background: rgba(255,255,255,0.25);
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .files-list { display: flex; flex-direction: column; gap: 8px; }
+    .files-empty {
+      font-size: 11.5px;
+      color: #7A8BA3;
+      font-style: italic;
+      padding: 10px 12px;
+      background: #FAFCFF;
+      border: 1px dashed #D0DDF0;
+      border-radius: 7px;
+      text-align: center;
+    }
+    .files-empty .hint {
+      display: block;
+      margin-top: 4px;
+      font-size: 10.5px;
+      color: #93A0B4;
+    }
+
+    .file-card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-left: 3px solid #1D4ED8;
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+    .file-card.uploading {
+      border-left-color: #F57600;
+      background: #FFF9F0;
+    }
+    .file-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 7px;
+      background: #DBEAFE;
+      color: #1D4ED8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+    .file-card.uploading .file-icon {
+      background: #FFE5CC;
+      color: #B85300;
+    }
+    .file-info { min-width: 0; }
+    .file-name {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #1A365C;
+      line-height: 1.3;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .file-meta {
+      font-size: 10.5px;
+      color: #7A8BA3;
+      margin-top: 3px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .file-meta .mini-chip {
+      background: #F0F7FF;
+      padding: 1px 6px;
+      border-radius: 8px;
+      font-weight: 600;
+      color: #4A5F7F;
+      border: 1px solid #D0DDF0;
+    }
+    .file-actions {
+      display: flex;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+    .file-btn {
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+    .file-btn.preview-btn { background: #1D4ED8; color: #FFFFFF; }
+    .file-btn.preview-btn:hover { background: #1E40AF; }
+    .file-btn.open-btn {
+      background: #FFFFFF;
+      color: #1A365C;
+      border-color: #D0DDF0;
+    }
+    .file-btn.open-btn:hover { border-color: #1A365C; }
+    .file-btn.delete-btn {
+      background: #FFFFFF;
+      color: #B91C1C;
+      border-color: #FCA5A5;
+      padding: 6px 9px;
+    }
+    .file-btn.delete-btn:hover { background: #FEF2F2; border-color: #DC2626; }
+
+    .upload-progress {
+      height: 4px;
+      background: #FFE5CC;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 5px;
+    }
+    .upload-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #F57600, #E06900);
+      width: 40%;
+      animation: indeterminate 1.2s infinite ease-in-out;
+    }
+    @keyframes indeterminate {
+      0% { margin-left: -40%; }
+      100% { margin-left: 100%; }
+    }
+
+    .preview-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(26, 54, 92, 0.78);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 20px;
+      backdrop-filter: blur(3px);
+    }
+    .preview-overlay.open { display: flex; }
+    .preview-modal {
+      background: #FFFFFF;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 1100px;
+      height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .preview-header {
+      padding: 14px 20px;
+      background: linear-gradient(135deg, #1A365C 0%, #2D4A6F 100%);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .preview-title {
+      font-size: 14px;
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+      min-width: 0;
+    }
+    .preview-title .prev-code {
+      font-size: 10.5px;
+      opacity: 0.85;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-right: 10px;
+      padding: 2px 7px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 4px;
+    }
+    .preview-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .preview-btn-nav {
+      padding: 7px 14px;
+      background: rgba(255,255,255,0.15);
+      color: #FFFFFF;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .preview-btn-nav:hover { background: rgba(255,255,255,0.25); }
+    .preview-close {
+      width: 32px;
+      height: 32px;
+      background: rgba(255,255,255,0.15);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 6px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .preview-close:hover { background: rgba(255,255,255,0.3); }
+    .preview-body {
+      flex: 1;
+      background: #2D4A6F;
+      position: relative;
+      overflow: hidden;
+    }
+    .preview-body iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #FFFFFF;
+    }
+    .preview-loading {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.8);
+      font-size: 13px;
+    }
+
+    .app-footer {
+      padding: 18px 36px;
+      background: linear-gradient(135deg, #1A365C 0%, #2D4A6F 100%);
+      color: rgba(255,255,255,0.85);
+      font-size: 11px;
+      line-height: 1.6;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .app-footer a { color: #F57600; text-decoration: none; font-weight: 600; }
+    .app-footer .footer-right { font-size: 10.5px; opacity: 0.75; }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #1A365C;
+      color: #FFFFFF;
+      padding: 12px 22px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+      transition: transform 0.25s;
+      z-index: 3000;
+      max-width: 90%;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.success { background: #1B7A3D; }
+    .toast.error { background: #DC2626; }
+
+    /* ===== Edit Mode (PIN protection) ===== */
+    .lock-btn {
+      padding: 10px 14px;
+      border-radius: 9px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+    .lock-btn.locked {
+      background: #FFFFFF;
+      color: #4A5F7F;
+      border: 1.5px solid #D0DDF0;
+    }
+    .lock-btn.locked:hover {
+      border-color: #F57600;
+      color: #F57600;
+      transform: translateY(-1px);
+    }
+    .lock-btn.unlocked {
+      background: linear-gradient(135deg, #F57600 0%, #E06900 100%);
+      color: #FFFFFF;
+      box-shadow: 0 2px 6px rgba(245, 118, 0, 0.25);
+    }
+    .lock-btn.unlocked:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(245, 118, 0, 0.35);
+    }
+
+    .pin-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(26, 54, 92, 0.78);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2500;
+      backdrop-filter: blur(4px);
+      padding: 20px;
+    }
+    .pin-overlay.open { display: flex; }
+    .pin-modal {
+      background: #FFFFFF;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 420px;
+      padding: 28px 28px 22px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      animation: pinModalIn 0.18s ease-out;
+    }
+    @keyframes pinModalIn {
+      from { opacity: 0; transform: translateY(-10px) scale(0.98); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .pin-header { text-align: center; margin-bottom: 20px; }
+    .pin-icon-wrap {
+      width: 60px; height: 60px;
+      background: linear-gradient(135deg, #F57600 0%, #E06900 100%);
+      border-radius: 15px;
+      color: #FFFFFF;
+      font-size: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+      box-shadow: 0 6px 18px rgba(245, 118, 0, 0.3);
+    }
+    .pin-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1A365C;
+      margin-bottom: 6px;
+    }
+    .pin-subtitle {
+      font-size: 12.5px;
+      color: #7A8BA3;
+      line-height: 1.5;
+    }
+    .pin-input {
+      width: 100%;
+      padding: 14px 16px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 6px;
+      text-align: center;
+      color: #1A365C;
+      background: #F0F7FF;
+      border: 2px solid #D0DDF0;
+      border-radius: 9px;
+      outline: none;
+      margin-bottom: 14px;
+      transition: all 0.15s;
+    }
+    .pin-input:focus {
+      border-color: #F57600;
+      box-shadow: 0 0 0 4px rgba(245, 118, 0, 0.12);
+      background: #FFFFFF;
+    }
+    .pin-input::placeholder { color: #B5C0D1; letter-spacing: 4px; }
+    .pin-hint {
+      font-size: 11px;
+      color: #7A8BA3;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+    .pin-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .pin-actions button {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: all 0.15s;
+    }
+    .pin-cancel {
+      background: #FFFFFF;
+      color: #4A5F7F;
+      border-color: #D0DDF0;
+    }
+    .pin-cancel:hover { border-color: #7A8BA3; }
+    .pin-submit {
+      background: #F57600;
+      color: #FFFFFF;
+    }
+    .pin-submit:hover { background: #E06900; }
+
+    /* View-mode: hide edit-only controls, disable checkboxes */
+    body:not(.edit-mode) .edit-only { display: none !important; }
+    body:not(.edit-mode) .item-check {
+      cursor: pointer;
+    }
+    body:not(.edit-mode) .item-check input[type="checkbox"] {
+      pointer-events: none;
+      cursor: pointer;
+    }
+    body:not(.edit-mode) .item-check .checkmark {
+      opacity: 0.75;
+    }
+    body:not(.edit-mode) .item-check input:not(:checked) ~ .checkmark {
+      background: #F5F7FA;
+      border-color: #E2E8F0;
+    }
+    /* Lock badge on every checkbox in view mode */
+    body:not(.edit-mode) .item-check::after {
+      content: '🔒';
+      position: absolute;
+      bottom: -5px;
+      right: -7px;
+      font-size: 9px;
+      line-height: 1;
+      background: #FFFFFF;
+      border: 1.5px solid #D0DDF0;
+      border-radius: 50%;
+      width: 15px;
+      height: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 3px rgba(26, 54, 92, 0.15);
+      pointer-events: none;
+      transition: all 0.15s;
+    }
+    body:not(.edit-mode) .item-check:hover::after {
+      background: #FFF3E8;
+      border-color: #F57600;
+      transform: scale(1.15);
+    }
+    body:not(.edit-mode) .item-check:hover .checkmark {
+      border-color: #F57600;
+      opacity: 1;
+    }
+    body:not(.edit-mode) .checklist-item:hover {
+      border-color: #E2E8F0;
+      box-shadow: none;
+    }
+
+    @media print {
+      body { background: #FFFFFF; }
+      .page-wrapper { padding: 0; }
+      .app-container { box-shadow: none; border-radius: 0; }
+      .action-bar, .btn-upload, .file-actions, .fh-btn, .fh-edit-panel, .setup-banner, .preview-overlay, .reflink-actions, .reflink-edit { display: none !important; }
+      .checklist-item { break-inside: avoid; page-break-inside: avoid; }
+    }
+
+    @media (max-width: 768px) {
+      .page-wrapper { padding: 15px 8px 30px; }
+      .app-header, .title-section, .org-strip, .folder-hero, .stats-bar, .action-bar, .checklist-section, .app-footer {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+      .setup-banner { margin-left: 18px; margin-right: 18px; }
+      .stats-bar { grid-template-columns: repeat(2, 1fr); }
+      .fh-row { grid-template-columns: 1fr; }
+      .item-top { grid-template-columns: auto 1fr; }
+      .item-top .status-chip { grid-column: 1 / -1; justify-self: start; margin-left: 36px; }
+      .file-card { grid-template-columns: auto 1fr; }
+      .file-actions { grid-column: 1 / -1; justify-content: flex-end; margin-top: 6px; }
+      .reflink-item { grid-template-columns: auto 1fr; }
+      .reflink-item-actions { grid-column: 1 / -1; justify-content: flex-end; margin-top: 4px; }
+      .preview-modal { height: 95vh; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="app-container">
+
+      <div class="app-header">
+        <div class="logo"><span class="alice">alice.</span><span class="care">care</span></div>
+        <div class="header-label">
+          <strong>CDSS Compliance Console</strong>
+          HCS 9201 Inspection Checklist
+          <small>Licensed HCO #344700080</small>
+        </div>
+      </div>
+
+      <div class="title-section">
+        <h1>Home Care Organization <span>Inspection Checklist</span></h1>
+        <p>Upload one or more supporting files per requirement directly into the shared Google Drive folder. Add an optional reference link pointing to the live source system (CareAcademy, HCA Tracker, Paychex, etc.) so inspectors can verify against the system of record.</p>
+      </div>
+
+      <div class="org-strip">
+        <div class="org-item"><span class="lbl">Licensee</span><span class="val">TEKKS LLC DBA alice.care</span></div>
+        <div class="org-item"><span class="lbl">License Number</span><span class="val orange">344700080</span></div>
+        <div class="org-item"><span class="lbl">Location</span><span class="val">Fair Oaks, California</span></div>
+        <div class="org-item"><span class="lbl">Form</span><span class="val">HCS 9201 (11/25)</span></div>
+        <div class="org-item"><span class="lbl">Last Reviewed</span><span class="val" id="lastReviewed">Not yet saved</span></div>
+      </div>
+
+      <div class="folder-hero unconfigured" id="folderHero">
+        <div class="fh-label" id="fhLabel">Connecting to backend...</div>
+        <div class="fh-row">
+          <div class="fh-folder-name">
+            <div class="fh-icon">📁</div>
+            <div class="fh-text">
+              <div class="fh-title" id="fhTitle">HCS 9201 Supporting Materials</div>
+              <div class="fh-sub" id="fhSub">Loading...</div>
+            </div>
+          </div>
+          <span class="sync-indicator syncing" id="syncIndicator">Syncing</span>
+          <button class="lock-btn locked" id="lockBtn" title="Unlock edit mode">🔒 View Mode</button>
+          <button class="fh-btn fh-btn-refresh" id="fhRefreshBtn" title="Refresh files and state">⟳ Refresh</button>
+          <button class="fh-btn fh-btn-open" id="fhOpenBtn" disabled>↗ Open Folder</button>
+        </div>
+      </div>
+
+      <div class="stats-bar">
+        <div class="stat-card">
+          <span class="stat-label">Total Items</span>
+          <span class="stat-value" id="statTotal">0</span>
+          <span class="stat-sub">Statutory requirements</span>
+        </div>
+        <div class="stat-card complete">
+          <span class="stat-label">Verified</span>
+          <span class="stat-value" id="statComplete">0</span>
+          <span class="stat-sub">Ready for inspection</span>
+        </div>
+        <div class="stat-card pending">
+          <span class="stat-label">Outstanding</span>
+          <span class="stat-value" id="statPending">0</span>
+          <span class="stat-sub">Still need review</span>
+        </div>
+        <div class="stat-card files">
+          <span class="stat-label">Files in Folder</span>
+          <span class="stat-value" id="statFiles">0</span>
+          <span class="stat-sub" id="statFilesSub">Not yet connected</span>
+        </div>
+      </div>
+
+      <div class="action-bar">
+        <div class="filter-group">
+          <button class="filter-chip active" data-filter="all">All Items</button>
+          <button class="filter-chip" data-filter="pending">Outstanding</button>
+          <button class="filter-chip" data-filter="complete">Verified</button>
+          <button class="filter-chip" data-filter="action">Action Needed</button>
+          <button class="filter-chip" data-filter="nofiles">No Files Yet</button>
+          <button class="filter-chip" data-filter="nolinks">No Reference Link</button>
+        </div>
+        <div class="action-buttons">
+          <button class="btn btn-secondary" onclick="exportJSON()">📥 Export Backup</button>
+          <button class="btn btn-secondary edit-only" onclick="importJSON()">📤 Import Backup</button>
+          <button class="btn btn-secondary" onclick="window.print()">🖨 Print View</button>
+          <button class="btn btn-danger edit-only" onclick="resetAll()">♻ Reset Checkboxes</button>
+        </div>
+      </div>
+
+      <div id="checklistRoot"></div>
+
+      <div class="app-footer">
+        <div>
+          Source: California Department of Social Services, Form HCS 9201 (11/25). Files live in your shared Google Drive folder. Checkbox state and reference links save per browser, export a backup to sync with your team.
+          Visit <a href="https://www.Alicecare.com" target="_blank" rel="noopener">www.Alicecare.com</a> for the operations home page.
+        </div>
+        <div class="footer-right">alice.care &copy; 2026 &middot; TEKKS LLC</div>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="importFile" accept=".json" style="display:none;">
+  <div class="toast" id="toast"></div>
+
+  <!-- PIN modal -->
+  <div class="pin-overlay" id="pinOverlay">
+    <div class="pin-modal">
+      <div class="pin-header">
+        <div class="pin-icon-wrap">🔐</div>
+        <div class="pin-title">Enter Edit Code</div>
+        <div class="pin-subtitle">Unlock editing to check boxes, upload files, set expiration dates, and manage reference links.</div>
+      </div>
+      <input type="password" class="pin-input" id="pinInput" placeholder="••••••••" maxlength="20" autocomplete="off" inputmode="numeric">
+      <div class="pin-hint">Contact your Alice Care administrator if you do not have the code.</div>
+      <div class="pin-actions">
+        <button class="pin-cancel" id="pinCancelBtn">Cancel</button>
+        <button class="pin-submit" id="pinSubmitBtn">Unlock</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="preview-overlay" id="previewOverlay">
+    <div class="preview-modal">
+      <div class="preview-header">
+        <div class="preview-title">
+          <span class="prev-code" id="previewCode">§</span>
+          <span id="previewName">File preview</span>
+        </div>
+        <div class="preview-actions">
+          <button class="preview-btn-nav" id="previewOpenBtn">↗ Open in Drive</button>
+          <button class="preview-close" id="previewCloseBtn">×</button>
+        </div>
+      </div>
+      <div class="preview-body">
+        <div class="preview-loading" id="previewLoading">Loading preview...</div>
+        <iframe id="previewIframe" style="display:none"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SECTIONS = [
+      {
+        id: 'background',
+        title: 'Background Check',
+        subtitle: 'Ownership and executive screening requirements',
+        iconColor: 'blue',
+        iconLetter: 'B',
+        items: [
+          {
+            slug: 'owner_background',
+            code: '1796.33',
+            text: 'Secure background clearance for all qualifying individuals before the HCO license issues.',
+            subtext: '(a) Applies to the owner when the owner is an individual. (b) When the owner is a corporation, LLC, joint venture, association, or other entity, clearance covers any 10 percent or greater owner plus the CEO or a person serving in a similar capacity, under Section 1796.23.'
+          }
+        ]
+      },
+      {
+        id: 'hco_requirements',
+        title: 'Home Care Organization Requirements',
+        subtitle: 'Postings, insurance, and operational safeguards',
+        iconColor: 'orange',
+        iconLetter: 'O',
+        items: [
+          { slug: 'license_posted', code: '1796.42(a)', text: 'Post the HCO license in a conspicuous location inside the place of business.' },
+          { slug: 'hours_posted', code: '1796.42(a)', text: 'Post business hours in a conspicuous location inside the place of business.' },
+          { slug: 'workers_comp', code: '1796.42(b)', text: 'Maintain and abide by a valid workers compensation policy covering every affiliated Home Care Aide.' },
+          { slug: 'dishonesty_bond', code: '1796.42(c)', text: 'Maintain and abide by an employee dishonesty bond that includes third party coverage with a minimum limit of ten thousand dollars ($10,000).' },
+          { slug: 'liability_insurance', code: '1796.42(d)', text: 'Maintain proof of general and professional liability insurance of at least one million dollars ($1,000,000) per occurrence and three million dollars ($3,000,000) in the aggregate.' },
+          { slug: 'staff_clearance', code: '1796.43(a)(1)', text: 'Confirm every staff person, volunteer, or employee who contacts clients, prospective clients, or confidential client information completes the requirements of Sections 1796.23, 1796.24, 1796.25, 1796.26, and 1796.28 before that contact or access occurs.' },
+          { slug: 'termination_notice', code: '1796.43(a)(3)', text: 'Notify the Department immediately once the HCO stops employing an individual as an affiliated Home Care Aide.' },
+          { slug: 'records_access', code: '1796.52(c)', text: 'Make the HCO records, books, and premises available on request. Refusal triggers cause for license revocation.', subtext: 'Inspections under the Act may cover books, records, or premises without advance notice.' }
+        ]
+      },
+      {
+        id: 'aide_requirements',
+        title: 'Affiliated Home Care Aide Requirements',
+        subtitle: 'Registry status, health screening, and training',
+        iconColor: 'green',
+        iconLetter: 'A',
+        items: [
+          { slug: 'aide_registry', code: '1796.43(a)', text: 'Verify every affiliated Home Care Aide holds a cleared status on the Home Care Aide Registry.' },
+          { slug: 'aide_clearance', code: '1796.43(a)(1)', text: 'Confirm each aide completes the requirements of Sections 1796.23, 1796.24, 1796.25, 1796.26, and 1796.28 before any client contact or access to confidential client information.' },
+          { slug: 'tb_clearance', code: '1796.43(a)(2)', text: 'Demonstrate each aide remains free of active tuberculosis disease under Section 1796.45.' },
+          { slug: 'orientation_training', code: '1796.44(b)(1)', text: 'Deliver two hours of orientation training covering the caregiver role and the applicable terms of employment.' },
+          { slug: 'safety_training', code: '1796.44(b)(2)', text: 'Deliver three hours of safety training that covers basic safety precautions, emergency procedures, and infection control.' },
+          { slug: 'annual_training', code: '1796.44(c)', text: 'Deliver a minimum of five hours of annual training to every affiliated Home Care Aide.' }
+        ]
+      }
+    ];
+
+    // ===== Hard-coded backend =====
+    const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwMVu3U_2aAi8CU2HwzAtOo83wnQzqISYJkoiTkLBXHswOch34LvSQ1kRDwpy9GXFtxMg/exec';
+    const STORAGE_KEY = 'alicecare_hcs9201_checklist_v7';
+    const MAX_FILE_SIZE = 25 * 1024 * 1024;
+    const EXPIRATION_WARNING_DAYS = 30;
+
+    let state = {
+      folderUrl: '',
+      folderName: 'HCS 9201 Supporting Materials',
+      checkboxes: {},
+      refLinks: {},
+      lastModified: null,
+      lastModifiedBy: null
+    };
+    let filesBySlug = {};
+    let currentFilter = 'all';
+    let backendStatus = 'disconnected';
+    let syncStatus = 'idle'; // idle, syncing, error, saved
+    let syncTimer = null;
+    let previewList = [];
+    let previewIndex = 0;
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          state = Object.assign(state, JSON.parse(raw));
+          if (!state.checkboxes) state.checkboxes = {};
+          if (!state.refLinks) state.refLinks = {};
+          // Migrate any legacy boolean checkboxes into the object schema.
+          Object.keys(state.checkboxes).forEach(slug => {
+            if (typeof state.checkboxes[slug] === 'boolean') {
+              state.checkboxes[slug] = {
+                checked: state.checkboxes[slug],
+                completedAt: null,
+                expiresAt: null
+              };
+            }
+          });
+          normalizeRefLinks();
+        }
+      } catch (e) { /* keep default */ }
+    }
+
+    // Normalize refLinks: single-object legacy format becomes a one-element array.
+    function normalizeRefLinks() {
+      if (!state.refLinks) { state.refLinks = {}; return; }
+      Object.keys(state.refLinks).forEach(slug => {
+        const v = state.refLinks[slug];
+        if (Array.isArray(v)) return;
+        if (v && v.url) {
+          state.refLinks[slug] = [{ url: v.url, label: v.label || '' }];
+        } else {
+          delete state.refLinks[slug];
+        }
+      });
+    }
+
+    function getRefLinks(slug) {
+      const v = state.refLinks[slug];
+      if (Array.isArray(v)) return v;
+      if (v && v.url) return [{ url: v.url, label: v.label || '' }];
+      return [];
+    }
+
+    function saveLocal() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) { /* ignore */ }
+      renderLastUpdated();
+    }
+
+    function scheduleSync() {
+      saveLocal();
+      if (syncTimer) clearTimeout(syncTimer);
+      syncTimer = setTimeout(pushSharedState, 500);
+    }
+
+    function setSyncStatus(next) {
+      syncStatus = next;
+      const ind = document.getElementById('syncIndicator');
+      if (!ind) return;
+      ind.className = 'sync-indicator ' + (next === 'syncing' ? 'syncing' : next === 'error' ? 'error' : '');
+      ind.textContent = next === 'syncing' ? 'Saving...' : next === 'error' ? 'Save failed' : next === 'saved' ? 'All saved' : 'Connected';
+    }
+
+    async function pushSharedState() {
+      if (backendStatus !== 'connected') return;
+      try {
+        setSyncStatus('syncing');
+        const resp = await apiCall('setState', {
+          checkboxes: state.checkboxes,
+          refLinks: state.refLinks
+        });
+        state.lastModified = resp.lastModified;
+        state.lastModifiedBy = resp.lastModifiedBy;
+        saveLocal();
+        setSyncStatus('saved');
+        setTimeout(() => { if (syncStatus === 'saved') setSyncStatus('idle'); }, 2000);
+      } catch (err) {
+        setSyncStatus('error');
+        showToast('Sync failed: ' + err.message, 'error');
+      }
+    }
+
+    async function fetchSharedState() {
+      try {
+        const data = await apiCall('getState');
+        // Server is source of truth. Merge into local state.
+        state.checkboxes = data.checkboxes || {};
+        state.refLinks = data.refLinks || {};
+        state.lastModified = data.lastModified || null;
+        state.lastModifiedBy = data.lastModifiedBy || null;
+        normalizeRefLinks();
+        saveLocal();
+      } catch (err) {
+        showToast('Could not load team state: ' + err.message, 'error');
+      }
+    }
+
+    async function apiCall(action, payload) {
+      const body = Object.assign({ action }, payload || {});
+      const resp = await fetch(BACKEND_URL, {
+        method: 'POST',
+        mode: 'cors',
+        redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(body)
+      });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
+      if (!data.ok) throw new Error(data.error || 'Unknown backend error');
+      return data;
+    }
+
+    async function pingBackend() {
+      try {
+        backendStatus = 'connecting';
+        renderFolderHero();
+        const data = await apiCall('ping');
+        state.folderUrl = data.folderUrl || '';
+        state.folderName = data.folderName || 'HCS 9201 Supporting Materials';
+        backendStatus = 'connected';
+        renderFolderHero();
+        // Fetch files and shared state in parallel.
+        await Promise.all([refreshFiles(), fetchSharedState()]);
+        render();
+        renderStats();
+        setSyncStatus('idle');
+        return true;
+      } catch (err) {
+        backendStatus = 'error';
+        renderFolderHero(err.message);
+        setSyncStatus('error');
+        return false;
+      }
+    }
+
+    async function refreshFiles() {
+      if (backendStatus !== 'connected') return;
+      try {
+        const data = await apiCall('listAll');
+        filesBySlug = data.filesBySlug || {};
+        state.folderName = data.folderName || state.folderName;
+        state.folderUrl = data.folderUrl || state.folderUrl;
+        renderFolderHero();
+        render();
+        renderStats();
+      } catch (err) {
+        showToast('Failed to refresh: ' + err.message, 'error');
+      }
+    }
+
+    async function uploadFilesForItem(slug, files) {
+      const itemEl = document.querySelector(`.checklist-item[data-slug="${slug}"]`);
+      const list = itemEl ? itemEl.querySelector('.files-list') : null;
+      if (list) {
+        const empty = list.querySelector('.files-empty');
+        if (empty) empty.remove();
+      }
+
+      let successCount = 0;
+      let errorCount = 0;
+
+      for (const file of files) {
+        if (file.size > MAX_FILE_SIZE) {
+          showToast(`"${file.name}" exceeds 25 MB limit`, 'error');
+          errorCount++;
+          continue;
+        }
+
+        const placeholder = buildUploadingCard(file.name);
+        if (list) list.appendChild(placeholder);
+
+        try {
+          const fileData = await fileToDataURL(file);
+          const resp = await apiCall('upload', {
+            slug,
+            fileName: file.name,
+            fileData,
+            mimeType: file.type || 'application/octet-stream'
+          });
+          if (!filesBySlug[slug]) filesBySlug[slug] = [];
+          filesBySlug[slug].unshift(resp.file);
+          successCount++;
+          if (placeholder && placeholder.parentNode) placeholder.remove();
+        } catch (err) {
+          if (placeholder && placeholder.parentNode) placeholder.remove();
+          showToast(`Upload of "${file.name}" failed: ${err.message}`, 'error');
+          errorCount++;
+        }
+      }
+
+      render();
+      renderStats();
+
+      if (successCount > 0) {
+        const plural = successCount > 1 ? 's' : '';
+        showToast(`Uploaded ${successCount} file${plural}${errorCount > 0 ? `, ${errorCount} failed` : ''}`, 'success');
+      }
+    }
+
+    async function deleteFile(slug, fileId, fileName) {
+      if (!confirm(`Permanently remove "${fileName}"? The file moves to Drive trash and recovers within 30 days.`)) return;
+      try {
+        await apiCall('delete', { fileId });
+        filesBySlug[slug] = (filesBySlug[slug] || []).filter(f => f.id !== fileId);
+        render();
+        renderStats();
+        showToast('File removed', 'success');
+      } catch (err) {
+        showToast('Delete failed: ' + err.message, 'error');
+      }
+    }
+
+    function renderFolderHero(errorMsg) {
+      const hero = document.getElementById('folderHero');
+      const label = document.getElementById('fhLabel');
+      const title = document.getElementById('fhTitle');
+      const sub = document.getElementById('fhSub');
+      const openBtn = document.getElementById('fhOpenBtn');
+
+      hero.className = 'folder-hero';
+
+      if (backendStatus === 'connecting' || backendStatus === 'disconnected') {
+        hero.classList.add('unconfigured');
+        label.textContent = 'Connecting...';
+        title.textContent = state.folderName;
+        sub.textContent = 'Testing backend and fetching team state';
+        openBtn.disabled = true;
+      } else if (backendStatus === 'connected') {
+        label.textContent = 'Connected · Live Drive folder · Team-synced state';
+        title.textContent = state.folderName;
+        const modBy = state.lastModifiedBy ? ` · last updated by ${state.lastModifiedBy}` : '';
+        sub.textContent = (state.folderUrl || '') + modBy;
+        openBtn.disabled = !state.folderUrl;
+      } else {
+        hero.classList.add('error');
+        label.textContent = 'Backend error';
+        title.textContent = 'Connection failed';
+        sub.textContent = errorMsg || 'Unable to reach the Apps Script backend';
+        openBtn.disabled = true;
+      }
+    }
+
+    function render() {
+      const root = document.getElementById('checklistRoot');
+      root.innerHTML = '';
+
+      SECTIONS.forEach(section => {
+        const sectionItems = section.items.map((item, idx) => {
+          const rec = getCheckboxRecord(item.slug);
+          const expState = expirationState(rec);
+          return { item, idx, rec, expState, effectivelyChecked: rec.checked && !expState.expired };
+        });
+
+        const visibleItems = sectionItems.filter(({ item, rec, expState, effectivelyChecked }) => {
+          if (currentFilter === 'all') return true;
+          if (currentFilter === 'pending') return !effectivelyChecked;
+          if (currentFilter === 'complete') return effectivelyChecked;
+          if (currentFilter === 'action') return effectivelyChecked && (expState.warning || expState.expired) || (rec.checked && expState.expired);
+          if (currentFilter === 'nofiles') return !(filesBySlug[item.slug] || []).length;
+          if (currentFilter === 'nolinks') return getRefLinks(item.slug).length === 0;
+          return true;
+        });
+
+        if (visibleItems.length === 0) return;
+
+        const completedCount = sectionItems.filter(x => x.effectivelyChecked).length;
+        const sec = document.createElement('div');
+        sec.className = 'checklist-section';
+        sec.innerHTML = `
+          <div class="section-header">
+            <div class="section-icon ${section.iconColor}">${section.iconLetter}</div>
+            <div class="section-title-group">
+              <div class="section-title">${section.title}</div>
+              <div class="section-subtitle">${section.subtitle}</div>
+            </div>
+            <div class="section-progress">${completedCount} of ${sectionItems.length}</div>
+          </div>
+          <div class="section-items"></div>
+        `;
+        root.appendChild(sec);
+
+        const itemsContainer = sec.querySelector('.section-items');
+        visibleItems.forEach(({ item, idx, rec, expState, effectivelyChecked }) => {
+          itemsContainer.appendChild(buildItem(section.id, idx, item, rec, expState, effectivelyChecked));
+        });
+      });
+    }
+
+    // ===== Expiration + checkbox helpers =====
+    function getCheckboxRecord(slug) {
+      const rec = state.checkboxes[slug];
+      if (!rec) return { checked: false, completedAt: null, expiresAt: null };
+      if (typeof rec === 'boolean') return { checked: rec, completedAt: null, expiresAt: null };
+      return {
+        checked: !!rec.checked,
+        completedAt: rec.completedAt || null,
+        expiresAt: rec.expiresAt || null
+      };
+    }
+
+    function expirationState(rec) {
+      if (!rec.expiresAt) return { hasDate: false, expired: false, warning: false, daysLeft: null };
+      const today = new Date(); today.setHours(0,0,0,0);
+      const exp = new Date(rec.expiresAt); exp.setHours(0,0,0,0);
+      const msPerDay = 86400000;
+      const daysLeft = Math.round((exp - today) / msPerDay);
+      return {
+        hasDate: true,
+        expired: daysLeft < 0,
+        warning: daysLeft >= 0 && daysLeft <= EXPIRATION_WARNING_DAYS,
+        daysLeft
+      };
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    function buildItem(sectionId, idx, item, rec, expState, effectivelyChecked) {
+      const el = document.createElement('div');
+      el.className = 'checklist-item' + (effectivelyChecked ? ' complete' : '');
+      el.dataset.section = sectionId;
+      el.dataset.idx = idx;
+      el.dataset.slug = item.slug;
+
+      const files = filesBySlug[item.slug] || [];
+      const refLinks = getRefLinks(item.slug);
+      const canUpload = backendStatus === 'connected';
+
+      let statusChip;
+      if (effectivelyChecked && expState.warning) {
+        statusChip = `<span class="status-chip warning">⚠ Expires in ${expState.daysLeft}d</span>`;
+      } else if (rec.checked && expState.expired) {
+        statusChip = '<span class="status-chip expired">⚠ Expired · Re-verify</span>';
+      } else if (effectivelyChecked) {
+        statusChip = '<span class="status-chip done">✓ Verified</span>';
+      } else {
+        statusChip = '<span class="status-chip pending">Outstanding</span>';
+      }
+
+      el.innerHTML = `
+        <div class="item-top">
+          <label class="item-check">
+            <input type="checkbox" ${effectivelyChecked ? 'checked' : ''}>
+            <span class="checkmark"></span>
+          </label>
+          <div class="item-content">
+            <span class="item-code">§ ${item.code}</span>
+            <div class="item-text">${escapeHTML(item.text)}</div>
+            ${item.subtext ? `<div class="item-subtext">${escapeHTML(item.subtext)}</div>` : ''}
+          </div>
+          ${statusChip}
+        </div>
+        <div class="expiration-container"></div>
+        <div class="reflink-container"></div>
+        <div class="files-block">
+          <div class="files-header">
+            <div class="files-label">
+              Supporting Files
+              <span class="files-count ${files.length > 0 ? 'has' : ''}">${files.length}</span>
+            </div>
+            <button class="btn-upload edit-only" ${canUpload ? '' : 'disabled title="Backend not connected"'}>
+              <span class="plus">+</span> Upload Files
+            </button>
+          </div>
+          <div class="files-list"></div>
+          <input type="file" class="file-picker" multiple style="display:none">
+        </div>
+      `;
+
+      // Checkbox handler
+      const checkLabel = el.querySelector('.item-check');
+      checkLabel.addEventListener('click', (e) => {
+        if (!isEditMode()) {
+          e.preventDefault();
+          e.stopPropagation();
+          showPinModal();
+        }
+      });
+      el.querySelector('input[type="checkbox"]').addEventListener('change', (e) => {
+        if (!isEditMode()) { e.preventDefault(); return; }
+        const nowChecked = e.target.checked;
+        const current = getCheckboxRecord(item.slug);
+        if (nowChecked) {
+          state.checkboxes[item.slug] = {
+            checked: true,
+            completedAt: new Date().toISOString(),
+            // If re-verifying an expired item, clear the old expiration so the user sets a fresh one.
+            expiresAt: current.expired ? null : current.expiresAt
+          };
+        } else {
+          state.checkboxes[item.slug] = { checked: false, completedAt: null, expiresAt: null };
+        }
+        scheduleSync();
+        render();
+        renderStats();
+      });
+
+      // Expiration UI
+      const expContainer = el.querySelector('.expiration-container');
+      if (rec.checked) {
+        expContainer.appendChild(buildExpirationRow(item, rec, expState));
+      }
+
+      // Reference link
+      el.querySelector('.reflink-container').appendChild(buildRefLinkRow(item, refLinks));
+
+      // Upload
+      const uploadBtn = el.querySelector('.btn-upload');
+      const picker = el.querySelector('.file-picker');
+      if (!uploadBtn.disabled) {
+        uploadBtn.addEventListener('click', () => picker.click());
+        picker.addEventListener('change', async (e) => {
+          const files = Array.from(e.target.files);
+          picker.value = '';
+          if (files.length === 0) return;
+          await uploadFilesForItem(item.slug, files);
+        });
+      }
+
+      // Files list
+      const listEl = el.querySelector('.files-list');
+      if (files.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'files-empty';
+        if (backendStatus !== 'connected') {
+          empty.textContent = 'Backend unavailable. Check configuration.';
+        } else {
+          empty.innerHTML = 'No files uploaded yet.<span class="hint">Click Upload Files to add one or more documents at once.</span>';
+        }
+        listEl.appendChild(empty);
+      } else {
+        files.forEach(f => listEl.appendChild(buildFileCard(item, f)));
+      }
+
+      return el;
+    }
+
+    function buildExpirationRow(item, rec, expState) {
+      const row = document.createElement('div');
+      const hasDate = !!rec.expiresAt;
+      let cls = 'expiration-row';
+      if (expState.expired) cls += ' expired';
+      else if (expState.warning) cls += ' warning';
+      else if (hasDate) cls += ' active';
+      row.className = cls;
+
+      const displayValue = hasDate ? formatDateForInput(rec.expiresAt) : '';
+
+      if (hasDate) {
+        const daysText = expState.expired
+          ? `${Math.abs(expState.daysLeft)}d ago`
+          : expState.daysLeft === 0 ? 'Today' : `${expState.daysLeft}d left`;
+        row.innerHTML = `
+          <div class="expiration-label">📅 Expires</div>
+          <div class="expiration-display">
+            ${formatDate(rec.expiresAt)}
+            <span class="expiration-days">${daysText}</span>
+          </div>
+          <div class="exp-date-wrapper edit-only">
+            <input type="text" class="exp-date-text" placeholder="MM/DD/YYYY" value="${displayValue}" maxlength="10" inputmode="numeric">
+            <button class="exp-cal-btn" title="Open calendar" type="button">📅</button>
+            <input type="date" class="exp-date-picker-hidden" tabindex="-1">
+          </div>
+          <div class="expiration-actions edit-only">
+            <button class="exp-btn clear">Clear</button>
+          </div>
+        `;
+      } else {
+        row.innerHTML = `
+          <div class="expiration-label">📅 Expiration</div>
+          <div class="expiration-display" style="color:#7A8BA3;font-style:italic;font-weight:500">
+            No expiration set. Item stays verified until manually un-checked.
+          </div>
+          <div class="exp-date-wrapper edit-only" style="display:none">
+            <input type="text" class="exp-date-text" placeholder="MM/DD/YYYY" maxlength="10" inputmode="numeric">
+            <button class="exp-cal-btn" title="Open calendar" type="button">📅</button>
+            <input type="date" class="exp-date-picker-hidden" tabindex="-1">
+          </div>
+          <div class="expiration-actions edit-only">
+            <button class="exp-btn add">+ Set expiration</button>
+          </div>
+        `;
+      }
+
+      const textInput = row.querySelector('.exp-date-text');
+      const calBtn = row.querySelector('.exp-cal-btn');
+      const datePicker = row.querySelector('.exp-date-picker-hidden');
+      const addBtn = row.querySelector('.exp-btn.add');
+      const clearBtn = row.querySelector('.exp-btn.clear');
+
+      function commitDate(raw) {
+        const iso = parseFlexibleDate(raw);
+        if (!iso) {
+          showToast('Invalid date. Use MM/DD/YYYY (e.g. 04/21/2027).', 'error');
+          textInput.focus();
+          textInput.select();
+          return false;
+        }
+        const current = getCheckboxRecord(item.slug);
+        state.checkboxes[item.slug] = {
+          checked: current.checked,
+          completedAt: current.completedAt,
+          expiresAt: iso
+        };
+        scheduleSync();
+        render();
+        renderStats();
+        showToast('Expiration updated', 'success');
+        return true;
+      }
+
+      if (addBtn) {
+        addBtn.addEventListener('click', () => {
+          const wrapper = row.querySelector('.exp-date-wrapper');
+          wrapper.style.display = '';
+          addBtn.style.display = 'none';
+          const oneYear = new Date();
+          oneYear.setFullYear(oneYear.getFullYear() + 1);
+          textInput.value = formatDateForInput(oneYear.toISOString());
+          textInput.focus();
+          textInput.select();
+        });
+      }
+
+      // Auto-insert slashes while typing numeric digits
+      textInput.addEventListener('input', (e) => {
+        const digits = e.target.value.replace(/\D/g, '').slice(0, 8);
+        let formatted = digits;
+        if (digits.length >= 5) formatted = digits.slice(0,2) + '/' + digits.slice(2,4) + '/' + digits.slice(4);
+        else if (digits.length >= 3) formatted = digits.slice(0,2) + '/' + digits.slice(2);
+        e.target.value = formatted;
+      });
+
+      textInput.addEventListener('blur', () => {
+        const v = textInput.value.trim();
+        if (!v) return;
+        // Don't commit if the date didn't change (re-render would flicker)
+        if (hasDate && v === displayValue) return;
+        commitDate(v);
+      });
+
+      textInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          commitDate(textInput.value);
+        } else if (e.key === 'Escape') {
+          textInput.value = displayValue;
+          textInput.blur();
+        }
+      });
+
+      // Calendar button opens the native date picker
+      calBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const iso = parseFlexibleDate(textInput.value) || (hasDate ? rec.expiresAt : new Date(Date.now() + 365 * 86400000).toISOString());
+        if (iso) datePicker.value = iso.slice(0, 10);
+        try {
+          datePicker.showPicker();
+        } catch (err) {
+          datePicker.focus();
+          datePicker.click();
+        }
+      });
+
+      datePicker.addEventListener('change', (e) => {
+        const val = e.target.value;
+        if (!val) return;
+        textInput.value = formatDateForInput(val + 'T00:00:00');
+        commitDate(textInput.value);
+      });
+
+      if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+          if (!confirm('Remove the expiration date for this requirement?')) return;
+          const current = getCheckboxRecord(item.slug);
+          state.checkboxes[item.slug] = {
+            checked: current.checked,
+            completedAt: current.completedAt,
+            expiresAt: null
+          };
+          scheduleSync();
+          render();
+          renderStats();
+        });
+      }
+
+      return row;
+    }
+
+    // ===== Flexible date parsing =====
+    // Accepts MM/DD/YYYY, M/D/YYYY, MM-DD-YYYY, YYYY-MM-DD, and 2-digit years (assumed 20xx).
+    function parseFlexibleDate(input) {
+      if (!input) return null;
+      const s = String(input).trim();
+      let y, m, d;
+      let match = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+      if (match) { y = +match[1]; m = +match[2]; d = +match[3]; }
+      else {
+        match = s.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2}|\d{4})$/);
+        if (!match) return null;
+        m = +match[1]; d = +match[2]; y = +match[3];
+        if (y < 100) y += 2000;
+      }
+      if (y < 1900 || y > 2200 || m < 1 || m > 12 || d < 1 || d > 31) return null;
+      const dt = new Date(y, m - 1, d);
+      if (dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== d) return null;
+      const pad = n => String(n).padStart(2, '0');
+      return `${y}-${pad(m)}-${pad(d)}T00:00:00.000Z`;
+    }
+
+    function formatDateForInput(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return '';
+      const pad = n => String(n).padStart(2, '0');
+      return `${pad(d.getMonth() + 1)}/${pad(d.getDate())}/${d.getFullYear()}`;
+    }
+
+    function buildRefLinkRow(item, refLinks) {
+      const row = document.createElement('div');
+      // Local UI state: -1 = not editing, 'new' = adding, number = editing that index
+      let editingIdx = -1;
+
+      function rerender() {
+        row.innerHTML = '';
+        row.className = 'reflink-row' + (refLinks.length > 0 ? '' : ' empty');
+
+        // Header
+        const header = document.createElement('div');
+        header.className = 'reflink-header';
+        header.innerHTML = `
+          <div class="reflink-header-label">
+            🔗 Source Links
+            ${refLinks.length > 0 ? `<span class="reflink-count">${refLinks.length}</span>` : ''}
+          </div>
+        `;
+        row.appendChild(header);
+
+        // List or empty message
+        if (refLinks.length > 0) {
+          const list = document.createElement('div');
+          list.className = 'reflink-list';
+          refLinks.forEach((link, idx) => list.appendChild(buildLinkItem(link, idx)));
+          row.appendChild(list);
+        } else if (editingIdx === -1) {
+          const empty = document.createElement('div');
+          empty.className = 'reflink-empty-msg';
+          empty.textContent = 'No source links yet. Add URLs where this data lives (CareAcademy, HCA Tracker, Paychex, etc.).';
+          row.appendChild(empty);
+        }
+
+        // Add button or edit form
+        if (editingIdx === -1) {
+          const addBtn = document.createElement('button');
+          addBtn.className = 'reflink-add-btn edit-only';
+          addBtn.textContent = refLinks.length > 0 ? '+ Add another link' : '+ Add source link';
+          addBtn.addEventListener('click', () => {
+            editingIdx = 'new';
+            rerender();
+          });
+          row.appendChild(addBtn);
+        } else {
+          row.appendChild(buildEditForm());
+        }
+      }
+
+      function buildLinkItem(link, idx) {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'reflink-item';
+        const host = getHostname(link.url);
+        itemEl.innerHTML = `
+          <div class="reflink-item-icon">🔗</div>
+          <div class="reflink-item-info">
+            <span class="domain">${escapeHTML(host)}</span>
+            ${link.label ? `<span class="desc">${escapeHTML(link.label)}</span>` : ''}
+          </div>
+          <div class="reflink-item-actions">
+            <button class="reflink-btn open">↗ Open</button>
+            <button class="reflink-btn edit edit-only">Edit</button>
+            <button class="reflink-btn delete edit-only" title="Remove">×</button>
+          </div>
+        `;
+        itemEl.querySelector('.open').addEventListener('click', () => {
+          window.open(link.url, '_blank', 'noopener,noreferrer');
+        });
+        itemEl.querySelector('.edit').addEventListener('click', () => {
+          editingIdx = idx;
+          rerender();
+        });
+        itemEl.querySelector('.delete').addEventListener('click', () => {
+          const desc = link.label ? host + ' — ' + link.label : host;
+          if (!confirm(`Remove link "${desc}"?`)) return;
+          refLinks.splice(idx, 1);
+          if (refLinks.length === 0) {
+            delete state.refLinks[item.slug];
+          } else {
+            state.refLinks[item.slug] = refLinks;
+          }
+          scheduleSync();
+          render();
+          showToast('Link removed', 'success');
+        });
+        return itemEl;
+      }
+
+      function buildEditForm() {
+        const form = document.createElement('div');
+        form.className = 'reflink-edit open';
+        const isNew = editingIdx === 'new';
+        const current = isNew ? { url: '', label: '' } : refLinks[editingIdx];
+        form.innerHTML = `
+          <div class="field-group">
+            <div>
+              <label>Source URL <span style="color:#DC2626">*</span></label>
+              <input type="url" class="field-ref-url" placeholder="https://alicecare1234.careacademy.com/..." value="${escapeAttr(current.url)}">
+            </div>
+            <div>
+              <label>Description (optional)</label>
+              <input type="text" class="field-ref-label" placeholder="e.g. Annual training dashboard, Registry lookup" maxlength="120" value="${escapeAttr(current.label)}">
+            </div>
+            <div class="reflink-edit-actions">
+              <button class="reflink-cancel">Cancel</button>
+              <button class="reflink-save">${isNew ? 'Add link' : 'Save changes'}</button>
+            </div>
+          </div>
+        `;
+
+        const urlInput = form.querySelector('.field-ref-url');
+        const labelInput = form.querySelector('.field-ref-label');
+        const saveBtn = form.querySelector('.reflink-save');
+        const cancelBtn = form.querySelector('.reflink-cancel');
+
+        setTimeout(() => urlInput.focus(), 50);
+
+        cancelBtn.addEventListener('click', () => {
+          editingIdx = -1;
+          rerender();
+        });
+
+        saveBtn.addEventListener('click', () => {
+          const url = urlInput.value.trim();
+          const label = labelInput.value.trim();
+          if (!isValidURL(url)) {
+            showToast('Enter a valid http or https URL', 'error');
+            return;
+          }
+          const payload = { url, label };
+          if (isNew) {
+            refLinks.push(payload);
+          } else {
+            refLinks[editingIdx] = payload;
+          }
+          state.refLinks[item.slug] = refLinks;
+          editingIdx = -1;
+          scheduleSync();
+          render();
+          showToast(isNew ? 'Link added' : 'Link updated', 'success');
+        });
+
+        [urlInput, labelInput].forEach(inp => {
+          inp.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); saveBtn.click(); }
+            else if (e.key === 'Escape') { cancelBtn.click(); }
+          });
+        });
+
+        return form;
+      }
+
+      rerender();
+      return row;
+    }
+
+    function buildFileCard(item, file) {
+      const card = document.createElement('div');
+      card.className = 'file-card';
+      card.dataset.fileId = file.id;
+
+      card.innerHTML = `
+        <div class="file-icon">${fileEmoji(file.mimeType, file.name)}</div>
+        <div class="file-info">
+          <div class="file-name">${escapeHTML(file.name)}</div>
+          <div class="file-meta">
+            <span class="mini-chip">${formatSize(file.size)}</span>
+            <span>${new Date(file.createdAt).toLocaleDateString()}</span>
+          </div>
+        </div>
+        <div class="file-actions">
+          <button class="file-btn preview-btn">👁 Preview</button>
+          <button class="file-btn open-btn">↗ Open</button>
+          <button class="file-btn delete-btn edit-only" title="Remove">×</button>
+        </div>
+      `;
+
+      card.querySelector('.preview-btn').addEventListener('click', () => openPreview(item, file));
+      card.querySelector('.open-btn').addEventListener('click', () => window.open(file.openUrl, '_blank', 'noopener,noreferrer'));
+      card.querySelector('.delete-btn').addEventListener('click', () => deleteFile(item.slug, file.id, file.name));
+
+      return card;
+    }
+
+    function buildUploadingCard(fileName) {
+      const card = document.createElement('div');
+      card.className = 'file-card uploading';
+      card.innerHTML = `
+        <div class="file-icon">⇡</div>
+        <div class="file-info">
+          <div class="file-name">${escapeHTML(fileName)}</div>
+          <div class="file-meta">
+            <span class="mini-chip" style="background:#FFE5CC;color:#B85300;border-color:#F5C992">Uploading...</span>
+          </div>
+          <div class="upload-progress"><div class="upload-progress-bar"></div></div>
+        </div>
+        <div class="file-actions"></div>
+      `;
+      return card;
+    }
+
+    function renderStats() {
+      let total = 0, complete = 0, needAction = 0;
+      SECTIONS.forEach(section => {
+        section.items.forEach(item => {
+          total++;
+          const rec = getCheckboxRecord(item.slug);
+          const expState = expirationState(rec);
+          const effective = rec.checked && !expState.expired;
+          if (effective) complete++;
+          if ((effective && expState.warning) || (rec.checked && expState.expired)) needAction++;
+        });
+      });
+      let totalFiles = 0;
+      Object.keys(filesBySlug).forEach(k => { totalFiles += filesBySlug[k].length; });
+
+      document.getElementById('statTotal').textContent = total;
+      document.getElementById('statComplete').textContent = complete;
+      document.getElementById('statPending').textContent = total - complete;
+      document.getElementById('statFiles').textContent = totalFiles;
+      const pendingSub = document.querySelector('.stat-card.pending .stat-sub');
+      if (pendingSub) {
+        pendingSub.textContent = needAction > 0
+          ? `${needAction} expiring or expired`
+          : 'Still need review';
+      }
+      document.getElementById('statFilesSub').textContent = backendStatus === 'connected'
+        ? (totalFiles === 0 ? 'Upload your first file' : 'Across all requirements')
+        : 'Not yet connected';
+    }
+
+    function renderLastUpdated() {
+      const el = document.getElementById('lastReviewed');
+      if (!state.lastModified) { el.textContent = 'Not yet saved'; return; }
+      const d = new Date(state.lastModified);
+      el.textContent = d.toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+
+    document.getElementById('fhOpenBtn').addEventListener('click', () => {
+      if (state.folderUrl) window.open(state.folderUrl, '_blank', 'noopener,noreferrer');
+    });
+    document.getElementById('fhRefreshBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('fhRefreshBtn');
+      btn.textContent = '⟳ Refreshing...';
+      await Promise.all([refreshFiles(), fetchSharedState()]);
+      render();
+      renderStats();
+      renderFolderHero();
+      btn.textContent = '⟳ Refresh';
+      showToast('Refreshed', 'success');
+    });
+
+    function buildPreviewList() {
+      previewList = [];
+      SECTIONS.forEach(section => {
+        section.items.forEach(item => {
+          (filesBySlug[item.slug] || []).forEach(f => {
+            previewList.push({ item, file: f });
+          });
+        });
+      });
+    }
+
+    function openPreview(item, file) {
+      buildPreviewList();
+      previewIndex = previewList.findIndex(p => p.file.id === file.id);
+      if (previewIndex < 0) previewIndex = 0;
+      showPreview();
+    }
+
+    function showPreview() {
+      const entry = previewList[previewIndex];
+      if (!entry) return;
+      const overlay = document.getElementById('previewOverlay');
+      const codeEl = document.getElementById('previewCode');
+      const nameEl = document.getElementById('previewName');
+      const iframe = document.getElementById('previewIframe');
+      const loading = document.getElementById('previewLoading');
+      const openBtn = document.getElementById('previewOpenBtn');
+
+      codeEl.textContent = '§ ' + entry.item.code;
+      nameEl.textContent = entry.file.name;
+      iframe.style.display = 'none';
+      loading.style.display = 'flex';
+      loading.textContent = 'Loading preview...';
+
+      iframe.onload = () => {
+        loading.style.display = 'none';
+        iframe.style.display = 'block';
+      };
+      iframe.src = entry.file.previewUrl;
+      openBtn.onclick = () => window.open(entry.file.openUrl, '_blank', 'noopener,noreferrer');
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePreview() {
+      const overlay = document.getElementById('previewOverlay');
+      const iframe = document.getElementById('previewIframe');
+      overlay.classList.remove('open');
+      iframe.src = 'about:blank';
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('previewCloseBtn').addEventListener('click', closePreview);
+    document.getElementById('previewOverlay').addEventListener('click', (e) => {
+      if (e.target.id === 'previewOverlay') closePreview();
+    });
+    document.addEventListener('keydown', (e) => {
+      const overlay = document.getElementById('previewOverlay');
+      if (!overlay.classList.contains('open')) return;
+      if (e.key === 'Escape') closePreview();
+    });
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+    function escapeAttr(str) { return escapeHTML(str); }
+    function isValidURL(str) {
+      if (!str) return false;
+      try { const u = new URL(str); return u.protocol === 'http:' || u.protocol === 'https:'; } catch (e) { return false; }
+    }
+    function getHostname(url) {
+      try { return new URL(url).hostname.replace(/^www\./, ''); } catch (e) { return url; }
+    }
+    function fileToDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve(r.result);
+        r.onerror = () => reject(r.error);
+        r.readAsDataURL(file);
+      });
+    }
+    function formatSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+    function fileEmoji(mime, name) {
+      mime = mime || '';
+      name = name || '';
+      if (mime.startsWith('image/')) return '🖼️';
+      if (mime === 'application/pdf') return '📕';
+      if (mime.startsWith('video/')) return '🎬';
+      if (mime.startsWith('audio/')) return '🎵';
+      if (/\.(docx?|odt|rtf)$/i.test(name)) return '📄';
+      if (/\.(xlsx?|csv|ods)$/i.test(name)) return '📊';
+      if (/\.(pptx?|odp)$/i.test(name)) return '📈';
+      if (/\.(zip|rar|7z|tar|gz)$/i.test(name)) return '🗜️';
+      return '📄';
+    }
+    function showToast(msg, type) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast show ' + (type || '');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => { t.className = 'toast'; }, 2800);
+    }
+
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        currentFilter = chip.dataset.filter;
+        render();
+      });
+    });
+
+    function exportJSON() {
+      const payload = {
+        exportedAt: new Date().toISOString(),
+        licensee: 'TEKKS LLC DBA alice.care',
+        licenseNumber: '344700080',
+        form: 'HCS 9201 (11/25)',
+        version: 7,
+        state: {
+          folderUrl: state.folderUrl,
+          folderName: state.folderName,
+          checkboxes: state.checkboxes,
+          refLinks: state.refLinks,
+          lastModified: state.lastModified,
+          lastModifiedBy: state.lastModifiedBy
+        }
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const stamp = new Date().toISOString().slice(0, 10);
+      a.href = url;
+      a.download = `alicecare_hcs9201_backup_${stamp}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Backup downloaded', 'success');
+    }
+
+    function importJSON() { document.getElementById('importFile').click(); }
+
+    document.getElementById('importFile').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async (evt) => {
+        try {
+          const data = JSON.parse(evt.target.result);
+          if (!data.state) throw new Error('Invalid backup format');
+          if (!confirm('Importing replaces the team-wide state (checkboxes, expirations, reference links). Continue?')) return;
+          state.checkboxes = data.state.checkboxes || {};
+          state.refLinks = data.state.refLinks || {};
+          // Normalize legacy boolean checkboxes.
+          Object.keys(state.checkboxes).forEach(slug => {
+            if (typeof state.checkboxes[slug] === 'boolean') {
+              state.checkboxes[slug] = { checked: state.checkboxes[slug], completedAt: null, expiresAt: null };
+            }
+          });
+          saveLocal();
+          await pushSharedState();
+          render();
+          renderStats();
+          showToast('Backup imported and synced', 'success');
+        } catch (err) {
+          showToast('Could not read backup file: ' + err.message, 'error');
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    });
+
+    function resetAll() {
+      if (!confirm('Reset every checkbox and expiration date for the whole team? Reference links and files in Drive stay untouched. This syncs to everyone immediately.')) return;
+      state.checkboxes = {};
+      scheduleSync();
+      render();
+      renderStats();
+      showToast('Checkboxes cleared', 'success');
+    }
+
+    window.exportJSON = exportJSON;
+    window.importJSON = importJSON;
+    window.resetAll = resetAll;
+
+    // ===== Edit mode (PIN protection) =====
+    const EDIT_PIN = '19731972';
+    const EDIT_MODE_KEY = 'alicecare_hcs9201_edit_mode';
+
+    function isEditMode() {
+      return sessionStorage.getItem(EDIT_MODE_KEY) === '1';
+    }
+
+    function applyEditMode(on) {
+      if (on) sessionStorage.setItem(EDIT_MODE_KEY, '1');
+      else sessionStorage.removeItem(EDIT_MODE_KEY);
+      document.body.classList.toggle('edit-mode', on);
+      updateLockButton();
+    }
+
+    function updateLockButton() {
+      const btn = document.getElementById('lockBtn');
+      if (!btn) return;
+      if (isEditMode()) {
+        btn.className = 'lock-btn unlocked';
+        btn.innerHTML = '🔓 Edit Mode';
+        btn.title = 'Click to lock';
+      } else {
+        btn.className = 'lock-btn locked';
+        btn.innerHTML = '🔒 View Mode';
+        btn.title = 'Click to unlock edit mode';
+      }
+    }
+
+    function showPinModal() {
+      const overlay = document.getElementById('pinOverlay');
+      const input = document.getElementById('pinInput');
+      input.value = '';
+      overlay.classList.add('open');
+      setTimeout(() => input.focus(), 60);
+    }
+
+    function hidePinModal() {
+      document.getElementById('pinOverlay').classList.remove('open');
+    }
+
+    function tryUnlock(pin) {
+      if (String(pin).trim() === EDIT_PIN) {
+        applyEditMode(true);
+        hidePinModal();
+        showToast('Edit mode unlocked', 'success');
+      } else {
+        showToast('Incorrect code', 'error');
+        const input = document.getElementById('pinInput');
+        input.value = '';
+        input.focus();
+      }
+    }
+
+    document.getElementById('lockBtn').addEventListener('click', () => {
+      if (isEditMode()) {
+        if (confirm('Lock edit mode? You will need to re-enter the code to make further changes.')) {
+          applyEditMode(false);
+          showToast('Locked', 'success');
+        }
+      } else {
+        showPinModal();
+      }
+    });
+
+    document.getElementById('pinSubmitBtn').addEventListener('click', () => {
+      tryUnlock(document.getElementById('pinInput').value);
+    });
+    document.getElementById('pinCancelBtn').addEventListener('click', hidePinModal);
+    document.getElementById('pinOverlay').addEventListener('click', (e) => {
+      if (e.target.id === 'pinOverlay') hidePinModal();
+    });
+    document.getElementById('pinInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); tryUnlock(e.target.value); }
+      else if (e.key === 'Escape') { e.preventDefault(); hidePinModal(); }
+    });
+
+    // Apply current edit mode state to body on load
+    document.body.classList.toggle('edit-mode', isEditMode());
+    updateLockButton();
+
+    loadState();
+    renderFolderHero();
+    render();
+    renderStats();
+    renderLastUpdated();
+    pingBackend(); // Auto-connect on load
+  </script>
+</body>
+</html>
