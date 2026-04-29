@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Caregiver Staffing Calculator | Alice Care v.1.1</title>
+  <title>Caregiver Staffing Calculator | Alice Care</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
@@ -797,18 +797,22 @@
               </div>
             </div>
 
-            <!-- Step 3: Active Assist Capability -->
+            <!-- Step 3: Active Assist Available -->
             <div class="form-section">
-              <h3><span class="step-num">3</span>Can the Client Actively Assist?</h3>
-              <div class="section-help">This question resolves the 1 versus 2 caregiver decision in the mid-weight and partial-assist range.</div>
+              <h3><span class="step-num">3</span>Active Assist Available?</h3>
+              <div class="section-help">This question resolves whether Alice Care sends one or two caregivers when the policy thresholds would otherwise require two. A responsible family member can fill the second-caregiver role if present and capable for every shift.</div>
               <div class="options" data-group="assist">
                 <label class="option">
                   <input type="radio" name="assist" value="yes">
                   <span class="option-text"><strong>Yes, the client participates</strong>The client follows directions, shifts weight, and helps the caregiver during transfers.</span>
                 </label>
                 <label class="option">
+                  <input type="radio" name="assist" value="family">
+                  <span class="option-text"><strong>Yes, a responsible family member assists</strong>A capable adult family member is present during every shift and acts as the second caregiver. Alice Care sends one caregiver in this scenario.</span>
+                </label>
+                <label class="option">
                   <input type="radio" name="assist" value="no">
-                  <span class="option-text"><strong>No, the client cannot help</strong>The caregiver carries the full load of every transfer.</span>
+                  <span class="option-text"><strong>No, no active assist available</strong>Neither the client nor a family member can assist. Alice Care provides full staffing as the policy thresholds require.</span>
                 </label>
               </div>
             </div>
@@ -1002,6 +1006,15 @@
       const equipment = [];
       let level = 0;
 
+      // Family assist option: a responsible family member acts as the second caregiver.
+      // For risk calculation, treat this as "client cannot actively assist" (the client itself
+      // can't help). The family member fills the second-caregiver role, so the staffing
+      // output downstream becomes 1 Alice Care caregiver instead of 2.
+      const familyAssists = state.assist === 'family';
+      if (familyAssists) {
+        state = Object.assign({}, state, { assist: 'no' });
+      }
+
       // ---------- LIFT REQUIRED (Level 4) ----------
       if (state.weight === 'above300') {
         rules.push({ level: 4, text: 'Client weight above 300 lbs requires a mechanical lift plus two caregivers.' });
@@ -1125,7 +1138,7 @@
       });
       const finalEquipment = Array.from(equipMap.values());
 
-      return { level, rules, equipment: finalEquipment };
+      return { level, rules, equipment: finalEquipment, familyAssists };
     }
 
     // Render the result panel
@@ -1229,6 +1242,41 @@
           summaryText = 'No staffing rule has triggered yet.';
       }
 
+      // ===== FAMILY-ASSIST OVERRIDE =====
+      // When a responsible family member fills the second-caregiver role, Alice Care
+      // sends one caregiver instead of two. Lift requirement is preserved because the
+      // lift is equipment, not personnel.
+      if (result.familyAssists) {
+        if (result.level === 4) {
+          headlineText = '1 Alice Care Caregiver + Lift';
+          badgeClass = 'lift';
+          badgeText = '1 Caregiver + Lift + Family';
+          summaryText = 'A responsible family member acts as the second caregiver during every shift. Alice Care sends one trained caregiver. A mechanical lift is still required because the lift handles all weight transfer; the family member assists with positioning.';
+          actions = [
+            'Schedule one Alice Care caregiver per shift. Family member acts as the second person.',
+            'Confirm a mechanical lift sits on site, in working order, with charged battery if applicable.',
+            'Brief the family member on lift operation and safe handling protocols before the first shift.',
+            'Document the family member as designated second caregiver in the care plan.',
+            'Verify family member presence at the start of every shift before any high-risk task.',
+            'Reassess staffing immediately if the family member becomes unavailable or unable to assist.'
+          ];
+        } else if (result.level >= 2) {
+          headlineText = '1 Alice Care Caregiver';
+          badgeClass = 'one';
+          badgeText = '1 Caregiver + Family';
+          summaryText = 'A responsible family member acts as the second caregiver during every shift. Alice Care sends one trained caregiver. The family member assists with transfers, repositioning, and any task that would otherwise require two caregivers.';
+          actions = [
+            'Schedule one Alice Care caregiver per shift. Family member acts as the second person.',
+            'Brief the family member on safe handling protocols and proper body mechanics before the first shift.',
+            'Document the family member as designated second caregiver in the care plan with a signed acknowledgment.',
+            'Verify family member presence at the start of every shift before any high-risk task.',
+            'Verify all recommended equipment sits on site before the first shift.',
+            'Reassess staffing immediately if the family member becomes unavailable or unable to assist.'
+          ];
+        }
+        // Level 1 with family is just normal level 1 (family is bonus help, no override needed)
+      }
+
       // Update the headline
       headline.className = 'result-staffing';
       headline.textContent = headlineText;
@@ -1251,10 +1299,20 @@
       });
       uniqueRules.sort((a, b) => b.level - a.level);
 
-      if (uniqueRules.length === 0) {
+      // When family-assist is active and underlying risk would have required 2+ caregivers,
+      // prepend a rule explaining the family member's role for clarity.
+      let finalRules = uniqueRules;
+      if (result.familyAssists && result.level >= 2) {
+        finalRules = [{
+          text: 'A responsible family member is present at every shift and acts as the second caregiver. Alice Care sends one caregiver instead of two.',
+          level: 0
+        }, ...uniqueRules];
+      }
+
+      if (finalRules.length === 0) {
         ruleList.innerHTML = '<li class="empty">No specific triggers active.</li>';
       } else {
-        ruleList.innerHTML = uniqueRules.map(r => `<li>${r.text}</li>`).join('');
+        ruleList.innerHTML = finalRules.map(r => `<li>${r.text}</li>`).join('');
       }
 
       // Equipment list
@@ -1277,10 +1335,18 @@
       // Action list
       actionList.innerHTML = actions.map(a => `<li>${a}</li>`).join('');
 
-      // Update sticky banner with color, icon, and text matching the level
-      banner.className = 'sticky-banner level-' + result.level;
+      // Update sticky banner with color, icon, and text matching the level.
+      // When family-assist is active, the banner reflects the Alice Care staffing output:
+      // level 4 with family stays as level 3 color (lift still required); levels 2 and 3
+      // with family drop to level 1 color (only one caregiver dispatched).
+      let bannerLevel = result.level;
+      if (result.familyAssists) {
+        if (result.level === 4) bannerLevel = 3;
+        else if (result.level >= 2) bannerLevel = 1;
+      }
+      banner.className = 'sticky-banner level-' + bannerLevel;
       const iconMap = { 1: '✓', 2: '⚖', 3: '⚠', 4: '⚠' };
-      bannerIcon.textContent = iconMap[result.level] || '?';
+      bannerIcon.textContent = iconMap[bannerLevel] || '?';
       bannerResult.textContent = headlineText;
       bannerBtn.disabled = false;
 
@@ -1367,7 +1433,14 @@
           4: [185, 28, 28]    // red
         };
         const calcResult = calculate(state);
-        const accentColor = levelColors[calcResult.level] || [245, 118, 0];
+        // Mirror the on-screen banner: family-assist drops the visual urgency since
+        // Alice Care only sends one caregiver. Keep orange when a lift is still required.
+        let displayLevel = calcResult.level;
+        if (calcResult.familyAssists) {
+          if (calcResult.level === 4) displayLevel = 3;
+          else if (calcResult.level >= 2) displayLevel = 1;
+        }
+        const accentColor = levelColors[displayLevel] || [245, 118, 0];
 
         // ============ Set up the document ============
         const doc = new jsPDFLib({ unit: 'mm', format: 'letter', orientation: 'portrait' });
