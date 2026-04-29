@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Caregiver Staffing Calculator | Alice Care</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.12.1/html2pdf.bundle.min.js" integrity="sha512-D25Z8/1q2z65ZpJ3NzY6XiPZfwjhbv34OTQHDIZd+KPK+uWCovGt+fMkSzW8ArzCMFUgZt6Cdu7qoXNuy6a2GA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
@@ -880,7 +881,7 @@
             <!-- Action Row -->
             <div class="action-row">
               <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset Form</button>
-              <button type="button" class="btn btn-print" onclick="window.print()">Print Result</button>
+              <button type="button" class="btn btn-print" id="downloadBtn" onclick="downloadPDF()">↓ Download PDF</button>
             </div>
           </form>
         </div>
@@ -1298,6 +1299,117 @@
       const target = document.querySelector('.result-card');
       if (target) {
         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    // Generate and download a branded PDF of the assessment result
+    async function downloadPDF() {
+      const btn = document.getElementById('downloadBtn');
+      const originalLabel = btn.textContent;
+
+      // Block download until the form has produced a real recommendation
+      const state = getState();
+      const ready = state.weight && state.mobility && state.assist && state.bedbound &&
+                    (state.bedbound !== 'yes' || state.reposition);
+      if (!ready) {
+        alert('Please complete questions 1 through 4 (and the bed-bound follow-up if applicable) before downloading the PDF.');
+        return;
+      }
+
+      // Verify the library loaded; fall back to print if the CDN is blocked
+      if (typeof html2pdf === 'undefined') {
+        const useFallback = confirm('PDF library could not load (network or CDN issue). Open the print dialog instead so you can save as PDF from there?');
+        if (useFallback) window.print();
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Generating PDF...';
+
+      try {
+        // Build a clean filename from client name and assessment date
+        const rawClient = document.getElementById('clientName').value.trim() || 'Client';
+        const rawDate = document.getElementById('assessDate').value || new Date().toISOString().split('T')[0];
+        const safeClient = rawClient.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_|_$/g, '').substring(0, 40) || 'Client';
+        const filename = `AliceCare_StaffingAssessment_${safeClient}_${rawDate}.pdf`;
+
+        // Clone the live result panel so we don't disturb the page
+        const original = document.querySelector('.result-panel');
+        const clone = original.cloneNode(true);
+
+        // Reveal the print-only header inside the clone
+        const printHeader = clone.querySelector('.print-header');
+        if (printHeader) {
+          printHeader.style.display = 'block';
+          printHeader.style.padding = '0 0 14px 0';
+          printHeader.style.borderBottom = '2px solid #1A365C';
+          printHeader.style.marginBottom = '18px';
+        }
+
+        // Wrap the clone with Alice Care branding header and footer
+        const wrapper = document.createElement('div');
+        wrapper.style.cssText = [
+          'padding: 24px',
+          "font-family: 'Poppins', Arial, Helvetica, sans-serif",
+          'background: #FFFFFF',
+          'color: #2D4A6F',
+          'width: 760px',
+          'box-sizing: border-box'
+        ].join(';');
+
+        const brandHeader = document.createElement('div');
+        brandHeader.style.cssText = 'text-align:center;padding:12px 0 16px;border-bottom:3px solid #F57600;margin-bottom:18px;';
+        brandHeader.innerHTML =
+          '<div style="font-size:26px;font-weight:700;letter-spacing:-0.5px;">' +
+            '<span style="color:#F57600;">alice.</span><span style="color:#1A365C;font-weight:400;">care</span>' +
+          '</div>' +
+          '<div style="font-size:11px;color:#5A6E89;letter-spacing:0.6px;margin-top:4px;">' +
+            'Caregiver Staffing Assessment &nbsp;·&nbsp; CDSS License #344700080' +
+          '</div>';
+        wrapper.appendChild(brandHeader);
+        wrapper.appendChild(clone);
+
+        const brandFooter = document.createElement('div');
+        brandFooter.style.cssText = 'margin-top:24px;padding-top:14px;border-top:1px solid #E2E8F0;font-size:9.5px;color:#94A3B8;text-align:center;line-height:1.6;';
+        const generated = new Date().toLocaleString('en-US', {
+          year: 'numeric', month: 'short', day: 'numeric',
+          hour: 'numeric', minute: '2-digit'
+        });
+        brandFooter.innerHTML =
+          'Alice Care &nbsp;·&nbsp; 8146 Greenback Lane, Suite #106, Fair Oaks, CA 95628 &nbsp;·&nbsp; (916) 292-8820<br>' +
+          'Generated ' + escapeHtml(generated) + ' &nbsp;·&nbsp; Result reflects the Two-Caregiver and Bed-Bound Safety Policy. Caregiver judgment in the field overrides any automated recommendation.';
+        wrapper.appendChild(brandFooter);
+
+        // Place the wrapper off-screen so html2canvas can render it accurately
+        wrapper.style.position = 'absolute';
+        wrapper.style.left = '-10000px';
+        wrapper.style.top = '0';
+        document.body.appendChild(wrapper);
+
+        const opt = {
+          margin: [10, 10, 12, 10],
+          filename: filename,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#FFFFFF' },
+          jsPDF: { unit: 'mm', format: 'letter', orientation: 'portrait', compress: true },
+          pagebreak: { mode: ['css', 'legacy'], avoid: ['.sub-card', '.result-card'] }
+        };
+
+        await html2pdf().set(opt).from(wrapper).save();
+
+        // Clean up the off-screen clone
+        document.body.removeChild(wrapper);
+
+        btn.textContent = '✓ Downloaded';
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.textContent = originalLabel;
+        }, 2200);
+      } catch (err) {
+        console.error('PDF generation failed:', err);
+        btn.disabled = false;
+        btn.textContent = originalLabel;
+        alert('PDF generation hit an error. Please try again, or use the browser print dialog (Cmd/Ctrl + P) and choose "Save as PDF".');
       }
     }
 
