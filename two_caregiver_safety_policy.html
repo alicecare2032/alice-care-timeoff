@@ -74,6 +74,38 @@
     .intro-section h1 span { color: #F57600; }
     .intro-section p { font-size: 13.5px; line-height: 1.7; color: #2D4A6F; }
 
+    /* Calculator CTA */
+    .calc-cta {
+      margin: 18px 0 0;
+      background: linear-gradient(135deg, #FFF4E6 0%, #FFE9D6 100%);
+      border: 1px solid #F5C98A;
+      border-radius: 10px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .calc-cta-text { flex: 1; }
+    .calc-cta-text strong { display: block; font-size: 13px; color: #1A365C; margin-bottom: 2px; }
+    .calc-cta-text span { font-size: 12px; color: #5A4A1E; line-height: 1.5; }
+    .calc-cta-btn {
+      flex-shrink: 0;
+      background: #F57600;
+      color: #FFFFFF;
+      text-decoration: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .calc-cta-btn:hover { background: #E06900; box-shadow: 0 2px 8px rgba(245, 118, 0, 0.3); }
+    @media (max-width: 580px) {
+      .calc-cta { flex-direction: column; align-items: stretch; text-align: center; }
+    }
+
     /* Definition Cards */
     .def-row { display: flex; gap: 14px; }
     .def-card { flex: 1; border-radius: 8px; padding: 18px 20px; }
@@ -446,6 +478,15 @@
       <div class="intro-section">
         <h1>Two-Caregiver &amp; <span>Bed-Bound Safety Policy</span></h1>
         <p>Alice Care places caregiver and client safety at the center of every shift. This policy specifies when one caregiver can safely staff a visit and when the shift requires two caregivers, sometimes paired with a transfer lift. Three factors drive the decision: client weight, mobility level, and bed-bound status. <strong>Bed-bound status automatically elevates risk regardless of weight</strong>, because most bed-bound tasks involve full-body handling. Whenever any factor crosses a threshold, the staffing model rises to match it. These rules protect caregivers from injury, protect clients from unsafe handling, and keep every visit aligned with our care standards.</p>
+
+        <!-- CTA to Calculator -->
+        <div class="calc-cta">
+          <div class="calc-cta-text">
+            <strong>Need a quick staffing decision for a specific client?</strong>
+            <span>Run the interactive Caregiver Staffing Calculator. Answer five questions and receive a recommendation, the triggered rules, and the equipment list.</span>
+          </div>
+          <a href="caregiver_staffing_calculator.html" class="calc-cta-btn">Open Calculator →</a>
+        </div>
       </div>
 
       <!-- Two Staffing Models -->
@@ -814,6 +855,7 @@
       <!-- Quick Links -->
       <div class="quick-links">
         <div class="quick-links-row">
+          <a href="caregiver_staffing_calculator.html" class="quick-link">Staffing Calculator</a>
           <a href="https://www.Alicecare.com" class="quick-link">Caregiving Essentials</a>
           <a href="https://www.Alicecare.com" class="quick-link">Safety Policies</a>
           <a href="https://www.Alicecare.com" class="quick-link">Equipment Guide</a>

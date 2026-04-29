@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caregiver Staffing Calculator | Alice Care</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Poppins', Arial, Helvetica, sans-serif;
+      background-color: #F0F7FF;
+      margin: 0;
+      padding: 0;
+      color: #2D4A6F;
+    }
+
+    .page-wrapper { width: 100%; padding: 30px 15px; }
+
+    .page-container {
+      max-width: 920px;
+      margin: 0 auto;
+      background-color: #FFFFFF;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(26, 54, 92, 0.08);
+    }
+
+    /* Header */
+    .page-header {
+      background: linear-gradient(135deg, #F57600 0%, #E06900 100%);
+      padding: 22px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page-header::before {
+      content: '';
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 50%;
+      top: -100px;
+      right: 5%;
+    }
+
+    .logo { font-size: 28px; font-weight: 700; position: relative; z-index: 1; }
+    .logo .alice { color: #FFFFFF; }
+    .logo .care { color: #1A365C; font-weight: 400; }
+
+    .header-tagline {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 12px;
+      font-weight: 400;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Back Link Bar */
+    .back-bar {
+      background: #1A365C;
+      padding: 10px 40px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .back-bar a {
+      color: #F57600;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .back-bar a:hover { text-decoration: underline; }
+
+    /* Intro */
+    .intro {
+      padding: 28px 40px 20px;
+      border-bottom: 1px solid #E2E8F0;
+    }
+
+    .intro h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1A365C;
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+
+    .intro h1 span { color: #F57600; }
+
+    .intro p {
+      font-size: 13.5px;
+      line-height: 1.7;
+      color: #2D4A6F;
+    }
+
+    /* Two-column layout */
+    .layout-grid {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 0;
+    }
+
+    .form-column { padding: 28px 30px 28px 40px; border-right: 1px solid #E2E8F0; }
+    .result-column { padding: 28px 40px 28px 30px; background: #F8FAFC; }
+
+    @media (max-width: 820px) {
+      .layout-grid { grid-template-columns: 1fr; }
+      .form-column { border-right: none; border-bottom: 1px solid #E2E8F0; padding: 22px 24px; }
+      .result-column { padding: 22px 24px; }
+    }
+
+    /* Form Section */
+    .form-section {
+      margin-bottom: 22px;
+      padding-bottom: 22px;
+      border-bottom: 1px dashed #E2E8F0;
+    }
+
+    .form-section:last-child { border-bottom: none; }
+
+    .form-section h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1A365C;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      background: #F57600;
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .form-section .section-help {
+      font-size: 11.5px;
+      color: #666666;
+      margin-bottom: 12px;
+      margin-left: 34px;
+      line-height: 1.5;
+    }
+
+    /* Client Info Inputs */
+    .client-info-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-left: 34px;
+    }
+
+    .client-info-row.three { grid-template-columns: 1fr 1fr 1fr; }
+
+    @media (max-width: 580px) {
+      .client-info-row, .client-info-row.three { grid-template-columns: 1fr; }
+    }
+
+    .input-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .input-field label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #5A6E89;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .input-field input[type="text"],
+    .input-field input[type="date"] {
+      padding: 8px 12px;
+      border: 1px solid #C7DAF0;
+      border-radius: 6px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px;
+      color: #1A365C;
+      background: #FFFFFF;
+      transition: border-color 0.15s;
+    }
+
+    .input-field input:focus {
+      outline: none;
+      border-color: #F57600;
+    }
+
+    /* Radio Options */
+    .options { margin-left: 34px; display: flex; flex-direction: column; gap: 8px; }
+
+    .option {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 11px 14px;
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .option:hover { border-color: #F57600; background: #FFF8F0; }
+
+    .option input[type="radio"], .option input[type="checkbox"] {
+      flex-shrink: 0;
+      margin-top: 2px;
+      accent-color: #F57600;
+      cursor: pointer;
+      width: 16px;
+      height: 16px;
+    }
+
+    .option input[type="radio"]:checked + .option-text,
+    .option input[type="checkbox"]:checked + .option-text {
+      color: #1A365C;
+    }
+
+    .option:has(input:checked) {
+      border-color: #F57600;
+      background: #FFF4E6;
+      box-shadow: 0 1px 3px rgba(245, 118, 0, 0.12);
+    }
+
+    .option-text {
+      font-size: 12.5px;
+      line-height: 1.5;
+      color: #2D4A6F;
+      flex: 1;
+    }
+
+    .option-text strong {
+      display: block;
+      font-weight: 600;
+      color: #1A365C;
+      margin-bottom: 2px;
+    }
+
+    .option-text .helper {
+      display: block;
+      font-size: 11px;
+      color: #666666;
+      margin-top: 2px;
+    }
+
+    /* Conditional Section */
+    .conditional {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.4s ease, opacity 0.3s ease;
+    }
+
+    .conditional.open {
+      max-height: 1200px;
+      opacity: 1;
+      margin-top: 14px;
+    }
+
+    .conditional-inner {
+      background: #F0F7FF;
+      border-left: 3px solid #1A365C;
+      border-radius: 6px;
+      padding: 14px 16px;
+    }
+
+    .conditional-inner h4 {
+      font-size: 12px;
+      font-weight: 700;
+      color: #1A365C;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .conditional-inner .options { margin-left: 0; }
+
+    /* Action Buttons */
+    .action-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s ease;
+    }
+
+    .btn-primary {
+      background: #F57600;
+      color: #FFFFFF;
+    }
+
+    .btn-primary:hover { background: #E06900; box-shadow: 0 2px 8px rgba(245, 118, 0, 0.3); }
+
+    .btn-secondary {
+      background: #FFFFFF;
+      color: #1A365C;
+      border: 1px solid #C7DAF0;
+    }
+
+    .btn-secondary:hover { background: #F0F7FF; border-color: #1A365C; }
+
+    .btn-print {
+      background: #1A365C;
+      color: #FFFFFF;
+    }
+
+    .btn-print:hover { background: #244780; }
+
+    /* Result Panel */
+    .result-panel { position: sticky; top: 20px; }
+
+    .result-card {
+      background: #FFFFFF;
+      border-radius: 12px;
+      padding: 24px 22px;
+      box-shadow: 0 2px 8px rgba(26, 54, 92, 0.08);
+      margin-bottom: 16px;
+    }
+
+    .result-header {
+      font-size: 11px;
+      font-weight: 700;
+      color: #5A6E89;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+
+    .result-staffing {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1A365C;
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+
+    .result-staffing.empty {
+      color: #94A3B8;
+      font-size: 16px;
+    }
+
+    .result-badge-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .result-badge {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 14px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    .result-badge.one { background: #E6F4EA; color: #1B7A3D; border: 1px solid #B7DFC6; }
+    .result-badge.flex { background: #FFF8E1; color: #8A6500; border: 1px solid #F0D785; }
+    .result-badge.two { background: #FFE9D6; color: #C25700; border: 1px solid #F5C98A; }
+    .result-badge.lift { background: #FDECEA; color: #B91C1C; border: 1px solid #F5C6C6; }
+
+    .result-summary {
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: #2D4A6F;
+      padding: 12px 14px;
+      background: #F8FAFC;
+      border-radius: 6px;
+      border-left: 3px solid #F57600;
+    }
+
+    /* Sub Cards */
+    .sub-card {
+      background: #FFFFFF;
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(26, 54, 92, 0.06);
+    }
+
+    .sub-card h4 {
+      font-size: 11px;
+      font-weight: 700;
+      color: #1A365C;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .sub-card h4::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: #F57600;
+      border-radius: 50%;
+    }
+
+    .rule-list { list-style: none; padding: 0; margin: 0; }
+
+    .rule-list li {
+      font-size: 12px;
+      line-height: 1.5;
+      color: #2D4A6F;
+      padding: 6px 0;
+      border-bottom: 1px dashed #E2E8F0;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .rule-list li:last-child { border-bottom: none; }
+
+    .rule-list li::before {
+      content: '✓';
+      flex-shrink: 0;
+      color: #F57600;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .rule-list li.empty::before { content: '·'; color: #94A3B8; }
+
+    .equipment-list { list-style: none; padding: 0; margin: 0; }
+
+    .equipment-list li {
+      font-size: 12px;
+      line-height: 1.5;
+      padding: 6px 0;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      border-bottom: 1px dashed #E2E8F0;
+    }
+
+    .equipment-list li:last-child { border-bottom: none; }
+
+    .equip-tag {
+      flex-shrink: 0;
+      padding: 1px 7px;
+      border-radius: 8px;
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .equip-tag.required { background: #FDECEA; color: #B91C1C; }
+    .equip-tag.recommended { background: #F0F7FF; color: #1A365C; }
+
+    .equip-name { color: #2D4A6F; }
+
+    /* Footer */
+    .page-footer {
+      background: #1A365C;
+      padding: 18px 40px;
+      text-align: center;
+      border-top: 3px solid #F57600;
+    }
+
+    .page-footer .footer-logo {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .page-footer .footer-logo .alice { color: #F57600; }
+    .page-footer .footer-logo .care { color: #FFFFFF; font-weight: 400; }
+
+    .page-footer .footer-text {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.6);
+      line-height: 1.5;
+    }
+
+    .page-footer .footer-text a {
+      color: #F57600;
+      text-decoration: none;
+    }
+
+    /* Empty state in result panel */
+    .empty-state {
+      text-align: center;
+      padding: 20px 10px;
+      color: #94A3B8;
+      font-size: 12.5px;
+      line-height: 1.6;
+    }
+
+    .empty-state .icon {
+      font-size: 32px;
+      color: #C7DAF0;
+      margin-bottom: 8px;
+    }
+
+    /* Print Styles */
+    @media print {
+      body { background: #FFFFFF; }
+      .page-wrapper { padding: 0; }
+      .page-container { box-shadow: none; max-width: 100%; }
+      .form-column, .back-bar, .action-row, .page-footer { display: none !important; }
+      .layout-grid { grid-template-columns: 1fr; }
+      .result-column { background: #FFFFFF; padding: 24px; }
+      .result-panel { position: static; }
+      .print-header { display: block !important; }
+      .sub-card, .result-card { box-shadow: none; border: 1px solid #E2E8F0; break-inside: avoid; }
+    }
+
+    .print-header {
+      display: none;
+      padding: 20px 0;
+      border-bottom: 2px solid #1A365C;
+      margin-bottom: 20px;
+    }
+
+    .print-header h2 {
+      font-size: 20px;
+      color: #1A365C;
+      margin-bottom: 4px;
+    }
+
+    .print-header .meta {
+      font-size: 12px;
+      color: #5A6E89;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="page-container">
+
+      <!-- Header -->
+      <div class="page-header">
+        <div class="logo">
+          <span class="alice">alice.</span><span class="care">care</span>
+        </div>
+        <div class="header-tagline">Caregiver Staffing Calculator</div>
+      </div>
+
+      <!-- Back link -->
+      <div class="back-bar">
+        ← Return to <a href="two_caregiver_safety_policy.html">Two-Caregiver &amp; Bed-Bound Safety Policy</a>
+      </div>
+
+      <!-- Intro -->
+      <div class="intro">
+        <h1>Determine the Right <span>Staffing for Each Client</span></h1>
+        <p>Answer the questions below to receive a staffing recommendation grounded in our published safety policy. The calculator runs every rule in real time, lists the triggers that drive the decision, and notes the equipment the shift requires. Use the print button to attach the result to the care plan.</p>
+      </div>
+
+      <!-- Layout: Form + Result -->
+      <div class="layout-grid">
+
+        <!-- FORM COLUMN -->
+        <div class="form-column">
+          <form id="staffingForm" autocomplete="off">
+
+            <!-- Client Info -->
+            <div class="form-section">
+              <h3><span class="step-num">i</span>Client Information (Optional)</h3>
+              <div class="section-help">Use these fields when documenting the assessment for the care plan.</div>
+              <div class="client-info-row three">
+                <div class="input-field">
+                  <label for="clientName">Client Name</label>
+                  <input type="text" id="clientName" placeholder="Full name">
+                </div>
+                <div class="input-field">
+                  <label for="assessor">Assessor</label>
+                  <input type="text" id="assessor" placeholder="Office staff name">
+                </div>
+                <div class="input-field">
+                  <label for="assessDate">Assessment Date</label>
+                  <input type="date" id="assessDate">
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 1: Weight -->
+            <div class="form-section">
+              <h3><span class="step-num">1</span>Client Weight</h3>
+              <div class="section-help">Select the range that matches the client's most recent recorded weight.</div>
+              <div class="options" data-group="weight">
+                <label class="option">
+                  <input type="radio" name="weight" value="under180">
+                  <span class="option-text"><strong>Under 180 lbs</strong>The client weighs less than 180 lbs.</span>
+                </label>
+                <label class="option">
+                  <input type="radio" name="weight" value="180to250">
+                  <span class="option-text"><strong>180 to 250 lbs</strong>The client falls in the mid-weight range.</span>
+                </label>
+                <label class="option">
+                  <input type="radio" name="weight" value="250to300">
+                  <span class="option-text"><strong>250 to 300 lbs</strong>The client weighs between 250 and 300 lbs.</span>
+                </label>
+                <label class="option">
+                  <input type="radio" name="weight" value="above300">
+                  <span class="option-text"><strong>Above 300 lbs</strong>The client weighs more than 300 lbs.</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Step 2: Mobility -->
+            <div class="form-section">
+              <h3><span class="step-num">2</span>Mobility Level</h3>
+              <div class="section-help">Pick the level that matches how the client moves and transfers.</div>
+              <div class="options" data-group="mobility">
+                <label class="option">
+                  <input type="radio" name="mobility" value="independent">
+                  <span class="option-text"><strong>Independent</strong>The client moves and transfers without physical support.</span>
+                </label>
+                <label class="option">
+                  <input type="radio" name="mobility" value="partial">
+                  <span class="option-text"><strong>Partial Assist</strong>The client needs some help with transfers and balance.</span>
+                </label>
+                <label class="option">
+                  <input type="radio" name="mobility" value="full">
+                  <span class="option-text"><strong>Full Assist</strong>The client cannot perform transfers without significant help.</span>
+                </label>
+                <label class="option">
+                  <input type="radio" name="mobility" value="nonweight">
+                  <span class="option-text"><strong>Non-Weight Bearing</strong>The client cannot bear weight on their legs.</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Step 3: Active Assist Capability -->
+            <div class="form-section">
+              <h3><span class="step-num">3</span>Can the Client Actively Assist?</h3>
+              <div class="section-help">This question resolves the 1 versus 2 caregiver decision in the mid-weight and partial-assist range.</div>
+              <div class="options" data-group="assist">
+                <label class="option">
+                  <input type="radio" name="assist" value="yes">
+                  <span class="option-text"><strong>Yes, the client participates</strong>The client follows directions, shifts weight, and helps the caregiver during transfers.</span>
+                </label>
+                <label class="option">
+                  <input type="radio" name="assist" value="no">
+                  <span class="option-text"><strong>No, the client cannot help</strong>The caregiver carries the full load of every transfer.</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Step 4: Bed-Bound -->
+            <div class="form-section">
+              <h3><span class="step-num">4</span>Bed-Bound Status</h3>
+              <div class="section-help">Mark the client bed-bound when they remain in bed most or all of the day, require help for every transfer, cannot reposition independently, or use a hospital bed.</div>
+              <div class="options" data-group="bedbound">
+                <label class="option">
+                  <input type="radio" name="bedbound" value="yes">
+                  <span class="option-text"><strong>Yes, client is bed-bound</strong>The client meets one or more bed-bound criteria.</span>
+                </label>
+                <label class="option">
+                  <input type="radio" name="bedbound" value="no">
+                  <span class="option-text"><strong>No, client is not bed-bound</strong>The client moves out of bed regularly.</span>
+                </label>
+              </div>
+
+              <!-- Bed-bound conditional sub-questions -->
+              <div class="conditional" id="bedboundDetails">
+                <div class="conditional-inner">
+                  <h4>Repositioning Ability</h4>
+                  <div class="options" data-group="reposition">
+                    <label class="option">
+                      <input type="radio" name="reposition" value="independent">
+                      <span class="option-text"><strong>Repositions independently</strong>The client shifts position without physical help.</span>
+                    </label>
+                    <label class="option">
+                      <input type="radio" name="reposition" value="limited">
+                      <span class="option-text"><strong>Limited movement</strong>The client moves partially and tires quickly.</span>
+                    </label>
+                    <label class="option">
+                      <input type="radio" name="reposition" value="cannot">
+                      <span class="option-text"><strong>Cannot reposition</strong>The client depends fully on the caregiver to turn or shift.</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 5: Specific Care Tasks -->
+            <div class="form-section">
+              <h3><span class="step-num">5</span>Specific Care Tasks Required</h3>
+              <div class="section-help">Select every task the shift involves. Each box that ticks may trigger a two-caregiver requirement.</div>
+              <div class="options" data-group="tasks">
+                <label class="option">
+                  <input type="checkbox" name="tasks" value="bedToChair">
+                  <span class="option-text"><strong>Bed-to-chair transfers</strong>The shift includes moving the client between bed and wheelchair or chair.</span>
+                </label>
+                <label class="option">
+                  <input type="checkbox" name="tasks" value="briefChange">
+                  <span class="option-text"><strong>Brief changes in bed</strong>Toileting and hygiene happen with the client in bed.</span>
+                </label>
+                <label class="option">
+                  <input type="checkbox" name="tasks" value="boosting">
+                  <span class="option-text"><strong>Boosting or pulling up in bed</strong>The client needs repositioning toward the head of the bed.</span>
+                </label>
+                <label class="option">
+                  <input type="checkbox" name="tasks" value="reposEvery2">
+                  <span class="option-text"><strong>Repositioning every 2 hours</strong>The care plan requires scheduled turns to prevent pressure injuries.</span>
+                </label>
+                <label class="option">
+                  <input type="checkbox" name="tasks" value="resistance">
+                  <span class="option-text"><strong>Resistance, stiffness, or pain during movement</strong>The client braces, guards, or shows pain when moved.</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Action Row -->
+            <div class="action-row">
+              <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset Form</button>
+              <button type="button" class="btn btn-print" onclick="window.print()">Print Result</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- RESULT COLUMN -->
+        <div class="result-column">
+          <div class="result-panel">
+
+            <!-- Print-only header -->
+            <div class="print-header" id="printHeader">
+              <h2>Caregiver Staffing Assessment</h2>
+              <div class="meta" id="printMeta">Alice Care · CDSS License #344700080</div>
+            </div>
+
+            <!-- Recommendation Card -->
+            <div class="result-card">
+              <div class="result-header">Recommended Staffing</div>
+              <div class="result-staffing empty" id="staffingHeadline">Awaiting answers</div>
+              <div class="result-badge-row" id="badgeRow"></div>
+              <div class="result-summary" id="summaryText">Complete the form to receive a recommendation grounded in the Alice Care safety policy.</div>
+            </div>
+
+            <!-- Triggered Rules -->
+            <div class="sub-card">
+              <h4>Why This Recommendation</h4>
+              <ul class="rule-list" id="ruleList">
+                <li class="empty">No triggers active yet.</li>
+              </ul>
+            </div>
+
+            <!-- Equipment -->
+            <div class="sub-card">
+              <h4>Equipment Required &amp; Recommended</h4>
+              <ul class="equipment-list" id="equipmentList">
+                <li><span class="equip-name" style="color:#94A3B8;">Equipment list updates as the form fills.</span></li>
+              </ul>
+            </div>
+
+            <!-- Action Items -->
+            <div class="sub-card">
+              <h4>Next Steps for the Office</h4>
+              <ul class="rule-list" id="actionList">
+                <li class="empty">Action items populate after the staffing decision.</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="page-footer">
+        <div class="footer-logo">
+          <span class="alice">alice.</span><span class="care">care</span>
+        </div>
+        <div class="footer-text">
+          Calculator outputs reflect the Alice Care Two-Caregiver and Bed-Bound Safety Policy.<br>
+          Caregiver judgment in the field overrides any automated recommendation. <a href="https://www.Alicecare.com">Alice Care Support</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // ============================================================
+    // Caregiver Staffing Decision Engine
+    // ============================================================
+    //
+    // Levels (highest wins):
+    //   1 = One caregiver
+    //   2 = One to two caregivers (judgment call)
+    //   3 = Two caregivers required
+    //   4 = Two caregivers plus mechanical lift required
+    //
+    // Logic mirrors the Alice Care Two-Caregiver and Bed-Bound
+    // Safety Policy. Every triggered rule appears in the result
+    // panel so the office can audit the decision.
+    // ============================================================
+
+    const form = document.getElementById('staffingForm');
+    const bedboundDetails = document.getElementById('bedboundDetails');
+
+    // Show or hide the bed-bound sub-questions based on the radio choice
+    function toggleBedboundDetails() {
+      const bb = document.querySelector('input[name="bedbound"]:checked');
+      if (bb && bb.value === 'yes') {
+        bedboundDetails.classList.add('open');
+      } else {
+        bedboundDetails.classList.remove('open');
+        // Clear repositioning answer when bed-bound flips to no
+        document.querySelectorAll('input[name="reposition"]').forEach(r => r.checked = false);
+      }
+    }
+
+    // Collect form state into a clean object
+    function getState() {
+      const data = new FormData(form);
+      const tasks = [];
+      document.querySelectorAll('input[name="tasks"]:checked').forEach(c => tasks.push(c.value));
+      return {
+        weight: data.get('weight'),
+        mobility: data.get('mobility'),
+        assist: data.get('assist'),
+        bedbound: data.get('bedbound'),
+        reposition: data.get('reposition'),
+        tasks: tasks
+      };
+    }
+
+    // Run the full decision engine
+    function calculate(state) {
+      const rules = [];
+      const equipment = [];
+      let level = 0;
+
+      // ---------- LIFT REQUIRED (Level 4) ----------
+      if (state.weight === 'above300') {
+        rules.push({ level: 4, text: 'Client weight above 300 lbs requires a mechanical lift plus two caregivers.' });
+      }
+      if (state.mobility === 'nonweight') {
+        rules.push({ level: 4, text: 'Non-weight-bearing status requires a mechanical lift plus two caregivers.' });
+      }
+      if (state.bedbound === 'yes' && state.weight === 'above300') {
+        rules.push({ level: 4, text: 'Bed-bound clients above 300 lbs require two caregivers plus a lift.' });
+      }
+
+      // ---------- TWO CAREGIVERS REQUIRED (Level 3) ----------
+      if (state.weight === '250to300') {
+        rules.push({ level: 3, text: 'Client weight 250 to 300 lbs requires two caregivers.' });
+      }
+      if (state.mobility === 'full') {
+        rules.push({ level: 3, text: 'Full-assist mobility requires two caregivers for every transfer.' });
+      }
+      if (state.bedbound === 'yes' && state.weight === '250to300') {
+        rules.push({ level: 3, text: 'Bed-bound clients above 250 lbs require two caregivers.' });
+      }
+      if (state.bedbound === 'yes' && state.assist === 'no') {
+        rules.push({ level: 3, text: 'Bed-bound client cannot assist; two caregivers required regardless of weight.' });
+      }
+      if (state.reposition === 'cannot') {
+        rules.push({ level: 3, text: 'Client cannot reposition; two caregivers required for every turn.' });
+      }
+      if (state.tasks.includes('bedToChair') && state.assist === 'no') {
+        rules.push({ level: 3, text: 'Bed-to-chair transfers with a non-assisting client require two caregivers.' });
+      } else if (state.tasks.includes('bedToChair') && state.bedbound === 'yes') {
+        rules.push({ level: 3, text: 'Bed-to-chair transfers for a bed-bound client require two caregivers.' });
+      }
+      if (state.tasks.includes('briefChange') && state.bedbound === 'yes') {
+        rules.push({ level: 3, text: 'Brief changes in bed for a bed-bound client require two caregivers.' });
+      } else if (state.tasks.includes('briefChange') && state.assist === 'no') {
+        rules.push({ level: 3, text: 'Brief changes for a non-assisting client require two caregivers.' });
+      }
+      if (state.tasks.includes('boosting') && (state.bedbound === 'yes' || state.assist === 'no')) {
+        rules.push({ level: 3, text: 'Boosting or pulling up in bed requires two caregivers when the client cannot assist.' });
+      }
+      if (state.tasks.includes('reposEvery2')) {
+        rules.push({ level: 3, text: 'Scheduled repositioning every 2 hours requires two caregivers to prevent pressure injuries.' });
+      }
+      if (state.tasks.includes('resistance')) {
+        rules.push({ level: 3, text: 'Resistance, stiffness, or pain during movement requires two caregivers for safe handling.' });
+      }
+
+      // ---------- ONE TO TWO CAREGIVERS (Level 2) ----------
+      if (state.weight === '180to250') {
+        if (state.assist === 'yes') {
+          rules.push({ level: 1, text: 'Client weight 180 to 250 lbs with an active assist allows one caregiver.' });
+        } else if (state.assist === 'no') {
+          rules.push({ level: 3, text: 'Client weight 180 to 250 lbs without active assist requires two caregivers.' });
+        } else {
+          rules.push({ level: 2, text: 'Client weight 180 to 250 lbs requires one or two caregivers depending on active assist.' });
+        }
+      }
+      if (state.mobility === 'partial') {
+        if (state.assist === 'yes') {
+          rules.push({ level: 1, text: 'Partial-assist mobility with an active assist allows one caregiver for stable transfers.' });
+        } else {
+          rules.push({ level: 2, text: 'Partial-assist mobility requires one or two caregivers depending on stability.' });
+        }
+      }
+      if (state.reposition === 'limited') {
+        rules.push({ level: 2, text: 'Limited bed mobility requires one or two caregivers depending on caregiver fatigue.' });
+      }
+      if (state.bedbound === 'yes' && state.weight === 'under180' && state.assist === 'yes' && state.reposition === 'independent') {
+        rules.push({ level: 1, text: 'Bed-bound client under 180 lbs who repositions independently and assists allows one caregiver for supervision.' });
+      } else if (state.bedbound === 'yes' && state.weight === 'under180') {
+        rules.push({ level: 2, text: 'Bed-bound clients under 180 lbs require one or two caregivers based on mobility.' });
+      }
+
+      // ---------- ONE CAREGIVER (Level 1) ----------
+      if (state.weight === 'under180' && state.bedbound === 'no') {
+        rules.push({ level: 1, text: 'Client weight under 180 lbs supports a single caregiver model.' });
+      }
+      if (state.mobility === 'independent') {
+        rules.push({ level: 1, text: 'Independent mobility supports a single caregiver model.' });
+      }
+
+      // Determine the highest level triggered
+      rules.forEach(r => { if (r.level > level) level = r.level; });
+
+      // Default safety net: if no rules triggered yet, level stays at 0 (incomplete)
+      // ---------- EQUIPMENT LOGIC ----------
+      if (level === 4) {
+        equipment.push({ type: 'required', name: 'Mechanical lift (Hoyer or comparable)' });
+      }
+      if (state.bedbound === 'yes') {
+        equipment.push({ type: 'recommended', name: 'Slide sheets' });
+        equipment.push({ type: 'recommended', name: 'Draw sheets' });
+        equipment.push({ type: 'recommended', name: 'Adjustable hospital bed' });
+      }
+      if (state.tasks.includes('reposEvery2') || state.reposition === 'cannot' || state.reposition === 'limited') {
+        equipment.push({ type: 'recommended', name: 'Positioning wedges and pillows' });
+      }
+      if (state.tasks.includes('briefChange')) {
+        equipment.push({ type: 'required', name: 'Protective equipment (gloves, barriers)' });
+      }
+      if (state.tasks.includes('bedToChair') && level >= 3) {
+        equipment.push({ type: 'required', name: 'Mechanical lift for transfer (when client cannot assist)' });
+      }
+      if (state.mobility === 'partial' || state.mobility === 'full') {
+        equipment.push({ type: 'recommended', name: 'Gait belt for stand-and-pivot transfers' });
+      }
+
+      // Deduplicate equipment by name (required wins over recommended)
+      const equipMap = new Map();
+      equipment.forEach(e => {
+        const existing = equipMap.get(e.name);
+        if (!existing || (existing.type === 'recommended' && e.type === 'required')) {
+          equipMap.set(e.name, e);
+        }
+      });
+      const finalEquipment = Array.from(equipMap.values());
+
+      return { level, rules, equipment: finalEquipment };
+    }
+
+    // Render the result panel
+    function render() {
+      const state = getState();
+      const result = calculate(state);
+
+      const headline = document.getElementById('staffingHeadline');
+      const badgeRow = document.getElementById('badgeRow');
+      const summary = document.getElementById('summaryText');
+      const ruleList = document.getElementById('ruleList');
+      const equipList = document.getElementById('equipmentList');
+      const actionList = document.getElementById('actionList');
+
+      // Detect incomplete state
+      const requiredAnswered = state.weight && state.mobility && state.assist && state.bedbound;
+      const bedboundOk = state.bedbound !== 'yes' || (state.bedbound === 'yes' && state.reposition);
+
+      if (!requiredAnswered || !bedboundOk) {
+        headline.className = 'result-staffing empty';
+        headline.textContent = 'Awaiting answers';
+        badgeRow.innerHTML = '';
+        summary.textContent = 'Complete questions 1 through 4 (and the bed-bound follow-up if applicable) to receive a recommendation.';
+        ruleList.innerHTML = '<li class="empty">No triggers active yet.</li>';
+        equipList.innerHTML = '<li><span class="equip-name" style="color:#94A3B8;">Equipment list updates as the form fills.</span></li>';
+        actionList.innerHTML = '<li class="empty">Action items populate after the staffing decision.</li>';
+        return;
+      }
+
+      // Build headline based on level
+      let headlineText = '';
+      let badgeClass = '';
+      let badgeText = '';
+      let summaryText = '';
+      let actions = [];
+
+      switch (result.level) {
+        case 4:
+          headlineText = '2 Caregivers + Mechanical Lift';
+          badgeClass = 'lift';
+          badgeText = 'Lift Required';
+          summaryText = 'This client requires two trained caregivers and a mechanical lift for every transfer. The office must verify lift availability and lift training for both assigned caregivers before the first shift.';
+          actions = [
+            'Confirm a mechanical lift sits on site, in working order, with charged battery if applicable.',
+            'Assign two caregivers who hold current Hoyer or sit-to-stand competency on file.',
+            'Document the staffing rationale in the care plan and schedule a 30-day reassessment.',
+            'Notify the family of the equipment requirement and confirm space for the lift in the home.'
+          ];
+          break;
+        case 3:
+          headlineText = '2 Caregivers Required';
+          badgeClass = 'two';
+          badgeText = '2 Caregivers';
+          summaryText = 'This client requires two caregivers for the shift. Both caregivers handle every high-risk task together. A mechanical lift may still help in specific scenarios; review the equipment list below.';
+          actions = [
+            'Schedule two caregivers for every shift that includes the triggering tasks.',
+            'Document the trigger in the care plan and post it inside the home for caregiver reference.',
+            'Verify all recommended equipment sits on site before the first shift.',
+            'Schedule a 60-day reassessment, or sooner if conditions change.'
+          ];
+          break;
+        case 2:
+          headlineText = '1 to 2 Caregivers';
+          badgeClass = 'flex';
+          badgeText = 'Judgment Call';
+          summaryText = 'The client falls inside a flexible range. The office decides between one and two caregivers based on the active assist level and caregiver feedback during the first two shifts. Default to two caregivers when in doubt.';
+          actions = [
+            'Start with two caregivers for the first shift to gather direct field feedback.',
+            'Ask the lead caregiver to document strain, fatigue, or safety concerns at shift end.',
+            'Move to one caregiver only after two consecutive incident-free shifts.',
+            'Reassess immediately if the client weight, mobility, or behavior shifts.'
+          ];
+          break;
+        case 1:
+          headlineText = '1 Caregiver';
+          badgeClass = 'one';
+          badgeText = '1 Caregiver';
+          summaryText = 'A single trained caregiver staffs this shift safely. The client supports their own transfers and repositioning. Standard equipment covers the visit.';
+          actions = [
+            'Schedule one trained caregiver per shift.',
+            'Document the staffing decision and the supporting answers in the care plan.',
+            'Schedule a 90-day reassessment, or sooner if conditions change.',
+            'Train the caregiver on escalation procedure if the client condition changes mid-shift.'
+          ];
+          break;
+        default:
+          headlineText = 'Awaiting answers';
+          badgeClass = '';
+          badgeText = '';
+          summaryText = 'No staffing rule has triggered yet.';
+      }
+
+      // Update the headline
+      headline.className = 'result-staffing';
+      headline.textContent = headlineText;
+
+      // Build the badge row
+      badgeRow.innerHTML = `<span class="result-badge ${badgeClass}">${badgeText}</span>`;
+      if (result.level === 4) {
+        badgeRow.innerHTML += `<span class="result-badge two">2 Caregivers</span>`;
+      }
+
+      // Summary
+      summary.textContent = summaryText;
+
+      // Rule list (sort highest level first, dedupe)
+      const seen = new Set();
+      const uniqueRules = result.rules.filter(r => {
+        if (seen.has(r.text)) return false;
+        seen.add(r.text);
+        return true;
+      });
+      uniqueRules.sort((a, b) => b.level - a.level);
+
+      if (uniqueRules.length === 0) {
+        ruleList.innerHTML = '<li class="empty">No specific triggers active.</li>';
+      } else {
+        ruleList.innerHTML = uniqueRules.map(r => `<li>${r.text}</li>`).join('');
+      }
+
+      // Equipment list
+      if (result.equipment.length === 0) {
+        equipList.innerHTML = '<li><span class="equip-name" style="color:#94A3B8;">Standard caregiver kit covers this visit.</span></li>';
+      } else {
+        // Sort required first
+        const sorted = [...result.equipment].sort((a, b) => {
+          if (a.type === b.type) return 0;
+          return a.type === 'required' ? -1 : 1;
+        });
+        equipList.innerHTML = sorted.map(e => `
+          <li>
+            <span class="equip-tag ${e.type}">${e.type}</span>
+            <span class="equip-name">${e.name}</span>
+          </li>
+        `).join('');
+      }
+
+      // Action list
+      actionList.innerHTML = actions.map(a => `<li>${a}</li>`).join('');
+
+      // Update print header
+      const clientName = document.getElementById('clientName').value || '__________________';
+      const assessor = document.getElementById('assessor').value || '__________________';
+      const assessDate = document.getElementById('assessDate').value || new Date().toISOString().split('T')[0];
+      document.getElementById('printMeta').innerHTML =
+        `<strong>Client:</strong> ${escapeHtml(clientName)} &nbsp;·&nbsp; ` +
+        `<strong>Assessor:</strong> ${escapeHtml(assessor)} &nbsp;·&nbsp; ` +
+        `<strong>Date:</strong> ${escapeHtml(assessDate)}`;
+    }
+
+    // Basic HTML escape for printed fields
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+      }[c]));
+    }
+
+    // Reset the form
+    function resetForm() {
+      form.reset();
+      bedboundDetails.classList.remove('open');
+      render();
+    }
+
+    // Wire up listeners
+    form.addEventListener('change', () => {
+      toggleBedboundDetails();
+      render();
+    });
+
+    form.addEventListener('input', render);
+
+    // Set today's date by default
+    document.getElementById('assessDate').value = new Date().toISOString().split('T')[0];
+
+    // Initial render
+    render();
+  </script>
+</body>
+</html>
