@@ -1423,16 +1423,22 @@
         </div>
       `;
 
-      // Place the element in the document so html2canvas can read its layout reliably.
-      // Using fixed position with negative z-index keeps it visible to the renderer
-      // but invisible to the user, which avoids the off-screen-coordinate edge cases.
+      // Place the PDF source element visibly in the DOM so html2canvas can render it,
+      // and cover it with a loading overlay so the user only sees the spinner.
+      // The opacity:0 trick fails because html2canvas respects opacity and renders blank.
       pdf.style.position = 'fixed';
       pdf.style.top = '0';
       pdf.style.left = '0';
-      pdf.style.zIndex = '-9999';
-      pdf.style.opacity = '0';
-      pdf.style.pointerEvents = 'none';
+      pdf.style.zIndex = '999998';
+      pdf.style.margin = '0';
       document.body.appendChild(pdf);
+
+      // Loading overlay above the PDF source
+      const overlay = document.createElement('div');
+      overlay.id = 'pdfLoadingOverlay';
+      overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(248,250,252,0.97);z-index:999999;display:flex;align-items:center;justify-content:center;font-family:Arial,Helvetica,sans-serif;';
+      overlay.innerHTML = '<div style="text-align:center;padding:40px;background:#FFFFFF;border-radius:12px;box-shadow:0 8px 32px rgba(26,54,92,0.15);max-width:320px;"><div style="font-size:32px;margin-bottom:12px;">📄</div><div style="font-size:18px;font-weight:700;color:#1A365C;margin-bottom:6px;">Generating PDF</div><div style="font-size:13px;color:#5A6E89;line-height:1.5;">Building your staffing assessment document. This takes a few seconds.</div></div>';
+      document.body.appendChild(overlay);
 
       // Wait for layout and font loading to finish before capture
       try {
@@ -1440,7 +1446,7 @@
           await document.fonts.ready;
         }
       } catch (e) { /* fonts API not available, continue */ }
-      await new Promise(r => setTimeout(r, 150));
+      await new Promise(r => setTimeout(r, 250));
 
       try {
         const opt = {
@@ -1474,6 +1480,9 @@
       } finally {
         if (pdf.parentNode) {
           document.body.removeChild(pdf);
+        }
+        if (overlay.parentNode) {
+          document.body.removeChild(overlay);
         }
       }
     }
