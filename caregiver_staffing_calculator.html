@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Caregiver Staffing Calculator | Alice Care</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.12.1/html2pdf.bundle.min.js" integrity="sha512-D25Z8/1q2z65ZpJ3NzY6XiPZfwjhbv34OTQHDIZd+KPK+uWCovGt+fMkSzW8ArzCMFUgZt6Cdu7qoXNuy6a2GA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <title>Caregiver Staffing Calculator | Alice Care v.1.1</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
@@ -1302,7 +1302,8 @@
       }
     }
 
-    // Generate and download a branded PDF of the assessment result
+    // Generate and download a PDF of the assessment using jsPDF directly.
+    // No canvas rendering, no DOM cloning - just programmatic PDF construction.
     async function downloadPDF() {
       const btn = document.getElementById('downloadBtn');
       const originalLabel = btn.textContent;
@@ -1316,156 +1317,332 @@
         return;
       }
 
-      // Verify the library loaded; fall back to print if the CDN is blocked
-      if (typeof html2pdf === 'undefined') {
-        const useFallback = confirm('PDF library could not load (network or CDN issue). Open the print dialog instead so you can save as PDF from there?');
-        if (useFallback) window.print();
+      // Resolve jsPDF constructor (UMD exposes it as window.jspdf.jsPDF)
+      const jsPDFLib = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+      if (!jsPDFLib) {
+        alert('PDF library could not load (network or CDN issue). Please refresh the page and try again.');
         return;
       }
 
       btn.disabled = true;
       btn.textContent = 'Generating PDF...';
 
-      // Build a clean filename from client name and assessment date
-      const rawClient = (document.getElementById('clientName').value || '').trim() || 'Client';
-      const rawAssessor = (document.getElementById('assessor').value || '').trim() || '__________________';
-      const rawDate = document.getElementById('assessDate').value || new Date().toISOString().split('T')[0];
-      const safeClient = rawClient.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_|_$/g, '').substring(0, 40) || 'Client';
-      const filename = `AliceCare_StaffingAssessment_${safeClient}_${rawDate}.pdf`;
-
-      // Extract current result data straight from the live result panel
-      const headlineText = (document.getElementById('staffingHeadline').textContent || '').trim();
-      const summaryText = (document.getElementById('summaryText').textContent || '').trim();
-      const ruleItems = Array.from(document.querySelectorAll('#ruleList li'))
-        .map(li => li.textContent.replace(/^[\s✓·]+/, '').trim())
-        .filter(t => t && !/no triggers active/i.test(t));
-      const equipItems = Array.from(document.querySelectorAll('#equipmentList li'))
-        .map(li => {
-          const tag = li.querySelector('.equip-tag');
-          const name = li.querySelector('.equip-name');
-          return {
-            type: tag ? tag.textContent.trim().toLowerCase() : '',
-            name: name ? name.textContent.trim() : li.textContent.trim()
-          };
-        })
-        .filter(e => e.name && !/updates as|standard caregiver kit/i.test(e.name));
-      const actionItems = Array.from(document.querySelectorAll('#actionList li'))
-        .map(li => li.textContent.replace(/^[\s✓·]+/, '').trim())
-        .filter(t => t && !/action items populate/i.test(t));
-      const generated = new Date().toLocaleString('en-US', {
-        year: 'numeric', month: 'short', day: 'numeric',
-        hour: 'numeric', minute: '2-digit'
-      });
-
-      // Helpers to render list sections
-      const renderTextList = (items, marker, fallback) => {
-        if (!items.length) return `<div style="color:#94A3B8;font-style:italic;font-size:12px;">${fallback}</div>`;
-        return items.map(t => `
-          <div style="padding:7px 0;border-bottom:1px dashed #E2E8F0;font-size:12px;line-height:1.55;color:#2D4A6F;">
-            <span style="color:#F57600;font-weight:700;margin-right:8px;display:inline-block;width:14px;">${marker}</span>${escapeHtml(t)}
-          </div>
-        `).join('');
-      };
-      const renderEquipList = (items) => {
-        if (!items.length) return '<div style="color:#94A3B8;font-style:italic;font-size:12px;">Standard caregiver kit covers this visit.</div>';
-        return items.map(e => {
-          const isReq = e.type === 'required';
-          return `
-            <div style="padding:7px 0;border-bottom:1px dashed #E2E8F0;font-size:12px;line-height:1.55;color:#2D4A6F;">
-              <span style="display:inline-block;padding:2px 8px;border-radius:9px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;margin-right:10px;background:${isReq ? '#FDECEA' : '#F0F7FF'};color:${isReq ? '#B91C1C' : '#1A365C'};">${escapeHtml(e.type || 'item')}</span>
-              ${escapeHtml(e.name)}
-            </div>
-          `;
-        }).join('');
-      };
-
-      // Build the PDF content with all inline styles (no class dependencies, system fonts)
-      const pdf = document.createElement('div');
-      pdf.id = 'pdfRenderTarget';
-      pdf.style.cssText = 'width:720px;padding:30px;font-family:Arial,Helvetica,sans-serif;background:#FFFFFF;color:#2D4A6F;box-sizing:border-box;line-height:1.5;';
-      pdf.innerHTML = `
-        <div style="text-align:center;padding:0 0 16px;border-bottom:3px solid #F57600;margin-bottom:20px;">
-          <div style="font-size:28px;font-weight:700;letter-spacing:-0.5px;">
-            <span style="color:#F57600;">alice.</span><span style="color:#1A365C;font-weight:400;">care</span>
-          </div>
-          <div style="font-size:11px;color:#5A6E89;letter-spacing:0.6px;margin-top:4px;">
-            Caregiver Staffing Assessment &nbsp;&middot;&nbsp; CDSS License #344700080
-          </div>
-        </div>
-        <div style="padding-bottom:14px;border-bottom:2px solid #1A365C;margin-bottom:20px;">
-          <h2 style="font-size:18px;color:#1A365C;margin:0 0 8px 0;font-weight:700;">Staffing Assessment Result</h2>
-          <div style="font-size:12px;color:#5A6E89;line-height:1.7;">
-            <strong style="color:#1A365C;">Client:</strong> ${escapeHtml(rawClient)} &nbsp;&middot;&nbsp;
-            <strong style="color:#1A365C;">Assessor:</strong> ${escapeHtml(rawAssessor)} &nbsp;&middot;&nbsp;
-            <strong style="color:#1A365C;">Date:</strong> ${escapeHtml(rawDate)}
-          </div>
-        </div>
-        <div style="background:#F8FAFC;border-radius:8px;padding:20px;margin-bottom:14px;border-left:4px solid #F57600;page-break-inside:avoid;">
-          <div style="font-size:11px;font-weight:700;color:#5A6E89;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Recommended Staffing</div>
-          <div style="font-size:22px;font-weight:700;color:#1A365C;margin-bottom:12px;line-height:1.2;">${escapeHtml(headlineText)}</div>
-          <div style="font-size:13px;color:#2D4A6F;line-height:1.6;">${escapeHtml(summaryText)}</div>
-        </div>
-        <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:8px;padding:16px 20px;margin-bottom:12px;page-break-inside:avoid;">
-          <div style="font-size:11px;font-weight:700;color:#1A365C;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;">Why This Recommendation</div>
-          ${renderTextList(ruleItems, '&#10003;', 'No specific triggers active.')}
-        </div>
-        <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:8px;padding:16px 20px;margin-bottom:12px;page-break-inside:avoid;">
-          <div style="font-size:11px;font-weight:700;color:#1A365C;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;">Equipment Required &amp; Recommended</div>
-          ${renderEquipList(equipItems)}
-        </div>
-        <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:8px;padding:16px 20px;margin-bottom:12px;page-break-inside:avoid;">
-          <div style="font-size:11px;font-weight:700;color:#1A365C;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;">Next Steps for the Office</div>
-          ${renderTextList(actionItems, '&#8594;', 'No action items.')}
-        </div>
-        <div style="margin-top:24px;padding-top:14px;border-top:1px solid #E2E8F0;font-size:9.5px;color:#94A3B8;text-align:center;line-height:1.6;">
-          Alice Care &nbsp;&middot;&nbsp; 8146 Greenback Lane, Suite #106, Fair Oaks, CA 95628 &nbsp;&middot;&nbsp; (916) 292-8820<br>
-          Generated ${escapeHtml(generated)} &nbsp;&middot;&nbsp; Result reflects the Two-Caregiver and Bed-Bound Safety Policy. Caregiver judgment in the field overrides any automated recommendation.
-        </div>
-      `;
-
-      // Place the PDF source element visibly in the DOM so html2canvas can render it,
-      // and cover it with a loading overlay so the user only sees the spinner.
-      // The opacity:0 trick fails because html2canvas respects opacity and renders blank.
-      pdf.style.position = 'fixed';
-      pdf.style.top = '0';
-      pdf.style.left = '0';
-      pdf.style.zIndex = '999998';
-      pdf.style.margin = '0';
-      document.body.appendChild(pdf);
-
-      // Loading overlay above the PDF source
-      const overlay = document.createElement('div');
-      overlay.id = 'pdfLoadingOverlay';
-      overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(248,250,252,0.97);z-index:999999;display:flex;align-items:center;justify-content:center;font-family:Arial,Helvetica,sans-serif;';
-      overlay.innerHTML = '<div style="text-align:center;padding:40px;background:#FFFFFF;border-radius:12px;box-shadow:0 8px 32px rgba(26,54,92,0.15);max-width:320px;"><div style="font-size:32px;margin-bottom:12px;">📄</div><div style="font-size:18px;font-weight:700;color:#1A365C;margin-bottom:6px;">Generating PDF</div><div style="font-size:13px;color:#5A6E89;line-height:1.5;">Building your staffing assessment document. This takes a few seconds.</div></div>';
-      document.body.appendChild(overlay);
-
-      // Wait for layout and font loading to finish before capture
       try {
-        if (document.fonts && document.fonts.ready) {
-          await document.fonts.ready;
-        }
-      } catch (e) { /* fonts API not available, continue */ }
-      await new Promise(r => setTimeout(r, 250));
+        // Build a clean filename from client name and assessment date
+        const rawClient = (document.getElementById('clientName').value || '').trim() || 'Client';
+        const rawAssessor = (document.getElementById('assessor').value || '').trim() || 'Office Staff';
+        const rawDate = document.getElementById('assessDate').value || new Date().toISOString().split('T')[0];
+        const safeClient = rawClient.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_|_$/g, '').substring(0, 40) || 'Client';
+        const filename = `AliceCare_StaffingAssessment_${safeClient}_${rawDate}.pdf`;
 
-      try {
-        const opt = {
-          margin: [10, 10, 12, 10],
-          filename: filename,
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: {
-            scale: 2,
-            useCORS: true,
-            logging: false,
-            backgroundColor: '#FFFFFF',
-            windowWidth: 720,
-            width: 720
-          },
-          jsPDF: { unit: 'mm', format: 'letter', orientation: 'portrait', compress: true },
-          pagebreak: { mode: ['css', 'legacy'] }
+        // Extract current result data from the live result panel
+        const headlineText = (document.getElementById('staffingHeadline').textContent || '').trim();
+        const summaryText = (document.getElementById('summaryText').textContent || '').trim();
+        const ruleItems = Array.from(document.querySelectorAll('#ruleList li'))
+          .map(li => li.textContent.trim())
+          .filter(t => t && !/no triggers active|no specific triggers/i.test(t));
+        const equipItems = Array.from(document.querySelectorAll('#equipmentList li'))
+          .map(li => {
+            const tag = li.querySelector('.equip-tag');
+            const name = li.querySelector('.equip-name');
+            return {
+              type: tag ? tag.textContent.trim().toLowerCase() : 'item',
+              name: name ? name.textContent.trim() : li.textContent.trim()
+            };
+          })
+          .filter(e => e.name && !/updates as|standard caregiver kit/i.test(e.name));
+        const actionItems = Array.from(document.querySelectorAll('#actionList li'))
+          .map(li => li.textContent.trim())
+          .filter(t => t && !/action items populate/i.test(t));
+        const generated = new Date().toLocaleString('en-US', {
+          year: 'numeric', month: 'short', day: 'numeric',
+          hour: 'numeric', minute: '2-digit'
+        });
+
+        // Determine the recommendation level color
+        const levelColors = {
+          1: [27, 122, 61],   // green
+          2: [138, 101, 0],   // amber
+          3: [194, 87, 0],    // orange
+          4: [185, 28, 28]    // red
+        };
+        const calcResult = calculate(state);
+        const accentColor = levelColors[calcResult.level] || [245, 118, 0];
+
+        // ============ Set up the document ============
+        const doc = new jsPDFLib({ unit: 'mm', format: 'letter', orientation: 'portrait' });
+
+        const pageWidth = 215.9;
+        const pageHeight = 279.4;
+        const marginX = 15;
+        const marginY = 15;
+        const contentWidth = pageWidth - 2 * marginX;
+        const footerHeight = 14;
+        let y = marginY;
+
+        // Color palette
+        const ORANGE = [245, 118, 0];
+        const NAVY = [26, 54, 92];
+        const TEXT = [45, 74, 111];
+        const MUTED = [90, 110, 137];
+        const LIGHT_BG = [248, 250, 252];
+        const BORDER = [226, 232, 240];
+        const RED = [185, 28, 28];
+        const RED_BG = [253, 236, 234];
+        const BLUE_NAVY = [26, 54, 92];
+        const BLUE_BG = [240, 247, 255];
+
+        // Helpers
+        const setColor = (rgb, kind) => {
+          if (kind === 'fill') doc.setFillColor(rgb[0], rgb[1], rgb[2]);
+          else if (kind === 'draw') doc.setDrawColor(rgb[0], rgb[1], rgb[2]);
+          else doc.setTextColor(rgb[0], rgb[1], rgb[2]);
         };
 
-        await html2pdf().set(opt).from(pdf).save();
+        const ensureSpace = (needed) => {
+          if (y + needed > pageHeight - marginY - footerHeight) {
+            doc.addPage();
+            y = marginY;
+            return true;
+          }
+          return false;
+        };
+
+        // ============ HEADER (alice.care logo) ============
+        doc.setFontSize(26);
+        doc.setFont('helvetica', 'bold');
+        const aliceText = 'alice.';
+        const careText = 'care';
+        const aliceWidth = doc.getTextWidth(aliceText);
+        doc.setFont('helvetica', 'normal');
+        const careWidth = doc.getTextWidth(careText);
+        const totalLogoWidth = aliceWidth + careWidth;
+        const logoStartX = (pageWidth - totalLogoWidth) / 2;
+
+        doc.setFont('helvetica', 'bold');
+        setColor(ORANGE, 'text');
+        doc.text(aliceText, logoStartX, y + 9);
+        doc.setFont('helvetica', 'normal');
+        setColor(NAVY, 'text');
+        doc.text(careText, logoStartX + aliceWidth, y + 9);
+
+        y += 13;
+
+        // Tagline
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        setColor(MUTED, 'text');
+        doc.text('Caregiver Staffing Assessment   |   CDSS License #344700080', pageWidth / 2, y, { align: 'center' });
+        y += 4;
+
+        // Orange separator
+        setColor(ORANGE, 'draw');
+        doc.setLineWidth(1);
+        doc.line(marginX, y, pageWidth - marginX, y);
+        y += 8;
+
+        // ============ TITLE + CLIENT INFO ============
+        doc.setFontSize(15);
+        doc.setFont('helvetica', 'bold');
+        setColor(NAVY, 'text');
+        doc.text('Staffing Assessment Result', marginX, y);
+        y += 6;
+
+        doc.setFontSize(9.5);
+        doc.setFont('helvetica', 'normal');
+        setColor(MUTED, 'text');
+        const clientLine = 'Client: ' + rawClient + '   |   Assessor: ' + rawAssessor + '   |   Date: ' + rawDate;
+        const clientLines = doc.splitTextToSize(clientLine, contentWidth);
+        clientLines.forEach((line) => {
+          doc.text(line, marginX, y);
+          y += 4.5;
+        });
+        y += 1;
+
+        setColor(NAVY, 'draw');
+        doc.setLineWidth(0.5);
+        doc.line(marginX, y, pageWidth - marginX, y);
+        y += 8;
+
+        // ============ RECOMMENDATION CARD ============
+        doc.setFontSize(10.5);
+        const summaryLines = doc.splitTextToSize(summaryText, contentWidth - 12);
+        const recCardHeight = 6 + 5 + 7 + (summaryLines.length * 4.7) + 6;
+
+        ensureSpace(recCardHeight + 4);
+        const recCardStartY = y;
+
+        // Card background
+        setColor(LIGHT_BG, 'fill');
+        doc.roundedRect(marginX, y, contentWidth, recCardHeight, 2, 2, 'F');
+        // Accent left border
+        setColor(accentColor, 'fill');
+        doc.rect(marginX, y, 1.6, recCardHeight, 'F');
+
+        y += 7;
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        setColor(MUTED, 'text');
+        doc.text('RECOMMENDED STAFFING', marginX + 6, y);
+        y += 5;
+
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        setColor(NAVY, 'text');
+        doc.text(headlineText, marginX + 6, y);
+        y += 6;
+
+        doc.setFontSize(10.5);
+        doc.setFont('helvetica', 'normal');
+        setColor(TEXT, 'text');
+        summaryLines.forEach((line) => {
+          doc.text(line, marginX + 6, y);
+          y += 4.7;
+        });
+        y = recCardStartY + recCardHeight + 5;
+
+        // ============ Helper to render a list section ============
+        const drawListSection = (title, items, prefix, prefixColor) => {
+          if (!items || items.length === 0) return;
+
+          // Calculate height first
+          doc.setFontSize(10);
+          let totalHeight = 6 + 5; // padding + label
+          const itemBlocks = items.map((text) => {
+            const lines = doc.splitTextToSize(text, contentWidth - 16);
+            return { lines: lines, height: lines.length * 4.7 + 2 };
+          });
+          itemBlocks.forEach((block) => totalHeight += block.height);
+          totalHeight += 4;
+
+          ensureSpace(totalHeight + 4);
+          const cardStartY = y;
+
+          // Card border
+          setColor(BORDER, 'draw');
+          doc.setLineWidth(0.2);
+          doc.roundedRect(marginX, y, contentWidth, totalHeight, 2, 2, 'S');
+
+          y += 6;
+          doc.setFontSize(8);
+          doc.setFont('helvetica', 'bold');
+          setColor(NAVY, 'text');
+          doc.text(title, marginX + 5, y);
+          y += 5;
+
+          itemBlocks.forEach((block) => {
+            // Page break check inside the loop
+            if (y + block.height > pageHeight - marginY - footerHeight) {
+              doc.addPage();
+              y = marginY;
+            }
+
+            // Prefix marker (filled circle)
+            setColor(prefixColor, 'fill');
+            doc.circle(marginX + 6, y - 1.3, 1, 'F');
+
+            // Item text
+            setColor(TEXT, 'text');
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            block.lines.forEach((line, idx) => {
+              doc.text(line, marginX + 11, y);
+              if (idx < block.lines.length - 1) y += 4.7;
+            });
+            y += 5;
+          });
+
+          y = Math.max(y, cardStartY + totalHeight) + 4;
+        };
+
+        // ============ WHY THIS RECOMMENDATION ============
+        drawListSection('WHY THIS RECOMMENDATION', ruleItems, 'circle', ORANGE);
+
+        // ============ EQUIPMENT (special rendering with required/recommended tags) ============
+        if (equipItems.length > 0) {
+          // Sort: required first
+          const sortedEquip = [...equipItems].sort((a, b) => {
+            if (a.type === b.type) return 0;
+            return a.type === 'required' ? -1 : 1;
+          });
+
+          doc.setFontSize(10);
+          let totalHeight = 6 + 5;
+          const itemBlocks = sortedEquip.map((item) => {
+            const lines = doc.splitTextToSize(item.name, contentWidth - 36);
+            return { lines: lines, item: item, height: lines.length * 4.7 + 2 };
+          });
+          itemBlocks.forEach((block) => totalHeight += block.height);
+          totalHeight += 4;
+
+          ensureSpace(totalHeight + 4);
+          const cardStartY = y;
+
+          setColor(BORDER, 'draw');
+          doc.setLineWidth(0.2);
+          doc.roundedRect(marginX, y, contentWidth, totalHeight, 2, 2, 'S');
+
+          y += 6;
+          doc.setFontSize(8);
+          doc.setFont('helvetica', 'bold');
+          setColor(NAVY, 'text');
+          doc.text('EQUIPMENT REQUIRED & RECOMMENDED', marginX + 5, y);
+          y += 5;
+
+          itemBlocks.forEach((block) => {
+            if (y + block.height > pageHeight - marginY - footerHeight) {
+              doc.addPage();
+              y = marginY;
+            }
+
+            const isReq = block.item.type === 'required';
+            // Tag pill
+            setColor(isReq ? RED_BG : BLUE_BG, 'fill');
+            doc.roundedRect(marginX + 5, y - 3.5, 22, 4.5, 1, 1, 'F');
+            doc.setFontSize(7);
+            doc.setFont('helvetica', 'bold');
+            setColor(isReq ? RED : BLUE_NAVY, 'text');
+            doc.text(block.item.type.toUpperCase(), marginX + 16, y - 0.5, { align: 'center' });
+
+            // Item name
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            setColor(TEXT, 'text');
+            block.lines.forEach((line, idx) => {
+              doc.text(line, marginX + 30, y);
+              if (idx < block.lines.length - 1) y += 4.7;
+            });
+            y += 5;
+          });
+
+          y = Math.max(y, cardStartY + totalHeight) + 4;
+        }
+
+        // ============ NEXT STEPS ============
+        drawListSection('NEXT STEPS FOR THE OFFICE', actionItems, 'circle', ORANGE);
+
+        // ============ FOOTER on every page ============
+        const totalPages = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+          doc.setPage(i);
+          setColor(BORDER, 'draw');
+          doc.setLineWidth(0.2);
+          doc.line(marginX, pageHeight - 12, pageWidth - marginX, pageHeight - 12);
+
+          doc.setFontSize(7.5);
+          doc.setFont('helvetica', 'normal');
+          setColor(MUTED, 'text');
+          doc.text('Alice Care   |   8146 Greenback Lane, Suite #106, Fair Oaks, CA 95628   |   (916) 292-8820',
+                   pageWidth / 2, pageHeight - 8, { align: 'center' });
+          doc.text('Generated ' + generated + '   |   Result reflects the Two-Caregiver and Bed-Bound Safety Policy',
+                   pageWidth / 2, pageHeight - 5, { align: 'center' });
+          if (totalPages > 1) {
+            doc.text('Page ' + i + ' of ' + totalPages, pageWidth - marginX, pageHeight - 5, { align: 'right' });
+          }
+        }
+
+        // ============ SAVE ============
+        doc.save(filename);
 
         btn.textContent = '✓ Downloaded';
         setTimeout(() => {
@@ -1476,14 +1653,7 @@
         console.error('PDF generation failed:', err);
         btn.disabled = false;
         btn.textContent = originalLabel;
-        alert('PDF generation hit an error: ' + (err.message || 'unknown') + '\n\nTry again, or use the browser print dialog (Cmd/Ctrl + P) and choose "Save as PDF".');
-      } finally {
-        if (pdf.parentNode) {
-          document.body.removeChild(pdf);
-        }
-        if (overlay.parentNode) {
-          document.body.removeChild(overlay);
-        }
+        alert('PDF generation hit an error: ' + (err.message || 'unknown') + '\n\nCheck the browser console for details.');
       }
     }
 
