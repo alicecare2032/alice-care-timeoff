@@ -198,33 +198,52 @@
       color: #2D4A6F;
     }
 
-    /* Two-column layout */
-    .layout-grid {
-      display: grid;
-      grid-template-columns: 1fr 360px;
-      gap: 0;
+    /* Single-column layout for reliable cross-browser rendering */
+    .layout-grid { display: block; }
+
+    .form-column {
+      padding: 28px 40px;
+      border-bottom: 1px solid #E2E8F0;
     }
 
-    .form-column { padding: 28px 30px 28px 40px; border-right: 1px solid #E2E8F0; }
+    .form-column form {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
     .result-column {
-      padding: 28px 40px 28px 30px;
+      padding: 28px 40px;
       background: #F8FAFC;
-      align-self: start;
-      position: sticky;
-      top: 64px;
-      max-height: calc(100vh - 64px);
-      overflow-y: auto;
     }
 
-    @media (max-width: 820px) {
-      .layout-grid { grid-template-columns: 1fr; }
-      .form-column { border-right: none; border-bottom: 1px solid #E2E8F0; padding: 22px 24px; }
-      .result-column {
-        padding: 22px 24px;
-        position: static;
-        max-height: none;
-        overflow-y: visible;
-      }
+    .result-divider {
+      background: #F8FAFC;
+      padding: 20px 40px 0;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #5A6E89;
+      text-transform: uppercase;
+      letter-spacing: 1.4px;
+      position: relative;
+    }
+
+    .result-divider::before,
+    .result-divider::after {
+      content: '';
+      display: inline-block;
+      width: 40px;
+      height: 1px;
+      background: #C7DAF0;
+      vertical-align: middle;
+      margin: 0 12px;
+    }
+
+    @media (max-width: 580px) {
+      .form-column { padding: 22px 24px; }
+      .result-column { padding: 22px 24px; }
+      .result-divider { padding: 16px 24px 0; }
+      .result-divider::before, .result-divider::after { width: 20px; margin: 0 8px; }
     }
 
     /* Form Section */
@@ -445,7 +464,7 @@
     .btn-print:hover { background: #244780; }
 
     /* Result Panel */
-    .result-panel { position: sticky; top: 20px; }
+    .result-panel { position: relative; max-width: 760px; margin: 0 auto; }
 
     .result-card {
       background: #FFFFFF;
@@ -639,16 +658,8 @@
       body { background: #FFFFFF; }
       .page-wrapper { padding: 0; }
       .page-container { box-shadow: none; max-width: 100%; }
-      .form-column, .back-bar, .action-row, .page-footer, .sticky-banner { display: none !important; }
-      .layout-grid { grid-template-columns: 1fr; }
-      .result-column {
-        background: #FFFFFF;
-        padding: 24px;
-        position: static;
-        max-height: none;
-        overflow-y: visible;
-      }
-      .result-panel { position: static; }
+      .form-column, .back-bar, .action-row, .page-footer, .sticky-banner, .result-divider { display: none !important; }
+      .result-column { background: #FFFFFF; padding: 24px; }
       .print-header { display: block !important; }
       .sub-card, .result-card { box-shadow: none; border: 1px solid #E2E8F0; break-inside: avoid; }
     }
@@ -873,6 +884,9 @@
             </div>
           </form>
         </div>
+
+        <!-- Visual divider between form and result -->
+        <div class="result-divider">Your Recommendation</div>
 
         <!-- RESULT COLUMN -->
         <div class="result-column">
