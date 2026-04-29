@@ -854,9 +854,67 @@
               </div>
             </div>
 
-            <!-- Step 5: Specific Care Tasks -->
+            <!-- Step 5: Support Equipment Available -->
             <div class="form-section">
-              <h3><span class="step-num">5</span>Specific Care Tasks Required</h3>
+              <h3><span class="step-num">5</span>Support Equipment Available on Site</h3>
+              <div class="section-help">Equipment availability changes staffing. Per VA Safe Patient Handling Algorithms and NIOSH guidance, the right device can transform a two-caregiver task into a safe one-caregiver task. Select every device confirmed available, in working order, and matched to the client weight capacity.</div>
+              <div class="options" data-group="equipment">
+                <label class="option">
+                  <input type="checkbox" name="equipment" value="hoyer">
+                  <span class="option-text"><strong>Floor lift (Hoyer or full-body sling lift)</strong>Hydraulic or electric lift with a full-body sling. Carries 100% of client weight. Use for non-weight-bearing clients and bariatric transfers above 300 lbs. Per NIOSH guidance, even with a lift, two caregivers operate it for non-weight-bearing residents unless the lead caregiver holds lift certification (see option below).</span>
+                </label>
+                <label class="option">
+                  <input type="checkbox" name="equipment" value="ceilingLift">
+                  <span class="option-text"><strong>Ceiling-mounted lift (track system)</strong>Permanently installed overhead track lift. The most ergonomically protective option. Allows safe one-caregiver transfers for cooperative dependent clients per VA algorithms.</span>
+                </label>
+
+                <!-- Conditional sub-option: lift certification (appears when any lift is selected) -->
+                <div class="conditional" id="liftCertContainer">
+                  <div class="conditional-inner" style="border-left-color:#F57600;background:#FFF8F0;">
+                    <h4 style="color:#C25700;">Lead Caregiver Lift Certification</h4>
+                    <div style="font-size:11.5px;color:#5A4A1E;line-height:1.55;margin-bottom:10px;">
+                      A lead caregiver who holds current Hoyer or sit-to-stand competency on file, plus documented field experience with the client, can safely operate the lift solo for cooperative non-weight-bearing clients. This certification override allows Alice Care to send one caregiver instead of two.
+                    </div>
+                    <label class="option">
+                      <input type="checkbox" name="liftCert" value="certified">
+                      <span class="option-text">
+                        <strong>Lead caregiver is lift-certified for solo operation</strong>
+                        Caregiver holds current Hoyer or mechanical lift competency, has documented experience with this specific client (3+ supervised shifts), and the office authorizes the solo-operation exception in writing for this case. The certified caregiver staffs the shift alone.
+                      </span>
+                    </label>
+                  </div>
+                </div>
+
+                <label class="option">
+                  <input type="checkbox" name="equipment" value="sitToStand">
+                  <span class="option-text"><strong>Sit-to-stand device (powered or manual)</strong>For partially weight-bearing clients who can sit at the edge of the bed and bend at hips, knees, and ankles. Eliminates manual lifting in transfers. Allows one caregiver for partial-assist clients with the device.</span>
+                </label>
+                <label class="option">
+                  <input type="checkbox" name="equipment" value="gaitBelt">
+                  <span class="option-text"><strong>Gait belt (transfer belt with handles)</strong>Stabilization aid for ambulatory and partial-assist clients. Per OSHA, never used for lifting. Provides handles for the caregiver to support balance during stand-and-pivot transfers.</span>
+                </label>
+                <label class="option">
+                  <input type="checkbox" name="equipment" value="slideSheets">
+                  <span class="option-text"><strong>Slide sheets or friction-reducing devices</strong>Low-friction sheets for lateral transfers and bed repositioning. Reduce caregiver load by 60 to 80% per biomechanical studies. Required for safe in-bed boosting.</span>
+                </label>
+                <label class="option">
+                  <input type="checkbox" name="equipment" value="hospitalBed">
+                  <span class="option-text"><strong>Adjustable hospital bed</strong>Height-adjustable bed with rails. Eliminates back strain during bedside care. Strongly recommended for every bed-bound client.</span>
+                </label>
+                <label class="option">
+                  <input type="checkbox" name="equipment" value="liftChair">
+                  <span class="option-text"><strong>Lift chair recliner (powered)</strong>Electric recliner that tilts forward to assist sit-to-stand. Suitable for cooperative clients with partial weight-bearing capacity who weigh within the chair's rated limit.</span>
+                </label>
+                <label class="option">
+                  <input type="checkbox" name="equipment" value="none">
+                  <span class="option-text"><strong>No specialized equipment available</strong>The home has no patient-handling equipment beyond standard furniture. Staffing must compensate for the absence of mechanical aids.</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Step 6: Specific Care Tasks -->
+            <div class="form-section">
+              <h3><span class="step-num">6</span>Specific Care Tasks Required</h3>
               <div class="section-help">Select every task the shift involves. Tasks marked "bed-bound trigger" only force two caregivers when combined with bed-bound status. Single-caregiver shifts remain the norm for ambulatory clients with active assist.</div>
               <div class="options" data-group="tasks">
                 <label class="option">
@@ -985,18 +1043,38 @@
       }
     }
 
+    // Show or hide the lift certification sub-option based on whether any lift is selected.
+    // Clear the certification when the underlying lift is unchecked so a stale flag doesn't linger.
+    function toggleLiftCert() {
+      const liftCertContainer = document.getElementById('liftCertContainer');
+      const hoyer = document.querySelector('input[name="equipment"][value="hoyer"]');
+      const ceiling = document.querySelector('input[name="equipment"][value="ceilingLift"]');
+      const anyLiftChecked = (hoyer && hoyer.checked) || (ceiling && ceiling.checked);
+      if (anyLiftChecked) {
+        liftCertContainer.classList.add('open');
+      } else {
+        liftCertContainer.classList.remove('open');
+        const cert = document.querySelector('input[name="liftCert"][value="certified"]');
+        if (cert) cert.checked = false;
+      }
+    }
+
     // Collect form state into a clean object
     function getState() {
       const data = new FormData(form);
       const tasks = [];
       document.querySelectorAll('input[name="tasks"]:checked').forEach(c => tasks.push(c.value));
+      const equipment = [];
+      document.querySelectorAll('input[name="equipment"]:checked').forEach(c => equipment.push(c.value));
       return {
         weight: data.get('weight'),
         mobility: data.get('mobility'),
         assist: data.get('assist'),
         bedbound: data.get('bedbound'),
         reposition: data.get('reposition'),
-        tasks: tasks
+        tasks: tasks,
+        equipment: equipment,
+        liftCertified: document.querySelector('input[name="liftCert"][value="certified"]:checked') !== null
       };
     }
 
@@ -1105,27 +1183,143 @@
       // Determine the highest level triggered
       rules.forEach(r => { if (r.level > level) level = r.level; });
 
+      // ===== EQUIPMENT-AWARE STAFFING ADJUSTMENT =====
+      // Per VA Safe Patient Handling Algorithms and OSHA Safe Patient Handling guidance,
+      // appropriate equipment can convert a 2-caregiver task into a safe 1-caregiver task
+      // for cooperative clients. Equipment matched to the client's scenario reduces the
+      // staffing level by one step, with safety floors that cannot be crossed.
+      const equip = state.equipment || [];
+      const hasFloorLift = equip.includes('hoyer');
+      const hasCeilingLift = equip.includes('ceilingLift');
+      const hasSitToStand = equip.includes('sitToStand');
+      const hasGaitBelt = equip.includes('gaitBelt');
+      const hasSlideSheets = equip.includes('slideSheets');
+      const hasHospitalBed = equip.includes('hospitalBed');
+      const hasLiftChair = equip.includes('liftChair');
+      const noEquipment = equip.includes('none') || equip.length === 0;
+      const anyLift = hasFloorLift || hasCeilingLift;
+
+      let originalLevel = level;
+      const equipmentRules = [];
+
+      // ----- Level 4 (lift required) handling -----
+      // NIOSH explicitly states two caregivers should operate a mechanical lift for
+      // a non-weight-bearing resident. We hold the safety floor at level 3 (2 caregivers)
+      // even with a lift; lift addresses equipment, not personnel count.
+      // Two exceptions:
+      //   1. Ceiling lifts per VA algorithms (cooperative client, single caregiver safe)
+      //   2. Lead caregiver lift certification: a certified caregiver with documented
+      //      experience on this client can safely operate the lift solo per Alice Care's
+      //      authorized exception protocol.
+      if (level === 4) {
+        if (state.liftCertified && state.assist === 'yes' && state.weight !== 'above300') {
+          level = 1;
+          equipmentRules.push({ level: 0, text: 'Lift certification override: a lead caregiver with current Hoyer competency, documented client-specific experience, and written office authorization staffs the shift alone with the lift.' });
+        } else if (state.liftCertified && state.weight === 'above300') {
+          // Bariatric clients: certification reduces from level 4 to level 3 but doesn't go to 1.
+          // The bariatric weight class introduces additional positioning demands beyond the lift itself.
+          level = 3;
+          equipmentRules.push({ level: 0, text: 'Lift certification noted for bariatric client; staffing remains at two caregivers because clients above 300 lbs require additional positioning support beyond lift operation alone.' });
+        } else if (hasCeilingLift && state.assist === 'yes') {
+          level = 2;
+          equipmentRules.push({ level: 0, text: 'Ceiling-mounted lift plus a cooperative client allows a single caregiver per VA Safe Patient Handling Algorithms. The track system removes the pushing and pulling load that floor lifts impose.' });
+        } else if (anyLift) {
+          level = 3;
+          equipmentRules.push({ level: 0, text: 'Mechanical lift available; staffing remains at two caregivers per NIOSH guidance for non-weight-bearing residents (one caregiver age 18+ operates the lift, the second positions the client).' });
+        }
+      }
+
+      // ----- Level 3 (2 caregivers required) handling -----
+      // A floor lift or sit-to-stand can drop the requirement to one caregiver when
+      // the client is cooperative or partially weight-bearing.
+      else if (level === 3) {
+        if (state.liftCertified && anyLift && state.assist === 'yes') {
+          level = 1;
+          equipmentRules.push({ level: 0, text: 'Lift certification override: the certified lead caregiver staffs the shift alone with the lift for this cooperative client.' });
+        } else if (anyLift && state.assist === 'yes' && state.weight !== 'above300') {
+          level = 1;
+          equipmentRules.push({ level: 0, text: 'Mechanical lift plus a cooperative client allows a single caregiver per VA Safe Patient Handling Algorithm 1 (bed to chair, chair to toilet).' });
+        } else if (hasSitToStand && state.mobility === 'partial' && state.assist === 'yes') {
+          level = 1;
+          equipmentRules.push({ level: 0, text: 'Sit-to-stand device plus a partially weight-bearing, cooperative client allows a single caregiver per OSHA Hospital eTool guidance. The device eliminates the manual lifting load.' });
+        } else if (hasFloorLift && state.bedbound === 'yes' && state.assist !== 'no') {
+          level = 2;
+          equipmentRules.push({ level: 0, text: 'Floor lift available for bed-bound transfers reduces caregiver load. Staffing stays in the 1-2 range pending shift-by-shift caregiver feedback.' });
+        }
+      }
+
+      // ----- Level 2 (1 to 2 judgment) handling -----
+      // Right equipment resolves the judgment call toward one caregiver.
+      else if (level === 2) {
+        if ((hasSitToStand || anyLift || hasLiftChair) && state.assist === 'yes') {
+          level = 1;
+          equipmentRules.push({ level: 0, text: 'Appropriate transfer equipment plus an active client resolves the judgment call: a single caregiver staffs the shift safely.' });
+        } else if (hasGaitBelt && state.mobility === 'partial' && state.assist === 'yes') {
+          level = 1;
+          equipmentRules.push({ level: 0, text: 'Gait belt plus a cooperative partial-assist client supports stand-and-pivot transfers with one caregiver per OSHA guidance. (Note: gait belts stabilize, never lift.)' });
+        }
+      }
+
+      // ----- Equipment GAP detection (raises level when needed equipment is missing) -----
+      // Per NIOSH, when the caregiver must lift more than 35 lbs of patient weight,
+      // the patient is considered fully dependent and assistive devices should be used.
+      if (state.mobility === 'nonweight' && noEquipment) {
+        equipmentRules.push({ level: 4, text: 'Non-weight-bearing client with NO mechanical lift on site: shift cannot proceed safely. The office must arrange a lift before the first visit (NIOSH safe patient handling standard).' });
+        if (level < 4) level = 4;
+      }
+      if (state.bedbound === 'yes' && state.tasks.includes('boosting') && !hasSlideSheets && !anyLift) {
+        equipmentRules.push({ level: 3, text: 'Boosting a bed-bound client without slide sheets or a lift exceeds the NIOSH 35 lb single-caregiver limit. Two caregivers required until equipment arrives.' });
+        if (level < 3) level = 3;
+      }
+      if (state.weight === 'above300' && !anyLift) {
+        equipmentRules.push({ level: 4, text: 'Bariatric client (above 300 lbs) requires a lift rated to the client\'s weight. Without one, the shift cannot proceed (NIOSH bariatric safe handling standard).' });
+        if (level < 4) level = 4;
+      }
+
+      // Push equipment rules into the main rules list with a level matching the actual
+      // current level so they sort correctly in the result panel.
+      equipmentRules.forEach(r => {
+        rules.push({ level: r.level === 0 ? level : r.level, text: r.text, source: 'equipment' });
+      });
+
+      // Track whether equipment changed the original recommendation
+      const equipmentAdjusted = (level !== originalLevel) || equipmentRules.length > 0;
+
       // Default safety net: if no rules triggered yet, level stays at 0 (incomplete)
       // ---------- EQUIPMENT LOGIC ----------
-      if (level === 4) {
-        equipment.push({ type: 'required', name: 'Mechanical lift (Hoyer or comparable)' });
+      // Maps internal equipment keys to display names so we can flag what is on site.
+      const equipKeyToName = {
+        hoyer: 'Floor lift (Hoyer or full-body sling lift)',
+        ceilingLift: 'Ceiling-mounted lift',
+        sitToStand: 'Sit-to-stand device',
+        gaitBelt: 'Gait belt',
+        slideSheets: 'Slide sheets and friction-reducing devices',
+        hospitalBed: 'Adjustable hospital bed',
+        liftChair: 'Lift chair recliner'
+      };
+
+      // Push the recommendation list (what the scenario calls for)
+      if (originalLevel === 4 || state.weight === 'above300' || state.mobility === 'nonweight') {
+        equipment.push({ type: 'required', name: 'Mechanical lift (floor or ceiling)', onSite: anyLift });
       }
       if (state.bedbound === 'yes') {
-        equipment.push({ type: 'recommended', name: 'Slide sheets' });
-        equipment.push({ type: 'recommended', name: 'Draw sheets' });
-        equipment.push({ type: 'recommended', name: 'Adjustable hospital bed' });
+        equipment.push({ type: 'recommended', name: 'Slide sheets', onSite: hasSlideSheets });
+        equipment.push({ type: 'recommended', name: 'Adjustable hospital bed', onSite: hasHospitalBed });
       }
       if (state.tasks.includes('reposEvery2') || state.reposition === 'cannot' || state.reposition === 'limited') {
-        equipment.push({ type: 'recommended', name: 'Positioning wedges and pillows' });
+        equipment.push({ type: 'recommended', name: 'Positioning wedges and pillows', onSite: null });
       }
       if (state.tasks.includes('briefChange')) {
-        equipment.push({ type: 'required', name: 'Protective equipment (gloves, barriers)' });
+        equipment.push({ type: 'required', name: 'Protective equipment (gloves, barriers)', onSite: null });
       }
-      if (state.tasks.includes('bedToChair') && level >= 3) {
-        equipment.push({ type: 'required', name: 'Mechanical lift for transfer (when client cannot assist)' });
+      if (state.tasks.includes('bedToChair') && (originalLevel >= 3 || state.assist === 'no')) {
+        equipment.push({ type: 'required', name: 'Mechanical lift for transfer', onSite: anyLift });
       }
       if (state.mobility === 'partial' || state.mobility === 'full') {
-        equipment.push({ type: 'recommended', name: 'Gait belt for stand-and-pivot transfers' });
+        equipment.push({ type: 'recommended', name: 'Gait belt for stand-and-pivot transfers', onSite: hasGaitBelt });
+      }
+      if ((state.mobility === 'partial' && state.assist === 'yes') || originalLevel === 3) {
+        equipment.push({ type: 'recommended', name: 'Sit-to-stand device for partial-assist transfers', onSite: hasSitToStand });
       }
 
       // Deduplicate equipment by name (required wins over recommended)
@@ -1138,7 +1332,7 @@
       });
       const finalEquipment = Array.from(equipMap.values());
 
-      return { level, rules, equipment: finalEquipment, familyAssists };
+      return { level, originalLevel, rules, equipment: finalEquipment, familyAssists, equipmentAdjusted };
     }
 
     // Render the result panel
@@ -1162,12 +1356,13 @@
       // Detect incomplete state
       const requiredAnswered = state.weight && state.mobility && state.assist && state.bedbound;
       const bedboundOk = state.bedbound !== 'yes' || (state.bedbound === 'yes' && state.reposition);
+      const equipmentAnswered = state.equipment && state.equipment.length > 0;
 
-      if (!requiredAnswered || !bedboundOk) {
+      if (!requiredAnswered || !bedboundOk || !equipmentAnswered) {
         headline.className = 'result-staffing empty';
         headline.textContent = 'Awaiting answers';
         badgeRow.innerHTML = '';
-        summary.textContent = 'Complete questions 1 through 4 (and the bed-bound follow-up if applicable) to receive a recommendation.';
+        summary.textContent = 'Complete questions 1 through 5 (and the bed-bound follow-up if applicable) to receive a recommendation. The equipment selection in question 5 directly affects the staffing decision.';
         ruleList.innerHTML = '<li class="empty">No triggers active yet.</li>';
         equipList.innerHTML = '<li><span class="equip-name" style="color:#94A3B8;">Equipment list updates as the form fills.</span></li>';
         actionList.innerHTML = '<li class="empty">Action items populate after the staffing decision.</li>';
@@ -1240,6 +1435,39 @@
           badgeClass = '';
           badgeText = '';
           summaryText = 'No staffing rule has triggered yet.';
+      }
+
+      // ===== LIFT CERTIFICATION OVERRIDE =====
+      // When the lead caregiver holds lift certification AND the underlying scenario
+      // involves a lift (originalLevel >= 3), update the headline and actions to reflect
+      // the certification-based staffing.
+      if (state.liftCertified && result.originalLevel >= 3 && result.level === 1) {
+        headlineText = '1 Certified Caregiver + Lift';
+        badgeClass = 'one';
+        badgeText = '1 Certified Caregiver + Lift';
+        summaryText = 'A lead caregiver holding current Hoyer or mechanical lift competency operates the lift solo for this cooperative client. The certified caregiver carries documented experience with this client and written office authorization for solo lift operation.';
+        actions = [
+          'Assign the lift-certified lead caregiver. Verify current Hoyer or mechanical lift competency on file.',
+          'Confirm the caregiver has 3+ supervised shifts with this specific client documented.',
+          'File the office authorization for solo lift operation in the care plan before the first shift.',
+          'Confirm the lift sits on site, in working order, with charged battery if applicable.',
+          'Brief the family on the solo-operation protocol and the emergency escalation path.',
+          'Schedule a 30-day reassessment, or sooner if the client condition shifts.',
+          'Reassess immediately if the certified caregiver becomes unavailable; the shift reverts to two caregivers until a certified replacement is assigned.'
+        ];
+      } else if (state.liftCertified && result.originalLevel === 4 && result.level === 3) {
+        // Bariatric scenario where certification reduced from 4 to 3 but not to 1
+        headlineText = '2 Caregivers + Lift (Bariatric)';
+        badgeClass = 'two';
+        badgeText = '2 Caregivers + Lift';
+        summaryText = 'The bariatric client (above 300 lbs) requires two caregivers plus a lift even with lift certification. The certified caregiver leads lift operation; the second caregiver handles positioning, sling adjustment, and stabilization that the bariatric weight class demands.';
+        actions = [
+          'Assign one lift-certified caregiver as lead operator and one trained caregiver for positioning support.',
+          'Confirm the lift sits on site, rated to the client weight, with sling matched to body habitus.',
+          'Document the bariatric handling protocol in the care plan with named roles.',
+          'Schedule a 30-day reassessment with weight monitoring.',
+          'Verify space and floor type accommodate the lift base safely on every shift.'
+        ];
       }
 
       // ===== FAMILY-ASSIST OVERRIDE =====
@@ -1319,17 +1547,29 @@
       if (result.equipment.length === 0) {
         equipList.innerHTML = '<li><span class="equip-name" style="color:#94A3B8;">Standard caregiver kit covers this visit.</span></li>';
       } else {
-        // Sort required first
+        // Sort required first, then by on-site status (missing required items appear at top)
         const sorted = [...result.equipment].sort((a, b) => {
-          if (a.type === b.type) return 0;
-          return a.type === 'required' ? -1 : 1;
+          // Required items first
+          if (a.type !== b.type) return a.type === 'required' ? -1 : 1;
+          // Within same type, missing required items rise to top
+          if (a.type === 'required' && a.onSite === false && b.onSite !== false) return -1;
+          if (a.type === 'required' && b.onSite === false && a.onSite !== false) return 1;
+          return 0;
         });
-        equipList.innerHTML = sorted.map(e => `
-          <li>
-            <span class="equip-tag ${e.type}">${e.type}</span>
-            <span class="equip-name">${e.name}</span>
-          </li>
-        `).join('');
+        equipList.innerHTML = sorted.map(e => {
+          let statusBadge = '';
+          if (e.onSite === true) {
+            statusBadge = '<span style="display:inline-block;padding:1px 7px;border-radius:8px;font-size:9px;font-weight:700;background:#E6F4EA;color:#1B7A3D;margin-left:6px;">ON SITE</span>';
+          } else if (e.onSite === false) {
+            statusBadge = '<span style="display:inline-block;padding:1px 7px;border-radius:8px;font-size:9px;font-weight:700;background:#FDECEA;color:#B91C1C;margin-left:6px;">MISSING</span>';
+          }
+          return `
+            <li>
+              <span class="equip-tag ${e.type}">${e.type}</span>
+              <span class="equip-name">${e.name}${statusBadge}</span>
+            </li>
+          `;
+        }).join('');
       }
 
       // Action list
@@ -1377,9 +1617,10 @@
       // Block download until the form has produced a real recommendation
       const state = getState();
       const ready = state.weight && state.mobility && state.assist && state.bedbound &&
-                    (state.bedbound !== 'yes' || state.reposition);
+                    (state.bedbound !== 'yes' || state.reposition) &&
+                    state.equipment && state.equipment.length > 0;
       if (!ready) {
-        alert('Please complete questions 1 through 4 (and the bed-bound follow-up if applicable) before downloading the PDF.');
+        alert('Please complete questions 1 through 5 (and the bed-bound follow-up if applicable) before downloading the PDF.');
         return;
       }
 
@@ -1741,12 +1982,30 @@
     function resetForm() {
       form.reset();
       bedboundDetails.classList.remove('open');
+      const liftCertContainer = document.getElementById('liftCertContainer');
+      if (liftCertContainer) liftCertContainer.classList.remove('open');
       render();
     }
 
+    // Equipment "none" option behaves exclusively: selecting it clears all other
+    // equipment checkboxes; selecting any other option clears "none".
+    function handleEquipmentExclusivity(changedInput) {
+      if (!changedInput || changedInput.name !== 'equipment') return;
+      if (changedInput.value === 'none' && changedInput.checked) {
+        document.querySelectorAll('input[name="equipment"]').forEach(c => {
+          if (c.value !== 'none') c.checked = false;
+        });
+      } else if (changedInput.checked && changedInput.value !== 'none') {
+        const noneBox = document.querySelector('input[name="equipment"][value="none"]');
+        if (noneBox) noneBox.checked = false;
+      }
+    }
+
     // Wire up listeners
-    form.addEventListener('change', () => {
+    form.addEventListener('change', (e) => {
+      handleEquipmentExclusivity(e.target);
       toggleBedboundDetails();
+      toggleLiftCert();
       render();
     });
 
