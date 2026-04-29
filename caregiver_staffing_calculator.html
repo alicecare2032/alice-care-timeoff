@@ -1326,79 +1326,140 @@
       btn.disabled = true;
       btn.textContent = 'Generating PDF...';
 
+      // Build a clean filename from client name and assessment date
+      const rawClient = (document.getElementById('clientName').value || '').trim() || 'Client';
+      const rawAssessor = (document.getElementById('assessor').value || '').trim() || '__________________';
+      const rawDate = document.getElementById('assessDate').value || new Date().toISOString().split('T')[0];
+      const safeClient = rawClient.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_|_$/g, '').substring(0, 40) || 'Client';
+      const filename = `AliceCare_StaffingAssessment_${safeClient}_${rawDate}.pdf`;
+
+      // Extract current result data straight from the live result panel
+      const headlineText = (document.getElementById('staffingHeadline').textContent || '').trim();
+      const summaryText = (document.getElementById('summaryText').textContent || '').trim();
+      const ruleItems = Array.from(document.querySelectorAll('#ruleList li'))
+        .map(li => li.textContent.replace(/^[\s✓·]+/, '').trim())
+        .filter(t => t && !/no triggers active/i.test(t));
+      const equipItems = Array.from(document.querySelectorAll('#equipmentList li'))
+        .map(li => {
+          const tag = li.querySelector('.equip-tag');
+          const name = li.querySelector('.equip-name');
+          return {
+            type: tag ? tag.textContent.trim().toLowerCase() : '',
+            name: name ? name.textContent.trim() : li.textContent.trim()
+          };
+        })
+        .filter(e => e.name && !/updates as|standard caregiver kit/i.test(e.name));
+      const actionItems = Array.from(document.querySelectorAll('#actionList li'))
+        .map(li => li.textContent.replace(/^[\s✓·]+/, '').trim())
+        .filter(t => t && !/action items populate/i.test(t));
+      const generated = new Date().toLocaleString('en-US', {
+        year: 'numeric', month: 'short', day: 'numeric',
+        hour: 'numeric', minute: '2-digit'
+      });
+
+      // Helpers to render list sections
+      const renderTextList = (items, marker, fallback) => {
+        if (!items.length) return `<div style="color:#94A3B8;font-style:italic;font-size:12px;">${fallback}</div>`;
+        return items.map(t => `
+          <div style="padding:7px 0;border-bottom:1px dashed #E2E8F0;font-size:12px;line-height:1.55;color:#2D4A6F;">
+            <span style="color:#F57600;font-weight:700;margin-right:8px;display:inline-block;width:14px;">${marker}</span>${escapeHtml(t)}
+          </div>
+        `).join('');
+      };
+      const renderEquipList = (items) => {
+        if (!items.length) return '<div style="color:#94A3B8;font-style:italic;font-size:12px;">Standard caregiver kit covers this visit.</div>';
+        return items.map(e => {
+          const isReq = e.type === 'required';
+          return `
+            <div style="padding:7px 0;border-bottom:1px dashed #E2E8F0;font-size:12px;line-height:1.55;color:#2D4A6F;">
+              <span style="display:inline-block;padding:2px 8px;border-radius:9px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;margin-right:10px;background:${isReq ? '#FDECEA' : '#F0F7FF'};color:${isReq ? '#B91C1C' : '#1A365C'};">${escapeHtml(e.type || 'item')}</span>
+              ${escapeHtml(e.name)}
+            </div>
+          `;
+        }).join('');
+      };
+
+      // Build the PDF content with all inline styles (no class dependencies, system fonts)
+      const pdf = document.createElement('div');
+      pdf.id = 'pdfRenderTarget';
+      pdf.style.cssText = 'width:720px;padding:30px;font-family:Arial,Helvetica,sans-serif;background:#FFFFFF;color:#2D4A6F;box-sizing:border-box;line-height:1.5;';
+      pdf.innerHTML = `
+        <div style="text-align:center;padding:0 0 16px;border-bottom:3px solid #F57600;margin-bottom:20px;">
+          <div style="font-size:28px;font-weight:700;letter-spacing:-0.5px;">
+            <span style="color:#F57600;">alice.</span><span style="color:#1A365C;font-weight:400;">care</span>
+          </div>
+          <div style="font-size:11px;color:#5A6E89;letter-spacing:0.6px;margin-top:4px;">
+            Caregiver Staffing Assessment &nbsp;&middot;&nbsp; CDSS License #344700080
+          </div>
+        </div>
+        <div style="padding-bottom:14px;border-bottom:2px solid #1A365C;margin-bottom:20px;">
+          <h2 style="font-size:18px;color:#1A365C;margin:0 0 8px 0;font-weight:700;">Staffing Assessment Result</h2>
+          <div style="font-size:12px;color:#5A6E89;line-height:1.7;">
+            <strong style="color:#1A365C;">Client:</strong> ${escapeHtml(rawClient)} &nbsp;&middot;&nbsp;
+            <strong style="color:#1A365C;">Assessor:</strong> ${escapeHtml(rawAssessor)} &nbsp;&middot;&nbsp;
+            <strong style="color:#1A365C;">Date:</strong> ${escapeHtml(rawDate)}
+          </div>
+        </div>
+        <div style="background:#F8FAFC;border-radius:8px;padding:20px;margin-bottom:14px;border-left:4px solid #F57600;page-break-inside:avoid;">
+          <div style="font-size:11px;font-weight:700;color:#5A6E89;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Recommended Staffing</div>
+          <div style="font-size:22px;font-weight:700;color:#1A365C;margin-bottom:12px;line-height:1.2;">${escapeHtml(headlineText)}</div>
+          <div style="font-size:13px;color:#2D4A6F;line-height:1.6;">${escapeHtml(summaryText)}</div>
+        </div>
+        <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:8px;padding:16px 20px;margin-bottom:12px;page-break-inside:avoid;">
+          <div style="font-size:11px;font-weight:700;color:#1A365C;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;">Why This Recommendation</div>
+          ${renderTextList(ruleItems, '&#10003;', 'No specific triggers active.')}
+        </div>
+        <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:8px;padding:16px 20px;margin-bottom:12px;page-break-inside:avoid;">
+          <div style="font-size:11px;font-weight:700;color:#1A365C;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;">Equipment Required &amp; Recommended</div>
+          ${renderEquipList(equipItems)}
+        </div>
+        <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:8px;padding:16px 20px;margin-bottom:12px;page-break-inside:avoid;">
+          <div style="font-size:11px;font-weight:700;color:#1A365C;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;">Next Steps for the Office</div>
+          ${renderTextList(actionItems, '&#8594;', 'No action items.')}
+        </div>
+        <div style="margin-top:24px;padding-top:14px;border-top:1px solid #E2E8F0;font-size:9.5px;color:#94A3B8;text-align:center;line-height:1.6;">
+          Alice Care &nbsp;&middot;&nbsp; 8146 Greenback Lane, Suite #106, Fair Oaks, CA 95628 &nbsp;&middot;&nbsp; (916) 292-8820<br>
+          Generated ${escapeHtml(generated)} &nbsp;&middot;&nbsp; Result reflects the Two-Caregiver and Bed-Bound Safety Policy. Caregiver judgment in the field overrides any automated recommendation.
+        </div>
+      `;
+
+      // Place the element in the document so html2canvas can read its layout reliably.
+      // Using fixed position with negative z-index keeps it visible to the renderer
+      // but invisible to the user, which avoids the off-screen-coordinate edge cases.
+      pdf.style.position = 'fixed';
+      pdf.style.top = '0';
+      pdf.style.left = '0';
+      pdf.style.zIndex = '-9999';
+      pdf.style.opacity = '0';
+      pdf.style.pointerEvents = 'none';
+      document.body.appendChild(pdf);
+
+      // Wait for layout and font loading to finish before capture
       try {
-        // Build a clean filename from client name and assessment date
-        const rawClient = document.getElementById('clientName').value.trim() || 'Client';
-        const rawDate = document.getElementById('assessDate').value || new Date().toISOString().split('T')[0];
-        const safeClient = rawClient.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_|_$/g, '').substring(0, 40) || 'Client';
-        const filename = `AliceCare_StaffingAssessment_${safeClient}_${rawDate}.pdf`;
-
-        // Clone the live result panel so we don't disturb the page
-        const original = document.querySelector('.result-panel');
-        const clone = original.cloneNode(true);
-
-        // Reveal the print-only header inside the clone
-        const printHeader = clone.querySelector('.print-header');
-        if (printHeader) {
-          printHeader.style.display = 'block';
-          printHeader.style.padding = '0 0 14px 0';
-          printHeader.style.borderBottom = '2px solid #1A365C';
-          printHeader.style.marginBottom = '18px';
+        if (document.fonts && document.fonts.ready) {
+          await document.fonts.ready;
         }
+      } catch (e) { /* fonts API not available, continue */ }
+      await new Promise(r => setTimeout(r, 150));
 
-        // Wrap the clone with Alice Care branding header and footer
-        const wrapper = document.createElement('div');
-        wrapper.style.cssText = [
-          'padding: 24px',
-          "font-family: 'Poppins', Arial, Helvetica, sans-serif",
-          'background: #FFFFFF',
-          'color: #2D4A6F',
-          'width: 760px',
-          'box-sizing: border-box'
-        ].join(';');
-
-        const brandHeader = document.createElement('div');
-        brandHeader.style.cssText = 'text-align:center;padding:12px 0 16px;border-bottom:3px solid #F57600;margin-bottom:18px;';
-        brandHeader.innerHTML =
-          '<div style="font-size:26px;font-weight:700;letter-spacing:-0.5px;">' +
-            '<span style="color:#F57600;">alice.</span><span style="color:#1A365C;font-weight:400;">care</span>' +
-          '</div>' +
-          '<div style="font-size:11px;color:#5A6E89;letter-spacing:0.6px;margin-top:4px;">' +
-            'Caregiver Staffing Assessment &nbsp;·&nbsp; CDSS License #344700080' +
-          '</div>';
-        wrapper.appendChild(brandHeader);
-        wrapper.appendChild(clone);
-
-        const brandFooter = document.createElement('div');
-        brandFooter.style.cssText = 'margin-top:24px;padding-top:14px;border-top:1px solid #E2E8F0;font-size:9.5px;color:#94A3B8;text-align:center;line-height:1.6;';
-        const generated = new Date().toLocaleString('en-US', {
-          year: 'numeric', month: 'short', day: 'numeric',
-          hour: 'numeric', minute: '2-digit'
-        });
-        brandFooter.innerHTML =
-          'Alice Care &nbsp;·&nbsp; 8146 Greenback Lane, Suite #106, Fair Oaks, CA 95628 &nbsp;·&nbsp; (916) 292-8820<br>' +
-          'Generated ' + escapeHtml(generated) + ' &nbsp;·&nbsp; Result reflects the Two-Caregiver and Bed-Bound Safety Policy. Caregiver judgment in the field overrides any automated recommendation.';
-        wrapper.appendChild(brandFooter);
-
-        // Place the wrapper off-screen so html2canvas can render it accurately
-        wrapper.style.position = 'absolute';
-        wrapper.style.left = '-10000px';
-        wrapper.style.top = '0';
-        document.body.appendChild(wrapper);
-
+      try {
         const opt = {
           margin: [10, 10, 12, 10],
           filename: filename,
           image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#FFFFFF' },
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#FFFFFF',
+            windowWidth: 720,
+            width: 720
+          },
           jsPDF: { unit: 'mm', format: 'letter', orientation: 'portrait', compress: true },
-          pagebreak: { mode: ['css', 'legacy'], avoid: ['.sub-card', '.result-card'] }
+          pagebreak: { mode: ['css', 'legacy'] }
         };
 
-        await html2pdf().set(opt).from(wrapper).save();
-
-        // Clean up the off-screen clone
-        document.body.removeChild(wrapper);
+        await html2pdf().set(opt).from(pdf).save();
 
         btn.textContent = '✓ Downloaded';
         setTimeout(() => {
@@ -1409,7 +1470,11 @@
         console.error('PDF generation failed:', err);
         btn.disabled = false;
         btn.textContent = originalLabel;
-        alert('PDF generation hit an error. Please try again, or use the browser print dialog (Cmd/Ctrl + P) and choose "Save as PDF".');
+        alert('PDF generation hit an error: ' + (err.message || 'unknown') + '\n\nTry again, or use the browser print dialog (Cmd/Ctrl + P) and choose "Save as PDF".');
+      } finally {
+        if (pdf.parentNode) {
+          document.body.removeChild(pdf);
+        }
       }
     }
 
