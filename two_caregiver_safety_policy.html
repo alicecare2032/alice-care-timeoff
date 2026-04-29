@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Two-Caregiver &amp; Bed-Bound Safety Policy | Alice Care</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Poppins', Arial, Helvetica, sans-serif;
+      background-color: #F0F7FF;
+      margin: 0;
+      padding: 0;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    .email-wrapper { width: 100%; background-color: #F0F7FF; padding: 30px 15px; }
+
+    .email-container {
+      max-width: 700px;
+      margin: 0 auto;
+      background-color: #FFFFFF;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(26, 54, 92, 0.08);
+    }
+
+    /* Header */
+    .email-header {
+      background: linear-gradient(135deg, #F57600 0%, #E06900 100%);
+      padding: 22px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .email-header::before {
+      content: '';
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 50%;
+      top: -80px;
+      right: 6%;
+    }
+
+    .logo { font-size: 28px; font-weight: 700; position: relative; z-index: 1; }
+    .logo .alice { color: #FFFFFF; }
+    .logo .care { color: #1A365C; font-weight: 400; }
+
+    .header-tagline {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 12px;
+      font-weight: 400;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Section base */
+    .section { padding: 28px 40px; border-bottom: 1px solid #E2E8F0; }
+    .section h2 { font-size: 16px; font-weight: 700; color: #1A365C; margin-bottom: 6px; }
+    .section .section-sub { font-size: 12px; color: #666666; margin-bottom: 18px; line-height: 1.5; }
+
+    /* Intro Section */
+    .intro-section { padding: 28px 40px; border-bottom: 1px solid #E2E8F0; }
+    .intro-section h1 { font-size: 22px; font-weight: 700; color: #1A365C; margin-bottom: 10px; line-height: 1.3; }
+    .intro-section h1 span { color: #F57600; }
+    .intro-section p { font-size: 13.5px; line-height: 1.7; color: #2D4A6F; }
+
+    /* Definition Cards */
+    .def-row { display: flex; gap: 14px; }
+    .def-card { flex: 1; border-radius: 8px; padding: 18px 20px; }
+    .def-card.solo { background: #E6F4EA; border: 1px solid #B7DFC6; }
+    .def-card.team { background: #FFF4E6; border: 1px solid #F5C98A; }
+    .def-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.4px; }
+    .def-card.solo h4 { color: #1B7A3D; }
+    .def-card.team h4 { color: #C25700; }
+    .def-card p { font-size: 12px; line-height: 1.55; color: #2D4A6F; }
+
+    /* Bed-Bound Definition Card */
+    .bedbound-def {
+      background: #F0F7FF;
+      border-left: 4px solid #1A365C;
+      border-radius: 8px;
+      padding: 18px 22px;
+    }
+    .bedbound-def h4 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1A365C;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 10px;
+    }
+    .bedbound-def ul { margin: 0; padding-left: 18px; font-size: 12.5px; line-height: 1.7; color: #2D4A6F; }
+    .bedbound-def ul li::marker { color: #F57600; }
+
+    /* Tables */
+    .guideline-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(26, 54, 92, 0.06);
+    }
+    .guideline-table thead th {
+      background: #1A365C;
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 11px 14px;
+      text-align: left;
+    }
+    .guideline-table tbody td {
+      padding: 12px 14px;
+      font-size: 12.5px;
+      line-height: 1.5;
+      color: #2D4A6F;
+      border-bottom: 1px solid #E2E8F0;
+      vertical-align: top;
+    }
+    .guideline-table tbody tr:last-child td { border-bottom: none; }
+    .guideline-table tbody tr:nth-child(odd) td { background: #F8FAFC; }
+    .guideline-table tbody tr:nth-child(even) td { background: #FFFFFF; }
+    .guideline-table .condition-cell { font-weight: 600; color: #1A365C; width: 40%; }
+
+    .equip-line {
+      display: block;
+      font-size: 11.5px;
+      color: #5A6E89;
+      margin-top: 4px;
+      font-style: italic;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      vertical-align: middle;
+    }
+    .badge.one { background: #E6F4EA; color: #1B7A3D; border: 1px solid #B7DFC6; }
+    .badge.flex { background: #FFF8E1; color: #8A6500; border: 1px solid #F0D785; }
+    .badge.two { background: #FFE9D6; color: #C25700; border: 1px solid #F5C98A; }
+    .badge.lift { background: #FDECEA; color: #B91C1C; border: 1px solid #F5C6C6; }
+
+    .risk-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-left: 6px;
+    }
+    .risk-tag.low { background: #E6F4EA; color: #1B7A3D; }
+    .risk-tag.moderate { background: #FFF8E1; color: #8A6500; }
+    .risk-tag.high { background: #FDECEA; color: #B91C1C; }
+
+    /* Mandatory Triggers */
+    .triggers-card {
+      background: #FDECEA;
+      border: 1px solid #F5C6C6;
+      border-left: 4px solid #B91C1C;
+      border-radius: 8px;
+      padding: 18px 22px;
+      margin-top: 20px;
+    }
+    .triggers-card h4 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #B91C1C;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 10px;
+    }
+    .triggers-card p { font-size: 12px; color: #5A2828; margin-bottom: 8px; line-height: 1.5; }
+    .triggers-card ul { margin: 0; padding-left: 18px; font-size: 12.5px; line-height: 1.7; color: #2D4A6F; }
+    .triggers-card ul li::marker { color: #B91C1C; }
+
+    /* Task Cards */
+    .task-card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-left: 4px solid #F57600;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+    }
+    .task-card:last-child { margin-bottom: 0; }
+    .task-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .task-num {
+      flex-shrink: 0;
+      width: 26px;
+      height: 26px;
+      background: #F57600;
+      color: #FFFFFF;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .task-title { font-size: 13.5px; font-weight: 700; color: #1A365C; }
+    .task-body { font-size: 12.5px; line-height: 1.6; color: #2D4A6F; }
+    .task-body ul { margin: 6px 0 0 18px; padding: 0; line-height: 1.65; }
+    .task-body ul li::marker { color: #F57600; }
+    .task-body strong { color: #1A365C; }
+
+    /* Equipment Cards */
+    .equip-row { display: flex; gap: 14px; }
+    .equip-card { flex: 1; border-radius: 8px; padding: 18px 20px; }
+    .equip-card.recommend { background: #F0F7FF; border: 1px solid #C7DAF0; }
+    .equip-card.required { background: #FFF4E6; border: 1px solid #F5C98A; }
+    .equip-card h4 { font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 10px; }
+    .equip-card.recommend h4 { color: #1A365C; }
+    .equip-card.required h4 { color: #C25700; }
+    .equip-card ul { margin: 0; padding-left: 18px; font-size: 12px; line-height: 1.7; color: #2D4A6F; }
+
+    /* Documentation Checklist */
+    .doc-checklist {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      padding: 18px 22px;
+    }
+    .doc-checklist h4 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1A365C;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .doc-list { list-style: none; padding: 0; margin: 0; }
+    .doc-list li {
+      font-size: 12.5px;
+      line-height: 1.5;
+      color: #2D4A6F;
+      padding: 8px 0;
+      border-bottom: 1px dashed #E2E8F0;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .doc-list li:last-child { border-bottom: none; }
+    .doc-checkbox {
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #F57600;
+      border-radius: 3px;
+      display: inline-block;
+      margin-top: 2px;
+    }
+    .doc-list li strong { color: #1A365C; }
+
+    /* Key Rules */
+    .rule-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 16px;
+      background: #F8FAFC;
+      border-left: 3px solid #F57600;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+    .rule-card:last-child { margin-bottom: 0; }
+    .rule-num {
+      flex-shrink: 0;
+      width: 26px;
+      height: 26px;
+      background: #F57600;
+      color: #FFFFFF;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .rule-text { font-size: 12.5px; line-height: 1.55; color: #2D4A6F; flex: 1; }
+    .rule-text strong { color: #1A365C; }
+
+    /* Field Rule Banner */
+    .field-rule {
+      background: linear-gradient(135deg, #1A365C 0%, #244780 100%);
+      color: #FFFFFF;
+      padding: 30px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .field-rule::before {
+      content: '';
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      background: rgba(245, 118, 0, 0.08);
+      border-radius: 50%;
+      top: -100px;
+      left: -50px;
+    }
+    .field-rule::after {
+      content: '';
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      background: rgba(245, 118, 0, 0.06);
+      border-radius: 50%;
+      bottom: -120px;
+      right: -60px;
+    }
+    .field-rule .label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #F57600;
+      text-transform: uppercase;
+      letter-spacing: 1.4px;
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 1;
+    }
+    .field-rule .quote {
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.45;
+      max-width: 540px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+    .field-rule .quote em { color: #F57600; font-style: normal; font-weight: 700; }
+
+    /* Scope Reminder */
+    .scope-reminder {
+      background: #F0F7FF;
+      border-radius: 8px;
+      padding: 18px 22px;
+      margin: 20px 40px 0;
+      border-left: 4px solid #F57600;
+    }
+    .scope-reminder h4 { font-size: 13px; font-weight: 600; color: #1A365C; margin-bottom: 6px; }
+    .scope-reminder p { font-size: 12px; line-height: 1.6; color: #2D4A6F; }
+
+    /* Regulatory Note */
+    .reg-note {
+      background: #FFFBF0;
+      border: 1px solid #F5DFA0;
+      border-radius: 8px;
+      padding: 14px 20px;
+      margin: 14px 40px 0;
+      font-size: 11.5px;
+      line-height: 1.6;
+      color: #5A4A1E;
+    }
+    .reg-note strong { color: #8A6500; }
+    .reg-note ul { margin: 8px 0 4px 18px; padding: 0; line-height: 1.7; }
+    .reg-note ul li::marker { color: #F57600; }
+
+    /* Contact Row */
+    .contact-row {
+      padding: 22px 40px;
+      font-size: 12.5px;
+      line-height: 1.7;
+      color: #2D4A6F;
+      border-top: 1px solid #E2E8F0;
+      margin-top: 20px;
+    }
+    .contact-row a { color: #F57600; font-weight: 600; text-decoration: none; }
+
+    /* Quick Links */
+    .quick-links { background: #1A365C; padding: 16px 40px; text-align: center; }
+    .quick-links-row { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
+    .quick-link {
+      display: inline-block;
+      color: #FFFFFF !important;
+      text-decoration: none;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 7px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 6px;
+      font-family: 'Poppins', Arial, sans-serif;
+    }
+    .quick-link:hover { background: rgba(255, 255, 255, 0.1); }
+
+    /* Footer */
+    .email-footer { background: #1A365C; padding: 22px 40px; text-align: center; border-top: 3px solid #F57600; }
+    .footer-logo { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    .footer-logo .alice { color: #F57600; }
+    .footer-logo .care { color: #FFFFFF; font-weight: 400; }
+    .footer-address { font-size: 11px; color: rgba(255, 255, 255, 0.55); line-height: 1.5; margin-bottom: 12px; }
+    .footer-unsubscribe { font-size: 11px; color: rgba(255, 255, 255, 0.45); }
+    .footer-unsubscribe a { color: #F57600; text-decoration: underline; }
+
+    /* Responsive */
+    @media screen and (max-width: 580px) {
+      .email-header { padding: 18px 24px; flex-direction: column; text-align: center; gap: 4px; }
+      .intro-section { padding: 22px 24px; }
+      .intro-section h1 { font-size: 19px; }
+      .section { padding: 22px 24px; }
+      .def-row, .equip-row { flex-direction: column; }
+      .guideline-table thead th { padding: 9px 10px; font-size: 10.5px; }
+      .guideline-table tbody td { padding: 9px 10px; font-size: 11.5px; }
+      .guideline-table .condition-cell { width: auto; }
+      .scope-reminder, .reg-note { margin-left: 24px; margin-right: 24px; }
+      .contact-row { padding: 20px 24px; }
+      .quick-links { padding: 16px 24px; }
+      .quick-link { padding: 7px 10px; font-size: 10px; }
+      .email-footer { padding: 20px 24px; }
+      .field-rule { padding: 24px 24px; }
+      .field-rule .quote { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="email-wrapper">
+    <div class="email-container">
+
+      <!-- Header -->
+      <div class="email-header">
+        <div class="logo">
+          <span class="alice">alice.</span><span class="care">care</span>
+        </div>
+        <div class="header-tagline">Safe · Affordable · Reliable</div>
+      </div>
+
+      <!-- Intro -->
+      <div class="intro-section">
+        <h1>Two-Caregiver &amp; <span>Bed-Bound Safety Policy</span></h1>
+        <p>Alice Care places caregiver and client safety at the center of every shift. This policy specifies when one caregiver can safely staff a visit and when the shift requires two caregivers, sometimes paired with a transfer lift. Three factors drive the decision: client weight, mobility level, and bed-bound status. <strong>Bed-bound status automatically elevates risk regardless of weight</strong>, because most bed-bound tasks involve full-body handling. Whenever any factor crosses a threshold, the staffing model rises to match it. These rules protect caregivers from injury, protect clients from unsafe handling, and keep every visit aligned with our care standards.</p>
+      </div>
+
+      <!-- Two Staffing Models -->
+      <div class="section">
+        <h2>Two Staffing Models at a Glance</h2>
+        <div class="def-row">
+          <div class="def-card solo">
+            <h4>Single Caregiver</h4>
+            <p>The client weighs under 180 lbs, moves independently or with light assistance, and repositions without help. One trained caregiver covers the full shift safely.</p>
+          </div>
+          <div class="def-card team">
+            <h4>Two Caregivers (Lift if Needed)</h4>
+            <p>The client weighs 250 lbs or more, requires full-assist mobility, or cannot reposition in bed. A second caregiver joins the shift, and a transfer lift adds to the team for clients above 300 lbs or non-weight-bearing status.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bed-Bound Definition -->
+      <div class="section">
+        <h2>What Defines a Bed-Bound Client</h2>
+        <div class="section-sub">A client meets the bed-bound definition when any combination of these conditions holds. The intake team flags this status during enrollment and reviews it at every reassessment.</div>
+        <div class="bedbound-def">
+          <h4>A Client is Bed-Bound When They</h4>
+          <ul>
+            <li>Remain in bed most or all of the day</li>
+            <li>Require assistance for every transfer</li>
+            <li>Cannot reposition independently</li>
+            <li>Use a hospital bed or similar medical setup</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Weight-Based Guidelines -->
+      <div class="section">
+        <h2>Weight-Based Guidelines</h2>
+        <div class="section-sub">Client weight sets the first line of safety planning. Match the weight range to the staffing column below.</div>
+        <table class="guideline-table">
+          <thead>
+            <tr>
+              <th>Client Weight</th>
+              <th>Staffing Requirement</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="condition-cell">Under 180 lbs</td>
+              <td><span class="badge one">1 Caregiver</span> &nbsp; The caregiver assists when the client participates in the transfer.</td>
+            </tr>
+            <tr>
+              <td class="condition-cell">180 to 250 lbs</td>
+              <td><span class="badge flex">1 or 2 Caregivers</span> &nbsp; One caregiver covers light assists. Two caregivers staff the shift when the client cannot help.</td>
+            </tr>
+            <tr>
+              <td class="condition-cell">250 to 300 lbs</td>
+              <td><span class="badge two">2 Caregivers</span> &nbsp; Two caregivers staff the shift in every scenario.</td>
+            </tr>
+            <tr>
+              <td class="condition-cell">Above 300 lbs</td>
+              <td><span class="badge lift">2 Caregivers + Lift</span> &nbsp; Two caregivers plus a mechanical lift handle every transfer.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Mobility-Based Guidelines -->
+      <div class="section">
+        <h2>Mobility-Based Guidelines</h2>
+        <div class="section-sub">Mobility level often outweighs weight alone. A lighter client who cannot bear weight still requires team staffing.</div>
+        <table class="guideline-table">
+          <thead>
+            <tr>
+              <th>Mobility Level</th>
+              <th>Staffing Requirement</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="condition-cell">Independent</td>
+              <td><span class="badge one">1 Caregiver</span> &nbsp; The client moves and transfers without physical support.</td>
+            </tr>
+            <tr>
+              <td class="condition-cell">Partial Assist</td>
+              <td><span class="badge flex">1 to 2 Caregivers</span> &nbsp; Staffing scales with the size and stability of the client during each transfer.</td>
+            </tr>
+            <tr>
+              <td class="condition-cell">Full Assist</td>
+              <td><span class="badge two">2 Caregivers</span> &nbsp; Two caregivers perform every transfer and stand by every position change.</td>
+            </tr>
+            <tr>
+              <td class="condition-cell">Non-Weight Bearing</td>
+              <td><span class="badge lift">2 Caregivers + Lift</span> &nbsp; A mechanical lift handles all weight transfer; two caregivers control positioning.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Bed-Bound Care Risk Model -->
+      <div class="section">
+        <h2>Bed-Bound Care Risk Model</h2>
+        <div class="section-sub">Every bed-bound task carries its own risk profile. Match the factor to the staffing model and verify the equipment before the shift starts.</div>
+        <table class="guideline-table">
+          <thead>
+            <tr>
+              <th>Factor &amp; Condition</th>
+              <th>Staffing &amp; Equipment</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="condition-cell">Bed mobility: client repositions independently <span class="risk-tag low">Low</span></td>
+              <td><span class="badge one">1 Caregiver</span> &nbsp; The caregiver supervises only.<span class="equip-line">Equipment: none required.</span></td>
+            </tr>
+            <tr>
+              <td class="condition-cell">Bed mobility: limited movement <span class="risk-tag moderate">Moderate</span></td>
+              <td><span class="badge flex">1 to 2 Caregivers</span> &nbsp; The caregiver monitors fatigue and asks for backup at the first sign of strain.<span class="equip-line">Equipment: slide sheets recommended.</span></td>
+            </tr>
+            <tr>
+              <td class="condition-cell">Bed mobility: cannot reposition <span class="risk-tag high">High</span></td>
+              <td><span class="badge two">2 Caregivers Required</span> &nbsp; No solo turning under any circumstance.<span class="equip-line">Equipment: slide sheets or mechanical lift.</span></td>
+            </tr>
+            <tr>
+              <td class="condition-cell">Transfer: bed to wheelchair <span class="risk-tag high">High</span></td>
+              <td><span class="badge two">2 Caregivers Required</span> &nbsp; Caregivers never lift manually.<span class="equip-line">Equipment: mechanical lift recommended.</span></td>
+            </tr>
+            <tr>
+              <td class="condition-cell">Transfer: fully bed-bound, no transfers <span class="risk-tag high">High</span></td>
+              <td><span class="badge two">2 Caregivers</span> &nbsp; Care tasks focus on in-bed positioning and hygiene.<span class="equip-line">Equipment: positioning aids.</span></td>
+            </tr>
+            <tr>
+              <td class="condition-cell">Toileting and brief change: fully dependent <span class="risk-tag high">High</span></td>
+              <td><span class="badge two">2 Caregivers Required</span> &nbsp; Hygiene and repositioning happen together.<span class="equip-line">Equipment: protective equipment plus slide sheets.</span></td>
+            </tr>
+            <tr>
+              <td class="condition-cell">Repositioning every 2 hours <span class="risk-tag high">High</span></td>
+              <td><span class="badge two">2 Caregivers Required</span> &nbsp; The team prevents pressure injuries with each turn.<span class="equip-line">Equipment: slide sheets and wedges.</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Mandatory Triggers -->
+        <div class="triggers-card">
+          <h4>Mandatory Two-Caregiver Triggers (Bed-Bound)</h4>
+          <p>The shift requires two caregivers if <strong>any one</strong> of these conditions applies:</p>
+          <ul>
+            <li>The client cannot turn or reposition independently</li>
+            <li>The client requires a brief change in bed</li>
+            <li>The client requires boosting or pulling up in bed</li>
+            <li>The client holds non-weight-bearing status</li>
+            <li>The client shows resistance, stiffness, or pain during movement</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Critical Task Guidance -->
+      <div class="section">
+        <h2>Critical Task Guidance for Bed-Bound Care</h2>
+        <div class="section-sub">Five core tasks shape every bed-bound shift. Each one carries its own staffing and equipment standard.</div>
+
+        <div class="task-card">
+          <div class="task-head">
+            <div class="task-num">1</div>
+            <div class="task-title">Repositioning in Bed</div>
+          </div>
+          <div class="task-body">
+            Caregivers never pull or drag a client alone. Two caregivers handle every side-to-side turn and every boost up in bed.
+            <ul>
+              <li>Use draw sheets and slide sheets to reduce friction</li>
+              <li>Coordinate the count out loud before each move</li>
+              <li>Stop the moment the client braces, stiffens, or guards</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="task-card">
+          <div class="task-head">
+            <div class="task-num">2</div>
+            <div class="task-title">Brief Changes and Hygiene</div>
+          </div>
+          <div class="task-body">
+            Brief changes combine lifting and rolling. Two caregivers staff every change when the client cannot assist or the client's weight exceeds safe handling for one person.
+            <ul>
+              <li>One caregiver stabilizes the client's body</li>
+              <li>The second caregiver performs the hygiene step</li>
+              <li>The team protects dignity by keeping the client covered between steps</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="task-card">
+          <div class="task-head">
+            <div class="task-num">3</div>
+            <div class="task-title">Pressure Injury Prevention</div>
+          </div>
+          <div class="task-body">
+            Caregivers reposition the client every two hours, or follow the schedule in the care plan when it specifies a different interval.
+            <ul>
+              <li>Use pillows and wedges to offload heels, hips, and shoulders</li>
+              <li>Avoid friction and shear by lifting rather than dragging</li>
+              <li>Document skin changes immediately and notify the office</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="task-card">
+          <div class="task-head">
+            <div class="task-num">4</div>
+            <div class="task-title">Bed-to-Chair Transfers</div>
+          </div>
+          <div class="task-body">
+            <strong>If the team attempts a transfer:</strong> two caregivers staff the move, and a Hoyer lift carries the client whenever the client cannot assist.
+            <ul>
+              <li>Cancel the transfer when the equipment is unavailable</li>
+              <li>Cancel the transfer when the client refuses or shows distress</li>
+              <li>Document the cancellation and notify the office before the next shift</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="task-card">
+          <div class="task-head">
+            <div class="task-num">5</div>
+            <div class="task-title">Feeding and Hydration in Bed</div>
+          </div>
+          <div class="task-body">
+            One caregiver delivers feeding and hydration when the client maintains an upright position without help.
+            <ul>
+              <li>Upgrade to two caregivers when the client needs positioning support</li>
+              <li>Upgrade to two caregivers when poor positioning raises aspiration risk</li>
+              <li>Stop feeding immediately at any sign of choking or coughing</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weight + Bed-Bound Combined Rule -->
+      <div class="section">
+        <h2>Weight + Bed-Bound Combined Rule</h2>
+        <div class="section-sub">When the client meets bed-bound criteria, weight alone no longer carries the decision. Use this combined matrix to confirm staffing.</div>
+        <table class="guideline-table">
+          <thead>
+            <tr>
+              <th>Combined Condition</th>
+              <th>Required Staffing</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="condition-cell">Bed-bound and under 180 lbs</td>
+              <td><span class="badge flex">1 to 2 Caregivers</span> &nbsp; Mobility level decides the final count.</td>
+            </tr>
+            <tr>
+              <td class="condition-cell">Bed-bound and cannot assist</td>
+              <td><span class="badge two">2 Caregivers Required</span> &nbsp; Weight does not change this rule.</td>
+            </tr>
+            <tr>
+              <td class="condition-cell">Bed-bound and above 250 lbs</td>
+              <td><span class="badge two">2 Caregivers Required</span> &nbsp; Two caregivers handle every task.</td>
+            </tr>
+            <tr>
+              <td class="condition-cell">Bed-bound and above 300 lbs</td>
+              <td><span class="badge lift">2 Caregivers + Lift Required</span> &nbsp; The lift carries every transfer; two caregivers control positioning.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Equipment Standard -->
+      <div class="section">
+        <h2>Equipment Standard for Bed-Bound Clients</h2>
+        <div class="section-sub">The office verifies equipment before assigning the shift. Caregivers report any missing item before performing the affected task.</div>
+        <div class="equip-row">
+          <div class="equip-card recommend">
+            <h4>Strongly Recommended</h4>
+            <ul>
+              <li>Slide sheets</li>
+              <li>Draw sheets</li>
+              <li>Positioning wedges</li>
+              <li>Adjustable hospital bed</li>
+            </ul>
+          </div>
+          <div class="equip-card required">
+            <h4>Required When Applicable</h4>
+            <ul>
+              <li>Mechanical lift (Hoyer) for any transfer when the client cannot assist</li>
+              <li>Mechanical lift for any client above 300 lbs</li>
+              <li>Mechanical lift for non-weight-bearing clients</li>
+              <li>Protective equipment for hygiene and brief changes</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Caregiver Safety Authority + Key Rules -->
+      <div class="section">
+        <h2>Caregiver Safety Authority and Core Rules</h2>
+        <div class="section-sub">Caregivers hold the final word on field safety. The four rules below override any prior schedule, prior plan, or family request.</div>
+
+        <div class="rule-card">
+          <div class="rule-num">1</div>
+          <div class="rule-text"><strong>Stop immediately when a task feels unsafe.</strong> Caregiver instinct catches what charts miss. Document the concern, call the office, and request a reassessment before the next visit.</div>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-num">2</div>
+          <div class="rule-text"><strong>Never force movement.</strong> Resistance, stiffness, or pain stops the task. The team escalates instead of pushing through.</div>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-num">3</div>
+          <div class="rule-text"><strong>Use proper equipment for every high-risk transfer.</strong> Hoyer lifts, sit-to-stand devices, slide sheets, draw sheets, and gait belts protect both bodies in the room. Equipment availability sits inside the safety plan, not outside it.</div>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-num">4</div>
+          <div class="rule-text"><strong>Escalate to the Care Team for every doubt.</strong> The office adjusts staffing, dispatches a second caregiver, or schedules equipment delivery before the next shift. Caregivers carry no penalty for raising a concern.</div>
+        </div>
+      </div>
+
+      <!-- Care Plan / Intake Documentation -->
+      <div class="section">
+        <h2>Care Plan and Intake Documentation</h2>
+        <div class="section-sub">Every bed-bound client carries a documented profile in the care plan. The intake team confirms each item below before the first shift and reviews it at every reassessment.</div>
+        <div class="doc-checklist">
+          <h4>Required Intake Fields for Bed-Bound Clients</h4>
+          <ul class="doc-list">
+            <li><span class="doc-checkbox"></span><div><strong>Mobility level.</strong> None, limited, or partial. The intake team selects one and notes triggers that change the level.</div></li>
+            <li><span class="doc-checkbox"></span><div><strong>Repositioning frequency.</strong> Every 2 hours by default, or the interval the care plan specifies.</div></li>
+            <li><span class="doc-checkbox"></span><div><strong>Toileting method.</strong> Brief change, or external catheter management only. The team flags any other method for medical scope review.</div></li>
+            <li><span class="doc-checkbox"></span><div><strong>Equipment available on site.</strong> Slide sheets, draw sheets, wedges, hospital bed, and mechanical lift each receive a yes or no entry.</div></li>
+            <li><span class="doc-checkbox"></span><div><strong>Staffing designation.</strong> One caregiver (1:1) or two caregivers (2:1). The plan documents the trigger that justifies the designation.</div></li>
+            <li><span class="doc-checkbox"></span><div><strong>Reassessment trigger.</strong> Any weight change above 10 lbs, any new equipment need, any caregiver-reported safety concern, or any hospitalization triggers an immediate reassessment.</div></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Field Rule Banner -->
+      <div class="field-rule">
+        <div class="label">The Field Rule</div>
+        <div class="quote">If the client is in bed and cannot help you move them, <em>you do not move them alone.</em></div>
+      </div>
+
+      <!-- Scope Reminder -->
+      <div class="scope-reminder">
+        <h4>When the Care Plan Must Update</h4>
+        <p>Client weight, mobility, repositioning ability, and skin condition shift over time. Caregivers report any change immediately so Alice Care reviews the staffing model, adjusts the care plan, adds a second caregiver, or schedules equipment delivery before the next shift. A care plan written six months ago does not bind today's safety decision. Caregiver judgment in the field overrides any prior schedule until the office completes the reassessment.</p>
+      </div>
+
+      <!-- Regulatory Note -->
+      <div class="reg-note">
+        <strong>Best Practice and Compliance Alignment:</strong> Alice Care operates under CDSS License #344700080. The thresholds in this policy align with the safe-handling standards published by the agencies below.
+        <ul>
+          <li><strong>Occupational Safety and Health Administration (OSHA):</strong> avoid manual lifting and high-force exertion.</li>
+          <li><strong>National Institute for Occupational Safety and Health (NIOSH):</strong> dependent patients require assistive devices or team handling, with a single-worker manual lift cap near 35 lbs in patient handling.</li>
+          <li><strong>American Nurses Association (ANA):</strong> no-lift standards and team-based handling for dependent clients.</li>
+          <li><strong>Centers for Disease Control and Prevention (CDC):</strong> pressure injury prevention through scheduled repositioning.</li>
+          <li><strong>California Department of Social Services (CDSS):</strong> non-medical scope and safety boundaries under the Home Care Services Consumer Protection Act (AB 1217), codified at California Health &amp; Safety Code §§ 1796.10 to 1796.63.</li>
+        </ul>
+        Caregivers complete training that covers body mechanics, transfer technique, and equipment use before working any high-risk shift.
+      </div>
+
+      <!-- Contact -->
+      <div class="contact-row">
+        Need a staffing reassessment, equipment review, or guidance on a specific client situation? Reach the Alice Care office by phone, text, or voicemail at <a href="tel:+19162928820">(916) 292-8820</a><br>Monday to Saturday, 9:00 AM to 5:00 PM
+      </div>
+
+      <!-- Quick Links -->
+      <div class="quick-links">
+        <div class="quick-links-row">
+          <a href="https://www.Alicecare.com" class="quick-link">Caregiving Essentials</a>
+          <a href="https://www.Alicecare.com" class="quick-link">Safety Policies</a>
+          <a href="https://www.Alicecare.com" class="quick-link">Equipment Guide</a>
+          <a href="https://www.Alicecare.com" class="quick-link">Training</a>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="email-footer">
+        <div class="footer-logo">
+          <span class="alice">alice.</span><span class="care">care</span>
+        </div>
+        <div class="footer-address">
+          8146 Greenback Lane, Suite #106<br>
+          Fair Oaks, California 95628, United States
+        </div>
+        <div class="footer-unsubscribe">
+          Questions or feedback on this policy? <a href="https://www.Alicecare.com">Reach the Alice Care office</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
