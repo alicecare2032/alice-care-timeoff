@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <title>Stockholder Vote | TEKKS Inc.</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --alice-orange: #F57600;
+      --alice-orange-dark: #E06900;
+      --alice-navy: #1A365C;
+      --alice-light-navy: #2D4A6F;
+      --alice-alice-blue: #F0F7FF;
+      --alice-white: #FFFFFF;
+      --alice-light-grey: #F5F5F5;
+      --alice-dark-grey: #666666;
+      --success-green: #10B981;
+      --warning-amber: #F59E0B;
+      --error-red: #EF4444;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { -webkit-text-size-adjust: 100%; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, var(--alice-alice-blue) 0%, #E8F4FD 50%, var(--alice-light-grey) 100%);
+      min-height: 100vh;
+      color: var(--alice-navy);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, var(--alice-orange) 0%, var(--alice-orange-dark) 100%);
+      color: white;
+      padding: 1.25rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content: ''; position: absolute; width: 200px; height: 200px;
+      background: rgba(255, 255, 255, 0.08); border-radius: 50%;
+      top: -100px; right: 10%;
+    }
+    .header::after {
+      content: ''; position: absolute; width: 150px; height: 150px;
+      background: rgba(255, 255, 255, 0.05); border-radius: 50%;
+      bottom: -75px; left: 5%;
+    }
+    .header-content {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; justify-content: space-between; align-items: center;
+      position: relative; z-index: 1; flex-wrap: wrap; gap: 1rem;
+    }
+    .brand { display: flex; flex-direction: column; }
+    .logo { font-size: 1.75rem; font-weight: 700; line-height: 1; }
+    .logo .alice { color: var(--alice-white); }
+    .logo .dot { color: var(--alice-navy); }
+    .logo .care { color: var(--alice-navy); font-weight: 400; }
+    .tagline { font-size: 0.85rem; opacity: 0.95; margin-top: 0.4rem; letter-spacing: 0.3px; }
+    .meeting-badge {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0.5rem 1rem; border-radius: 50px;
+      font-size: 0.85rem; backdrop-filter: blur(10px);
+      font-weight: 500;
+    }
+
+    /* Container */
+    .container { max-width: 850px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    /* Cards */
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(26, 54, 92, 0.08);
+      padding: 2.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-tight { padding: 1.75rem 2rem; }
+
+    /* States */
+    .state { display: none; }
+    .state.active { display: block; animation: fadeUp 0.4s ease; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(15px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Loading */
+    .loading-wrap {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; min-height: 50vh; text-align: center;
+    }
+    .spinner {
+      width: 56px; height: 56px;
+      border: 4px solid #E5E7EB;
+      border-top-color: var(--alice-orange);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin-bottom: 1.25rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-wrap p { color: var(--alice-dark-grey); font-size: 0.95rem; }
+
+    /* Welcome banner */
+    .welcome-banner {
+      background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%);
+      border-left: 4px solid var(--alice-orange);
+      border-radius: 12px;
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .welcome-banner h2 {
+      color: var(--alice-navy);
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+    .welcome-banner p {
+      color: var(--alice-navy);
+      font-size: 0.95rem;
+      line-height: 1.55;
+    }
+
+    /* Stockholder details */
+    .holder-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-top: 1.25rem;
+    }
+    .holder-stat {
+      background: var(--alice-alice-blue);
+      border-radius: 10px;
+      padding: 0.9rem 1rem;
+    }
+    .holder-stat .label {
+      font-size: 0.7rem;
+      color: var(--alice-dark-grey);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      font-weight: 600;
+    }
+    .holder-stat .value {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--alice-navy);
+      margin-top: 0.25rem;
+    }
+
+    /* Section title */
+    .section-title {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid var(--alice-light-grey);
+    }
+    .section-title-num {
+      background: var(--alice-orange);
+      color: white;
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .section-title h3 {
+      font-size: 1.15rem; font-weight: 600;
+      color: var(--alice-navy);
+    }
+
+    /* Resolution intro */
+    .resolution-text {
+      background: #F8FAFC;
+      border-left: 3px solid var(--alice-light-navy);
+      padding: 1rem 1.25rem;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 1.5rem;
+      font-size: 0.92rem;
+      color: var(--alice-light-navy);
+      line-height: 1.65;
+    }
+    .resolution-text strong { color: var(--alice-navy); }
+
+    /* Nominee card */
+    .nominee {
+      border: 2px solid #E5E7EB;
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+      transition: all 0.25s ease;
+    }
+    .nominee:hover { border-color: var(--alice-orange); box-shadow: 0 4px 12px rgba(245, 118, 0, 0.08); }
+    .nominee.answered { border-color: var(--success-green); background: #F0FDF4; }
+
+    .nominee-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;
+    }
+    .nominee-name {
+      font-size: 1.1rem; font-weight: 600; color: var(--alice-navy);
+    }
+    .nominee-status {
+      font-size: 0.78rem;
+      padding: 0.25rem 0.7rem;
+      border-radius: 50px;
+      background: var(--alice-light-grey);
+      color: var(--alice-dark-grey);
+      font-weight: 500;
+    }
+    .nominee.answered .nominee-status {
+      background: #D1FAE5; color: #047857;
+    }
+
+    .vote-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+    }
+    .vote-option {
+      cursor: pointer;
+      border: 2px solid #E5E7EB;
+      border-radius: 10px;
+      padding: 0.85rem 0.5rem;
+      text-align: center;
+      transition: all 0.2s ease;
+      background: white;
+      user-select: none;
+    }
+    .vote-option:hover { border-color: var(--alice-orange); background: #FFF7ED; }
+    .vote-option input { display: none; }
+    .vote-option .vote-label {
+      font-weight: 600; font-size: 0.95rem; color: var(--alice-navy);
+    }
+    .vote-option .vote-icon {
+      width: 24px; height: 24px; margin: 0 auto 0.4rem;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%;
+      background: var(--alice-light-grey);
+      color: var(--alice-dark-grey);
+      transition: all 0.2s ease;
+    }
+    .vote-option .vote-icon svg { width: 14px; height: 14px; fill: currentColor; }
+
+    .vote-option.selected.for {
+      border-color: var(--success-green); background: #ECFDF5;
+    }
+    .vote-option.selected.for .vote-icon {
+      background: var(--success-green); color: white;
+    }
+    .vote-option.selected.against {
+      border-color: var(--error-red); background: #FEF2F2;
+    }
+    .vote-option.selected.against .vote-icon {
+      background: var(--error-red); color: white;
+    }
+    .vote-option.selected.abstain {
+      border-color: var(--warning-amber); background: #FFFBEB;
+    }
+    .vote-option.selected.abstain .vote-icon {
+      background: var(--warning-amber); color: white;
+    }
+
+    /* Consent box */
+    .consent-box {
+      background: #FFFBEB;
+      border: 2px solid #FCD34D;
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      margin: 1.5rem 0;
+      display: flex; gap: 0.75rem; align-items: flex-start;
+    }
+    .consent-box input[type="checkbox"] {
+      margin-top: 4px;
+      width: 18px; height: 18px;
+      accent-color: var(--alice-orange);
+      cursor: pointer; flex-shrink: 0;
+    }
+    .consent-box label {
+      font-size: 0.9rem; color: #78350F;
+      line-height: 1.55; cursor: pointer;
+    }
+    .consent-box label strong { color: #92400E; }
+
+    /* Submit area */
+    .submit-area {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 0.75rem; margin-top: 1.5rem;
+    }
+    .progress-info {
+      font-size: 0.85rem; color: var(--alice-dark-grey);
+    }
+    .progress-info strong { color: var(--alice-navy); }
+
+    .btn {
+      padding: 1rem 2.5rem; border: none; border-radius: 10px;
+      font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600;
+      cursor: pointer; transition: all 0.3s ease;
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--alice-orange) 0%, var(--alice-orange-dark) 100%);
+      color: white;
+    }
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245, 118, 0, 0.35);
+    }
+    .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    /* Result/error states */
+    .status-card {
+      text-align: center;
+      padding: 3rem 2rem;
+    }
+    .status-icon-wrap {
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.5rem;
+    }
+    .status-icon-wrap.success {
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    }
+    .status-icon-wrap.warning {
+      background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+    }
+    .status-icon-wrap.error {
+      background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+    }
+    .status-icon-wrap svg { width: 48px; height: 48px; fill: white; }
+
+    .status-card h2 {
+      font-size: 1.6rem; font-weight: 600;
+      color: var(--alice-navy);
+      margin-bottom: 0.75rem;
+    }
+    .status-card p {
+      color: var(--alice-dark-grey);
+      font-size: 1rem; line-height: 1.6;
+      max-width: 520px; margin: 0 auto;
+    }
+
+    /* Vote summary table */
+    .summary-table {
+      margin-top: 2rem;
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .summary-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.9rem 1.25rem;
+      border-bottom: 1px solid #E5E7EB;
+      font-size: 0.95rem;
+    }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-row .name { color: var(--alice-navy); font-weight: 500; }
+    .summary-row .vote-pill {
+      padding: 0.25rem 0.85rem;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .vote-pill.For { background: #D1FAE5; color: #047857; }
+    .vote-pill.Against { background: #FEE2E2; color: #B91C1C; }
+    .vote-pill.Abstain { background: #FEF3C7; color: #92400E; }
+
+    .signature-block {
+      margin-top: 1.5rem;
+      padding: 1.25rem 1.5rem;
+      background: var(--alice-alice-blue);
+      border-radius: 10px;
+      font-size: 0.85rem;
+      color: var(--alice-light-navy);
+      line-height: 1.6;
+      text-align: left;
+    }
+    .signature-block .label {
+      font-size: 0.7rem; text-transform: uppercase;
+      letter-spacing: 0.6px; font-weight: 600;
+      color: var(--alice-dark-grey); margin-bottom: 0.4rem;
+    }
+    .signature-block .value {
+      font-weight: 600; color: var(--alice-navy);
+      font-size: 0.95rem;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 0.8rem;
+      color: var(--alice-dark-grey);
+    }
+    .footer a { color: var(--alice-orange); text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+
+    /* Mobile */
+    @media (max-width: 640px) {
+      .card { padding: 1.5rem; }
+      .header { padding: 1rem 1.25rem; }
+      .logo { font-size: 1.4rem; }
+      .vote-options { grid-template-columns: 1fr; }
+      .nominee { padding: 1rem 1.25rem; }
+      .welcome-banner h2 { font-size: 1.2rem; }
+      .container { padding: 1.25rem 1rem; }
+      .btn { width: 100%; }
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 2rem; left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--alice-navy); color: white;
+      padding: 0.85rem 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+      font-size: 0.9rem;
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      max-width: 90%;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.error { background: var(--error-red); }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="brand">
+        <div class="logo"><span class="alice">alice</span><span class="dot">.</span><span class="care">care</span></div>
+        <div class="tagline">TEKKS Inc. Stockholder Vote</div>
+      </div>
+      <div class="meeting-badge">Written Consent in Lieu of Annual Meeting</div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- LOADING STATE -->
+    <section id="state-loading" class="state active">
+      <div class="card loading-wrap">
+        <div class="spinner"></div>
+        <p>Verifying your stockholder credentials...</p>
+      </div>
+    </section>
+
+    <!-- INVALID TOKEN STATE -->
+    <section id="state-invalid" class="state">
+      <div class="card status-card">
+        <div class="status-icon-wrap error">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>
+        </div>
+        <h2>We Could Not Verify Your Token</h2>
+        <p>Your voting link looks invalid or has expired. Please check the link in your email, or reach out to us at <a href="mailto:info@alice.care" style="color: var(--alice-orange);">info@alice.care</a> for help.</p>
+      </div>
+    </section>
+
+    <!-- ALREADY VOTED STATE -->
+    <section id="state-voted" class="state">
+      <div class="card status-card">
+        <div class="status-icon-wrap warning">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+        </div>
+        <h2>Your Vote Is Already on File</h2>
+        <p id="voted-message">Our records show that you already submitted your vote. Each token works only once. Thank you for participating.</p>
+        <div id="voted-summary"></div>
+      </div>
+    </section>
+
+    <!-- VOTE FORM STATE -->
+    <section id="state-form" class="state">
+
+      <!-- Welcome -->
+      <div class="card card-tight">
+        <div class="welcome-banner">
+          <h2 id="welcome-name">Welcome, Stockholder</h2>
+          <p>TEKKS Inc. invites you to cast your written consent for the election of the Board of Directors. Pursuant to Section 228 of the Delaware General Corporation Law and Section 2.14 of the Bylaws, your consent will count toward the resolution to elect the four nominees below.</p>
+        </div>
+
+        <div class="holder-grid">
+          <div class="holder-stat">
+            <div class="label">Relationship</div>
+            <div class="value" id="holder-relationship">N/A</div>
+          </div>
+          <div class="holder-stat">
+            <div class="label">Outstanding Shares</div>
+            <div class="value" id="holder-outstanding">N/A</div>
+          </div>
+          <div class="holder-stat">
+            <div class="label">Outstanding %</div>
+            <div class="value" id="holder-outstanding-pct">N/A</div>
+          </div>
+          <div class="holder-stat">
+            <div class="label">Fully Diluted %</div>
+            <div class="value" id="holder-diluted-pct">N/A</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resolution 1: Election of Directors -->
+      <div class="card">
+        <div class="section-title">
+          <div class="section-title-num">1</div>
+          <h3>Election of Directors</h3>
+        </div>
+
+        <div class="resolution-text">
+          <strong>WHEREAS,</strong> the stockholders desire to elect the Board of Directors of the Company to serve until the next annual meeting of stockholders, or until their successors are duly elected and qualified, or until their earlier resignation or removal.
+          <br><br>
+          <strong>NOW, THEREFORE, BE IT RESOLVED,</strong> that each of the following nominees stands for election to the Board of Directors of the Company. Please mark <strong>For</strong>, <strong>Against</strong>, or <strong>Abstain</strong> for each nominee.
+        </div>
+
+        <div id="nominees-container">
+          <!-- Nominee cards will be rendered here -->
+        </div>
+      </div>
+
+      <!-- Resolutions 2 to 4: Acknowledgment -->
+      <div class="card">
+        <div class="section-title">
+          <div class="section-title-num">2</div>
+          <h3>Effectiveness, Ratification, and Authorization</h3>
+        </div>
+
+        <div class="resolution-text">
+          By submitting your written consent, you also acknowledge the following resolutions:
+          <br><br>
+          <strong>RESOLVED,</strong> that this Written Consent takes effect on the date the stockholders holding the requisite number of shares execute and deliver it to the Company.
+          <br><br>
+          <strong>RESOLVED,</strong> that the stockholders ratify, confirm, and approve all prior actions of the Board of Directors and officers of the Company that align with the foregoing resolutions.
+          <br><br>
+          <strong>RESOLVED,</strong> that any officer of the Company holds authorization to take such further actions and to execute and deliver any documents the officer deems necessary or appropriate to carry out the intent of the foregoing resolutions.
+        </div>
+
+        <div class="consent-box">
+          <input type="checkbox" id="consent-check">
+          <label for="consent-check">
+            <strong>I confirm</strong> that I am the stockholder of record (or an authorized signatory) for the entity above. I cast this written consent voluntarily and acknowledge that the Company will treat this electronic submission as my original signature pursuant to the execution clause of the consent. I understand that I cannot change my vote once I submit it.
+          </label>
+        </div>
+
+        <div class="submit-area">
+          <div class="progress-info">
+            <span id="progress-text"><strong>0 of 4</strong> nominees voted</span>
+          </div>
+          <button class="btn btn-primary" id="submit-btn" disabled onclick="submitVote()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            Submit My Written Consent
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SUBMITTING STATE -->
+    <section id="state-submitting" class="state">
+      <div class="card loading-wrap">
+        <div class="spinner"></div>
+        <p>Recording your written consent. Please wait...</p>
+      </div>
+    </section>
+
+    <!-- SUCCESS STATE -->
+    <section id="state-success" class="state">
+      <div class="card status-card">
+        <div class="status-icon-wrap success">
+          <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        </div>
+        <h2>We Recorded Your Vote</h2>
+        <p>Thank you for participating in the TEKKS Inc. annual meeting in lieu. Your written consent now joins the official corporate record. The summary below confirms what you submitted.</p>
+        <div id="success-summary"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div>TEKKS Inc. &middot; Delaware Corporation &middot; <a href="https://www.Alicecare.com">www.Alicecare.com</a></div>
+    <div style="margin-top: 0.5rem;">Questions? Email <a href="mailto:info@alice.care">info@alice.care</a></div>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    // ============================================================
+    // CONFIGURATION
+    // ============================================================
+    // Replace this with your deployed Apps Script Web App URL.
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwYfJ78G41f6Na3fkVsxJekYg22jL1_8i0xXUMicex_Pd6cfBIBQ6PZ4fYT3EUuZJmnTg/exec';
+
+    // The four director nominees (matches the written consent PDF).
+    const NOMINEES = [
+      { id: 'tommaso',  name: 'Tommaso Esmanech' },
+      { id: 'neel',     name: 'Neel Srinivasan Karamadai' },
+      { id: 'sandra',   name: 'Sandra Castiblanco' },
+      { id: 'jennie',   name: 'Jennie Martinez' }
+    ];
+
+    const VOTE_CHOICES = ['For', 'Against', 'Abstain'];
+
+    // ============================================================
+    // STATE
+    // ============================================================
+    let stockholderToken = null;
+    let stockholderData = null;
+    const voteSelections = {};   // { nomineeId: 'For' | 'Against' | 'Abstain' }
+
+    // ============================================================
+    // STATE MACHINE
+    // ============================================================
+    function showState(name) {
+      document.querySelectorAll('.state').forEach(el => el.classList.remove('active'));
+      const target = document.getElementById('state-' + name);
+      if (target) target.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ============================================================
+    // JSONP HELPER
+    // ============================================================
+    function callBackend(action, params, callback) {
+      const callbackName = 'cb_' + Math.random().toString(36).substr(2, 9);
+      const timeoutId = setTimeout(() => {
+        if (window[callbackName]) {
+          delete window[callbackName];
+          callback({ success: false, error: 'Request timed out. Please try again.' });
+        }
+      }, 30000);
+
+      window[callbackName] = function(response) {
+        clearTimeout(timeoutId);
+        delete window[callbackName];
+        const script = document.getElementById(callbackName);
+        if (script) script.remove();
+        callback(response);
+      };
+
+      const queryParts = ['action=' + encodeURIComponent(action), 'callback=' + callbackName];
+      Object.keys(params).forEach(key => {
+        queryParts.push(key + '=' + encodeURIComponent(params[key]));
+      });
+
+      const script = document.createElement('script');
+      script.id = callbackName;
+      script.src = APPS_SCRIPT_URL + '?' + queryParts.join('&');
+      script.onerror = function() {
+        clearTimeout(timeoutId);
+        delete window[callbackName];
+        callback({ success: false, error: 'Network error. Please check your connection.' });
+      };
+      document.body.appendChild(script);
+    }
+
+    // ============================================================
+    // INITIALIZATION
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+      const params = new URLSearchParams(window.location.search);
+      stockholderToken = (params.get('token') || '').trim();
+
+      if (!stockholderToken) {
+        showState('invalid');
+        return;
+      }
+
+      lookupStockholder();
+    });
+
+    function lookupStockholder() {
+      callBackend('lookup', { token: stockholderToken }, function(response) {
+        if (!response || !response.success) {
+          showState('invalid');
+          return;
+        }
+
+        if (response.alreadyVoted) {
+          renderAlreadyVoted(response);
+          showState('voted');
+          return;
+        }
+
+        stockholderData = response.stockholder;
+        renderForm();
+        showState('form');
+      });
+    }
+
+    // ============================================================
+    // RENDER STOCKHOLDER INFO + NOMINEES
+    // ============================================================
+    function renderForm() {
+      document.getElementById('welcome-name').textContent = 'Welcome, ' + stockholderData.name;
+      document.getElementById('holder-relationship').textContent = stockholderData.relationship || 'N/A';
+      document.getElementById('holder-outstanding').textContent = formatNumber(stockholderData.outstanding);
+      document.getElementById('holder-outstanding-pct').textContent = stockholderData.outstandingPct || 'N/A';
+      document.getElementById('holder-diluted-pct').textContent = stockholderData.dilutedPct || 'N/A';
+
+      const container = document.getElementById('nominees-container');
+      container.innerHTML = '';
+
+      NOMINEES.forEach(function(nominee, idx) {
+        const card = document.createElement('div');
+        card.className = 'nominee';
+        card.id = 'nominee-' + nominee.id;
+        card.innerHTML =
+          '<div class="nominee-header">' +
+            '<div class="nominee-name">' + (idx + 1) + '. ' + nominee.name + '</div>' +
+            '<div class="nominee-status" id="status-' + nominee.id + '">Awaiting your vote</div>' +
+          '</div>' +
+          '<div class="vote-options">' +
+            buildVoteOption(nominee.id, 'For',     'check') +
+            buildVoteOption(nominee.id, 'Against', 'close') +
+            buildVoteOption(nominee.id, 'Abstain', 'minus') +
+          '</div>';
+        container.appendChild(card);
+      });
+
+      // Attach click handlers
+      document.querySelectorAll('.vote-option').forEach(function(el) {
+        el.addEventListener('click', function() {
+          const nomineeId = el.dataset.nominee;
+          const choice = el.dataset.choice;
+          selectVote(nomineeId, choice);
+        });
+      });
+
+      // Consent checkbox
+      document.getElementById('consent-check').addEventListener('change', updateSubmitButton);
+    }
+
+    function buildVoteOption(nomineeId, choice, iconType) {
+      const icons = {
+        check: '<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>',
+        close: '<svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>',
+        minus: '<svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>'
+      };
+      return '<div class="vote-option" data-nominee="' + nomineeId + '" data-choice="' + choice + '">' +
+               '<div class="vote-icon">' + icons[iconType] + '</div>' +
+               '<div class="vote-label">' + choice + '</div>' +
+             '</div>';
+    }
+
+    function selectVote(nomineeId, choice) {
+      voteSelections[nomineeId] = choice;
+
+      // Update visuals for this nominee group
+      const card = document.getElementById('nominee-' + nomineeId);
+      card.querySelectorAll('.vote-option').forEach(function(el) {
+        el.classList.remove('selected', 'for', 'against', 'abstain');
+        if (el.dataset.choice === choice) {
+          el.classList.add('selected', choice.toLowerCase());
+        }
+      });
+
+      card.classList.add('answered');
+      document.getElementById('status-' + nomineeId).textContent = 'Voted: ' + choice;
+
+      updateSubmitButton();
+    }
+
+    function updateSubmitButton() {
+      const votedCount = Object.keys(voteSelections).length;
+      document.getElementById('progress-text').innerHTML =
+        '<strong>' + votedCount + ' of 4</strong> nominees voted';
+
+      const consentChecked = document.getElementById('consent-check').checked;
+      const allVoted = votedCount === NOMINEES.length;
+
+      document.getElementById('submit-btn').disabled = !(allVoted && consentChecked);
+    }
+
+    // ============================================================
+    // SUBMIT VOTE
+    // ============================================================
+    function submitVote() {
+      // Final validation
+      if (Object.keys(voteSelections).length !== NOMINEES.length) {
+        showToast('Please vote on all four nominees first.', 'error');
+        return;
+      }
+      if (!document.getElementById('consent-check').checked) {
+        showToast('Please confirm your consent acknowledgment first.', 'error');
+        return;
+      }
+
+      const submitBtn = document.getElementById('submit-btn');
+      submitBtn.disabled = true;
+
+      showState('submitting');
+
+      const votesPayload = NOMINEES.map(function(n) {
+        return n.name + ':' + voteSelections[n.id];
+      }).join('|');
+
+      callBackend('submit', {
+        token: stockholderToken,
+        votes: votesPayload
+      }, function(response) {
+        if (!response || !response.success) {
+          // If already voted (race condition), show that state
+          if (response && response.alreadyVoted) {
+            renderAlreadyVoted(response);
+            showState('voted');
+            return;
+          }
+          showState('form');
+          showToast(response && response.error ? response.error : 'Submission failed. Please try again.', 'error');
+          submitBtn.disabled = false;
+          updateSubmitButton();
+          return;
+        }
+
+        renderSuccessSummary(response);
+        showState('success');
+      });
+    }
+
+    // ============================================================
+    // RENDER SUMMARIES
+    // ============================================================
+    function renderSuccessSummary(response) {
+      const html = buildSummaryHTML(voteSelections, response.timestamp, stockholderData ? stockholderData.name : null);
+      document.getElementById('success-summary').innerHTML = html;
+    }
+
+    function renderAlreadyVoted(response) {
+      const summaryEl = document.getElementById('voted-summary');
+      const messageEl = document.getElementById('voted-message');
+
+      if (response.timestamp) {
+        const dateStr = formatTimestamp(response.timestamp);
+        messageEl.textContent = 'Our records show that you submitted your vote on ' + dateStr + '. Each token works only once.';
+      }
+
+      if (response.previousVotes) {
+        // Convert previous votes (object keyed by nominee name) into selections object
+        const selections = {};
+        NOMINEES.forEach(function(n) {
+          if (response.previousVotes[n.name]) {
+            selections[n.id] = response.previousVotes[n.name];
+          }
+        });
+        summaryEl.innerHTML = buildSummaryHTML(selections, response.timestamp, response.stockholderName);
+      } else {
+        summaryEl.innerHTML = '';
+      }
+    }
+
+    function buildSummaryHTML(selections, timestamp, stockholderName) {
+      let html = '<div class="summary-table">';
+      NOMINEES.forEach(function(n) {
+        const choice = selections[n.id] || 'N/A';
+        html += '<div class="summary-row">' +
+                  '<div class="name">' + n.name + '</div>' +
+                  '<div class="vote-pill ' + choice + '">' + choice + '</div>' +
+                '</div>';
+      });
+      html += '</div>';
+
+      html += '<div class="signature-block">';
+      if (stockholderName) {
+        html += '<div class="label">Stockholder</div>' +
+                '<div class="value">' + stockholderName + '</div><br>';
+      }
+      if (timestamp) {
+        html += '<div class="label">Recorded At</div>' +
+                '<div class="value">' + formatTimestamp(timestamp) + ' Pacific Time</div>';
+      }
+      html += '</div>';
+      return html;
+    }
+
+    // ============================================================
+    // UTILITIES
+    // ============================================================
+    function formatNumber(n) {
+      if (n === null || n === undefined || n === '') return 'N/A';
+      const num = Number(n);
+      if (isNaN(num)) return n;
+      return num.toLocaleString('en-US');
+    }
+
+    function formatTimestamp(iso) {
+      try {
+        const d = new Date(iso);
+        return d.toLocaleString('en-US', {
+          timeZone: 'America/Los_Angeles',
+          year: 'numeric', month: 'short', day: 'numeric',
+          hour: 'numeric', minute: '2-digit'
+        });
+      } catch (e) {
+        return iso;
+      }
+    }
+
+    function showToast(message, type) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast' + (type === 'error' ? ' error' : '');
+      // Force reflow
+      void toast.offsetWidth;
+      toast.classList.add('show');
+      setTimeout(function() { toast.classList.remove('show'); }, 4000);
+    }
+  </script>
+</body>
+</html>
