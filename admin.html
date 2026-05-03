@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vote Admin | TEKKS Inc.</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --alice-orange: #F57600;
+      --alice-orange-dark: #E06900;
+      --alice-navy: #1A365C;
+      --alice-light-navy: #2D4A6F;
+      --alice-alice-blue: #F0F7FF;
+      --alice-white: #FFFFFF;
+      --alice-light-grey: #F5F5F5;
+      --alice-dark-grey: #666666;
+      --success-green: #10B981;
+      --success-green-light: #D1FAE5;
+      --warning-amber: #F59E0B;
+      --warning-amber-light: #FEF3C7;
+      --error-red: #EF4444;
+      --error-red-light: #FEE2E2;
+      --neutral-grey: #9CA3AF;
+      --neutral-grey-light: #E5E7EB;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, var(--alice-alice-blue) 0%, #E8F4FD 50%, var(--alice-light-grey) 100%);
+      min-height: 100vh;
+      color: var(--alice-navy);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, var(--alice-navy) 0%, var(--alice-light-navy) 100%);
+      color: white;
+      padding: 1.25rem 2rem;
+      box-shadow: 0 4px 12px rgba(26, 54, 92, 0.15);
+    }
+    .header-content {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .brand { display: flex; flex-direction: column; }
+    .logo { font-size: 1.7rem; font-weight: 700; line-height: 1; }
+    .logo .alice { color: white; }
+    .logo .dot { color: var(--alice-orange); }
+    .logo .care { color: white; font-weight: 400; }
+    .tagline { font-size: 0.8rem; opacity: 0.9; margin-top: 0.4rem; letter-spacing: 0.4px; }
+    .admin-pill {
+      background: var(--alice-orange);
+      padding: 0.4rem 1rem; border-radius: 50px;
+      font-size: 0.8rem; font-weight: 600;
+      letter-spacing: 0.5px; text-transform: uppercase;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 1.75rem 1.5rem; }
+
+    /* PIN screen */
+    .pin-wrap {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 60vh;
+    }
+    .pin-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(26, 54, 92, 0.12);
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+    }
+    .pin-icon {
+      width: 70px; height: 70px;
+      background: linear-gradient(135deg, var(--alice-navy) 0%, var(--alice-light-navy) 100%);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.25rem;
+    }
+    .pin-icon svg { width: 32px; height: 32px; fill: white; }
+    .pin-card h1 { font-size: 1.4rem; font-weight: 600; margin-bottom: 0.4rem; }
+    .pin-card .sub { color: var(--alice-dark-grey); font-size: 0.92rem; margin-bottom: 1.75rem; }
+    .pin-input {
+      width: 100%;
+      padding: 0.9rem 1rem;
+      border: 2px solid var(--neutral-grey-light);
+      border-radius: 10px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 2px;
+      text-align: center;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+    .pin-input:focus { border-color: var(--alice-orange); }
+    .pin-error {
+      background: var(--error-red-light);
+      color: #991B1B;
+      border-radius: 8px;
+      padding: 0.6rem 0.9rem;
+      font-size: 0.85rem;
+      margin-top: 0.85rem;
+      display: none;
+    }
+    .pin-error.show { display: block; }
+
+    /* Buttons */
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+    }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--alice-orange) 0%, var(--alice-orange-dark) 100%);
+      color: white; width: 100%; margin-top: 1rem;
+      padding: 0.95rem 1.5rem; font-size: 1rem;
+    }
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(245, 118, 0, 0.35);
+    }
+    .btn-secondary {
+      background: white;
+      color: var(--alice-navy);
+      border: 2px solid var(--neutral-grey-light);
+    }
+    .btn-secondary:hover:not(:disabled) {
+      border-color: var(--alice-navy);
+      background: var(--alice-light-grey);
+    }
+    .btn-success {
+      background: linear-gradient(135deg, var(--success-green) 0%, #059669 100%);
+      color: white;
+    }
+    .btn-success:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+    }
+    .btn-icon { padding: 0.75rem 0.85rem; }
+    .btn svg { width: 16px; height: 16px; fill: currentColor; }
+
+    /* Dashboard layout */
+    .dashboard { display: none; }
+    .dashboard.active { display: block; }
+
+    /* Top toolbar */
+    .toolbar {
+      background: white;
+      border-radius: 12px;
+      padding: 0.85rem 1.25rem;
+      margin-bottom: 1.5rem;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 0.75rem;
+      box-shadow: 0 2px 8px rgba(26, 54, 92, 0.06);
+    }
+    .toolbar-left { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    .toolbar-right { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+    .last-update {
+      font-size: 0.82rem; color: var(--alice-dark-grey);
+    }
+    .last-update strong { color: var(--alice-navy); }
+
+    .auto-refresh {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.85rem; color: var(--alice-dark-grey);
+      cursor: pointer; user-select: none;
+    }
+    .auto-refresh input[type="checkbox"] {
+      width: 16px; height: 16px;
+      accent-color: var(--alice-orange);
+      cursor: pointer;
+    }
+
+    /* Top metric tiles */
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .metric-tile {
+      background: white;
+      border-radius: 12px;
+      padding: 1.25rem 1.4rem;
+      box-shadow: 0 2px 8px rgba(26, 54, 92, 0.06);
+      position: relative;
+      overflow: hidden;
+    }
+    .metric-tile::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; width: 4px; height: 100%;
+      background: var(--alice-orange);
+    }
+    .metric-tile.shares::before { background: var(--alice-navy); }
+    .metric-tile.quorum::before { background: var(--success-green); }
+    .metric-tile.last::before { background: var(--warning-amber); }
+
+    .metric-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: var(--alice-dark-grey);
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+    .metric-value {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--alice-navy);
+      line-height: 1.1;
+      margin-bottom: 0.25rem;
+    }
+    .metric-sub {
+      font-size: 0.82rem;
+      color: var(--alice-dark-grey);
+    }
+    .metric-sub.highlight { color: var(--success-green); font-weight: 600; }
+    .metric-sub.warning { color: var(--warning-amber); font-weight: 600; }
+
+    /* Section title */
+    .section-title {
+      font-size: 1.1rem; font-weight: 600;
+      color: var(--alice-navy);
+      margin-bottom: 1rem;
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .section-title-bar {
+      width: 4px; height: 20px;
+      background: var(--alice-orange);
+      border-radius: 2px;
+    }
+
+    /* Nominee results */
+    .nominee-results {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .nominee-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.4rem 1.5rem;
+      box-shadow: 0 2px 8px rgba(26, 54, 92, 0.06);
+    }
+    .nominee-card-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px solid var(--neutral-grey-light);
+    }
+    .nominee-card-name {
+      font-size: 1.05rem; font-weight: 600; color: var(--alice-navy);
+    }
+    .nominee-status-pill {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      padding: 0.3rem 0.75rem;
+      border-radius: 50px;
+    }
+    .nominee-status-pill.pass { background: var(--success-green-light); color: #047857; }
+    .nominee-status-pill.fail { background: var(--error-red-light); color: #B91C1C; }
+    .nominee-status-pill.pending { background: var(--warning-amber-light); color: #92400E; }
+
+    /* Stacked bar */
+    .stacked-bar {
+      display: flex;
+      height: 26px;
+      border-radius: 6px;
+      overflow: hidden;
+      background: var(--neutral-grey-light);
+      margin-bottom: 0.75rem;
+    }
+    .bar-segment {
+      transition: width 0.5s ease;
+      position: relative;
+    }
+    .bar-segment.For { background: var(--success-green); }
+    .bar-segment.Against { background: var(--error-red); }
+    .bar-segment.Abstain { background: var(--warning-amber); }
+    .bar-segment.Pending { background: var(--neutral-grey); }
+
+    /* Threshold marker */
+    .threshold-row {
+      position: relative;
+      height: 14px;
+      margin-bottom: 0.85rem;
+    }
+    .threshold-marker {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      transform: translateX(-50%);
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--alice-navy);
+      white-space: nowrap;
+      display: flex; align-items: center; gap: 0.3rem;
+    }
+    .threshold-marker::before {
+      content: ''; width: 2px; height: 8px;
+      background: var(--alice-navy);
+    }
+
+    .breakdown {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem 1rem;
+      font-size: 0.85rem;
+    }
+    .breakdown-row {
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .breakdown-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .breakdown-dot.For { background: var(--success-green); }
+    .breakdown-dot.Against { background: var(--error-red); }
+    .breakdown-dot.Abstain { background: var(--warning-amber); }
+    .breakdown-dot.Pending { background: var(--neutral-grey); }
+    .breakdown-row .label { color: var(--alice-dark-grey); }
+    .breakdown-row .value {
+      margin-left: auto;
+      font-weight: 600;
+      color: var(--alice-navy);
+    }
+
+    /* Stockholder table card */
+    .table-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.4rem 1.5rem;
+      box-shadow: 0 2px 8px rgba(26, 54, 92, 0.06);
+      margin-bottom: 1.5rem;
+    }
+    .table-controls {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    .filter-pills {
+      display: flex; gap: 0.4rem; flex-wrap: wrap;
+    }
+    .filter-pill {
+      padding: 0.4rem 0.85rem;
+      border-radius: 50px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      background: var(--alice-light-grey);
+      color: var(--alice-dark-grey);
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+    .filter-pill:hover {
+      background: var(--alice-alice-blue);
+      color: var(--alice-navy);
+    }
+    .filter-pill.active {
+      background: var(--alice-navy);
+      color: white;
+      border-color: var(--alice-navy);
+    }
+    .search-input {
+      padding: 0.55rem 0.9rem;
+      border: 1px solid var(--neutral-grey-light);
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.88rem;
+      outline: none;
+      width: 240px;
+      max-width: 100%;
+      transition: border-color 0.2s ease;
+    }
+    .search-input:focus { border-color: var(--alice-orange); }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 8px;
+      border: 1px solid var(--neutral-grey-light);
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      min-width: 1000px;
+    }
+    .data-table thead {
+      background: var(--alice-light-grey);
+    }
+    .data-table th {
+      padding: 0.75rem 0.85rem;
+      text-align: left;
+      font-weight: 600;
+      color: var(--alice-navy);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      user-select: none;
+      border-bottom: 1px solid var(--neutral-grey-light);
+      white-space: nowrap;
+    }
+    .data-table th:hover { color: var(--alice-orange); }
+    .data-table th.numeric, .data-table td.numeric { text-align: right; }
+    .data-table th.center, .data-table td.center { text-align: center; }
+    .data-table th .sort-icon {
+      font-size: 0.7rem; margin-left: 0.3rem; opacity: 0.5;
+    }
+    .data-table th.sorted .sort-icon { opacity: 1; color: var(--alice-orange); }
+    .data-table td {
+      padding: 0.7rem 0.85rem;
+      border-bottom: 1px solid var(--neutral-grey-light);
+      color: var(--alice-navy);
+      vertical-align: middle;
+    }
+    .data-table tbody tr:hover { background: var(--alice-alice-blue); }
+    .data-table tbody tr:last-child td { border-bottom: none; }
+
+    .vote-pill {
+      display: inline-block;
+      padding: 0.18rem 0.55rem;
+      border-radius: 50px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+    .vote-pill.For { background: var(--success-green-light); color: #047857; }
+    .vote-pill.Against { background: var(--error-red-light); color: #B91C1C; }
+    .vote-pill.Abstain { background: var(--warning-amber-light); color: #92400E; }
+    .vote-pill.Pending { background: var(--neutral-grey-light); color: #6B7280; }
+
+    .relationship-tag {
+      display: inline-block;
+      padding: 0.15rem 0.55rem;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      background: var(--alice-light-grey);
+      color: var(--alice-dark-grey);
+    }
+    .relationship-tag.Founder { background: #DBEAFE; color: #1E40AF; }
+    .relationship-tag.Investor { background: #E0E7FF; color: #4338CA; }
+    .relationship-tag.Advisor { background: #FCE7F3; color: #9D174D; }
+    .relationship-tag.Employee { background: #D1FAE5; color: #047857; }
+
+    .timestamp { font-size: 0.78rem; color: var(--alice-dark-grey); white-space: nowrap; }
+
+    /* Loading and empty states */
+    .loading-overlay {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 50vh; flex-direction: column; gap: 1rem;
+    }
+    .spinner {
+      width: 50px; height: 50px;
+      border: 4px solid var(--neutral-grey-light);
+      border-top-color: var(--alice-orange);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-overlay p { color: var(--alice-dark-grey); }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 2rem; left: 50%;
+      transform: translateX(-50%) translateY(120px);
+      background: var(--alice-navy); color: white;
+      padding: 0.85rem 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      font-size: 0.9rem;
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      max-width: 90%;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.success { background: var(--success-green); }
+    .toast.error { background: var(--error-red); }
+
+    /* Modal */
+    .modal-backdrop {
+      display: none;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(26, 54, 92, 0.5);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .modal-backdrop.show { display: flex; }
+    .modal {
+      background: white;
+      border-radius: 14px;
+      padding: 2rem;
+      max-width: 460px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    }
+    .modal h3 { font-size: 1.2rem; margin-bottom: 0.6rem; color: var(--alice-navy); }
+    .modal p { color: var(--alice-dark-grey); margin-bottom: 1.5rem; line-height: 1.6; font-size: 0.92rem; }
+    .modal-actions { display: flex; gap: 0.75rem; justify-content: flex-end; }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 1.5rem 1rem;
+      font-size: 0.78rem;
+      color: var(--alice-dark-grey);
+    }
+    .footer a { color: var(--alice-orange); text-decoration: none; }
+
+    /* Mobile */
+    @media (max-width: 640px) {
+      .header { padding: 1rem 1.25rem; }
+      .container { padding: 1rem; }
+      .pin-card { padding: 1.75rem; }
+      .nominee-card { padding: 1.1rem 1.2rem; }
+      .table-card { padding: 1rem; }
+      .toolbar { padding: 0.75rem 1rem; }
+      .metric-tile { padding: 1rem 1.1rem; }
+      .metric-value { font-size: 1.35rem; }
+      .breakdown { grid-template-columns: 1fr; }
+      .toolbar-right { width: 100%; }
+      .toolbar-right .btn { flex: 1; }
+      .search-input { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-content">
+      <div class="brand">
+        <div class="logo"><span class="alice">alice</span><span class="dot">.</span><span class="care">care</span></div>
+        <div class="tagline">TEKKS Inc. Vote Results</div>
+      </div>
+      <div class="admin-pill">Admin Panel</div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- PIN ENTRY -->
+    <section id="screen-pin" class="screen">
+      <div class="pin-wrap">
+        <div class="pin-card">
+          <div class="pin-icon">
+            <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+          </div>
+          <h1>Admin Access</h1>
+          <p class="sub">Enter the admin PIN to view live vote results.</p>
+          <input type="password" class="pin-input" id="pin-input" placeholder="Admin PIN" autocomplete="off">
+          <div class="pin-error" id="pin-error">Invalid PIN. Please try again.</div>
+          <button class="btn btn-primary" id="pin-submit" onclick="authenticate()">
+            Unlock Dashboard
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOADING -->
+    <section id="screen-loading" class="screen" style="display:none;">
+      <div class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Pulling the latest vote data...</p>
+      </div>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section id="screen-dashboard" class="screen dashboard">
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <div class="last-update">
+            Last refresh: <strong id="last-refresh-time">just now</strong>
+          </div>
+          <label class="auto-refresh">
+            <input type="checkbox" id="auto-refresh-toggle">
+            Auto-refresh every 30s
+          </label>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn btn-secondary" onclick="refreshNow()" title="Refresh data">
+            <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+            Refresh
+          </button>
+          <button class="btn btn-secondary" onclick="exportCSV()" title="Download CSV">
+            <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            Export CSV
+          </button>
+          <button class="btn btn-success" onclick="confirmReminders()" title="Send reminder emails to non-voters">
+            <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            Send Reminders
+          </button>
+        </div>
+      </div>
+
+      <!-- Top metrics -->
+      <div class="metrics" id="metrics-container">
+        <!-- Tiles render here -->
+      </div>
+
+      <!-- Nominee results -->
+      <div class="section-title">
+        <div class="section-title-bar"></div>
+        Director Election Results
+      </div>
+      <div class="nominee-results" id="nominee-results">
+        <!-- Nominee cards render here -->
+      </div>
+
+      <!-- Stockholder table -->
+      <div class="table-card">
+        <div class="section-title" style="margin-bottom: 0.75rem;">
+          <div class="section-title-bar"></div>
+          Stockholder Detail (<span id="row-count">0</span>)
+        </div>
+
+        <div class="table-controls">
+          <div class="filter-pills" id="filter-pills">
+            <div class="filter-pill active" data-filter="all">All</div>
+            <div class="filter-pill" data-filter="voted">Voted</div>
+            <div class="filter-pill" data-filter="pending">Pending</div>
+            <div class="filter-pill" data-filter="Founder">Founders</div>
+            <div class="filter-pill" data-filter="Investor">Investors</div>
+            <div class="filter-pill" data-filter="Advisor">Advisors</div>
+            <div class="filter-pill" data-filter="Employee">Employees</div>
+          </div>
+          <input type="search" class="search-input" id="search-input" placeholder="Search name or email...">
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table" id="data-table">
+            <thead>
+              <tr id="table-header-row">
+                <!-- Headers render here -->
+              </tr>
+            </thead>
+            <tbody id="data-tbody">
+              <!-- Rows render here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div>TEKKS Inc. &middot; Admin Panel &middot; <a href="https://www.Alicecare.com">www.Alicecare.com</a></div>
+  </footer>
+
+  <!-- Reminder confirmation modal -->
+  <div class="modal-backdrop" id="modal-reminders">
+    <div class="modal">
+      <h3>Send Reminder Emails?</h3>
+      <p id="reminder-modal-text">This sends a reminder email to every stockholder who has not yet voted. Each recipient receives their unique voting link again.</p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-success" id="confirm-reminder-btn" onclick="sendReminders()">Send Reminders</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    // ============================================================
+    // CONFIGURATION
+    // ============================================================
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwYfJ78G41f6Na3fkVsxJekYg22jL1_8i0xXUMicex_Pd6cfBIBQ6PZ4fYT3EUuZJmnTg/exec';
+
+    const NOMINEES = [
+      'Tommaso Esmanech',
+      'Neel Srinivasan Karamadai',
+      'Sandra Castiblanco',
+      'Jennie Martinez'
+    ];
+
+    // ============================================================
+    // STATE
+    // ============================================================
+    let adminPin = null;
+    let lastData = null;
+    let autoRefreshTimer = null;
+    let currentSort = { column: 'outstanding', direction: 'desc' };
+    let currentFilter = 'all';
+    let searchTerm = '';
+
+    // ============================================================
+    // JSONP HELPER
+    // ============================================================
+    function callBackend(action, params, callback) {
+      const cbName = 'cb_' + Math.random().toString(36).substr(2, 9);
+      const timeoutId = setTimeout(function() {
+        if (window[cbName]) {
+          delete window[cbName];
+          callback({ success: false, error: 'Request timed out.' });
+        }
+      }, 30000);
+      window[cbName] = function(response) {
+        clearTimeout(timeoutId);
+        delete window[cbName];
+        const s = document.getElementById(cbName);
+        if (s) s.remove();
+        callback(response);
+      };
+      const queryParts = ['action=' + encodeURIComponent(action), 'callback=' + cbName];
+      Object.keys(params).forEach(function(key) {
+        queryParts.push(key + '=' + encodeURIComponent(params[key]));
+      });
+      const script = document.createElement('script');
+      script.id = cbName;
+      script.src = APPS_SCRIPT_URL + '?' + queryParts.join('&');
+      script.onerror = function() {
+        clearTimeout(timeoutId);
+        delete window[cbName];
+        callback({ success: false, error: 'Network error.' });
+      };
+      document.body.appendChild(script);
+    }
+
+    // ============================================================
+    // PIN AUTHENTICATION
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('pin-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') authenticate();
+      });
+
+      // Sortable headers and filters wire up after first render
+      document.getElementById('search-input').addEventListener('input', function(e) {
+        searchTerm = e.target.value.toLowerCase().trim();
+        renderStockholderTable();
+      });
+
+      document.querySelectorAll('.filter-pill').forEach(function(p) {
+        p.addEventListener('click', function() {
+          document.querySelectorAll('.filter-pill').forEach(function(x) { x.classList.remove('active'); });
+          p.classList.add('active');
+          currentFilter = p.dataset.filter;
+          renderStockholderTable();
+        });
+      });
+
+      document.getElementById('auto-refresh-toggle').addEventListener('change', function(e) {
+        if (e.target.checked) {
+          autoRefreshTimer = setInterval(refreshNow, 30000);
+          showToast('Auto-refresh on. Updating every 30 seconds.', 'success');
+        } else {
+          if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+          autoRefreshTimer = null;
+          showToast('Auto-refresh off.', 'success');
+        }
+      });
+
+      // Auto-focus PIN input
+      document.getElementById('pin-input').focus();
+    });
+
+    function authenticate() {
+      const pin = document.getElementById('pin-input').value.trim();
+      if (!pin) return;
+
+      const submitBtn = document.getElementById('pin-submit');
+      const errorEl = document.getElementById('pin-error');
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Verifying...';
+      errorEl.classList.remove('show');
+
+      callBackend('adminStats', { pin: pin }, function(response) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Unlock Dashboard';
+
+        if (!response || !response.success) {
+          errorEl.textContent = (response && response.error) ? response.error : 'Could not verify PIN.';
+          errorEl.classList.add('show');
+          return;
+        }
+
+        adminPin = pin;
+        lastData = response;
+        showScreen('dashboard');
+        renderAll(response);
+      });
+    }
+
+    // ============================================================
+    // SCREEN STATE
+    // ============================================================
+    function showScreen(name) {
+      document.querySelectorAll('.screen').forEach(function(s) { s.style.display = 'none'; });
+      const target = document.getElementById('screen-' + name);
+      if (target) target.style.display = 'block';
+      if (name === 'dashboard') {
+        document.getElementById('screen-dashboard').classList.add('active');
+      }
+    }
+
+    // ============================================================
+    // REFRESH
+    // ============================================================
+    function refreshNow() {
+      if (!adminPin) return;
+      callBackend('adminStats', { pin: adminPin }, function(response) {
+        if (!response || !response.success) {
+          showToast('Refresh failed: ' + (response && response.error ? response.error : 'unknown'), 'error');
+          return;
+        }
+        lastData = response;
+        renderAll(response);
+      });
+    }
+
+    // ============================================================
+    // RENDER ALL
+    // ============================================================
+    function renderAll(data) {
+      renderMetrics(data);
+      renderNomineeCards(data);
+      renderStockholderTable();
+      document.getElementById('last-refresh-time').textContent = formatTime(new Date());
+    }
+
+    // ============================================================
+    // METRICS
+    // ============================================================
+    function renderMetrics(data) {
+      const t = data.totals;
+      const quorumMet = t.sharesParticipationPct >= 50;
+
+      const html = '' +
+        // Participation
+        '<div class="metric-tile">' +
+          '<div class="metric-label">Stockholder Participation</div>' +
+          '<div class="metric-value">' + t.voted + ' / ' + t.stockholders + '</div>' +
+          '<div class="metric-sub">' + t.participationPct.toFixed(1) + '% of stockholders voted</div>' +
+        '</div>' +
+
+        // Voting power
+        '<div class="metric-tile shares">' +
+          '<div class="metric-label">Voting Power Cast</div>' +
+          '<div class="metric-value">' + t.sharesParticipationPct.toFixed(1) + '%</div>' +
+          '<div class="metric-sub">' + formatNumber(t.votedOutstandingShares) + ' of ' + formatNumber(t.outstandingShares) + ' shares</div>' +
+        '</div>' +
+
+        // Quorum / threshold status
+        '<div class="metric-tile quorum">' +
+          '<div class="metric-label">Majority Threshold</div>' +
+          '<div class="metric-value">' + formatNumber(Math.floor(t.majorityThreshold) + 1) + '</div>' +
+          '<div class="metric-sub ' + (quorumMet ? 'highlight' : 'warning') + '">' +
+            (quorumMet ? '✓ Majority of voting power participating' : 'Awaiting majority of voting power') +
+          '</div>' +
+        '</div>' +
+
+        // Last vote
+        '<div class="metric-tile last">' +
+          '<div class="metric-label">Last Vote Recorded</div>' +
+          '<div class="metric-value">' + (t.lastVoteAt ? relativeTime(t.lastVoteAt) : 'No votes yet') + '</div>' +
+          '<div class="metric-sub">' + (t.lastVoteAt ? formatDateTime(t.lastVoteAt) : 'Awaiting first response') + '</div>' +
+        '</div>';
+
+      document.getElementById('metrics-container').innerHTML = html;
+    }
+
+    // ============================================================
+    // NOMINEE CARDS
+    // ============================================================
+    function renderNomineeCards(data) {
+      const t = data.totals;
+      const totalShares = t.outstandingShares;
+      let html = '';
+
+      data.nominees.forEach(function(n) {
+        let statusLabel = 'Pending';
+        let statusClass = 'pending';
+        if (n.passed) {
+          statusLabel = 'Elected';
+          statusClass = 'pass';
+        } else if (!n.stillReachable) {
+          statusLabel = 'Cannot Pass';
+          statusClass = 'fail';
+        }
+
+        const forPct      = totalShares > 0 ? (n.For.outstanding / totalShares * 100) : 0;
+        const againstPct  = totalShares > 0 ? (n.Against.outstanding / totalShares * 100) : 0;
+        const abstainPct  = totalShares > 0 ? (n.Abstain.outstanding / totalShares * 100) : 0;
+        const pendingPct  = Math.max(0, 100 - forPct - againstPct - abstainPct);
+
+        html += '<div class="nominee-card">' +
+          '<div class="nominee-card-header">' +
+            '<div class="nominee-card-name">' + escapeHtml(n.name) + '</div>' +
+            '<div class="nominee-status-pill ' + statusClass + '">' + statusLabel + '</div>' +
+          '</div>' +
+
+          // Stacked bar showing share distribution across outcomes
+          '<div class="stacked-bar" title="Share-weighted vote distribution">' +
+            (forPct > 0     ? '<div class="bar-segment For" style="width:' + forPct + '%"></div>' : '') +
+            (againstPct > 0 ? '<div class="bar-segment Against" style="width:' + againstPct + '%"></div>' : '') +
+            (abstainPct > 0 ? '<div class="bar-segment Abstain" style="width:' + abstainPct + '%"></div>' : '') +
+            (pendingPct > 0 ? '<div class="bar-segment Pending" style="width:' + pendingPct + '%"></div>' : '') +
+          '</div>' +
+
+          // Threshold marker (50% line)
+          '<div class="threshold-row">' +
+            '<div class="threshold-marker">50% threshold</div>' +
+          '</div>' +
+
+          // Breakdown grid
+          '<div class="breakdown">' +
+            buildBreakdown('For', n.For, totalShares) +
+            buildBreakdown('Against', n.Against, totalShares) +
+            buildBreakdown('Abstain', n.Abstain, totalShares) +
+            buildBreakdown('Pending', { count: t.pending, outstanding: t.pendingOutstandingShares }, totalShares) +
+          '</div>' +
+        '</div>';
+      });
+
+      document.getElementById('nominee-results').innerHTML = html;
+    }
+
+    function buildBreakdown(label, data, totalShares) {
+      const sharePct = totalShares > 0 ? (data.outstanding / totalShares * 100) : 0;
+      return '<div class="breakdown-row">' +
+        '<div class="breakdown-dot ' + label + '"></div>' +
+        '<div class="label">' + label + '</div>' +
+        '<div class="value">' + data.count + ' / ' + sharePct.toFixed(1) + '%</div>' +
+      '</div>';
+    }
+
+    // ============================================================
+    // STOCKHOLDER TABLE
+    // ============================================================
+    function renderStockholderTable() {
+      if (!lastData) return;
+
+      // Filter
+      const filtered = lastData.stockholders.filter(function(s) {
+        // Filter
+        if (currentFilter === 'voted' && !s.hasVoted) return false;
+        if (currentFilter === 'pending' && s.hasVoted) return false;
+        if (['Founder', 'Investor', 'Advisor', 'Employee'].indexOf(currentFilter) !== -1) {
+          if (s.relationship !== currentFilter) return false;
+        }
+        // Search
+        if (searchTerm) {
+          const hay = (s.name + ' ' + s.email).toLowerCase();
+          if (hay.indexOf(searchTerm) === -1) return false;
+        }
+        return true;
+      });
+
+      // Sort
+      const col = currentSort.column;
+      const dir = currentSort.direction === 'asc' ? 1 : -1;
+      filtered.sort(function(a, b) {
+        let av = a[col];
+        let bv = b[col];
+        if (col === 'votedAt') {
+          av = av ? new Date(av).getTime() : 0;
+          bv = bv ? new Date(bv).getTime() : 0;
+        }
+        if (typeof av === 'string') av = av.toLowerCase();
+        if (typeof bv === 'string') bv = bv.toLowerCase();
+        if (av === null || av === undefined) av = '';
+        if (bv === null || bv === undefined) bv = '';
+        if (av < bv) return -1 * dir;
+        if (av > bv) return 1 * dir;
+        return 0;
+      });
+
+      // Render header
+      const headers = [
+        { key: 'name',          label: 'Stockholder' },
+        { key: 'relationship',  label: 'Relationship' },
+        { key: 'outstanding',   label: 'Shares', cls: 'numeric' },
+        { key: 'outstandingPct',label: 'Outstanding %', cls: 'numeric' },
+        { key: 'tommaso',       label: 'Tommaso', cls: 'center' },
+        { key: 'neel',          label: 'Neel',    cls: 'center' },
+        { key: 'sandra',        label: 'Sandra',  cls: 'center' },
+        { key: 'jennie',        label: 'Jennie',  cls: 'center' },
+        { key: 'votedAt',       label: 'Voted At' }
+      ];
+      const headerHtml = headers.map(function(h) {
+        const sortedClass = (currentSort.column === h.key) ? ' sorted' : '';
+        const arrow = (currentSort.column === h.key) ? (currentSort.direction === 'asc' ? '▲' : '▼') : '◇';
+        return '<th class="' + (h.cls || '') + sortedClass + '" data-sort="' + h.key + '">' +
+                 h.label + '<span class="sort-icon">' + arrow + '</span>' +
+               '</th>';
+      }).join('');
+      document.getElementById('table-header-row').innerHTML = headerHtml;
+
+      // Wire sort handlers
+      document.querySelectorAll('th[data-sort]').forEach(function(th) {
+        th.addEventListener('click', function() {
+          const key = th.dataset.sort;
+          if (currentSort.column === key) {
+            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+          } else {
+            currentSort.column = key;
+            currentSort.direction = (key === 'name' || key === 'relationship') ? 'asc' : 'desc';
+          }
+          renderStockholderTable();
+        });
+      });
+
+      // Render rows
+      let bodyHtml = '';
+      filtered.forEach(function(s) {
+        const votes = s.votes || {};
+        bodyHtml += '<tr>' +
+          '<td><div style="font-weight:500;">' + escapeHtml(s.name) + '</div>' +
+            '<div class="timestamp">' + escapeHtml(s.email) + '</div></td>' +
+          '<td>' + (s.relationship ? '<span class="relationship-tag ' + s.relationship + '">' + s.relationship + '</span>' : '') + '</td>' +
+          '<td class="numeric">' + formatNumber(s.outstanding) + '</td>' +
+          '<td class="numeric">' + (s.outstandingPct || '') + '</td>' +
+          '<td class="center">' + voteCell(votes['Tommaso Esmanech']) + '</td>' +
+          '<td class="center">' + voteCell(votes['Neel Srinivasan Karamadai']) + '</td>' +
+          '<td class="center">' + voteCell(votes['Sandra Castiblanco']) + '</td>' +
+          '<td class="center">' + voteCell(votes['Jennie Martinez']) + '</td>' +
+          '<td class="timestamp">' + (s.votedAt ? formatDateTime(s.votedAt) : '<span style="color:var(--neutral-grey);">Not yet</span>') + '</td>' +
+        '</tr>';
+      });
+
+      if (filtered.length === 0) {
+        bodyHtml = '<tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--alice-dark-grey);">No stockholders match your filters.</td></tr>';
+      }
+
+      document.getElementById('data-tbody').innerHTML = bodyHtml;
+      document.getElementById('row-count').textContent = filtered.length;
+    }
+
+    function voteCell(choice) {
+      if (!choice) return '<span class="vote-pill Pending">Pending</span>';
+      return '<span class="vote-pill ' + choice + '">' + choice + '</span>';
+    }
+
+    // ============================================================
+    // CSV EXPORT
+    // ============================================================
+    function exportCSV() {
+      if (!lastData) return;
+
+      const headers = [
+        'Stakeholder', 'Email', 'Relationship', 'Outstanding Shares',
+        'Outstanding %', 'Fully Diluted', 'Fully Diluted %', 'Cash Raised',
+        'Has Token', 'Voted', 'Voted At',
+        'Tommaso Esmanech', 'Neel Srinivasan Karamadai', 'Sandra Castiblanco', 'Jennie Martinez'
+      ];
+
+      const lines = [headers.join(',')];
+
+      lastData.stockholders.forEach(function(s) {
+        const votes = s.votes || {};
+        const row = [
+          csvCell(s.name),
+          csvCell(s.email),
+          csvCell(s.relationship),
+          s.outstanding,
+          csvCell(s.outstandingPct),
+          s.diluted,
+          csvCell(s.dilutedPct),
+          csvCell(s.cashRaised),
+          s.hasToken ? 'Yes' : 'No',
+          s.hasVoted ? 'Yes' : 'No',
+          s.votedAt ? formatDateTime(s.votedAt) : '',
+          votes['Tommaso Esmanech'] || '',
+          votes['Neel Srinivasan Karamadai'] || '',
+          votes['Sandra Castiblanco'] || '',
+          votes['Jennie Martinez'] || ''
+        ];
+        lines.push(row.join(','));
+      });
+
+      // Append totals
+      lines.push('');
+      lines.push('SUMMARY');
+      lines.push('Total Stockholders,' + lastData.totals.stockholders);
+      lines.push('Voted,' + lastData.totals.voted);
+      lines.push('Pending,' + lastData.totals.pending);
+      lines.push('Total Outstanding Shares,' + lastData.totals.outstandingShares);
+      lines.push('Voted Outstanding Shares,' + lastData.totals.votedOutstandingShares);
+      lines.push('Majority Threshold,' + Math.floor(lastData.totals.majorityThreshold + 1));
+      lines.push('');
+      lines.push('NOMINEE,For_Count,For_Shares,Against_Count,Against_Shares,Abstain_Count,Abstain_Shares,Status');
+      lastData.nominees.forEach(function(n) {
+        const status = n.passed ? 'ELECTED' : (n.stillReachable ? 'PENDING' : 'CANNOT PASS');
+        lines.push([
+          csvCell(n.name),
+          n.For.count, n.For.outstanding,
+          n.Against.count, n.Against.outstanding,
+          n.Abstain.count, n.Abstain.outstanding,
+          status
+        ].join(','));
+      });
+
+      const csv = lines.join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const ts = new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19);
+      a.download = 'TEKKS-vote-results-' + ts + '.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      showToast('CSV downloaded.', 'success');
+    }
+
+    function csvCell(v) {
+      if (v === null || v === undefined) return '';
+      const s = String(v);
+      if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1) {
+        return '"' + s.replace(/"/g, '""') + '"';
+      }
+      return s;
+    }
+
+    // ============================================================
+    // REMINDERS
+    // ============================================================
+    function confirmReminders() {
+      const pending = lastData ? lastData.totals.pending : 0;
+      document.getElementById('reminder-modal-text').textContent =
+        'This sends a reminder email to ' + pending +
+        ' stockholder' + (pending === 1 ? '' : 's') + ' who have not yet voted. Each recipient receives their unique voting link again.';
+      document.getElementById('modal-reminders').classList.add('show');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-reminders').classList.remove('show');
+    }
+
+    function sendReminders() {
+      const btn = document.getElementById('confirm-reminder-btn');
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+
+      callBackend('adminReminders', { pin: adminPin }, function(response) {
+        btn.disabled = false;
+        btn.textContent = 'Send Reminders';
+        closeModal();
+
+        if (!response || !response.success) {
+          showToast('Reminder send failed: ' + (response && response.error ? response.error : 'unknown'), 'error');
+          return;
+        }
+        showToast('Sent ' + response.sent + ' reminder' + (response.sent === 1 ? '' : 's') + '. Skipped ' + response.skipped + '.', 'success');
+        // Refresh in case anyone responds quickly
+        setTimeout(refreshNow, 2000);
+      });
+    }
+
+    // ============================================================
+    // UTILITIES
+    // ============================================================
+    function formatNumber(n) {
+      if (n === null || n === undefined || n === '') return '0';
+      const num = Number(n);
+      if (isNaN(num)) return n;
+      return num.toLocaleString('en-US');
+    }
+
+    function formatDateTime(iso) {
+      try {
+        const d = new Date(iso);
+        return d.toLocaleString('en-US', {
+          timeZone: 'America/Los_Angeles',
+          month: 'short', day: 'numeric',
+          hour: 'numeric', minute: '2-digit'
+        });
+      } catch (e) { return iso; }
+    }
+
+    function formatTime(d) {
+      return d.toLocaleString('en-US', {
+        timeZone: 'America/Los_Angeles',
+        hour: 'numeric', minute: '2-digit', second: '2-digit'
+      });
+    }
+
+    function relativeTime(iso) {
+      const d = new Date(iso);
+      const diff = Date.now() - d.getTime();
+      const sec = Math.floor(diff / 1000);
+      if (sec < 60) return 'Just now';
+      const min = Math.floor(sec / 60);
+      if (min < 60) return min + ' min ago';
+      const hr = Math.floor(min / 60);
+      if (hr < 24) return hr + ' hr ago';
+      const day = Math.floor(hr / 24);
+      return day + ' day' + (day > 1 ? 's' : '') + ' ago';
+    }
+
+    function escapeHtml(s) {
+      if (s === null || s === undefined) return '';
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function showToast(message, type) {
+      const t = document.getElementById('toast');
+      t.textContent = message;
+      t.className = 'toast ' + (type || '');
+      void t.offsetWidth;
+      t.classList.add('show');
+      setTimeout(function() { t.classList.remove('show'); }, 3500);
+    }
+  </script>
+</body>
+</html>
