@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vote Admin | TEKKS Inc.</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
   <style>
     :root {
       --alice-orange: #F57600;
@@ -525,6 +527,146 @@
     .modal p { color: var(--alice-dark-grey); margin-bottom: 1.5rem; line-height: 1.6; font-size: 0.92rem; }
     .modal-actions { display: flex; gap: 0.75rem; justify-content: flex-end; }
 
+    /* Document preview modal */
+    .modal-backdrop.document-backdrop {
+      align-items: flex-start;
+      padding: 1.5rem 1rem;
+      overflow-y: auto;
+    }
+    .document-modal {
+      background: white;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-height: calc(100vh - 3rem);
+    }
+    .document-modal-header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--neutral-grey-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      background: var(--alice-light-grey);
+      border-radius: 12px 12px 0 0;
+    }
+    .document-modal-header h3 {
+      font-size: 1.1rem;
+      color: var(--alice-navy);
+      margin: 0;
+      font-weight: 600;
+    }
+    .document-modal-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .document-content {
+      padding: 2.5rem 3rem;
+      overflow-y: auto;
+      font-family: 'Times New Roman', Times, serif;
+      color: #1A1A1A;
+      font-size: 11pt;
+      line-height: 1.55;
+      background: white;
+      flex: 1;
+    }
+
+    /* Inner document styling (matches PDF output as closely as HTML allows) */
+    .doc-pdf-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .doc-pdf-header .corp-name {
+      font-size: 18pt;
+      font-weight: bold;
+      letter-spacing: 1.5pt;
+    }
+    .doc-pdf-header .corp-sub {
+      font-style: italic;
+      font-size: 10pt;
+      margin-top: 3pt;
+      color: #444;
+    }
+    .doc-pdf-header .doc-title {
+      margin-top: 0.85rem;
+      font-size: 13pt;
+      font-weight: bold;
+      letter-spacing: 0.5pt;
+    }
+    .doc-pdf p {
+      margin-bottom: 0.65rem;
+      text-align: justify;
+    }
+    .doc-pdf h4 {
+      font-size: 12pt;
+      font-weight: bold;
+      margin: 0.85rem 0 0.5rem 0;
+    }
+    .doc-pdf table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.65rem 0 0.85rem 0;
+      font-size: 10pt;
+    }
+    .doc-pdf table th {
+      background: #F0F0F0;
+      font-weight: bold;
+      padding: 6pt 8pt;
+      border: 1px solid #888;
+      text-align: left;
+    }
+    .doc-pdf table td {
+      padding: 6pt 8pt;
+      border: 1px solid #888;
+      vertical-align: top;
+    }
+    .doc-pdf table .num { text-align: right; font-variant-numeric: tabular-nums; }
+    .doc-pdf table .ctr { text-align: center; }
+    .doc-pdf .vote-cell { font-weight: bold; }
+    .doc-pdf .vote-cell.For { color: #047857; }
+    .doc-pdf .vote-cell.Against { color: #B91C1C; }
+    .doc-pdf .vote-cell.Abstain { color: #92400E; }
+    .doc-pdf .result-cell.elected { color: #047857; font-weight: bold; }
+    .doc-pdf .result-cell.not-elected { color: #B91C1C; font-weight: bold; }
+    .doc-pdf .result-cell.pending { color: #92400E; font-weight: bold; }
+    .doc-pdf .signature-line {
+      font-style: italic;
+      font-size: 10pt;
+    }
+    .doc-pdf .signature-line .attest {
+      font-size: 8.5pt;
+      color: #555;
+      font-style: normal;
+    }
+    .doc-pdf .doc-footer {
+      margin-top: 1.5rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid #ccc;
+      font-size: 9pt;
+      font-style: italic;
+      color: #555;
+      line-height: 1.5;
+    }
+    .doc-pdf .doc-footer strong { color: #333; }
+    .doc-status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-left: 0.5rem;
+    }
+    .doc-status-badge.draft { background: #FEF3C7; color: #92400E; }
+    .doc-status-badge.final { background: #D1FAE5; color: #047857; }
+
+    @media (max-width: 640px) {
+      .document-content { padding: 1.5rem 1.25rem; font-size: 10pt; }
+      .document-modal-header { padding: 0.85rem 1rem; }
+    }
+
     /* Footer */
     .footer {
       text-align: center;
@@ -614,6 +756,10 @@
             <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
             Export CSV
           </button>
+          <button class="btn btn-primary" onclick="openDocumentModal()" title="Generate official consent document">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+            Generate Document
+          </button>
           <button class="btn btn-success" onclick="confirmReminders()" title="Send reminder emails to non-voters">
             <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
             Send Reminders
@@ -685,6 +831,25 @@
       <div class="modal-actions">
         <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
         <button class="btn btn-success" id="confirm-reminder-btn" onclick="sendReminders()">Send Reminders</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Document preview modal -->
+  <div class="modal-backdrop document-backdrop" id="modal-document">
+    <div class="document-modal">
+      <div class="document-modal-header">
+        <h3>Official Written Consent <span class="doc-status-badge" id="doc-status-badge">DRAFT</span></h3>
+        <div class="document-modal-actions">
+          <button class="btn btn-success" id="download-pdf-btn" onclick="downloadDocumentPDF()">
+            <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            Download PDF
+          </button>
+          <button class="btn btn-secondary" onclick="closeDocumentModal()">Close</button>
+        </div>
+      </div>
+      <div class="document-content" id="document-preview">
+        <!-- Rendered preview here -->
       </div>
     </div>
   </div>
@@ -1180,6 +1345,459 @@
         setTimeout(refreshNow, 2000);
       });
     }
+
+    // ============================================================
+    // OFFICIAL DOCUMENT GENERATION
+    // ============================================================
+    function openDocumentModal() {
+      if (!lastData) {
+        showToast('Please wait for data to load.', 'error');
+        return;
+      }
+      renderDocumentPreview();
+      document.getElementById('modal-document').classList.add('show');
+    }
+
+    function closeDocumentModal() {
+      document.getElementById('modal-document').classList.remove('show');
+    }
+
+    function renderDocumentPreview() {
+      const data = lastData;
+      const t = data.totals;
+      const generatedAt = new Date().toLocaleString('en-US', {
+        timeZone: 'America/Los_Angeles',
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+        hour: 'numeric', minute: '2-digit'
+      });
+
+      const signers = data.stockholders.filter(function(s) { return s.hasVoted; });
+
+      // Status badge logic
+      const allDecided = data.nominees.every(function(n) { return n.passed || !n.stillReachable; });
+      const statusBadge = document.getElementById('doc-status-badge');
+      if (signers.length === 0) {
+        statusBadge.textContent = 'DRAFT';
+        statusBadge.className = 'doc-status-badge draft';
+      } else if (allDecided && t.voted === t.stockholders) {
+        statusBadge.textContent = 'FINAL';
+        statusBadge.className = 'doc-status-badge final';
+      } else {
+        statusBadge.textContent = 'INTERIM';
+        statusBadge.className = 'doc-status-badge draft';
+      }
+
+      // Vote tabulation rows
+      let tabulationRows = '';
+      data.nominees.forEach(function(n) {
+        let resultText = 'Pending';
+        let resultClass = 'pending';
+        if (n.passed) { resultText = 'Elected'; resultClass = 'elected'; }
+        else if (!n.stillReachable) { resultText = 'Not Elected'; resultClass = 'not-elected'; }
+
+        tabulationRows +=
+          '<tr>' +
+            '<td><strong>' + escapeHtml(n.name) + '</strong></td>' +
+            '<td class="ctr">' + n.For.count + ' <span style="color:#666;font-size:9pt;">(' + formatNumber(n.For.outstanding) + ' sh)</span></td>' +
+            '<td class="ctr">' + n.Against.count + ' <span style="color:#666;font-size:9pt;">(' + formatNumber(n.Against.outstanding) + ' sh)</span></td>' +
+            '<td class="ctr">' + n.Abstain.count + ' <span style="color:#666;font-size:9pt;">(' + formatNumber(n.Abstain.outstanding) + ' sh)</span></td>' +
+            '<td class="ctr"><span class="result-cell ' + resultClass + '">' + resultText + '</span></td>' +
+          '</tr>';
+      });
+
+      // Signatures table rows
+      let signatureRows = '';
+      if (signers.length === 0) {
+        signatureRows = '<tr><td colspan="5" style="text-align:center;font-style:italic;color:#666;padding:1rem;">No stockholders have executed this Written Consent.</td></tr>';
+      } else {
+        signers.forEach(function(s, i) {
+          const dt = s.votedAt ? new Date(s.votedAt).toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' }) : '';
+          signatureRows +=
+            '<tr>' +
+              '<td class="ctr">' + (i + 1) + '</td>' +
+              '<td>' + escapeHtml(s.name) + '</td>' +
+              '<td class="num">' + formatNumber(s.outstanding) + '</td>' +
+              '<td class="signature-line">/s/ ' + escapeHtml(s.name) + '<br><span class="attest">(executed by electronic signature)</span></td>' +
+              '<td>' + dt + '</td>' +
+            '</tr>';
+        });
+      }
+
+      // Vote detail rows
+      let voteDetailRows = '';
+      signers.forEach(function(s) {
+        const v = s.votes || {};
+        const dt = s.votedAt ? new Date(s.votedAt).toLocaleString('en-US', {
+          timeZone: 'America/Los_Angeles',
+          month: 'short', day: 'numeric', year: 'numeric',
+          hour: 'numeric', minute: '2-digit'
+        }) : '';
+        const voteCells = ['Tommaso Esmanech', 'Neel Srinivasan Karamadai', 'Sandra Castiblanco', 'Jennie Martinez']
+          .map(function(name) {
+            const choice = v[name] || 'Not voted';
+            return '<td class="ctr vote-cell ' + (v[name] || '') + '">' + choice + '</td>';
+          }).join('');
+        voteDetailRows += '<tr><td>' + escapeHtml(s.name) + '</td>' + voteCells + '<td>' + dt + '</td></tr>';
+      });
+      const voteDetailSection = signers.length > 0 ? (
+        '<h4>Vote Detail by Stockholder</h4>' +
+        '<table>' +
+          '<thead><tr>' +
+            '<th>Stockholder</th>' +
+            '<th class="ctr">T. Esmanech</th>' +
+            '<th class="ctr">N. Karamadai</th>' +
+            '<th class="ctr">S. Castiblanco</th>' +
+            '<th class="ctr">J. Martinez</th>' +
+            '<th>Recorded At</th>' +
+          '</tr></thead>' +
+          '<tbody>' + voteDetailRows + '</tbody>' +
+        '</table>'
+      ) : '';
+
+      const html =
+        '<div class="doc-pdf">' +
+          '<div class="doc-pdf-header">' +
+            '<div class="corp-name">TEKKS INC.</div>' +
+            '<div class="corp-sub">(a Delaware corporation)</div>' +
+            '<div class="doc-title">WRITTEN CONSENT OF STOCKHOLDERS<br>IN LIEU OF ANNUAL MEETING</div>' +
+          '</div>' +
+          '<p>Pursuant to Section 228 of the Delaware General Corporation Law and Section 2.14 of the Bylaws of TEKKS Inc. (the &ldquo;Company&rdquo;), the undersigned stockholders of the Company, holding not less than the minimum number of votes necessary to authorize the actions set forth below, hereby adopt the following resolutions by written consent in lieu of an annual meeting of stockholders:</p>' +
+          '<h4>1. Election of Directors</h4>' +
+          '<p><strong>WHEREAS,</strong> the stockholders desire to elect the Board of Directors of the Company to serve until the next annual meeting of stockholders or until their successors are duly elected and qualified, or until their earlier resignation or removal;</p>' +
+          '<p><strong>NOW, THEREFORE, BE IT RESOLVED,</strong> that each of the following nominees is hereby submitted for election to the Board of Directors of the Company, with the undersigned stockholders voting as indicated below:</p>' +
+          '<table>' +
+            '<thead><tr>' +
+              '<th>Director Nominee</th>' +
+              '<th class="ctr">For</th>' +
+              '<th class="ctr">Against</th>' +
+              '<th class="ctr">Abstain</th>' +
+              '<th class="ctr">Result</th>' +
+            '</tr></thead>' +
+            '<tbody>' + tabulationRows + '</tbody>' +
+          '</table>' +
+          '<p><strong>RESOLVED FURTHER,</strong> that each nominee receiving the affirmative vote of stockholders holding a majority of the outstanding voting power of the Company shall be elected as a director.</p>' +
+          '<h4>2. Effectiveness of Consent</h4>' +
+          '<p><strong>RESOLVED,</strong> that this Written Consent shall be effective as of the date on which stockholders holding the requisite number of shares have executed and delivered this Written Consent to the Company.</p>' +
+          '<h4>3. Ratification of Actions</h4>' +
+          '<p><strong>RESOLVED,</strong> that all actions previously taken by the Board of Directors and officers of the Company consistent with the foregoing resolutions are hereby ratified, confirmed, and approved in all respects.</p>' +
+          '<h4>4. General Authorization</h4>' +
+          '<p><strong>RESOLVED,</strong> that any officer of the Company is hereby authorized and directed to take all such further actions and to execute and deliver any and all documents as such officer may deem necessary or appropriate to carry out the intent of the foregoing resolutions.</p>' +
+          '<h4>Execution</h4>' +
+          '<p>This Written Consent may be executed in one or more counterparts, including by electronic transmission (including email or electronic signature), each of which shall be deemed an original, and all of which together shall constitute one and the same instrument.</p>' +
+          '<h4>STOCKHOLDERS</h4>' +
+          '<table>' +
+            '<thead><tr>' +
+              '<th class="ctr" style="width:40px;">#</th>' +
+              '<th>Shareholder Name</th>' +
+              '<th class="num"># of Shares</th>' +
+              '<th>Signature</th>' +
+              '<th>Date</th>' +
+            '</tr></thead>' +
+            '<tbody>' + signatureRows + '</tbody>' +
+          '</table>' +
+          voteDetailSection +
+          '<h4>Delivery</h4>' +
+          '<p>This Written Consent shall be delivered to the Company by delivery to its principal place of business or via electronic transmission to an officer of the Company, and shall be filed with the minutes of the proceedings of the stockholders.</p>' +
+          '<div class="doc-footer">' +
+            '<strong>Document generated:</strong> ' + generatedAt + ' Pacific Time<br>' +
+            '<strong>Voting power represented:</strong> ' + formatNumber(t.votedOutstandingShares) + ' of ' + formatNumber(t.outstandingShares) + ' outstanding shares (' + t.sharesParticipationPct.toFixed(2) + '%)<br>' +
+            '<strong>Stockholders signed:</strong> ' + t.voted + ' of ' + t.stockholders + '<br>' +
+            '<strong>Generated by:</strong> TEKKS Inc. electronic voting system' +
+          '</div>' +
+        '</div>';
+
+      document.getElementById('document-preview').innerHTML = html;
+    }
+
+    function downloadDocumentPDF() {
+      if (!lastData) { showToast('No data loaded.', 'error'); return; }
+      if (!window.jspdf || !window.jspdf.jsPDF) {
+        showToast('PDF library not loaded yet. Please try again.', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('download-pdf-btn');
+      btn.disabled = true;
+      btn.textContent = 'Generating...';
+
+      try {
+        buildAndSavePDF();
+        showToast('PDF downloaded.', 'success');
+      } catch (err) {
+        console.error(err);
+        showToast('PDF generation failed: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> Download PDF';
+      }
+    }
+
+    function buildAndSavePDF() {
+      const data = lastData;
+      const t = data.totals;
+      const signers = data.stockholders.filter(function(s) { return s.hasVoted; });
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+
+      const margin = 54; // 0.75 inch
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const contentWidth = pageWidth - 2 * margin;
+      let y = margin;
+
+      // Helpers
+      function addText(text, opts) {
+        opts = opts || {};
+        const font = opts.font || 'times';
+        const style = opts.style || 'normal';
+        const size = opts.size || 11;
+        const lineHeight = opts.lineHeight || 1.45;
+        const align = opts.align || 'left';
+        const spaceAfter = opts.spaceAfter || 0;
+        const indent = opts.indent || 0;
+        const justify = opts.justify || false;
+
+        doc.setFont(font, style);
+        doc.setFontSize(size);
+        doc.setTextColor(0, 0, 0);
+
+        const wrapWidth = contentWidth - indent;
+        const lines = doc.splitTextToSize(text, wrapWidth);
+        const lh = size * lineHeight;
+
+        for (let i = 0; i < lines.length; i++) {
+          if (y + lh > pageHeight - margin - 25) {
+            doc.addPage();
+            y = margin;
+          }
+          if (justify && i < lines.length - 1 && align === 'left') {
+            // Simple justification: spread spaces
+            const words = lines[i].split(' ');
+            if (words.length > 1) {
+              const lineWidth = doc.getTextWidth(lines[i]);
+              const extraSpace = (wrapWidth - lineWidth) / (words.length - 1);
+              if (extraSpace > 0 && extraSpace < 8) {
+                let xPos = margin + indent;
+                for (let w = 0; w < words.length; w++) {
+                  doc.text(words[w], xPos, y);
+                  xPos += doc.getTextWidth(words[w]) + doc.getTextWidth(' ') + extraSpace;
+                }
+                y += lh;
+                continue;
+              }
+            }
+          }
+          const x = align === 'center' ? pageWidth / 2 : (margin + indent);
+          doc.text(lines[i], x, y, { align: align });
+          y += lh;
+        }
+        y += spaceAfter;
+      }
+
+      function ensureSpace(pts) {
+        if (y + pts > pageHeight - margin - 25) {
+          doc.addPage();
+          y = margin;
+        }
+      }
+
+      // === HEADER ===
+      addText('TEKKS INC.', { size: 18, style: 'bold', align: 'center' });
+      addText('(a Delaware corporation)', { size: 10, style: 'italic', align: 'center', spaceAfter: 18 });
+      addText('WRITTEN CONSENT OF STOCKHOLDERS', { size: 13, style: 'bold', align: 'center' });
+      addText('IN LIEU OF ANNUAL MEETING', { size: 13, style: 'bold', align: 'center', spaceAfter: 22 });
+
+      // === PREAMBLE ===
+      addText('Pursuant to Section 228 of the Delaware General Corporation Law and Section 2.14 of the Bylaws of TEKKS Inc. (the "Company"), the undersigned stockholders of the Company, holding not less than the minimum number of votes necessary to authorize the actions set forth below, hereby adopt the following resolutions by written consent in lieu of an annual meeting of stockholders:', { spaceAfter: 14, justify: true });
+
+      // === SECTION 1 ===
+      addText('1. Election of Directors', { size: 12, style: 'bold', spaceAfter: 8 });
+      addText('WHEREAS, the stockholders desire to elect the Board of Directors of the Company to serve until the next annual meeting of stockholders or until their successors are duly elected and qualified, or until their earlier resignation or removal;', { spaceAfter: 10, justify: true });
+      addText('NOW, THEREFORE, BE IT RESOLVED, that each of the following nominees is hereby submitted for election to the Board of Directors of the Company, with the undersigned stockholders voting as indicated below:', { spaceAfter: 10, justify: true });
+
+      // Vote tabulation table
+      ensureSpace(160);
+      doc.autoTable({
+        startY: y,
+        margin: { left: margin, right: margin },
+        head: [['Director Nominee', 'For', 'Against', 'Abstain', 'Result']],
+        body: data.nominees.map(function(n) {
+          let result = 'Pending';
+          if (n.passed) result = 'Elected';
+          else if (!n.stillReachable) result = 'Not Elected';
+          return [
+            n.name,
+            n.For.count + ' (' + formatNumber(n.For.outstanding) + ' sh)',
+            n.Against.count + ' (' + formatNumber(n.Against.outstanding) + ' sh)',
+            n.Abstain.count + ' (' + formatNumber(n.Abstain.outstanding) + ' sh)',
+            result
+          ];
+        }),
+        styles: { font: 'times', fontSize: 10, cellPadding: 5, lineColor: [120, 120, 120], lineWidth: 0.5 },
+        headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold', halign: 'center' },
+        columnStyles: {
+          0: { fontStyle: 'bold' },
+          1: { halign: 'center' },
+          2: { halign: 'center' },
+          3: { halign: 'center' },
+          4: { halign: 'center', fontStyle: 'bold' }
+        },
+        didParseCell: function(d) {
+          if (d.row.section === 'body' && d.column.index === 4) {
+            const text = d.cell.text[0];
+            if (text === 'Elected') d.cell.styles.textColor = [4, 120, 87];
+            else if (text === 'Not Elected') d.cell.styles.textColor = [185, 28, 28];
+            else if (text === 'Pending') d.cell.styles.textColor = [146, 64, 14];
+          }
+        }
+      });
+      y = doc.lastAutoTable.finalY + 14;
+
+      addText('RESOLVED FURTHER, that each nominee receiving the affirmative vote of stockholders holding a majority of the outstanding voting power of the Company shall be elected as a director.', { spaceAfter: 14, justify: true });
+
+      // === SECTION 2 ===
+      addText('2. Effectiveness of Consent', { size: 12, style: 'bold', spaceAfter: 8 });
+      addText('RESOLVED, that this Written Consent shall be effective as of the date on which stockholders holding the requisite number of shares have executed and delivered this Written Consent to the Company.', { spaceAfter: 14, justify: true });
+
+      // === SECTION 3 ===
+      addText('3. Ratification of Actions', { size: 12, style: 'bold', spaceAfter: 8 });
+      addText('RESOLVED, that all actions previously taken by the Board of Directors and officers of the Company consistent with the foregoing resolutions are hereby ratified, confirmed, and approved in all respects.', { spaceAfter: 14, justify: true });
+
+      // === SECTION 4 ===
+      addText('4. General Authorization', { size: 12, style: 'bold', spaceAfter: 8 });
+      addText('RESOLVED, that any officer of the Company is hereby authorized and directed to take all such further actions and to execute and deliver any and all documents as such officer may deem necessary or appropriate to carry out the intent of the foregoing resolutions.', { spaceAfter: 14, justify: true });
+
+      // === EXECUTION ===
+      addText('Execution', { size: 12, style: 'bold', spaceAfter: 8 });
+      addText('This Written Consent may be executed in one or more counterparts, including by electronic transmission (including email or electronic signature), each of which shall be deemed an original, and all of which together shall constitute one and the same instrument.', { spaceAfter: 14, justify: true });
+
+      // === STOCKHOLDERS / SIGNATURES ===
+      addText('STOCKHOLDERS', { size: 12, style: 'bold', spaceAfter: 8 });
+
+      if (signers.length === 0) {
+        addText('No stockholders have executed this Written Consent at the time of generation.', { style: 'italic', spaceAfter: 14 });
+      } else {
+        ensureSpace(80);
+        doc.autoTable({
+          startY: y,
+          margin: { left: margin, right: margin },
+          head: [['#', 'Shareholder Name', '# of Shares', 'Electronic Signature', 'Date']],
+          body: signers.map(function(s, i) {
+            return [
+              (i + 1).toString(),
+              s.name,
+              formatNumber(s.outstanding),
+              '/s/ ' + s.name + '\n(executed electronically)',
+              s.votedAt ? new Date(s.votedAt).toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' }) : ''
+            ];
+          }),
+          styles: { font: 'times', fontSize: 10, cellPadding: 5, lineColor: [120, 120, 120], lineWidth: 0.5, valign: 'middle' },
+          headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold' },
+          columnStyles: {
+            0: { halign: 'center', cellWidth: 28 },
+            1: { fontStyle: 'normal' },
+            2: { halign: 'right' },
+            3: { fontStyle: 'italic', fontSize: 9 }
+          }
+        });
+        y = doc.lastAutoTable.finalY + 14;
+      }
+
+      // === VOTE DETAIL APPENDIX ===
+      if (signers.length > 0) {
+        ensureSpace(120);
+        addText('Vote Detail by Stockholder', { size: 12, style: 'bold', spaceAfter: 8 });
+
+        doc.autoTable({
+          startY: y,
+          margin: { left: margin, right: margin },
+          head: [['Stockholder', 'T. Esmanech', 'N. Karamadai', 'S. Castiblanco', 'J. Martinez', 'Recorded At']],
+          body: signers.map(function(s) {
+            const v = s.votes || {};
+            return [
+              s.name,
+              v['Tommaso Esmanech'] || 'N/A',
+              v['Neel Srinivasan Karamadai'] || 'N/A',
+              v['Sandra Castiblanco'] || 'N/A',
+              v['Jennie Martinez'] || 'N/A',
+              s.votedAt ? new Date(s.votedAt).toLocaleString('en-US', {
+                timeZone: 'America/Los_Angeles',
+                month: 'short', day: 'numeric',
+                hour: 'numeric', minute: '2-digit'
+              }) : ''
+            ];
+          }),
+          styles: { font: 'times', fontSize: 9, cellPadding: 4, lineColor: [120, 120, 120], lineWidth: 0.5 },
+          headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold', halign: 'center' },
+          columnStyles: {
+            1: { halign: 'center' },
+            2: { halign: 'center' },
+            3: { halign: 'center' },
+            4: { halign: 'center' }
+          },
+          didParseCell: function(d) {
+            if (d.row.section === 'body' && d.column.index >= 1 && d.column.index <= 4) {
+              const text = d.cell.text[0];
+              if (text === 'For') { d.cell.styles.textColor = [4, 120, 87]; d.cell.styles.fontStyle = 'bold'; }
+              else if (text === 'Against') { d.cell.styles.textColor = [185, 28, 28]; d.cell.styles.fontStyle = 'bold'; }
+              else if (text === 'Abstain') { d.cell.styles.textColor = [146, 64, 14]; d.cell.styles.fontStyle = 'bold'; }
+            }
+          }
+        });
+        y = doc.lastAutoTable.finalY + 14;
+      }
+
+      // === DELIVERY ===
+      ensureSpace(80);
+      addText('Delivery', { size: 12, style: 'bold', spaceAfter: 8 });
+      addText('This Written Consent shall be delivered to the Company by delivery to its principal place of business or via electronic transmission to an officer of the Company, and shall be filed with the minutes of the proceedings of the stockholders.', { spaceAfter: 18, justify: true });
+
+      // === GENERATION FOOTER ===
+      ensureSpace(80);
+      doc.setDrawColor(160);
+      doc.setLineWidth(0.5);
+      doc.line(margin, y, pageWidth - margin, y);
+      y += 12;
+
+      const generatedAt = new Date().toLocaleString('en-US', {
+        timeZone: 'America/Los_Angeles',
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+        hour: 'numeric', minute: '2-digit'
+      });
+
+      doc.setFont('times', 'italic');
+      doc.setFontSize(9);
+      doc.setTextColor(80);
+      const footerLines = [
+        'Document generated: ' + generatedAt + ' Pacific Time',
+        'Voting power represented: ' + formatNumber(t.votedOutstandingShares) + ' of ' + formatNumber(t.outstandingShares) + ' outstanding shares (' + t.sharesParticipationPct.toFixed(2) + '%)',
+        'Stockholders signed: ' + t.voted + ' of ' + t.stockholders,
+        'Generated by: TEKKS Inc. electronic voting system'
+      ];
+      footerLines.forEach(function(line) {
+        doc.text(line, margin, y);
+        y += 12;
+      });
+
+      // === PAGE NUMBERS + RUNNING HEADER ===
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFont('times', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(140);
+        doc.text('TEKKS Inc. - Written Consent of Stockholders', margin, pageHeight - 25);
+        doc.text('Page ' + i + ' of ' + pageCount, pageWidth - margin, pageHeight - 25, { align: 'right' });
+      }
+
+      // === SAVE ===
+      const ts = new Date().toISOString().substring(0, 10);
+      const status = (signers.length === 0) ? 'DRAFT' :
+                     (t.voted === t.stockholders) ? 'FINAL' : 'INTERIM';
+      doc.save('TEKKS-Written-Consent-' + status + '-' + ts + '.pdf');
+    }
+
 
     // ============================================================
     // UTILITIES
