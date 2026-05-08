@@ -232,8 +232,61 @@
         .risk-level-item.high .level-name { color: #c62828; }
         .risk-level-item .level-desc { font-size: 11px; color: #666; }
         
-        /* Print */
-        @media print { .nav-bar, .form-actions, .btn, .edit-banner { display: none !important; } .container { box-shadow: none; } }
+        /* ── Print / Safari PDF ─────────────────────────────────────────── */
+        @media print {
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            html, body { background: white !important; padding: 0 !important; margin: 0 !important; font-size: 11pt !important; }
+            .nav-bar, .form-actions, .action-buttons, .btn, .edit-banner,
+            .modal-overlay, #toast { display: none !important; }
+            .container { box-shadow: none !important; border-radius: 0 !important; max-width: 100% !important; }
+            .header { background: #1A365C !important; color: white !important; padding: 14px 16px !important; break-inside: avoid; }
+            .section { break-inside: avoid; border: 1px solid #D3D7DF !important; margin-bottom: 12pt !important; }
+            .section-header { background: #1A365C !important; color: white !important; padding: 8px 12px !important; font-size: 10pt !important; }
+            .section-header.orange { background: #F57600 !important; }
+            .section-content { padding: 10px 12px !important; }
+            .form-grid, .form-grid-2, .form-grid-3 { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 8px !important; }
+            .form-group label { font-size: 8pt !important; color: #1A365C !important; display: block; margin-bottom: 2px; }
+            /* Render all inputs as visible flat text boxes */
+            .form-group input[type="text"],
+            .form-group input[type="tel"],
+            .form-group input[type="email"],
+            .form-group input[type="number"],
+            .form-group input[type="date"],
+            .form-group input[type="time"],
+            .form-group textarea,
+            .form-group select {
+                border: 1px solid #aaa !important;
+                border-radius: 3px !important;
+                padding: 4px 6px !important;
+                font-size: 9pt !important;
+                min-height: 24px !important;
+                height: auto !important;
+                width: 100% !important;
+                background: white !important;
+                box-shadow: none !important;
+                -webkit-appearance: none !important;
+                appearance: none !important;
+            }
+            .form-group textarea { min-height: 40px !important; }
+            /* Show checkbox/radio state as text indicator */
+            .checkbox-item { padding: 3px 6px !important; min-height: 20px !important; font-size: 9pt !important; border: 1px solid #ddd !important; border-radius: 3px !important; }
+            .checkbox-item input, .yes-no-group input { width: 14px !important; height: 14px !important; min-width: 14px !important; }
+            .yes-no-group label { padding: 3px 8px !important; min-height: 20px !important; font-size: 9pt !important; }
+            .care-table { font-size: 8pt !important; }
+            .care-table th { padding: 6px 4px !important; font-size: 7pt !important; }
+            .care-table td { padding: 5px 4px !important; }
+            .care-table input[type="radio"], .care-table input[type="checkbox"] { width: 14px !important; height: 14px !important; min-width: 14px !important; }
+            .contact-card { border: 1px solid #E5ECF3 !important; page-break-inside: avoid; }
+            .subsection { border-top: 1px dashed #ccc !important; margin-top: 10px !important; padding-top: 8px !important; }
+            .schedule-day { padding: 6px 4px !important; }
+            .schedule-day input[type="time"] { min-height: 20px !important; padding: 2px 3px !important; font-size: 8pt !important; }
+            .risk-level-item { padding: 8px !important; min-width: 0 !important; }
+            .med-table th, .med-table td { padding: 5px 4px !important; font-size: 8pt !important; }
+            .med-table input { min-height: 22px !important; padding: 3px 5px !important; font-size: 8pt !important; }
+            .table-wrapper, .med-table-wrapper, .schedule-wrapper { overflow: visible !important; margin: 0 !important; padding: 0 !important; }
+            .care-table, .med-table, .schedule-grid { min-width: 0 !important; }
+            @page { margin: 12mm 10mm; size: A4 portrait; }
+        }
         
         /* iPad Landscape */
         @media (max-width: 1024px) {
@@ -1389,49 +1442,149 @@
             window.scrollTo(0, 0);
         }
 
+        // ── Sync live DOM values → HTML attributes so html2canvas / print can read them ──
+        function syncFormValues(rootDoc) {
+            var doc = rootDoc || document;
+
+            // Text-like inputs: write the live .value back as the HTML attribute
+            var textTypes = ['text', 'tel', 'email', 'number', 'date', 'time', 'hidden'];
+            textTypes.forEach(function(t) {
+                doc.querySelectorAll('input[type="' + t + '"]').forEach(function(el) {
+                    var live = (doc === document) ? el : (function() {
+                        // In a cloned doc, find the matching original by name+type
+                        var orig = document.querySelector('input[type="' + t + '"][name="' + (el.getAttribute('name') || '') + '"]');
+                        return orig;
+                    })();
+                    var val = live ? live.value : el.value;
+                    el.setAttribute('value', val);
+                    el.value = val; // also set property for good measure
+                });
+            });
+
+            // Checkboxes
+            doc.querySelectorAll('input[type="checkbox"]').forEach(function(el) {
+                var name = el.getAttribute('name');
+                var orig = (doc === document) ? el : document.querySelector('input[type="checkbox"][name="' + name + '"]');
+                if (orig && orig.checked) {
+                    el.setAttribute('checked', 'checked');
+                    el.checked = true;
+                } else {
+                    el.removeAttribute('checked');
+                    el.checked = false;
+                }
+            });
+
+            // Radios — match by name + value
+            doc.querySelectorAll('input[type="radio"]').forEach(function(el) {
+                var name = el.getAttribute('name');
+                var val  = el.getAttribute('value');
+                var orig = (doc === document) ? el : document.querySelector('input[type="radio"][name="' + name + '"][value="' + val + '"]');
+                if (orig && orig.checked) {
+                    el.setAttribute('checked', 'checked');
+                    el.checked = true;
+                } else {
+                    el.removeAttribute('checked');
+                    el.checked = false;
+                }
+            });
+
+            // Textareas — set both textContent and value
+            doc.querySelectorAll('textarea').forEach(function(el) {
+                var name = el.getAttribute('name');
+                var orig = (doc === document) ? el : document.querySelector('textarea[name="' + name + '"]');
+                var val  = orig ? orig.value : el.value;
+                el.textContent = val;
+                el.value = val;
+            });
+
+            // Selects — mark the correct <option> as selected
+            doc.querySelectorAll('select').forEach(function(el) {
+                var name = el.getAttribute('name');
+                var orig = (doc === document) ? el : document.querySelector('select[name="' + name + '"]');
+                var val  = orig ? orig.value : el.value;
+                el.value = val;
+                Array.prototype.forEach.call(el.options, function(opt) {
+                    if (opt.value === val) {
+                        opt.setAttribute('selected', 'selected');
+                    } else {
+                        opt.removeAttribute('selected');
+                    }
+                });
+            });
+        }
+
+        // ── Detect Safari (desktop or iOS) — html2canvas is unreliable on WebKit ──
+        function isSafariBrowser() {
+            var ua = navigator.userAgent;
+            var isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+            var isDesktopSafari = /^((?!chrome|android).)*safari/i.test(ua);
+            return isIOS || isDesktopSafari;
+        }
+
         function generatePDF() {
             var data = getFormData();
             var name = ((data.firstName || 'Client') + '_' + (data.lastName || 'Unknown')).replace(/\s+/g, '_');
             var today = new Date();
             var dateStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
             var filename = 'HomeCare_Eval_' + name + '_' + dateStr + '.pdf';
-            
+
+            // Step 1: sync all live form values to HTML attributes (fixes text-not-appearing bug)
+            syncFormValues(document);
+
+            // Step 2: Safari / iOS — use native print dialog (Save as PDF)
+            if (isSafariBrowser()) {
+                showToast('Opening print dialog — choose Save as PDF', 'info');
+                // Brief delay so the toast renders before print dialog blocks the UI
+                setTimeout(function() {
+                    window.print();
+                }, 300);
+                return;
+            }
+
+            // Step 3: Chrome / Firefox — use html2pdf with onclone sync
             showToast('Generating PDF... please wait', 'info');
-            
-            // Hide action buttons so they don't appear in the PDF
+
             var actionBar = document.querySelector('.action-buttons');
             var editBanner = document.getElementById('editBanner');
+            var navBar = document.querySelector('.nav-bar');
             var toast = document.getElementById('toast');
-            if (actionBar) actionBar.style.display = 'none';
+            if (actionBar)  actionBar.style.display  = 'none';
             if (editBanner) editBanner.style.display = 'none';
-            if (toast) toast.style.display = 'none';
+            if (navBar)     navBar.style.display     = 'none';
+            if (toast)      toast.style.display      = 'none';
 
             var element = document.querySelector('.container');
             var opt = {
                 margin: [10, 8, 10, 8],
                 filename: filename,
-                image: { type: 'jpeg', quality: 0.92 },
-                // scale: 1.5 is safer than 2 for large complex forms
-                html2canvas: { scale: 1.5, useCORS: true, scrollY: 0, logging: false },
+                image: { type: 'jpeg', quality: 0.95 },
+                html2canvas: {
+                    scale: 1.5,
+                    useCORS: true,
+                    scrollY: 0,
+                    logging: false,
+                    // onclone runs on the cloned DOM before rendering — sync values again here
+                    onclone: function(clonedDoc) {
+                        syncFormValues(clonedDoc);
+                    }
+                },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                // 'css' + 'legacy' is more stable than 'avoid-all' for complex forms
                 pagebreak: { mode: ['css', 'legacy'] }
             };
-            
+
             html2pdf().set(opt).from(element).save()
             .then(function() {
-                showToast('PDF generated!', 'success');
+                showToast('PDF downloaded: ' + filename, 'success');
             })
             .catch(function(err) {
-                // Surface the real error so it is visible in the console
                 console.error('PDF generation error:', err);
-                showToast('PDF failed: ' + (err && err.message ? err.message : 'unknown error'), 'error');
+                showToast('PDF failed — try using Print (Ctrl+P) to save as PDF', 'error');
             })
             .finally(function() {
-                // Always restore hidden UI elements
-                if (actionBar) actionBar.style.display = '';
+                if (actionBar)  actionBar.style.display  = '';
                 if (editBanner) editBanner.style.display = '';
-                if (toast) toast.style.display = '';
+                if (navBar)     navBar.style.display     = '';
+                if (toast)      toast.style.display      = '';
             });
         }
 
