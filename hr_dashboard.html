@@ -360,6 +360,12 @@
             color: #FF7475;
         }
         
+        .badge-no-accrued {
+            background: #FFF3CD;
+            color: #856404;
+            border: 1px solid #FFEAA7;
+        }
+        
         .hours-cell {
             font-weight: 600;
             color: #F57600;
@@ -986,6 +992,9 @@
                 }
                 
                 var typeBadge = '<span class="badge badge-' + req.requestType + '">' + req.requestType.toUpperCase() + '</span>';
+                if (req.noAccruedTime) {
+                    typeBadge += ' <span class="badge badge-no-accrued" title="Employee opted out of using accrued time">No Accrual</span>';
+                }
                 
                 // Get formatted date from requestDate (e.g., "25-Nov-25")
                 var formattedDate = 'N/A';
@@ -1116,8 +1125,12 @@
                 month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' 
             }) : 'N/A';
             
-            var statusBadges = '<div style="display: flex; gap: 10px; margin-bottom: 20px;">';
+            var statusBadges = '<div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">';
             statusBadges += '<span class="badge badge-' + req.requestType + '">' + req.requestType.toUpperCase() + '</span>';
+            
+            if (req.noAccruedTime) {
+                statusBadges += '<span class="badge badge-no-accrued">⚠ No Accrual Used</span>';
+            }
             
             if (req.rejectionStatus === 'rejected') {
                 statusBadges += '<span class="badge badge-rejected">NOT ELIGIBLE</span>';
@@ -1142,7 +1155,6 @@
                 '<div class="detail-item"><div class="detail-label">Phone</div><div class="detail-value">' + req.employeePhone + '</div></div>' +
                 '</div></div>';
             
-            // Request Information
             html += '<div class="detail-section">' +
                 '<h3>Request Information</h3>' +
                 '<div class="detail-grid">' +
@@ -1151,6 +1163,11 @@
                 '<div class="detail-item"><div class="detail-label">Week</div><div class="detail-value">' + (req.weekYear || 'N/A') + '</div></div>' +
                 '<div class="detail-item"><div class="detail-label">Submitted</div><div class="detail-value">' + submittedDate + '</div></div>' +
                 '<div class="detail-item"><div class="detail-label">Total Hours</div><div class="detail-value" style="color: #F57600;">' + totalHours.toFixed(2) + ' hrs</div></div>' +
+                '<div class="detail-item"><div class="detail-label">Accrual Usage</div><div class="detail-value">' +
+                (req.noAccruedTime
+                    ? '<span style="color: #856404; font-weight: 600;">⚠ Employee opted out — accrued hours will NOT be used</span>'
+                    : '<span style="color: #62B790;">✓ Accrued hours apply</span>') +
+                '</div></div>' +
                 '</div></div>';
             
             // Services Missed
@@ -1394,6 +1411,12 @@
             
             for (var i = 0; i < filteredRequests.length; i++) {
                 var req = filteredRequests[i];
+                
+                // Skip requests where employee opted out of accrued time
+                if (req.noAccruedTime) {
+                    continue;
+                }
+                
                 var employeeId = req.employeeId;
                 var requestType = req.requestType;
                 var key = employeeId + '_' + requestType;
@@ -1438,6 +1461,16 @@
             });
             
             var textContent = '';
+            
+            // Count excluded requests
+            var excludedCount = 0;
+            for (var i = 0; i < filteredRequests.length; i++) {
+                if (filteredRequests[i].noAccruedTime) excludedCount++;
+            }
+            
+            if (excludedCount > 0) {
+                textContent += '*** NOTE: ' + excludedCount + ' request(s) excluded — employee(s) opted out of accrued time usage ***\n\n';
+            }
             
             // Add Sick requests
             if (sickData.length > 0) {

@@ -221,6 +221,33 @@
         
         .day-card:hover { border-color: #F57600; }
         
+        .no-accrued-row {
+            background: #FFF8F0;
+            border: 1.5px solid #F5C488;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+        }
+        
+        .no-accrued-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #3D3D3D;
+            font-weight: 400;
+            margin-bottom: 0;
+        }
+        
+        .no-accrued-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #F57600;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+        
         .day-card-header {
             background: #1A365C;
             color: white;
@@ -975,6 +1002,12 @@
                             '</select>' +
                         '</div>' +
                     '</div>' +
+                    '<div class="no-accrued-row">' +
+                        '<label class="no-accrued-label">' +
+                            '<input type="checkbox" class="day-no-accrued">' +
+                            '<span>I do <strong>not</strong> want to use my accrued sick/vacation time for this day</span>' +
+                        '</label>' +
+                    '</div>' +
                     '<label style="margin-bottom: 10px; display: block;">Services Missed</label>' +
                     '<div class="services-container" id="services-' + dayCount + '">' +
                         '<!-- Services will be added here -->' +
@@ -1152,6 +1185,7 @@
                 
                 var date = day.querySelector('.day-date').value;
                 var type = day.querySelector('.day-type').value;
+                var noAccruedTime = day.querySelector('.day-no-accrued').checked;
                 var services = [];
                 
                 day.querySelectorAll('.service-row').forEach(function(service) {
@@ -1166,6 +1200,7 @@
                     requestId: requestId,
                     requestType: type,
                     requestDate: date,
+                    noAccruedTime: noAccruedTime,
                     services: services
                 });
             });
