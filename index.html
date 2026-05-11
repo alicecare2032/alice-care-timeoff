@@ -616,6 +616,7 @@
         .badge-reviewed { background: #E3F2FD; color: #2196F3; }
         .badge-approved { background: #E0F1E9; color: #62B790; }
         .badge-rejected { background: #FFE3E3; color: #FF7475; }
+        .badge-no-accrued { background: #FFF3CD; color: #856404; border: 1px solid #FFEAA7; }
         
         /* Table Styles */
         .requests-table {
@@ -1373,14 +1374,25 @@
                 }
                 
                 var statusBadge = '';
-                if (request.rejectionStatus === 'rejected') {
-                    statusBadge = '<span class="badge badge-rejected">NOT_ELIGIBLE</span>';
-                } else if (request.approvalStatus === 'approved') {
-                    statusBadge = '<span class="badge badge-approved">APPROVED</span>';
-                } else if (request.reviewStatus === 'reviewed') {
-                    statusBadge = '<span class="badge badge-reviewed">REVIEWED</span>';
+                if (request.noAccruedTime) {
+                    // No-accrual requests: show their workflow stage, but approval/rejection display as "No Accrual Requested"
+                    if (request.rejectionStatus === 'rejected' || request.approvalStatus === 'approved') {
+                        statusBadge = '<span class="badge badge-no-accrued">NO ACCRUAL REQUESTED</span>';
+                    } else if (request.reviewStatus === 'reviewed') {
+                        statusBadge = '<span class="badge badge-reviewed">REVIEWED</span>';
+                    } else {
+                        statusBadge = '<span class="badge badge-pending">PENDING</span>';
+                    }
                 } else {
-                    statusBadge = '<span class="badge badge-pending">PENDING</span>';
+                    if (request.rejectionStatus === 'rejected') {
+                        statusBadge = '<span class="badge badge-rejected">NOT ELIGIBLE</span>';
+                    } else if (request.approvalStatus === 'approved') {
+                        statusBadge = '<span class="badge badge-approved">APPROVED</span>';
+                    } else if (request.reviewStatus === 'reviewed') {
+                        statusBadge = '<span class="badge badge-reviewed">REVIEWED</span>';
+                    } else {
+                        statusBadge = '<span class="badge badge-pending">PENDING</span>';
+                    }
                 }
                 
                 var reviewStatus = request.reviewStatus === 'reviewed' ? 
@@ -1388,7 +1400,13 @@
                     '<span style="color: #999;">Pending</span>';
                 
                 var approvalStatus = '';
-                if (request.rejectionStatus === 'rejected') {
+                if (request.noAccruedTime) {
+                    if (request.rejectionStatus === 'rejected' || request.approvalStatus === 'approved') {
+                        approvalStatus = '<span style="color: #856404; font-weight: 600;">No Accrual Requested</span>';
+                    } else {
+                        approvalStatus = '<span style="color: #999;">Pending</span>';
+                    }
+                } else if (request.rejectionStatus === 'rejected') {
                     approvalStatus = '<span style="color: #FF7475;">✗ Not Eligible</span>';
                 } else if (request.approvalStatus === 'approved') {
                     approvalStatus = '<span style="color: #62B790;">✓ Approved</span>';
@@ -1396,7 +1414,8 @@
                     approvalStatus = '<span style="color: #999;">Pending</span>';
                 }
                 
-                var approvedHours = (request.approvalStatus === 'approved' && request.approvedHours) ? 
+                // No accrued-time requests never show approved hours — there are none to pay
+                var approvedHours = (!request.noAccruedTime && request.approvalStatus === 'approved' && request.approvedHours) ? 
                     request.approvedHours : '-';
                 
                 var requestType = request.requestType === 'vacation' ? 'Vacation' : 'Sick';
@@ -1434,6 +1453,18 @@
             modalDate.textContent = date;
             
             var html = '';
+            
+            // No-accrual notice banner
+            if (request.noAccruedTime) {
+                html += '<div style="background: #FFF3CD; border: 1.5px solid #FFEAA7; border-left: 4px solid #856404; border-radius: 8px; padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: flex-start; gap: 12px;">' +
+                    '<span style="font-size: 20px; line-height: 1;">⚠</span>' +
+                    '<div>' +
+                        '<div style="font-weight: 600; color: #856404; font-size: 14px; margin-bottom: 4px;">No Accrual Requested</div>' +
+                        '<div style="font-size: 13px; color: #5a4400; line-height: 1.5;">You indicated that you do not want to use your accrued sick or vacation time for this request. Your accrued balance will not be affected.</div>' +
+                    '</div>' +
+                '</div>';
+            }
+            
             var totalHours = 0;
             for (var s = 0; s < request.services.length; s++) {
                 var service = request.services[s];
@@ -1449,6 +1480,11 @@
             }
             
             html += '<div class="modal-total"><span>Total Hours for the Day</span><span>' + totalHours.toFixed(2) + ' hours</span></div>';
+            
+            // Accrual status line
+            if (request.noAccruedTime) {
+                html += '<div style="background: #FFF3CD; border-radius: 8px; padding: 12px 16px; margin-top: 12px; font-size: 13px; color: #856404; font-weight: 600; text-align: center;">Accrued balance: not affected by this request</div>';
+            }
             
             modalBody.innerHTML = html;
             modal.classList.add('active');
