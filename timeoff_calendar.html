@@ -383,7 +383,15 @@ let cursor = new Date(today);
 })();
 
 // ---- HELPERS ----
-function isoWeek(d) {
+// For Sun-Sat display weeks: use Thursday (+4 days from Sunday) to identify
+// the correct ISO week — Thursday is always in the same ISO week as Mon-Sat.
+function displayWeekNum(sundayDate) {
+  const thu = new Date(sundayDate);
+  thu.setDate(sundayDate.getDate() + 4);
+  return isoWeek(thu);
+}
+
+
   const jan4 = new Date(d.getFullYear(), 0, 4);
   const startOfWeek1 = new Date(jan4);
   startOfWeek1.setDate(jan4.getDate() - ((jan4.getDay() + 6) % 7));
@@ -451,7 +459,7 @@ function renderMonth() {
   cells.forEach((cell,idx)=>{
     // insert week number cell at start of each row
     if(idx%7===0){
-      const wk=isoWeek(cell.date);
+      const wk=displayWeekNum(cell.date);
       html+=`<div class="month-wk-cell"><span class="wk-num">${wk}</span></div>`;
     }
     const ds=dateStr(cell.date), evs=eventsOnDate(ds), isT=isSameDay(cell.date,today);
@@ -474,7 +482,7 @@ function renderWeek() {
   const fmt=d=>`${MONTHS[d.getMonth()].slice(0,3)} ${d.getDate()}`;
   document.getElementById('periodLabel').textContent=`${fmt(ws)} - ${fmt(we)}, ${we.getFullYear()}`;
   let days=[]; for(let i=0;i<7;i++){const d=new Date(ws);d.setDate(ws.getDate()+i);days.push(d);}
-  const wkNum = isoWeek(ws);
+  const wkNum = displayWeekNum(ws);
   let html=`<div class="week-grid"><div class="week-wk-header">Wk</div><div style="background:var(--navy);border-bottom:2px solid rgba(255,255,255,.15);"></div>`;
   days.forEach(d=>{
     const isT=isSameDay(d,today);
@@ -500,7 +508,8 @@ function renderDay() {
   const dayName=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][cursor.getDay()];
   document.getElementById('periodLabel').textContent=`${dayName}, ${MONTHS[cursor.getMonth()]} ${cursor.getDate()}, ${cursor.getFullYear()}`;
   const evs=eventsOnDate(ds);
-  const wkNum = isoWeek(cursor);
+  const weekSunday = new Date(cursor); weekSunday.setDate(cursor.getDate() - cursor.getDay());
+  const wkNum = displayWeekNum(weekSunday);
   let html=`<div class="day-view-wrap"><div class="day-header"><div class="big-date">${cursor.getDate()}</div><div class="day-meta"><div class="day-name">${dayName}</div><div class="day-month">${MONTHS[cursor.getMonth()]} ${cursor.getFullYear()}</div></div><div style="margin-left:auto;text-align:center;background:rgba(255,255,255,.1);border-radius:10px;padding:8px 16px;"><div style="font-size:10px;font-weight:600;opacity:.6;text-transform:uppercase;letter-spacing:.06em;">Week</div><div style="font-size:28px;font-weight:700;color:var(--orange);line-height:1;">${wkNum}</div></div></div><div class="day-events-panel">`;
   if(!evs.length){html+=`<div class="no-events"><div class="icon">📅</div><p>No time off requests on this day.</p></div>`;}
   else {
