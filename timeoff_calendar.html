@@ -227,8 +227,8 @@
 <div class="nav">
   <div class="logo"><span class="alice">alice</span><span class="dot">.</span><span class="care">care</span></div>
   <div class="nav-right">
-    <span id="syncIndicator" style="font-size:11px;font-weight:600;color:#F59E0B;padding:5px 10px;background:var(--bg);border-radius:6px;">⟳ Syncing...</span>
-    <a class="nav-link" href="https://www.alicecare.com">&#8592; HR Dashboard (List View)</a>
+    <span id="syncIndicator" style="font-size:11px;font-weight:600;color:#F59E0B;padding:5px 10px;background:var(--bg);border-radius:6px;cursor:pointer;" onclick="loadLiveStatuses()" title="Click to refresh statuses">⟳ Syncing...</span>
+    <a class="nav-link" href="https://alicecare2032.github.io/alice-care-timeoff/hr_dashboard.html">&#8592; HR Dashboard (List View)</a>
     <span style="font-size:13px;color:var(--muted);font-weight:500;">Time Off Calendar</span>
   </div>
 </div>
@@ -292,40 +292,73 @@ const RAW = [{"id":"AC-1761229957113-93","name":"Lucia Diaz","type":"vacation","
 
 // local status overrides — populated by live fetch + optimistic updates
 const localStatus = {};
+const pinnedStatus = {}; // user-confirmed actions — never overwritten by live fetch
 let liveLoaded = false;
 
+// Normalize any date string to YYYY-MM-DD
+function toISODate(raw) {
+  if (!raw) return '';
+  const s = String(raw).trim();
+  // Already ISO: 2026-06-09
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
+  // M/D/YYYY or MM/DD/YYYY
+  const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (m) return `${m[3]}-${m[1].padStart(2,'0')}-${m[2].padStart(2,'0')}`;
+  // Try JS Date parse as last resort
+  const d = new Date(s);
+  if (!isNaN(d)) return d.toISOString().slice(0, 10);
+  return '';
+}
+
 // ---- LIVE STATUS SYNC ----
-function loadLiveStatuses() {
+function loadLiveStatuses(afterAction) {
   const indicator = document.getElementById('syncIndicator');
   if (indicator) { indicator.textContent = '⟳ Syncing...'; indicator.style.color = '#F59E0B'; }
 
   fetch(SCRIPT_URL)
-    .then(r => r.json())
-    .then(data => {
-      const requests = data.requests || data.data || data || [];
+    .then(r => r.text())                          // GAS needs text(), not json()
+    .then(text => {
+      let data;
+      try { data = JSON.parse(text); } catch(e) {
+        throw new Error('JSON parse failed: ' + text.slice(0, 120));
+      }
+
+      if (!data.success) throw new Error(data.error || 'GAS returned success:false');
+
+      const requests = data.requests || [];
+      let updatedCount = 0;
+
       requests.forEach(req => {
-        const id = req.requestId || req['Request ID'] || '';
-        const dates = (req.dates || [req.date || req['Request Date'] || '']).filter(Boolean);
+        const id   = req.requestId || '';
+        const date = toISODate(req.requestDate || req.date || '');
+        if (!id || !date) return;
+
+        const key = id + '|' + date;
 
         let status = 'pending';
-        if ((req.rejectionStatus || req['Rejection Status'] || '').toLowerCase() === 'rejected') status = 'rejected';
-        else if ((req.approvalStatus || req['Approval Status'] || '').toLowerCase() === 'approved') status = 'approved';
-        else if ((req.reviewStatus  || req['Review Status']  || '').toLowerCase() === 'reviewed')  status = 'reviewed';
+        if ((req.rejectionStatus || '').toLowerCase() === 'rejected') status = 'rejected';
+        else if ((req.approvalStatus || '').toLowerCase() === 'approved') status = 'approved';
+        else if ((req.reviewStatus  || '').toLowerCase() === 'reviewed')  status = 'reviewed';
 
-        dates.forEach(d => {
-          const key = id + '|' + d;
-          // only set if not already overridden by a local action
-          if (!localStatus[key] || localStatus[key] === 'pending') {
-            localStatus[key] = status;
-          }
-        });
+        // Pinned (user just acted) — never overwrite
+        if (pinnedStatus[key]) return;
+
+        if (localStatus[key] !== status) updatedCount++;
+        localStatus[key] = status;
       });
+
       liveLoaded = true;
-      if (indicator) { indicator.textContent = '● Live'; indicator.style.color = '#22C55E'; }
+      if (indicator) {
+        indicator.textContent = afterAction
+          ? `● Confirmed (${new Date().toLocaleTimeString()})`
+          : '● Live';
+        indicator.style.color = '#22C55E';
+      }
       render();
     })
-    .catch(() => {
-      if (indicator) { indicator.textContent = '● Offline (cached data)'; indicator.style.color = '#F59E0B'; }
+    .catch(err => {
+      console.warn('loadLiveStatuses failed:', err);
+      if (indicator) { indicator.textContent = '● Cached data'; indicator.style.color = '#F59E0B'; }
     });
 }
 
@@ -369,7 +402,10 @@ function dateStr(d) {
 }
 function isSameDay(a,b) { return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate(); }
 
-function getStatus(ev) { return localStatus[ev.id+'|'+ev.date] || ev.status; }
+function getStatus(ev) {
+  const key = ev.id + '|' + ev.date;
+  return pinnedStatus[key] || localStatus[key] || ev.status;
+}
 
 function filtered() {
   const emp = document.getElementById('empFilter').value;
@@ -632,24 +668,23 @@ function quickApprove(id, date, defaultHours) {
   const btn = document.getElementById('btn_approve_'+id);
   setLoading(btn, true, 'Submitting...');
 
+  const key = id + '|' + date;
   const now = new Date().toISOString();
-  const reviewPayload = { action:'review', requestId:id, reviewerName:name, reviewedDate:now, reviewComments:comments };
+  const reviewPayload  = { action:'review',  requestId:id, reviewerName:name, reviewedDate:now, reviewComments:comments };
   const approvePayload = { action:'approve', requestId:id, approverName:name, approvedDate:now, approvedHours:hours, approvalComments:comments };
+
+  // Pin immediately — survives any subsequent live fetch
+  pinnedStatus[key] = 'approved';
+  localStatus[key]  = 'approved';
+  closeModal();
+  render();
+  toast('Reviewed & Approved — syncing to Google Sheets...', 'success');
 
   postToScript(reviewPayload)
     .then(() => postToScript(approvePayload))
-    .then(() => {
-      localStatus[id+'|'+date] = 'approved';
-      closeModal();
-      toast('Reviewed & Approved successfully!', 'success');
-      render();
-    })
-    .catch(() => {
-      // no-cors always "succeeds" but catches network errors
-      localStatus[id+'|'+date] = 'approved';
-      closeModal();
-      toast('Submitted! Reload to confirm from Google Sheets.', 'success');
-      render();
+    .finally(() => {
+      // Re-fetch after 3s to confirm the sheet updated
+      setTimeout(() => loadLiveStatuses(true), 3000);
     });
 }
 
@@ -660,26 +695,22 @@ function quickReject(id, date) {
   if (!name) { toast('Please enter your name.', 'error'); return; }
   if (!reason) { toast('Please enter a rejection reason.', 'error'); return; }
 
-  const btn = document.getElementById('btn_reject_'+id);
-  setLoading(btn, true, 'Submitting...');
-
+  const key = id + '|' + date;
   const now = new Date().toISOString();
   const reviewPayload = { action:'review', requestId:id, reviewerName:name, reviewedDate:now, reviewComments:reason };
-  const rejectPayload  = { action:'reject', requestId:id, rejectorName:name, rejectedDate:now, rejectionComments:reason };
+  const rejectPayload  = { action:'reject',  requestId:id, rejectorName:name, rejectedDate:now, rejectionComments:reason };
+
+  // Pin immediately
+  pinnedStatus[key] = 'rejected';
+  localStatus[key]  = 'rejected';
+  closeModal();
+  render();
+  toast('Reviewed & Rejected — syncing to Google Sheets...', 'success');
 
   postToScript(reviewPayload)
     .then(() => postToScript(rejectPayload))
-    .then(() => {
-      localStatus[id+'|'+date] = 'rejected';
-      closeModal();
-      toast('Reviewed & Rejected.', 'success');
-      render();
-    })
-    .catch(() => {
-      localStatus[id+'|'+date] = 'rejected';
-      closeModal();
-      toast('Submitted! Reload to confirm from Google Sheets.', 'success');
-      render();
+    .finally(() => {
+      setTimeout(() => loadLiveStatuses(true), 3000);
     });
 }
 
@@ -688,17 +719,23 @@ function promptApprove(id, date, hours) {
   const name = prompt('Your name:'); if (!name) return;
   const h = parseFloat(prompt('Approved hours:', hours)); if (isNaN(h)) return;
   const comments = prompt('Comments:'); if (!comments) return;
+  const key = id + '|' + date;
+  pinnedStatus[key] = 'approved'; localStatus[key] = 'approved';
+  closeModal(); render(); toast('Approved!', 'success');
   const now = new Date().toISOString();
   postToScript({action:'approve',requestId:id,approverName:name,approvedDate:now,approvedHours:h,approvalComments:comments})
-    .finally(()=>{ localStatus[id+'|'+date]='approved'; closeModal(); toast('Approved!','success'); render(); });
+    .finally(() => setTimeout(() => loadLiveStatuses(true), 3000));
 }
 
 function promptReject(id, date) {
   const name = prompt('Your name:'); if (!name) return;
   const reason = prompt('Rejection reason:'); if (!reason) return;
+  const key = id + '|' + date;
+  pinnedStatus[key] = 'rejected'; localStatus[key] = 'rejected';
+  closeModal(); render(); toast('Rejected.', 'success');
   const now = new Date().toISOString();
   postToScript({action:'reject',requestId:id,rejectorName:name,rejectedDate:now,rejectionComments:reason})
-    .finally(()=>{ localStatus[id+'|'+date]='rejected'; closeModal(); toast('Rejected.','success'); render(); });
+    .finally(() => setTimeout(() => loadLiveStatuses(true), 3000));
 }
 
 // ---- API ----
