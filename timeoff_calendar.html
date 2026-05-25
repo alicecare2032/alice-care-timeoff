@@ -25,6 +25,7 @@
     --approved-dot: #22C55E;
     --rejected-dot: #EF4444;
     --pending-dot: #F59E0B;
+    --reviewed-dot: #8B5CF6;
   }
 
   body { font-family: 'Poppins', sans-serif; background: var(--bg); min-height: 100vh; color: var(--text); }
@@ -64,6 +65,7 @@
   .legend-dot.approved { background: var(--approved-dot); }
   .legend-dot.rejected { background: var(--rejected-dot); }
   .legend-dot.pending  { background: var(--pending-dot); }
+  .legend-dot.reviewed { background: var(--reviewed-dot); }
 
   .cal-wrap { max-width: 1400px; margin: 16px auto 30px; padding: 0 20px; }
   .cal-card { background: var(--white); border-radius: 14px; box-shadow: 0 4px 20px rgba(26,54,92,.12); overflow: hidden; }
@@ -75,7 +77,7 @@
   .month-wk-cell { background: #F0F4F9; border-right: 2px solid #C8D4E3; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; justify-content: center; padding-top: 9px; }
   .wk-num { font-size: 10px; font-weight: 700; color: #8A9BB5; letter-spacing: .02em; line-height: 1; }
   .month-day { min-height: 110px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 8px 6px 6px; background: var(--white); }
-  .month-day:nth-child(7n) { border-right: none; }
+  .month-day:nth-child(8n) { border-right: none; }
   .month-day.other-month { background: #F7F9FC; }
   .day-num { font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 4px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
   .month-day.today .day-num { background: var(--orange); color: var(--white); }
@@ -88,6 +90,7 @@
   .status-dot.approved { background: var(--approved-dot); }
   .status-dot.rejected { background: var(--rejected-dot); }
   .status-dot.pending  { background: var(--pending-dot); }
+  .status-dot.reviewed { background: var(--reviewed-dot); }
   .more-chip { font-size: 10px; color: var(--muted); font-weight: 600; padding: 2px 4px; cursor: pointer; text-decoration: underline; }
 
   /* WEEK */
@@ -123,6 +126,7 @@
   .day-event-badge.approved { background: #DCFCE7; color: #166534; }
   .day-event-badge.rejected { background: #FEE2E2; color: #991B1B; }
   .day-event-badge.pending  { background: #FEF3C7; color: #92400E; }
+  .day-event-badge.reviewed { background: #EDE9FE; color: #5B21B6; }
   .no-events { text-align: center; padding: 60px 20px; color: var(--muted); }
   .no-events .icon { font-size: 48px; margin-bottom: 12px; }
   .no-events p { font-size: 15px; font-weight: 500; }
@@ -155,6 +159,7 @@
   .status-badge.approved { background: #DCFCE7; color: #166534; }
   .status-badge.rejected { background: #FEE2E2; color: #991B1B; }
   .status-badge.pending  { background: #FEF3C7; color: #92400E; }
+  .status-badge.reviewed { background: #EDE9FE; color: #5B21B6; }
 
   /* ACTION ZONE */
   .action-zone { margin-top: 16px; border-top: 2px solid var(--bg); padding-top: 16px; }
@@ -264,6 +269,7 @@
       <div class="legend-item"><div class="legend-chip vacation"></div>Vacation</div>
       <div class="legend-item"><div class="legend-chip sick"></div>Sick</div>
       <div class="legend-item"><div class="legend-dot approved"></div>Approved</div>
+      <div class="legend-item"><div class="legend-dot reviewed"></div>Reviewed</div>
       <div class="legend-item"><div class="legend-dot pending"></div>Pending</div>
       <div class="legend-item"><div class="legend-dot rejected"></div>Rejected</div>
     </div>
@@ -516,11 +522,15 @@ function renderDay() {
 
 function countStrip(evs) {
   const vac=evs.filter(e=>e.type==='vacation').length, sick=evs.filter(e=>e.type==='sick').length;
-  const appr=evs.filter(e=>getStatus(e)==='approved').length, pend=evs.filter(e=>getStatus(e)==='pending').length, rej=evs.filter(e=>getStatus(e)==='rejected').length;
+  const appr=evs.filter(e=>getStatus(e)==='approved').length;
+  const revd=evs.filter(e=>getStatus(e)==='reviewed').length;
+  const pend=evs.filter(e=>getStatus(e)==='pending').length;
+  const rej =evs.filter(e=>getStatus(e)==='rejected').length;
   return `<div class="count-strip">
     <span>Showing: <strong>${evs.length} requests</strong></span>
     <span>&#9788; Vacation: <strong>${vac}</strong></span><span>🤒 Sick: <strong>${sick}</strong></span>
     <span style="color:#86efac">&#9679; Approved: <strong>${appr}</strong></span>
+    <span style="color:#d8b4fe">&#9679; Reviewed: <strong>${revd}</strong></span>
     <span style="color:#fde68a">&#9679; Pending: <strong>${pend}</strong></span>
     <span style="color:#fca5a5">&#9679; Rejected: <strong>${rej}</strong></span>
   </div>`;
@@ -604,6 +614,70 @@ function showModal(id, date) {
 
       <div style="font-size:11px;color:var(--muted);margin-top:8px;">&#9432; Both cards send Review + Action to Google Sheets in a single submission. No double steps required.</div>
     </div>`;
+  } else if (st === 'reviewed') {
+    actionZone = `
+    <div class="action-zone">
+      <div class="action-zone-title">&#9889; Final Approval Required</div>
+
+      <!-- FINAL APPROVE -->
+      <div class="quick-action-card approve-card">
+        <div class="quick-action-label">
+          <span class="qa-icon">&#10003;</span>
+          Final Approve &nbsp;<span class="qa-badge" style="background:#8B5CF6;">REVIEWED</span>
+        </div>
+        <div style="font-size:11px;color:#5B21B6;background:#EDE9FE;border-radius:6px;padding:6px 10px;margin-bottom:10px;">
+          &#9432; This request has been reviewed. Provide your final approval below.
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Your Name *</label>
+            <input type="text" id="qa_name_fa" placeholder="Full name" value="Tommaso Esmanech">
+          </div>
+          <div class="form-group">
+            <label>Approved Hours *</label>
+            <input type="number" id="qa_hours_fa" step="0.01" min="0" placeholder="Hours" value="${ev.hours}">
+          </div>
+        </div>
+        <div class="form-row single">
+          <div class="form-group">
+            <label>Approval Comments *</label>
+            <input type="text" id="qa_comments_fa" placeholder="e.g. Approved, hours confirmed in Paychex">
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-qa secondary" onclick="closeModal()">Cancel</button>
+          <button class="btn-qa approve" id="btn_fapprove_${id}" onclick="finalApprove('${ev.id}','${ev.date}',${ev.hours})">
+            &#10003; Final Approve
+          </button>
+        </div>
+      </div>
+
+      <!-- FINAL REJECT -->
+      <div class="quick-action-card reject-card">
+        <div class="quick-action-label">
+          <span class="qa-icon">&#10007;</span>
+          Reject After Review
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Your Name *</label>
+            <input type="text" id="qa_name_fr" placeholder="Full name" value="Tommaso Esmanech">
+          </div>
+        </div>
+        <div class="form-row single">
+          <div class="form-group">
+            <label>Rejection Reason *</label>
+            <input type="text" id="qa_reason_fr" placeholder="e.g. No hours available in Paychex">
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-qa secondary" onclick="closeModal()">Cancel</button>
+          <button class="btn-qa reject" id="btn_freject_${id}" onclick="finalReject('${ev.id}','${ev.date}')">
+            &#10007; Reject
+          </button>
+        </div>
+      </div>
+    </div>`;
   } else if (st === 'approved') {
     actionZone = `
     <div class="action-zone">
@@ -644,7 +718,7 @@ function showModal(id, date) {
       </div>
       <div class="modal-field">
         <div class="modal-label">Status</div>
-        <div><span class="status-badge ${st}"><span style="width:8px;height:8px;display:inline-block;border-radius:50%;background:${st==='approved'?'#22C55E':st==='rejected'?'#EF4444':'#F59E0B'}"></span>${cap(st)}</span></div>
+        <div><span class="status-badge ${st}"><span style="width:8px;height:8px;display:inline-block;border-radius:50%;background:${st==='approved'?'#22C55E':st==='rejected'?'#EF4444':st==='reviewed'?'#8B5CF6':'#F59E0B'}"></span>${cap(st)}</span></div>
       </div>
     </div>
     <div class="modal-field">
@@ -712,6 +786,46 @@ function quickReject(id, date) {
     .finally(() => {
       setTimeout(() => loadLiveStatuses(true), 3000);
     });
+}
+
+// ---- FINAL APPROVE (already reviewed, just needs approval POST) ----
+function finalApprove(id, date, defaultHours) {
+  const name     = document.getElementById('qa_name_fa').value.trim();
+  const hours    = parseFloat(document.getElementById('qa_hours_fa').value);
+  const comments = document.getElementById('qa_comments_fa').value.trim();
+  if (!name)                        { toast('Please enter your name.', 'error'); return; }
+  if (isNaN(hours) || hours < 0)   { toast('Please enter valid approved hours.', 'error'); return; }
+  if (!comments)                    { toast('Please enter comments.', 'error'); return; }
+
+  const key = id + '|' + date;
+  pinnedStatus[key] = 'approved';
+  localStatus[key]  = 'approved';
+  closeModal();
+  render();
+  toast('Final Approval submitted — syncing to Google Sheets...', 'success');
+
+  const now = new Date().toISOString();
+  postToScript({ action:'approve', requestId:id, approverName:name, approvedDate:now, approvedHours:hours, approvalComments:comments })
+    .finally(() => setTimeout(() => loadLiveStatuses(true), 3000));
+}
+
+// ---- FINAL REJECT (already reviewed, now rejecting) ----
+function finalReject(id, date) {
+  const name   = document.getElementById('qa_name_fr').value.trim();
+  const reason = document.getElementById('qa_reason_fr').value.trim();
+  if (!name)   { toast('Please enter your name.', 'error'); return; }
+  if (!reason) { toast('Please enter a rejection reason.', 'error'); return; }
+
+  const key = id + '|' + date;
+  pinnedStatus[key] = 'rejected';
+  localStatus[key]  = 'rejected';
+  closeModal();
+  render();
+  toast('Rejection submitted — syncing to Google Sheets...', 'success');
+
+  const now = new Date().toISOString();
+  postToScript({ action:'reject', requestId:id, rejectorName:name, rejectedDate:now, rejectionComments:reason })
+    .finally(() => setTimeout(() => loadLiveStatuses(true), 3000));
 }
 
 // ---- REVERSAL PROMPTS ----
