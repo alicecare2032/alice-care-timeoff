@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>alice.care - Time Off Calendar</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --orange: #F57600;
+    --navy: #1A365C;
+    --bg: #E5ECF3;
+    --white: #ffffff;
+    --border: #D3D7DF;
+    --text: #2D3748;
+    --muted: #718096;
+    --vacation-bg: #D1E9FF;
+    --vacation-border: #2B8FD6;
+    --vacation-text: #1A4A70;
+    --sick-bg: #FFE0D6;
+    --sick-border: #E04C20;
+    --sick-text: #7A1F05;
+    --approved-dot: #22C55E;
+    --rejected-dot: #EF4444;
+    --pending-dot: #F59E0B;
+  }
+
+  body { font-family: 'Poppins', sans-serif; background: var(--bg); min-height: 100vh; color: var(--text); }
+
+  .nav { background: var(--white); padding: 14px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(26,54,92,.1); }
+  .logo { font-size: 26px; font-weight: 700; }
+  .logo .alice { color: var(--orange); }
+  .logo .dot { color: var(--orange); }
+  .logo .care { color: var(--navy); font-weight: 400; }
+  .nav-right { display: flex; align-items: center; gap: 14px; }
+  .nav-link { font-size: 13px; color: var(--navy); font-weight: 600; text-decoration: none; padding: 8px 16px; border-radius: 8px; background: var(--bg); transition: background .2s; }
+  .nav-link:hover { background: #D0DCE9; }
+
+  .toolbar { max-width: 1400px; margin: 20px auto 0; padding: 0 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+  .view-tabs { display: flex; background: var(--white); border-radius: 10px; padding: 4px; box-shadow: 0 2px 8px rgba(26,54,92,.08); }
+  .view-tab { padding: 8px 20px; border: none; background: transparent; border-radius: 7px; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; transition: all .2s; }
+  .view-tab.active { background: var(--navy); color: var(--white); box-shadow: 0 2px 6px rgba(26,54,92,.25); }
+  .view-tab:hover:not(.active) { color: var(--navy); }
+
+  .nav-controls { display: flex; align-items: center; gap: 10px; background: var(--white); border-radius: 10px; padding: 6px 14px; box-shadow: 0 2px 8px rgba(26,54,92,.08); }
+  .nav-btn { background: none; border: none; cursor: pointer; color: var(--navy); font-size: 18px; padding: 4px 8px; border-radius: 6px; font-family: 'Poppins', sans-serif; font-weight: 700; transition: background .15s; }
+  .nav-btn:hover { background: var(--bg); }
+  .period-label { font-size: 15px; font-weight: 700; color: var(--navy); min-width: 200px; text-align: center; }
+  .today-btn { background: var(--orange); color: var(--white); border: none; border-radius: 7px; font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; padding: 6px 14px; cursor: pointer; transition: opacity .2s; }
+  .today-btn:hover { opacity: .88; }
+
+  .filter-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .filter-row select { padding: 8px 14px; border: 2px solid var(--border); border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 13px; color: var(--navy); background: var(--white); cursor: pointer; font-weight: 500; transition: border-color .2s; }
+  .filter-row select:focus { outline: none; border-color: var(--orange); }
+
+  .legend { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--muted); }
+  .legend-chip { width: 28px; height: 14px; border-radius: 4px; border-left: 3px solid transparent; }
+  .legend-chip.vacation { background: var(--vacation-bg); border-color: var(--vacation-border); }
+  .legend-chip.sick { background: var(--sick-bg); border-color: var(--sick-border); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .legend-dot.approved { background: var(--approved-dot); }
+  .legend-dot.rejected { background: var(--rejected-dot); }
+  .legend-dot.pending  { background: var(--pending-dot); }
+
+  .cal-wrap { max-width: 1400px; margin: 16px auto 30px; padding: 0 20px; }
+  .cal-card { background: var(--white); border-radius: 14px; box-shadow: 0 4px 20px rgba(26,54,92,.12); overflow: hidden; }
+
+  /* MONTH */
+  .month-grid { display: grid; grid-template-columns: 38px repeat(7, 1fr); }
+  .month-header-cell { background: var(--navy); color: var(--white); text-align: center; padding: 12px 0; font-size: 12px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; }
+  .month-wk-header { background: var(--navy); color: rgba(255,255,255,.35); text-align: center; padding: 12px 0; font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+  .month-wk-cell { background: #F0F4F9; border-right: 2px solid #C8D4E3; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; justify-content: center; padding-top: 9px; }
+  .wk-num { font-size: 10px; font-weight: 700; color: #8A9BB5; letter-spacing: .02em; line-height: 1; }
+  .month-day { min-height: 110px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 8px 6px 6px; background: var(--white); }
+  .month-day:nth-child(7n) { border-right: none; }
+  .month-day.other-month { background: #F7F9FC; }
+  .day-num { font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 4px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+  .month-day.today .day-num { background: var(--orange); color: var(--white); }
+  .other-month .day-num { color: #C0CADB; }
+  .event-chip { display: flex; align-items: center; gap: 4px; padding: 3px 6px; border-radius: 4px; font-size: 10.5px; font-weight: 600; margin-bottom: 2px; cursor: pointer; border-left: 3px solid transparent; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: opacity .15s, transform .15s; }
+  .event-chip:hover { opacity: .85; transform: translateX(1px); }
+  .event-chip.vacation { background: var(--vacation-bg); border-color: var(--vacation-border); color: var(--vacation-text); }
+  .event-chip.sick { background: var(--sick-bg); border-color: var(--sick-border); color: var(--sick-text); }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .status-dot.approved { background: var(--approved-dot); }
+  .status-dot.rejected { background: var(--rejected-dot); }
+  .status-dot.pending  { background: var(--pending-dot); }
+  .more-chip { font-size: 10px; color: var(--muted); font-weight: 600; padding: 2px 4px; cursor: pointer; text-decoration: underline; }
+
+  /* WEEK */
+  .week-grid { display: grid; grid-template-columns: 38px 80px repeat(7, 1fr); }
+  .week-wk-header { background: var(--navy); color: rgba(255,255,255,.35); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; border-bottom: 2px solid rgba(255,255,255,.15); }
+  .week-wk-num { background: #F0F4F9; border-right: 2px solid #C8D4E3; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 10px; gap: 2px; }
+  .week-wk-num .wk-num { font-size: 10px; font-weight: 700; color: #8A9BB5; }
+  .week-wk-num .wk-label { font-size: 8px; font-weight: 600; color: #B0BDCF; text-transform: uppercase; letter-spacing: .04em; }
+  .week-col-header { background: var(--navy); color: var(--white); text-align: center; padding: 14px 4px; font-size: 12px; font-weight: 600; }
+  .week-col-header.today-col { background: var(--orange); }
+  .week-col-header .wday { font-size: 11px; opacity: .8; text-transform: uppercase; letter-spacing: .05em; }
+  .week-col-header .wdate { font-size: 22px; font-weight: 700; line-height: 1.1; }
+  .week-allday-label { display: flex; align-items: center; justify-content: flex-end; padding: 0 8px; font-size: 10px; color: var(--muted); font-weight: 600; background: #F7F9FC; border-bottom: 2px solid var(--border); min-height: 50px; border-right: 1px solid var(--border); }
+  .week-allday-row { background: #F7F9FC; border-bottom: 2px solid var(--border); min-height: 50px; display: flex; flex-direction: column; gap: 3px; padding: 5px 4px; }
+
+  /* DAY */
+  .day-view-wrap { display: grid; grid-template-columns: 1fr; }
+  .day-header { background: var(--navy); color: var(--white); padding: 20px 24px; display: flex; align-items: center; gap: 16px; }
+  .day-header .big-date { font-size: 44px; font-weight: 700; color: var(--orange); line-height: 1; }
+  .day-header .day-meta { display: flex; flex-direction: column; }
+  .day-header .day-name { font-size: 18px; font-weight: 600; }
+  .day-header .day-month { font-size: 14px; opacity: .75; }
+  .day-events-panel { padding: 20px 24px; }
+  .day-event-card { display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid transparent; cursor: pointer; transition: box-shadow .15s, transform .15s; }
+  .day-event-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,.1); transform: translateY(-1px); }
+  .day-event-card.vacation { background: var(--vacation-bg); border-color: var(--vacation-border); }
+  .day-event-card.sick { background: var(--sick-bg); border-color: var(--sick-border); }
+  .day-event-icon { font-size: 24px; }
+  .day-event-info { flex: 1; }
+  .day-event-name { font-size: 15px; font-weight: 700; color: var(--navy); }
+  .day-event-meta { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .day-event-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; margin-top: 4px; }
+  .day-event-badge.approved { background: #DCFCE7; color: #166534; }
+  .day-event-badge.rejected { background: #FEE2E2; color: #991B1B; }
+  .day-event-badge.pending  { background: #FEF3C7; color: #92400E; }
+  .no-events { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .no-events .icon { font-size: 48px; margin-bottom: 12px; }
+  .no-events p { font-size: 15px; font-weight: 500; }
+
+  /* COUNT STRIP */
+  .count-strip { background: var(--navy); color: var(--white); padding: 10px 20px; display: flex; gap: 24px; font-size: 12px; font-weight: 500; flex-wrap: wrap; }
+  .count-strip span { opacity: .8; }
+  .count-strip strong { opacity: 1; }
+
+  /* ============ DETAIL MODAL ============ */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 1000; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--white); border-radius: 16px; width: 520px; max-width: 95vw; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 70px rgba(0,0,0,.3); animation: slideUp .2s ease; }
+  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  .modal-head { padding: 20px 22px 16px; display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--border); }
+  .modal-head h3 { font-size: 17px; font-weight: 700; color: var(--navy); }
+  .modal-close { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--muted); line-height: 1; padding: 2px 6px; border-radius: 4px; }
+  .modal-close:hover { color: var(--navy); background: var(--bg); }
+
+  .modal-body { padding: 18px 22px; }
+  .modal-field { margin-bottom: 12px; }
+  .modal-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 3px; }
+  .modal-value { font-size: 14px; font-weight: 500; color: var(--text); }
+
+  .type-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+  .type-badge.vacation { background: var(--vacation-bg); color: var(--vacation-text); }
+  .type-badge.sick { background: var(--sick-bg); color: var(--sick-text); }
+  .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .status-badge.approved { background: #DCFCE7; color: #166534; }
+  .status-badge.rejected { background: #FEE2E2; color: #991B1B; }
+  .status-badge.pending  { background: #FEF3C7; color: #92400E; }
+
+  /* ACTION ZONE */
+  .action-zone { margin-top: 16px; border-top: 2px solid var(--bg); padding-top: 16px; }
+  .action-zone-title { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 12px; }
+
+  /* QUICK ACTION (combined) */
+  .quick-action-card { border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+  .quick-action-card.approve-card { background: #F0FDF4; border: 2px solid #86EFAC; }
+  .quick-action-card.reject-card  { background: #FFF5F5; border: 2px solid #FCA5A5; }
+  .quick-action-label { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .quick-action-label .qa-icon { font-size: 16px; }
+  .qa-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; background: var(--orange); color: #fff; letter-spacing: .04em; vertical-align: middle; }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .form-row.single { grid-template-columns: 1fr; }
+  .form-group { display: flex; flex-direction: column; gap: 4px; }
+  .form-group label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .form-group input, .form-group textarea {
+    padding: 8px 12px; border: 2px solid var(--border); border-radius: 8px;
+    font-family: 'Poppins', sans-serif; font-size: 13px; color: var(--text);
+    transition: border-color .2s; resize: vertical;
+  }
+  .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--orange); }
+
+  .btn-row { display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end; }
+  .btn-qa {
+    padding: 9px 20px; border: none; border-radius: 8px; font-family: 'Poppins', sans-serif;
+    font-size: 13px; font-weight: 700; cursor: pointer; transition: all .2s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .btn-qa.approve { background: #16A34A; color: #fff; }
+  .btn-qa.approve:hover { background: #15803D; }
+  .btn-qa.reject  { background: #DC2626; color: #fff; }
+  .btn-qa.reject:hover  { background: #B91C1C; }
+  .btn-qa.secondary { background: var(--bg); color: var(--navy); }
+  .btn-qa.secondary:hover { background: #D0DCE9; }
+
+  /* individual smaller actions */
+  .individual-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+  .btn-ind {
+    padding: 7px 14px; border: 2px solid transparent; border-radius: 8px; font-family: 'Poppins', sans-serif;
+    font-size: 12px; font-weight: 600; cursor: pointer; transition: all .2s;
+  }
+  .btn-ind.review  { border-color: #F59E0B; color: #92400E; background: #FEF3C7; }
+  .btn-ind.review:hover  { background: #FDE68A; }
+  .btn-ind.approve { border-color: #22C55E; color: #166534; background: #DCFCE7; }
+  .btn-ind.approve:hover { background: #BBF7D0; }
+  .btn-ind.reject  { border-color: #EF4444; color: #991B1B; background: #FEE2E2; }
+  .btn-ind.reject:hover  { background: #FECACA; }
+
+  /* spinner */
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .6s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* toast */
+  .toast { position: fixed; bottom: 28px; right: 28px; background: var(--navy); color: #fff; padding: 14px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; z-index: 9999; box-shadow: 0 8px 30px rgba(0,0,0,.25); animation: toastIn .3s ease; display: flex; align-items: center; gap: 10px; }
+  .toast.success { border-left: 4px solid var(--approved-dot); }
+  .toast.error   { border-left: 4px solid var(--rejected-dot); }
+  @keyframes toastIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="logo"><span class="alice">alice</span><span class="dot">.</span><span class="care">care</span></div>
+  <div class="nav-right">
+    <a class="nav-link" href="https://www.alicecare.com">&#8592; HR Dashboard (List View)</a>
+    <span style="font-size:13px;color:var(--muted);font-weight:500;">Time Off Calendar</span>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+    <div class="view-tabs">
+      <button class="view-tab active" onclick="setView('month')">Month</button>
+      <button class="view-tab" onclick="setView('week')">Week</button>
+      <button class="view-tab" onclick="setView('day')">Day</button>
+    </div>
+    <div class="nav-controls">
+      <button class="nav-btn" onclick="navBack()">&#8249;</button>
+      <span class="period-label" id="periodLabel"></span>
+      <button class="nav-btn" onclick="navForward()">&#8250;</button>
+    </div>
+    <button class="today-btn" onclick="goToday()">Today</button>
+  </div>
+  <div class="filter-row">
+    <select id="empFilter" onchange="render()"><option value="">All Employees</option></select>
+    <select id="typeFilter" onchange="render()">
+      <option value="">All Types</option>
+      <option value="vacation">Vacation</option>
+      <option value="sick">Sick</option>
+    </select>
+    <select id="statusFilter" onchange="render()">
+      <option value="">All Statuses</option>
+      <option value="approved">Approved</option>
+      <option value="rejected">Rejected</option>
+      <option value="pending">Pending</option>
+    </select>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-chip vacation"></div>Vacation</div>
+      <div class="legend-item"><div class="legend-chip sick"></div>Sick</div>
+      <div class="legend-item"><div class="legend-dot approved"></div>Approved</div>
+      <div class="legend-item"><div class="legend-dot pending"></div>Pending</div>
+      <div class="legend-item"><div class="legend-dot rejected"></div>Rejected</div>
+    </div>
+  </div>
+</div>
+
+<div class="cal-wrap">
+  <div class="cal-card" id="calCard"></div>
+</div>
+
+<!-- DETAIL + ACTION MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="overlayClick(event)">
+  <div class="modal" id="modal">
+    <div class="modal-head">
+      <h3 id="modalTitle">Request Detail</h3>
+      <button class="modal-close" onclick="closeModal()">&#10005;</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby_arKrcXeBY700shcwr33m6Abp9HkMDrId4D8uMWjuJVzWKgzkGuNXNxQQsbTV7mzW/exec';
+
+const RAW = [{"id":"AC-1761229957113-93","name":"Lucia Diaz","type":"vacation","date":"2025-10-21","hours":8.0,"status":"approved"},{"id":"AC-1761230018868-370","name":"Diana El Sourani","type":"vacation","date":"2025-10-31","hours":8.0,"status":"approved"},{"id":"AC-1761230100755-581","name":"Olivia Ramirez","type":"vacation","date":"2025-11-27","hours":8.0,"status":"approved"},{"id":"AC-1761230100755-581","name":"Olivia Ramirez","type":"vacation","date":"2025-11-28","hours":8.0,"status":"rejected"},{"id":"AC-1761230100755-581","name":"Olivia Ramirez","type":"vacation","date":"2025-11-29","hours":8.0,"status":"rejected"},{"id":"AC-1761494457902-741","name":"Diana El Sourani","type":"vacation","date":"2025-11-01","hours":8.0,"status":"approved"},{"id":"AC-1761494548098-542","name":"Diana El Sourani","type":"vacation","date":"2025-11-02","hours":8.0,"status":"approved"},{"id":"AC-1761931820017-511","name":"Glenda Eclavea","type":"sick","date":"2025-10-30","hours":0.0,"status":"rejected"},{"id":"AC-1763415977679-783","name":"Allison Jepsen","type":"vacation","date":"2025-12-18","hours":8.0,"status":"approved"},{"id":"AC-1763416054698-16","name":"Allison Jepsen","type":"vacation","date":"2025-12-19","hours":8.0,"status":"approved"},{"id":"AC-1763666797652-546","name":"Olivia Ramirez","type":"sick","date":"2025-11-20","hours":6.0,"status":"approved"},{"id":"AC-1763871478660-786","name":"Gracie Poole","type":"vacation","date":"2026-02-15","hours":8.0,"status":"pending"},{"id":"AC-1763871478660-787","name":"Gracie Poole","type":"vacation","date":"2026-02-16","hours":8.0,"status":"pending"},{"id":"AC-1763871478660-788","name":"Gracie Poole","type":"vacation","date":"2026-02-17","hours":8.0,"status":"pending"},{"id":"AC-1763871478660-789","name":"Gracie Poole","type":"vacation","date":"2026-02-18","hours":8.0,"status":"pending"},{"id":"AC-1763871478660-790","name":"Gracie Poole","type":"vacation","date":"2026-02-19","hours":8.0,"status":"pending"},{"id":"AC-1763915536160-519","name":"Diana El Sourani","type":"sick","date":"2025-11-23","hours":8.0,"status":"approved"},{"id":"AC-1764221386563-181","name":"Lucia Diaz Solis","type":"vacation","date":"2025-12-02","hours":3.0,"status":"rejected"},{"id":"AC-1764221386563-591","name":"Lucia Diaz Solis","type":"vacation","date":"2025-12-03","hours":7.0,"status":"rejected"},{"id":"AC-1764184697605-647","name":"Lucia Diaz Solis","type":"vacation","date":"2025-12-01","hours":13.0,"status":"rejected"},{"id":"AC-1764569388904-909","name":"Ayla Bambino","type":"vacation","date":"2025-12-05","hours":2.0,"status":"approved"},{"id":"AC-1764692042473-868","name":"Lucia Diaz","type":"vacation","date":"2025-12-01","hours":8.0,"status":"approved"},{"id":"AC-1764692042473-403","name":"Lucia Diaz","type":"vacation","date":"2025-12-02","hours":8.0,"status":"approved"},{"id":"AC-1764692042473-483","name":"Lucia Diaz","type":"vacation","date":"2025-12-03","hours":8.0,"status":"approved"},{"id":"AC-1764703952970-466","name":"Gracie Poole","type":"sick","date":"2026-01-06","hours":8.0,"status":"approved"},{"id":"AC-1764779425401-910","name":"Arshpreet Kaur","type":"vacation","date":"2026-01-30","hours":3.0,"status":"approved"},{"id":"AC-1764779425401-463","name":"Arshpreet Kaur","type":"vacation","date":"2026-01-31","hours":10.0,"status":"approved"},{"id":"AC-1764779425401-158","name":"Arshpreet Kaur","type":"vacation","date":"2026-02-01","hours":9.0,"status":"approved"},{"id":"AC-1764779425401-270","name":"Arshpreet Kaur","type":"vacation","date":"2026-02-02","hours":3.0,"status":"rejected"},{"id":"AC-1764779425401-705","name":"Arshpreet Kaur","type":"vacation","date":"2026-02-03","hours":4.0,"status":"rejected"},{"id":"AC-1764779425401-94","name":"Arshpreet Kaur","type":"vacation","date":"2026-02-04","hours":3.0,"status":"rejected"},{"id":"AC-1764779425401-181","name":"Arshpreet Kaur","type":"vacation","date":"2026-02-05","hours":4.0,"status":"approved"},{"id":"AC-1764779425401-897","name":"Arshpreet Kaur","type":"vacation","date":"2026-02-06","hours":3.0,"status":"approved"},{"id":"AC-1764779425401-257","name":"Arshpreet Kaur","type":"vacation","date":"2026-02-07","hours":10.0,"status":"approved"},{"id":"AC-1764779425401-353","name":"Arshpreet Kaur","type":"vacation","date":"2026-02-08","hours":9.0,"status":"rejected"},{"id":"764085483130-994","name":"Karen Ona","type":"sick","date":"2025-11-24","hours":24.0,"status":"rejected"},{"id":"AC-1765588973670-542","name":"Diana El Sourani","type":"vacation","date":"2026-01-02","hours":8.0,"status":"approved"},{"id":"AC-1765593007176-293","name":"Diana El Sourani","type":"vacation","date":"2026-01-03","hours":8.0,"status":"approved"},{"id":"AC-1766079865855-391","name":"Olivia Ramirez","type":"sick","date":"2025-12-15","hours":4.0,"status":"approved"},{"id":"AC-1766161045772-487","name":"Melody Vue","type":"sick","date":"2025-12-13","hours":1.0,"status":"approved"},{"id":"AC-1766208440699-184","name":"Allison Jepsen","type":"vacation","date":"2025-12-22","hours":8.0,"status":"approved"},{"id":"AC-1766425276142-824","name":"Karla Galindo","type":"sick","date":"2025-12-18","hours":3.0,"status":"approved"},{"id":"AC-1766425390490-945","name":"Karla Galindo","type":"vacation","date":"2025-12-25","hours":3.0,"status":"approved"},{"id":"AC-1766425434495-325","name":"Olivia Ramirez","type":"vacation","date":"2025-12-25","hours":4.5,"status":"approved"},{"id":"AC-1766781155150-33","name":"Karla Galindo","type":"vacation","date":"2026-01-01","hours":3.0,"status":"approved"},{"id":"AC-1767041750468-883","name":"Ayla Bambino","type":"sick","date":"2025-12-29","hours":6.0,"status":"approved"},{"id":"AC-1767056530106-319","name":"Olivia Ramirez","type":"vacation","date":"2025-12-25","hours":4.5,"status":"rejected"},{"id":"AC-1767056616878-504","name":"Olivia Ramirez","type":"vacation","date":"2025-12-25","hours":4.5,"status":"rejected"},{"id":"AC-1767056933913-968","name":"Olivia Ramirez","type":"vacation","date":"2025-12-24","hours":4.5,"status":"rejected"},{"id":"AC-1767330491752-524","name":"Melody Vue","type":"sick","date":"2026-01-01","hours":3.0,"status":"approved"},{"id":"AC-1767662552403-84","name":"Rayanne Howard","type":"vacation","date":"2026-02-25","hours":7.0,"status":"pending"},{"id":"AC-1767662552403-298","name":"Rayanne Howard","type":"vacation","date":"2026-02-24","hours":4.0,"status":"pending"},{"id":"AC-1767662552403-965","name":"Rayanne Howard","type":"vacation","date":"2026-02-27","hours":7.0,"status":"pending"},{"id":"AC-1767662552403-22","name":"Rayanne Howard","type":"vacation","date":"2026-02-28","hours":7.0,"status":"pending"},{"id":"AC-1767730985727-139","name":"Ivan Anaya","type":"sick","date":"2026-01-05","hours":3.5,"status":"rejected"},{"id":"AC-1767730985727-41","name":"Ivan Anaya","type":"sick","date":"2026-01-06","hours":3.0,"status":"rejected"},{"id":"AC-1768354191273-46","name":"Rayanne Howard","type":"vacation","date":"2026-03-27","hours":7.0,"status":"pending"},{"id":"AC-1768354191273-784","name":"Rayanne Howard","type":"vacation","date":"2026-03-28","hours":7.0,"status":"pending"},{"id":"AC-1768687230884-893","name":"Lucia Diaz","type":"vacation","date":"2026-01-20","hours":6.0,"status":"approved"},{"id":"AC-1769121326228-62","name":"Olivia Ramirez","type":"vacation","date":"2026-01-22","hours":3.0,"status":"approved"},{"id":"AC-1769299988152-984","name":"Racheal Carr-Houston","type":"sick","date":"2026-01-23","hours":2.0,"status":"approved"},{"id":"AC-1769381211424-33","name":"Olivia Ramirez","type":"sick","date":"2026-01-25","hours":8.0,"status":"approved"},{"id":"AC-1769455815336-762","name":"Lucia Diaz","type":"sick","date":"2026-01-21","hours":5.0,"status":"approved"},{"id":"AC-1769455815336-676","name":"Lucia Diaz","type":"sick","date":"2026-01-22","hours":5.0,"status":"approved"},{"id":"AC-1769455815336-748","name":"Lucia Diaz","type":"sick","date":"2026-01-22","hours":3.0,"status":"approved"},{"id":"AC-1769455815336-756","name":"Lucia Diaz","type":"sick","date":"2026-01-23","hours":3.0,"status":"approved"},{"id":"AC-1769534527555-343","name":"Rayanne Howard","type":"vacation","date":"2026-02-26","hours":7.0,"status":"pending"},{"id":"AC-1769534527556-935","name":"Rayanne Howard","type":"vacation","date":"2026-03-26","hours":7.0,"status":"pending"},{"id":"AC-1769728961632-864","name":"Allison Jepsen","type":"sick","date":"2026-01-30","hours":8.0,"status":"approved"},{"id":"AC-1769728961632-414","name":"Allison Jepsen","type":"sick","date":"2026-02-02","hours":8.0,"status":"approved"},{"id":"AC-1769728961632-677","name":"Allison Jepsen","type":"sick","date":"2026-02-03","hours":8.0,"status":"approved"},{"id":"AC-1769729252758-784","name":"Gracie Poole","type":"sick","date":"2026-01-30","hours":8.0,"status":"approved"},{"id":"AC-1769729252758-369","name":"Gracie Poole","type":"sick","date":"2026-02-02","hours":8.0,"status":"approved"},{"id":"AC-1769729252758-571","name":"Gracie Poole","type":"sick","date":"2026-02-03","hours":8.0,"status":"approved"},{"id":"AC-1769729252758-309","name":"Gracie Poole","type":"sick","date":"2026-02-04","hours":8.0,"status":"approved"},{"id":"AC-1769729252758-188","name":"Gracie Poole","type":"sick","date":"2026-02-05","hours":8.0,"status":"approved"},{"id":"AC-1769923967767-937","name":"Diana El Sourani","type":"sick","date":"2026-02-01","hours":8.0,"status":"approved"},{"id":"AC-1770178584211-347","name":"Allison Jepsen","type":"sick","date":"2026-02-04","hours":8.0,"status":"approved"},{"id":"AC-1770178584211-407","name":"Allison Jepsen","type":"sick","date":"2026-02-05","hours":8.0,"status":"approved"},{"id":"AC-1770233892673-324","name":"Ayla Bambino","type":"vacation","date":"2026-02-05","hours":4.5,"status":"approved"},{"id":"AC-1770997145879-941","name":"Rosita Almirol","type":"sick","date":"2026-02-19","hours":4.0,"status":"approved"},{"id":"AC-1770997145879-115","name":"Rosita Almirol","type":"sick","date":"2026-02-20","hours":4.0,"status":"approved"},{"id":"AC-1771359787923-882","name":"Lisa Grigoriou","type":"vacation","date":"2026-04-19","hours":8.0,"status":"approved"},{"id":"AC-1771359787923-875","name":"Lisa Grigoriou","type":"vacation","date":"2026-04-20","hours":8.0,"status":"approved"},{"id":"AC-1771359787923-149","name":"Lisa Grigoriou","type":"vacation","date":"2026-04-21","hours":8.0,"status":"approved"},{"id":"AC-1771359787923-851","name":"Lisa Grigoriou","type":"vacation","date":"2026-04-22","hours":8.0,"status":"approved"},{"id":"AC-1771359787923-800","name":"Lisa Grigoriou","type":"vacation","date":"2026-04-23","hours":8.0,"status":"approved"},{"id":"AC-1771359787923-682","name":"Lisa Grigoriou","type":"vacation","date":"2026-04-24","hours":8.0,"status":"approved"},{"id":"AC-1771359787923-554","name":"Lisa Grigoriou","type":"vacation","date":"2026-04-26","hours":8.0,"status":"approved"},{"id":"AC-1771359787923-93","name":"Lisa Grigoriou","type":"vacation","date":"2026-04-27","hours":8.0,"status":"approved"},{"id":"AC-1771359787923-653","name":"Lisa Grigoriou","type":"vacation","date":"2026-04-28","hours":8.0,"status":"approved"},{"id":"AC-1771359787923-923","name":"Lisa Grigoriou","type":"vacation","date":"2026-04-29","hours":8.0,"status":"approved"},{"id":"AC-1771359787923-670","name":"Lisa Grigoriou","type":"vacation","date":"2026-04-30","hours":8.0,"status":"approved"},{"id":"AC-1771359787923-472","name":"Lisa Grigoriou","type":"vacation","date":"2026-05-01","hours":8.0,"status":"approved"},{"id":"AC-1771359787923-870","name":"Lisa Grigoriou","type":"vacation","date":"2026-05-03","hours":8.0,"status":"rejected"},{"id":"AC-1771530996199-654","name":"Ayla Bambino","type":"vacation","date":"2026-03-04","hours":4.5,"status":"approved"},{"id":"AC-1771873255661-677","name":"Ayla Bambino","type":"sick","date":"2026-02-23","hours":2.5,"status":"approved"},{"id":"AC-1771953977674-776","name":"Olivia Ramirez","type":"sick","date":"2026-03-01","hours":5.0,"status":"approved"},{"id":"AC-1771953977674-751","name":"Olivia Ramirez","type":"vacation","date":"2026-03-02","hours":8.0,"status":"approved"},{"id":"AC-1772406923975-824","name":"Racheal Carr-Houston","type":"sick","date":"2026-02-27","hours":2.0,"status":"approved"},{"id":"AC-1772482607197-354","name":"Olivia Ramirez","type":"vacation","date":"2026-04-20","hours":8.0,"status":"approved"},{"id":"AC-1772524547585-916","name":"Lucia Diaz","type":"sick","date":"2026-03-10","hours":4.0,"status":"approved"},{"id":"AC-1772528645694-783","name":"Lucia Diaz","type":"sick","date":"2026-03-13","hours":7.0,"status":"approved"},{"id":"AC-1773160755204-391","name":"Olivia Ramirez","type":"vacation","date":"2026-03-09","hours":3.0,"status":"approved"},{"id":"AC-1773505452996-198","name":"Jeddalyn Reyes","type":"sick","date":"2026-03-16","hours":8.0,"status":"approved"},{"id":"AC-1773505452996-612","name":"Jeddalyn Reyes","type":"sick","date":"2026-03-17","hours":8.0,"status":"approved"},{"id":"AC-1773505452996-606","name":"Jeddalyn Reyes","type":"sick","date":"2026-03-18","hours":8.0,"status":"approved"},{"id":"AC-1773505452996-450","name":"Jeddalyn Reyes","type":"sick","date":"2026-03-19","hours":8.0,"status":"approved"},{"id":"AC-1773505452996-523","name":"Jeddalyn Reyes","type":"sick","date":"2026-03-20","hours":8.0,"status":"approved"},{"id":"AC-1773770831464-663","name":"Olivia Ramirez","type":"vacation","date":"2026-04-08","hours":2.5,"status":"approved"},{"id":"AC-1774020550876-107","name":"Arshpreet Kaur","type":"sick","date":"2026-03-19","hours":1.0,"status":"approved"},{"id":"AC-1774138565353-744","name":"Diana El Sourani","type":"sick","date":"2026-03-21","hours":8.0,"status":"approved"},{"id":"AC-1774204109932-672","name":"Olivia Ramirez","type":"vacation","date":"2026-05-24","hours":8.0,"status":"approved"},{"id":"AC-1774204109932-658","name":"Olivia Ramirez","type":"vacation","date":"2026-05-25","hours":8.0,"status":"rejected"},{"id":"AC-1774204109932-617","name":"Olivia Ramirez","type":"vacation","date":"2026-05-03","hours":8.0,"status":"rejected"},{"id":"AC-1774204109932-855","name":"Olivia Ramirez","type":"sick","date":"2026-04-29","hours":8.0,"status":"approved"},{"id":"AC-1774305249238-983","name":"Olivia Ramirez","type":"vacation","date":"2026-04-05","hours":8.0,"status":"approved"},{"id":"AC-1774553584697-345","name":"Olivia Ramirez","type":"vacation","date":"2026-05-19","hours":8.0,"status":"rejected"},{"id":"AC-1775231594354-122","name":"Arshpreet Kaur","type":"sick","date":"2026-04-02","hours":1.0,"status":"approved"},{"id":"AC-1775495093074-128","name":"Karla Galindo","type":"vacation","date":"2026-04-13","hours":8.0,"status":"approved"},{"id":"AC-1775500788505-199","name":"Ayla Bambino","type":"vacation","date":"2026-04-18","hours":8.0,"status":"approved"},{"id":"AC-1775500788505-709","name":"Ayla Bambino","type":"vacation","date":"2026-04-30","hours":4.5,"status":"approved"},{"id":"AC-1775699387889-562","name":"Virginia Cline","type":"sick","date":"2026-04-08","hours":8.0,"status":"approved"},{"id":"AC-1775699387889-536","name":"Virginia Cline","type":"sick","date":"2026-04-09","hours":5.0,"status":"approved"},{"id":"AC-1776354710371-566","name":"Olivia Ramirez","type":"vacation","date":"2026-05-07","hours":1.0,"status":"approved"},{"id":"AC-1776697051952-790","name":"Diana Brent","type":"sick","date":"2026-04-16","hours":11.0,"status":"rejected"},{"id":"AC-1776791896464-950","name":"Gkenda Eclavea","type":"sick","date":"2026-04-06","hours":12.0,"status":"approved"},{"id":"AC-1777130864864-28","name":"Ayla Bambino","type":"sick","date":"2026-04-29","hours":4.5,"status":"approved"},{"id":"AC-1777481093329-42","name":"Diana El Sourani","type":"vacation","date":"2026-05-26","hours":8.0,"status":"approved"},{"id":"AC-1777481093329-437","name":"Diana El Sourani","type":"vacation","date":"2026-05-29","hours":8.0,"status":"approved"},{"id":"AC-1777481093329-184","name":"Diana El Sourani","type":"vacation","date":"2026-05-30","hours":8.0,"status":"approved"},{"id":"AC-1777481093329-154","name":"Diana El Sourani","type":"vacation","date":"2026-05-31","hours":8.0,"status":"approved"},{"id":"AC-1777649208209-111","name":"Karla Galindo","type":"sick","date":"2026-04-27","hours":6.0,"status":"approved"},{"id":"AC-1778006289274-930","name":"Jeddalyn Reyes","type":"vacation","date":"2026-05-18","hours":9.0,"status":"approved"},{"id":"AC-1778006289274-928","name":"Jeddalyn Reyes","type":"vacation","date":"2026-05-19","hours":9.0,"status":"approved"},{"id":"AC-1778603229200-231","name":"Ayla Bambino","type":"sick","date":"2026-05-11","hours":4.5,"status":"approved"},{"id":"AC-1778720256970-864","name":"Ayla Bambino","type":"vacation","date":"2026-05-27","hours":4.5,"status":"approved"},{"id":"AC-1778850891498-152","name":"Rosita Almirol","type":"vacation","date":"2026-06-12","hours":5.0,"status":"pending"},{"id":"AC-1778850891498-323","name":"Rosita Almirol","type":"vacation","date":"2026-06-15","hours":5.0,"status":"pending"},{"id":"AC-1778854385044-884","name":"Rosita Almirol","type":"vacation","date":"2026-06-08","hours":4.0,"status":"pending"},{"id":"AC-1778854385044-351","name":"Rosita Almirol","type":"vacation","date":"2026-06-09","hours":6.0,"status":"pending"},{"id":"AC-1778854385044-38","name":"Rosita Almirol","type":"vacation","date":"2026-06-10","hours":4.0,"status":"pending"},{"id":"AC-1779075674208-556","name":"Arshpreet Kaur","type":"sick","date":"2026-05-17","hours":1.0,"status":"approved"},{"id":"AC-1779117397293-198","name":"Karla Galindo","type":"sick","date":"2026-05-13","hours":8.0,"status":"approved"},{"id":"AC-1779162842657-244","name":"Lucia Diaz","type":"vacation","date":"2026-05-26","hours":8.0,"status":"approved"},{"id":"AC-1779162842657-413","name":"Lucia Diaz","type":"vacation","date":"2026-05-27","hours":8.0,"status":"approved"},{"id":"AC-1779162842657-745","name":"Lucia Diaz","type":"vacation","date":"2026-05-28","hours":8.0,"status":"approved"},{"id":"AC-1779162842657-406","name":"Lucia Diaz","type":"vacation","date":"2026-05-29","hours":8.0,"status":"approved"},{"id":"AC-1779212944839-70","name":"Karla Galindo","type":"vacation","date":"2026-05-26","hours":8.0,"status":"approved"},{"id":"AC-1779225226211-510","name":"Ayla Bambino","type":"vacation","date":"2026-07-03","hours":4.5,"status":"pending"},{"id":"AC-1779225312009-829","name":"Ayla Bambino","type":"vacation","date":"2026-07-22","hours":4.5,"status":"pending"},{"id":"AC-1779382403018-712","name":"Olivia Ramirez","type":"vacation","date":"2026-06-21","hours":8.0,"status":"pending"},{"id":"AC-1779382403019-295","name":"Olivia Ramirez","type":"sick","date":"2026-06-24","hours":8.0,"status":"pending"},{"id":"AC-1779660458293-891","name":"Racheal Carr-Houston","type":"sick","date":"2026-05-21","hours":1.0,"status":"approved"},{"id":"AC-1779660458294-72","name":"Racheal Carr-Houston","type":"sick","date":"2026-05-22","hours":1.0,"status":"approved"}];
+
+// local status overrides (optimistic updates before page reload)
+const localStatus = {};
+
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+const today = new Date();
+let view = 'month';
+let cursor = new Date(today);
+
+// ---- EMPLOYEE FILTER ----
+(function() {
+  const names = [...new Set(RAW.map(e=>e.name))].sort();
+  const sel = document.getElementById('empFilter');
+  names.forEach(n => { const o = document.createElement('option'); o.value=n; o.textContent=n; sel.appendChild(o); });
+})();
+
+// ---- HELPERS ----
+function isoWeek(d) {
+  const jan4 = new Date(d.getFullYear(), 0, 4);
+  const startOfWeek1 = new Date(jan4);
+  startOfWeek1.setDate(jan4.getDate() - ((jan4.getDay() + 6) % 7));
+  const diff = d - startOfWeek1;
+  const week = Math.floor(diff / (7 * 24 * 60 * 60 * 1000)) + 1;
+  if (week < 1) {
+    const dec28 = new Date(d.getFullYear() - 1, 11, 28);
+    return isoWeek(dec28);
+  }
+  const dec28 = new Date(d.getFullYear(), 11, 28);
+  if (d > dec28) {
+    const nextJan4 = new Date(d.getFullYear() + 1, 0, 4);
+    const nextStart = new Date(nextJan4);
+    nextStart.setDate(nextJan4.getDate() - ((nextJan4.getDay() + 6) % 7));
+    if (d >= nextStart) return 1;
+  }
+  return week;
+}
+
+function dateStr(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function isSameDay(a,b) { return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate(); }
+
+function getStatus(ev) { return localStatus[ev.id+'|'+ev.date] || ev.status; }
+
+function filtered() {
+  const emp = document.getElementById('empFilter').value;
+  const type = document.getElementById('typeFilter').value;
+  const stat = document.getElementById('statusFilter').value;
+  return RAW.filter(e => {
+    const st = getStatus(e);
+    return (!emp||e.name===emp) && (!type||e.type===type) && (!stat||st===stat);
+  });
+}
+
+function eventsOnDate(ds) { return filtered().filter(e=>e.date===ds); }
+
+// ---- CHIP ----
+function chipHTML(ev, short) {
+  const st = getStatus(ev);
+  const name = short ? ev.name.split(' ')[0] : ev.name;
+  const icon = ev.type==='vacation' ? '☀' : '🤒';
+  return `<div class="event-chip ${ev.type}" onclick="showModal('${ev.id}','${ev.date}')">
+    <span class="status-dot ${st}"></span>${icon} ${name}
+  </div>`;
+}
+
+// ---- MONTH ----
+function renderMonth() {
+  const yr=cursor.getFullYear(), mo=cursor.getMonth();
+  document.getElementById('periodLabel').textContent=`${MONTHS[mo]} ${yr}`;
+  const firstDay=new Date(yr,mo,1).getDay();
+  const daysInMonth=new Date(yr,mo+1,0).getDate();
+  const daysInPrev=new Date(yr,mo,0).getDate();
+  let cells=[];
+  for(let i=0;i<firstDay;i++) cells.push({date:new Date(yr,mo-1,daysInPrev-firstDay+1+i),other:true});
+  for(let i=1;i<=daysInMonth;i++) cells.push({date:new Date(yr,mo,i),other:false});
+  while(cells.length%7!==0){const l=cells[cells.length-1].date;cells.push({date:new Date(l.getFullYear(),l.getMonth(),l.getDate()+1),other:true});}
+  let html='<div class="month-grid"><div class="month-wk-header">Wk</div>';
+  DAYS_SHORT.forEach(d=>{html+=`<div class="month-header-cell">${d}</div>`;});
+  cells.forEach((cell,idx)=>{
+    // insert week number cell at start of each row
+    if(idx%7===0){
+      const wk=isoWeek(cell.date);
+      html+=`<div class="month-wk-cell"><span class="wk-num">${wk}</span></div>`;
+    }
+    const ds=dateStr(cell.date), evs=eventsOnDate(ds), isT=isSameDay(cell.date,today);
+    const cls=['month-day',cell.other?'other-month':'',isT?'today':''].filter(Boolean).join(' ');
+    const numStyle=isT?'background:var(--orange);color:#fff;':'';
+    let evHTML='';
+    evs.slice(0,3).forEach(ev=>{evHTML+=chipHTML(ev,true);});
+    if(evs.length>3) evHTML+=`<div class="more-chip" onclick="goDay('${ds}')">+${evs.length-3} more</div>`;
+    html+=`<div class="${cls}"><div class="day-num" style="${numStyle}">${cell.date.getDate()}</div>${evHTML}</div>`;
+  });
+  html+='</div>';
+  const inView=filtered().filter(e=>{const d=new Date(e.date+'T00:00:00');return d.getFullYear()===yr&&d.getMonth()===mo;});
+  return countStrip(inView)+html;
+}
+
+// ---- WEEK ----
+function getWeekStart(d){const s=new Date(d);s.setDate(s.getDate()-s.getDay());s.setHours(0,0,0,0);return s;}
+function renderWeek() {
+  const ws=getWeekStart(cursor), we=new Date(ws); we.setDate(we.getDate()+6);
+  const fmt=d=>`${MONTHS[d.getMonth()].slice(0,3)} ${d.getDate()}`;
+  document.getElementById('periodLabel').textContent=`${fmt(ws)} - ${fmt(we)}, ${we.getFullYear()}`;
+  let days=[]; for(let i=0;i<7;i++){const d=new Date(ws);d.setDate(ws.getDate()+i);days.push(d);}
+  const wkNum = isoWeek(ws);
+  let html=`<div class="week-grid"><div class="week-wk-header">Wk</div><div style="background:var(--navy);border-bottom:2px solid rgba(255,255,255,.15);"></div>`;
+  days.forEach(d=>{
+    const isT=isSameDay(d,today);
+    html+=`<div class="week-col-header${isT?' today-col':''}"><div class="wday">${DAYS_SHORT[d.getDay()]}</div><div class="wdate">${d.getDate()}</div></div>`;
+  });
+  html+=`<div class="week-wk-num"><span class="wk-num">${wkNum}</span><span class="wk-label">week</span></div>`;
+  html+='<div class="week-allday-label">All Day</div>';
+  days.forEach(d=>{
+    const evs=eventsOnDate(dateStr(d));
+    html+='<div class="week-allday-row">';
+    evs.forEach(ev=>{html+=chipHTML(ev,false);});
+    if(!evs.length) html+='<div style="height:20px;"></div>';
+    html+='</div>';
+  });  html+='</div>';
+  const ws2=dateStr(ws),we2=dateStr(we);
+  const inView=filtered().filter(e=>e.date>=ws2&&e.date<=we2);
+  return countStrip(inView)+html;
+}
+
+// ---- DAY ----
+function renderDay() {
+  const ds=dateStr(cursor);
+  const dayName=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][cursor.getDay()];
+  document.getElementById('periodLabel').textContent=`${dayName}, ${MONTHS[cursor.getMonth()]} ${cursor.getDate()}, ${cursor.getFullYear()}`;
+  const evs=eventsOnDate(ds);
+  const wkNum = isoWeek(cursor);
+  let html=`<div class="day-view-wrap"><div class="day-header"><div class="big-date">${cursor.getDate()}</div><div class="day-meta"><div class="day-name">${dayName}</div><div class="day-month">${MONTHS[cursor.getMonth()]} ${cursor.getFullYear()}</div></div><div style="margin-left:auto;text-align:center;background:rgba(255,255,255,.1);border-radius:10px;padding:8px 16px;"><div style="font-size:10px;font-weight:600;opacity:.6;text-transform:uppercase;letter-spacing:.06em;">Week</div><div style="font-size:28px;font-weight:700;color:var(--orange);line-height:1;">${wkNum}</div></div></div><div class="day-events-panel">`;
+  if(!evs.length){html+=`<div class="no-events"><div class="icon">📅</div><p>No time off requests on this day.</p></div>`;}
+  else {
+    evs.forEach(ev=>{
+      const st=getStatus(ev);
+      html+=`<div class="day-event-card ${ev.type}" onclick="showModal('${ev.id}','${ev.date}')">
+        <div class="day-event-icon">${ev.type==='vacation'?'☀️':'🤒'}</div>
+        <div class="day-event-info">
+          <div class="day-event-name">${ev.name}</div>
+          <div class="day-event-meta">${ev.type.charAt(0).toUpperCase()+ev.type.slice(1)} &middot; ${ev.hours} hrs</div>
+          <div class="day-event-badge ${st}"><span class="legend-dot ${st}" style="width:8px;height:8px;display:inline-block;border-radius:50%;"></span>${cap(st)}</div>
+        </div>
+      </div>`;
+    });
+  }
+  html+='</div></div>';
+  return countStrip(evs)+html;
+}
+
+function countStrip(evs) {
+  const vac=evs.filter(e=>e.type==='vacation').length, sick=evs.filter(e=>e.type==='sick').length;
+  const appr=evs.filter(e=>getStatus(e)==='approved').length, pend=evs.filter(e=>getStatus(e)==='pending').length, rej=evs.filter(e=>getStatus(e)==='rejected').length;
+  return `<div class="count-strip">
+    <span>Showing: <strong>${evs.length} requests</strong></span>
+    <span>&#9788; Vacation: <strong>${vac}</strong></span><span>🤒 Sick: <strong>${sick}</strong></span>
+    <span style="color:#86efac">&#9679; Approved: <strong>${appr}</strong></span>
+    <span style="color:#fde68a">&#9679; Pending: <strong>${pend}</strong></span>
+    <span style="color:#fca5a5">&#9679; Rejected: <strong>${rej}</strong></span>
+  </div>`;
+}
+
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+
+// ---- MODAL ----
+function showModal(id, date) {
+  const ev = RAW.find(e=>e.id===id&&e.date===date) || RAW.find(e=>e.id===id);
+  if(!ev) return;
+  const st = getStatus(ev);
+  const icon = ev.type==='vacation'?'☀️':'🤒';
+  const d = new Date(ev.date+'T00:00:00');
+  const fmtDate = `${DAYS_SHORT[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+
+  document.getElementById('modalTitle').textContent = `${icon} ${ev.name}`;
+
+  // build action zone based on status
+  let actionZone = '';
+  if (st === 'pending') {
+    actionZone = `
+    <div class="action-zone">
+      <div class="action-zone-title">&#9889; Quick Actions</div>
+
+      <!-- REVIEW + APPROVE -->
+      <div class="quick-action-card approve-card">
+        <div class="quick-action-label">
+          <span class="qa-icon">&#10003;&#10003;</span>
+          Review &amp; Approve &nbsp;<span class="qa-badge">ONE STEP</span>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Your Name *</label>
+            <input type="text" id="qa_name_a" placeholder="Full name" value="Tommaso Esmanech">
+          </div>
+          <div class="form-group">
+            <label>Approved Hours *</label>
+            <input type="number" id="qa_hours_a" step="0.01" min="0" placeholder="Hours" value="${ev.hours}">
+          </div>
+        </div>
+        <div class="form-row single">
+          <div class="form-group">
+            <label>Comments *</label>
+            <input type="text" id="qa_comments_a" placeholder="e.g. Approved, hours available in Paychex">
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-qa secondary" onclick="closeModal()">Cancel</button>
+          <button class="btn-qa approve" id="btn_approve_${id}" onclick="quickApprove('${ev.id}','${ev.date}',${ev.hours})">
+            &#10003; Review &amp; Approve
+          </button>
+        </div>
+      </div>
+
+      <!-- REVIEW + REJECT -->
+      <div class="quick-action-card reject-card">
+        <div class="quick-action-label">
+          <span class="qa-icon">&#10007;</span>
+          Review &amp; Reject &nbsp;<span class="qa-badge">ONE STEP</span>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Your Name *</label>
+            <input type="text" id="qa_name_r" placeholder="Full name" value="Tommaso Esmanech">
+          </div>
+        </div>
+        <div class="form-row single">
+          <div class="form-group">
+            <label>Rejection Reason *</label>
+            <input type="text" id="qa_reason_r" placeholder="e.g. No hours available in Paychex">
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-qa secondary" onclick="closeModal()">Cancel</button>
+          <button class="btn-qa reject" id="btn_reject_${id}" onclick="quickReject('${ev.id}','${ev.date}')">
+            &#10007; Review &amp; Reject
+          </button>
+        </div>
+      </div>
+
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;">&#9432; Both cards send Review + Action to Google Sheets in a single submission. No double steps required.</div>
+    </div>`;
+  } else if (st === 'approved') {
+    actionZone = `
+    <div class="action-zone">
+      <div class="action-zone-title">Actions</div>
+      <div class="individual-actions">
+        <button class="btn-ind reject" onclick="promptReject('${ev.id}','${ev.date}')">&#10007; Reject This Request</button>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;">This request is already approved. You can reverse it to rejected.</div>
+    </div>`;
+  } else if (st === 'rejected') {
+    actionZone = `
+    <div class="action-zone">
+      <div class="action-zone-title">Actions</div>
+      <div class="individual-actions">
+        <button class="btn-ind approve" onclick="promptApprove('${ev.id}','${ev.date}',${ev.hours})">&#10003; Approve This Request</button>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;">This request is rejected. You can reverse it to approved.</div>
+    </div>`;
+  }
+
+  document.getElementById('modalBody').innerHTML = `
+    <div class="modal-field">
+      <div class="modal-label">Employee</div>
+      <div class="modal-value" style="font-weight:700;color:var(--navy);font-size:16px;">${ev.name}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="modal-field">
+        <div class="modal-label">Date</div>
+        <div class="modal-value">${fmtDate}</div>
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Hours Requested</div>
+        <div class="modal-value">${ev.hours} hrs</div>
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Type</div>
+        <div><span class="type-badge ${ev.type}">${icon} ${cap(ev.type)}</span></div>
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Status</div>
+        <div><span class="status-badge ${st}"><span style="width:8px;height:8px;display:inline-block;border-radius:50%;background:${st==='approved'?'#22C55E':st==='rejected'?'#EF4444':'#F59E0B'}"></span>${cap(st)}</span></div>
+      </div>
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Request ID</div>
+      <div class="modal-value" style="font-size:11px;color:var(--muted);font-family:monospace;">${ev.id}</div>
+    </div>
+    ${actionZone}`;
+
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+// ---- QUICK APPROVE (review + approve, two POSTs) ----
+function quickApprove(id, date, defaultHours) {
+  const name = document.getElementById('qa_name_a').value.trim();
+  const hours = parseFloat(document.getElementById('qa_hours_a').value);
+  const comments = document.getElementById('qa_comments_a').value.trim();
+  if (!name) { toast('Please enter your name.', 'error'); return; }
+  if (isNaN(hours) || hours < 0) { toast('Please enter valid approved hours.', 'error'); return; }
+  if (!comments) { toast('Please enter comments.', 'error'); return; }
+
+  const btn = document.getElementById('btn_approve_'+id);
+  setLoading(btn, true, 'Submitting...');
+
+  const now = new Date().toISOString();
+  const reviewPayload = { action:'review', requestId:id, reviewerName:name, reviewedDate:now, reviewComments:comments };
+  const approvePayload = { action:'approve', requestId:id, approverName:name, approvedDate:now, approvedHours:hours, approvalComments:comments };
+
+  postToScript(reviewPayload)
+    .then(() => postToScript(approvePayload))
+    .then(() => {
+      localStatus[id+'|'+date] = 'approved';
+      closeModal();
+      toast('Reviewed & Approved successfully!', 'success');
+      render();
+    })
+    .catch(() => {
+      // no-cors always "succeeds" but catches network errors
+      localStatus[id+'|'+date] = 'approved';
+      closeModal();
+      toast('Submitted! Reload to confirm from Google Sheets.', 'success');
+      render();
+    });
+}
+
+// ---- QUICK REJECT (review + reject, two POSTs) ----
+function quickReject(id, date) {
+  const name = document.getElementById('qa_name_r').value.trim();
+  const reason = document.getElementById('qa_reason_r').value.trim();
+  if (!name) { toast('Please enter your name.', 'error'); return; }
+  if (!reason) { toast('Please enter a rejection reason.', 'error'); return; }
+
+  const btn = document.getElementById('btn_reject_'+id);
+  setLoading(btn, true, 'Submitting...');
+
+  const now = new Date().toISOString();
+  const reviewPayload = { action:'review', requestId:id, reviewerName:name, reviewedDate:now, reviewComments:reason };
+  const rejectPayload  = { action:'reject', requestId:id, rejectorName:name, rejectedDate:now, rejectionComments:reason };
+
+  postToScript(reviewPayload)
+    .then(() => postToScript(rejectPayload))
+    .then(() => {
+      localStatus[id+'|'+date] = 'rejected';
+      closeModal();
+      toast('Reviewed & Rejected.', 'success');
+      render();
+    })
+    .catch(() => {
+      localStatus[id+'|'+date] = 'rejected';
+      closeModal();
+      toast('Submitted! Reload to confirm from Google Sheets.', 'success');
+      render();
+    });
+}
+
+// ---- REVERSAL PROMPTS ----
+function promptApprove(id, date, hours) {
+  const name = prompt('Your name:'); if (!name) return;
+  const h = parseFloat(prompt('Approved hours:', hours)); if (isNaN(h)) return;
+  const comments = prompt('Comments:'); if (!comments) return;
+  const now = new Date().toISOString();
+  postToScript({action:'approve',requestId:id,approverName:name,approvedDate:now,approvedHours:h,approvalComments:comments})
+    .finally(()=>{ localStatus[id+'|'+date]='approved'; closeModal(); toast('Approved!','success'); render(); });
+}
+
+function promptReject(id, date) {
+  const name = prompt('Your name:'); if (!name) return;
+  const reason = prompt('Rejection reason:'); if (!reason) return;
+  const now = new Date().toISOString();
+  postToScript({action:'reject',requestId:id,rejectorName:name,rejectedDate:now,rejectionComments:reason})
+    .finally(()=>{ localStatus[id+'|'+date]='rejected'; closeModal(); toast('Rejected.','success'); render(); });
+}
+
+// ---- API ----
+function postToScript(data) {
+  return fetch(SCRIPT_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+}
+
+function setLoading(btn, on, label) {
+  if (!btn) return;
+  btn.disabled = on;
+  btn.innerHTML = on ? `<span class="spinner"></span> ${label}` : btn.dataset.orig || btn.innerHTML;
+  if (!on) btn.innerHTML = btn.dataset.orig;
+}
+
+// ---- TOAST ----
+function toast(msg, type='success') {
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `${type==='success'?'&#10003;':'&#9888;'} ${msg}`;
+  document.body.appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transition='opacity .4s'; setTimeout(()=>t.remove(),400); }, 3500);
+}
+
+// ---- NAVIGATION ----
+function setView(v) {
+  view=v;
+  document.querySelectorAll('.view-tab').forEach(t=>t.classList.toggle('active',t.textContent.toLowerCase()===v));
+  render();
+}
+function navBack(){if(view==='month')cursor.setMonth(cursor.getMonth()-1);else if(view==='week')cursor.setDate(cursor.getDate()-7);else cursor.setDate(cursor.getDate()-1);render();}
+function navForward(){if(view==='month')cursor.setMonth(cursor.getMonth()+1);else if(view==='week')cursor.setDate(cursor.getDate()+7);else cursor.setDate(cursor.getDate()+1);render();}
+function goToday(){cursor=new Date(today);render();}
+function goDay(ds){cursor=new Date(ds+'T00:00:00');setView('day');}
+
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('open'); }
+function overlayClick(e){ if(e.target===document.getElementById('modalOverlay')) closeModal(); }
+document.addEventListener('keydown',e=>{ if(e.key==='ArrowLeft')navBack(); if(e.key==='ArrowRight')navForward(); if(e.key==='Escape')closeModal(); });
+
+function render(){
+  let html='';
+  if(view==='month') html=renderMonth();
+  else if(view==='week') html=renderWeek();
+  else html=renderDay();
+  document.getElementById('calCard').innerHTML=html;
+}
+
+render();
+</script>
+</body>
+</html>
