@@ -392,6 +392,7 @@ function displayWeekNum(sundayDate) {
 }
 
 
+function isoWeek(d) {
   const jan4 = new Date(d.getFullYear(), 0, 4);
   const startOfWeek1 = new Date(jan4);
   startOfWeek1.setDate(jan4.getDate() - ((jan4.getDay() + 6) % 7));
