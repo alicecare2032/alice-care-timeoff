@@ -438,7 +438,7 @@ function eventsOnDate(ds) { return filtered().filter(e=>e.date===ds); }
 function chipHTML(ev, short) {
   const st = getStatus(ev);
   const name = short ? ev.name.split(' ')[0] : ev.name;
-  const icon = ev.type==='vacation' ? '☀' : '🤒';
+  const icon = ev.type==='vacation' ? '🏖️' : '🤢';
   return `<div class="event-chip ${ev.type}" onclick="showModal('${ev.id}','${ev.date}')">
     <span class="status-dot ${st}"></span>${icon} ${name}
   </div>`;
@@ -517,7 +517,7 @@ function renderDay() {
     evs.forEach(ev=>{
       const st=getStatus(ev);
       html+=`<div class="day-event-card ${ev.type}" onclick="showModal('${ev.id}','${ev.date}')">
-        <div class="day-event-icon">${ev.type==='vacation'?'☀️':'🤒'}</div>
+        <div class="day-event-icon">${ev.type==='vacation'?'🏖️':'🤢'}</div>
         <div class="day-event-info">
           <div class="day-event-name">${ev.name}</div>
           <div class="day-event-meta">${ev.type.charAt(0).toUpperCase()+ev.type.slice(1)} &middot; ${ev.hours} hrs</div>
@@ -538,7 +538,7 @@ function countStrip(evs) {
   const rej =evs.filter(e=>getStatus(e)==='rejected').length;
   return `<div class="count-strip">
     <span>Showing: <strong>${evs.length} requests</strong></span>
-    <span>&#9788; Vacation: <strong>${vac}</strong></span><span>🤒 Sick: <strong>${sick}</strong></span>
+    <span>&#9788; Vacation: <strong>${vac}</strong></span><span>🤢 Sick: <strong>${sick}</strong></span>
     <span style="color:#86efac">&#9679; Approved: <strong>${appr}</strong></span>
     <span style="color:#d8b4fe">&#9679; Reviewed: <strong>${revd}</strong></span>
     <span style="color:#fde68a">&#9679; Pending: <strong>${pend}</strong></span>
@@ -553,7 +553,7 @@ function showModal(id, date) {
   const ev = RAW.find(e=>e.id===id&&e.date===date) || RAW.find(e=>e.id===id);
   if(!ev) return;
   const st = getStatus(ev);
-  const icon = ev.type==='vacation'?'☀️':'🤒';
+  const icon = ev.type==='vacation'?'🏖️':'🤢';
   const d = new Date(ev.date+'T00:00:00');
   const fmtDate = `${DAYS_SHORT[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
 
