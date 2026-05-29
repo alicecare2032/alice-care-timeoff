@@ -337,6 +337,8 @@ function loadLiveStatuses(afterAction) {
 
       const requests = data.requests || [];
       let updatedCount = 0;
+      // Debug: log first few records so field names are visible in console
+      if (requests.length) console.log('[TimeOff Calendar] GAS sample record:', JSON.stringify(requests[0]));
 
       requests.forEach(req => {
         const id   = req.requestId || '';
@@ -357,12 +359,22 @@ function loadLiveStatuses(afterAction) {
         }
 
         // Always patch hours on existing RAW records when live has a real value
-        const liveHours = parseFloat(req.requestedHours || req.hours || req.approvedHours || 0);
+        // Try every field name the GAS might use
+        const liveHours = parseFloat(
+          req.totalHours || req.requestedHours || req.hoursRequested || req.hours ||
+          req.shiftHours || req.numHours || 0
+        );
+        const liveApproved = parseFloat(req.approvedHours || req.hoursApproved || 0);
         if (!isNaN(liveHours) && liveHours > 0) {
           const existing = RAW.find(r => r.id === id && r.date === date);
           if (existing && (existing.hours === 0 || existing.hours == null)) {
             existing.hours = liveHours;
           }
+        }
+        // Always store approvedHours on existing records so modal can show it
+        if (!isNaN(liveApproved) && liveApproved > 0) {
+          const existing = RAW.find(r => r.id === id && r.date === date);
+          if (existing) existing.approvedHours = liveApproved;
         }
       });
 
@@ -385,7 +397,11 @@ function loadLiveStatuses(afterAction) {
         const name  = req.employeeName || req.name || req.employee || '';
         const rawType = (req.requestType || req.leaveType || req.type || 'vacation').toLowerCase();
         const type  = (rawType === 'sick' || rawType === 'sick leave') ? 'sick' : 'vacation';
-        const hours = parseFloat(req.requestedHours || req.hours || req.approvedHours || 0);
+        const hours = parseFloat(
+          req.totalHours || req.requestedHours || req.hoursRequested || req.hours ||
+          req.shiftHours || req.numHours || 0
+        );
+        const approvedHrs = parseFloat(req.approvedHours || req.hoursApproved || 0);
 
         if (!name) return; // cannot render a chip without a name
 
@@ -398,6 +414,7 @@ function loadLiveStatuses(afterAction) {
           type,
           date,
           hours: isNaN(hours) ? 0 : hours,
+          approvedHours: isNaN(approvedHrs) ? 0 : approvedHrs,
           status: resolvedStatus
         });
 
@@ -802,7 +819,13 @@ function showModal(id, date) {
       </div>
       <div class="modal-field">
         <div class="modal-label">Hours Requested</div>
-        <div class="modal-value">${ev.hours} hrs</div>
+        <div class="modal-value">${
+          ev.hours > 0
+            ? ev.hours + ' hrs'
+            : (ev.approvedHours > 0
+              ? ev.approvedHours + ' hrs <span style="font-size:10px;color:var(--muted);font-weight:400;">(approved hrs)</span>'
+              : '<span style="color:var(--muted);font-size:12px;">Not entered</span>')
+        }</div>
       </div>
       <div class="modal-field">
         <div class="modal-label">Type</div>
