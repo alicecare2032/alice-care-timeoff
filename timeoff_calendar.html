@@ -350,11 +350,20 @@ function loadLiveStatuses(afterAction) {
         else if ((req.approvalStatus || '').toLowerCase() === 'approved') status = 'approved';
         else if ((req.reviewStatus  || '').toLowerCase() === 'reviewed')  status = 'reviewed';
 
-        // Pinned (user just acted) — never overwrite
-        if (pinnedStatus[key]) return;
+        // Pinned (user just acted) — never overwrite status
+        if (!pinnedStatus[key]) {
+          if (localStatus[key] !== status) updatedCount++;
+          localStatus[key] = status;
+        }
 
-        if (localStatus[key] !== status) updatedCount++;
-        localStatus[key] = status;
+        // Always patch hours on existing RAW records when live has a real value
+        const liveHours = parseFloat(req.requestedHours || req.hours || req.approvedHours || 0);
+        if (!isNaN(liveHours) && liveHours > 0) {
+          const existing = RAW.find(r => r.id === id && r.date === date);
+          if (existing && (existing.hours === 0 || existing.hours == null)) {
+            existing.hours = liveHours;
+          }
+        }
       });
 
       // ---- MERGE NEW REQUESTS NOT YET IN RAW ----
