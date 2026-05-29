@@ -631,7 +631,7 @@ function countStrip(evs) {
   const rej =evs.filter(e=>getStatus(e)==='rejected').length;
   return `<div class="count-strip">
     <span>Showing: <strong>${evs.length} requests</strong></span>
-    <span>&#9788; Vacation: <strong>${vac}</strong> &middot; <strong>${fmtHrs(vacHrs)} hrs</strong></span><span>🤢 Sick: <strong>${sick}</strong> &middot; <strong>${fmtHrs(sickHrs)} hrs</strong></span>
+    <span>🏖️ Vacation: <strong>${vac}</strong> &middot; <strong>${fmtHrs(vacHrs)} hrs</strong></span><span>🤢 Sick: <strong>${sick}</strong> &middot; <strong>${fmtHrs(sickHrs)} hrs</strong></span>
     <span style="color:#86efac">&#9679; Approved: <strong>${appr}</strong></span>
     <span style="color:#d8b4fe">&#9679; Reviewed: <strong>${revd}</strong></span>
     <span style="color:#fde68a">&#9679; Pending: <strong>${pend}</strong></span>
