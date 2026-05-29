@@ -91,7 +91,11 @@
   .status-dot.rejected { background: var(--rejected-dot); }
   .status-dot.pending  { background: var(--pending-dot); }
   .status-dot.reviewed { background: var(--reviewed-dot); }
-  .more-chip { font-size: 10px; color: var(--muted); font-weight: 600; padding: 2px 4px; cursor: pointer; text-decoration: underline; }
+  .more-chip { font-size: 10px; color: var(--orange); font-weight: 700; padding: 3px 6px; cursor: pointer; background: rgba(245,118,0,.1); border-radius: 4px; display: inline-block; margin-top: 1px; transition: background .15s; }
+  .more-chip:hover { background: rgba(245,118,0,.2); }
+  .month-day.expanded { min-height: unset; }
+  .collapse-chip { font-size: 10px; color: var(--muted); font-weight: 600; padding: 3px 6px; cursor: pointer; background: var(--bg); border-radius: 4px; display: inline-block; margin-top: 1px; transition: background .15s; }
+  .collapse-chip:hover { background: #D0DCE9; }
 
   /* WEEK */
   .week-grid { display: grid; grid-template-columns: 38px 80px repeat(7, 1fr); }
@@ -426,6 +430,7 @@ const DAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const today = new Date();
 let view = 'month';
 let cursor = new Date(today);
+const expandedCells = new Set(); // tracks which date strings are expanded in month view
 
 // ---- EMPLOYEE FILTER ----
 (function() {
@@ -518,9 +523,15 @@ function renderMonth() {
     const ds=dateStr(cell.date), evs=eventsOnDate(ds), isT=isSameDay(cell.date,today);
     const cls=['month-day',cell.other?'other-month':'',isT?'today':''].filter(Boolean).join(' ');
     const numStyle=isT?'background:var(--orange);color:#fff;':'';
+    const isExpanded = expandedCells.has(ds);
     let evHTML='';
-    evs.slice(0,3).forEach(ev=>{evHTML+=chipHTML(ev,true);});
-    if(evs.length>3) evHTML+=`<div class="more-chip" onclick="goDay('${ds}')">+${evs.length-3} more</div>`;
+    if(isExpanded){
+      evs.forEach(ev=>{evHTML+=chipHTML(ev,true);});
+      if(evs.length>3) evHTML+=`<div class="collapse-chip" onclick="event.stopPropagation();toggleExpand('${ds}')">&#8593; Show less</div>`;
+    } else {
+      evs.slice(0,3).forEach(ev=>{evHTML+=chipHTML(ev,true);});
+      if(evs.length>3) evHTML+=`<div class="more-chip" onclick="event.stopPropagation();toggleExpand('${ds}')">+${evs.length-3} more</div>`;
+    }
     html+=`<div class="${cls}"><div class="day-num" style="${numStyle}">${cell.date.getDate()}</div>${evHTML}</div>`;
   });
   html+='</div>';
@@ -583,14 +594,18 @@ function renderDay() {
 }
 
 function countStrip(evs) {
-  const vac=evs.filter(e=>e.type==='vacation').length, sick=evs.filter(e=>e.type==='sick').length;
+  const vacEvs=evs.filter(e=>e.type==='vacation'), sickEvs=evs.filter(e=>e.type==='sick');
+  const vac=vacEvs.length, sick=sickEvs.length;
+  const vacHrs=vacEvs.reduce((s,e)=>s+(parseFloat(e.hours)||0),0);
+  const sickHrs=sickEvs.reduce((s,e)=>s+(parseFloat(e.hours)||0),0);
+  const fmtHrs=h=>Number.isInteger(h)?h:h.toFixed(1);
   const appr=evs.filter(e=>getStatus(e)==='approved').length;
   const revd=evs.filter(e=>getStatus(e)==='reviewed').length;
   const pend=evs.filter(e=>getStatus(e)==='pending').length;
   const rej =evs.filter(e=>getStatus(e)==='rejected').length;
   return `<div class="count-strip">
     <span>Showing: <strong>${evs.length} requests</strong></span>
-    <span>&#9788; Vacation: <strong>${vac}</strong></span><span>🤢 Sick: <strong>${sick}</strong></span>
+    <span>&#9788; Vacation: <strong>${vac}</strong> &middot; <strong>${fmtHrs(vacHrs)} hrs</strong></span><span>🤢 Sick: <strong>${sick}</strong> &middot; <strong>${fmtHrs(sickHrs)} hrs</strong></span>
     <span style="color:#86efac">&#9679; Approved: <strong>${appr}</strong></span>
     <span style="color:#d8b4fe">&#9679; Reviewed: <strong>${revd}</strong></span>
     <span style="color:#fde68a">&#9679; Pending: <strong>${pend}</strong></span>
@@ -599,6 +614,12 @@ function countStrip(evs) {
 }
 
 function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+
+function toggleExpand(ds) {
+  if (expandedCells.has(ds)) expandedCells.delete(ds);
+  else expandedCells.add(ds);
+  render();
+}
 
 // ---- MODAL ----
 function showModal(id, date) {
@@ -945,9 +966,9 @@ function setView(v) {
   document.querySelectorAll('.view-tab').forEach(t=>t.classList.toggle('active',t.textContent.toLowerCase()===v));
   render();
 }
-function navBack(){if(view==='month')cursor.setMonth(cursor.getMonth()-1);else if(view==='week')cursor.setDate(cursor.getDate()-7);else cursor.setDate(cursor.getDate()-1);render();}
-function navForward(){if(view==='month')cursor.setMonth(cursor.getMonth()+1);else if(view==='week')cursor.setDate(cursor.getDate()+7);else cursor.setDate(cursor.getDate()+1);render();}
-function goToday(){cursor=new Date(today);render();}
+function navBack(){if(view==='month'){cursor.setMonth(cursor.getMonth()-1);expandedCells.clear();}else if(view==='week')cursor.setDate(cursor.getDate()-7);else cursor.setDate(cursor.getDate()-1);render();}
+function navForward(){if(view==='month'){cursor.setMonth(cursor.getMonth()+1);expandedCells.clear();}else if(view==='week')cursor.setDate(cursor.getDate()+7);else cursor.setDate(cursor.getDate()+1);render();}
+function goToday(){cursor=new Date(today);expandedCells.clear();render();}
 function goDay(ds){cursor=new Date(ds+'T00:00:00');setView('day');}
 
 function closeModal(){ document.getElementById('modalOverlay').classList.remove('open'); }
