@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alice Care Team Raffle</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,400;1,9..144,300;1,9..144,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --orange: #F57600;
+  --orange-glow: rgba(245,118,0,0.35);
+  --navy: #0D1F3C;
+  --navy-mid: #1A365C;
+  --navy-light: rgba(255,255,255,0.08);
+  --gold: #F0B429;
+  --gold-dim: #C8860A;
+  --cream: #FDF8F2;
+  --white: #FFFFFF;
+  --muted: rgba(255,255,255,0.5);
+  --border: rgba(255,255,255,0.12);
+  --card-bg: rgba(255,255,255,0.06);
+  --card-border: rgba(255,255,255,0.14);
+  --shadow-glow: 0 0 60px rgba(245,118,0,0.2);
+}
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: #080F1E;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--white);
+  display: grid;
+  grid-template-columns: 480px 1fr;
+  grid-template-rows: 100vh;
+  position: relative;
+}
+
+/* ── BACKGROUND ─────────────────────────────────────── */
+#bgCanvas {
+  position: fixed; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── LEFT PANEL ─────────────────────────────────────── */
+#leftPanel {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  padding: 3rem 2.5rem 2rem;
+  background: rgba(8,15,30,0.7);
+  border-right: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+  overflow-y: auto;
+}
+
+/* logo */
+.logo-mark {
+  display: inline-flex;
+  align-items: baseline;
+  font-family: 'Fraunces', serif;
+  font-size: 2.8rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+.logo-mark .lo { color: var(--orange); }
+.logo-mark .lc { color: var(--white); }
+
+.tagline {
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--muted);
+  margin-bottom: 2.5rem;
+}
+
+/* prize board */
+.section-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 0.75rem;
+}
+
+.prize-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  margin-bottom: 0.5rem;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  transition: opacity 0.5s, background 0.4s;
+}
+.prize-row.depleted {
+  opacity: 0.28;
+  border-color: rgba(255,255,255,0.05);
+}
+.prize-row .prize-name {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.prize-row .prize-name .pemoji { font-size: 1.25rem; }
+.prize-count {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: rgba(245,118,0,0.18);
+  color: var(--orange);
+  white-space: nowrap;
+  border: 1px solid rgba(245,118,0,0.3);
+}
+.prize-row.depleted .prize-count {
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.3);
+  border-color: transparent;
+}
+
+/* entry form */
+.entry-block {
+  margin-top: auto;
+  padding-top: 2rem;
+}
+
+.field-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 0.5rem;
+  display: block;
+  letter-spacing: 0.04em;
+}
+.field-input {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border: 1.5px solid rgba(255,255,255,0.18);
+  border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1.1rem;
+  color: var(--white);
+  background: rgba(255,255,255,0.07);
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  margin-bottom: 1rem;
+}
+.field-input:focus {
+  border-color: var(--orange);
+  background: rgba(245,118,0,0.08);
+}
+.field-input::placeholder { color: rgba(255,255,255,0.25); }
+
+.spin-btn {
+  width: 100%;
+  padding: 1.1rem;
+  border: none;
+  border-radius: 14px;
+  background: var(--orange);
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+  box-shadow: 0 4px 24px rgba(245,118,0,0.45), 0 0 0 0 rgba(245,118,0,0);
+  letter-spacing: 0.02em;
+}
+.spin-btn:hover:not(:disabled) {
+  background: #E06B00;
+  box-shadow: 0 6px 32px rgba(245,118,0,0.6);
+}
+.spin-btn:active:not(:disabled) { transform: scale(0.98); }
+.spin-btn:disabled {
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.3);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.alert {
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  margin-bottom: 0.85rem;
+  display: none;
+}
+.alert.error {
+  background: rgba(185,28,28,0.25);
+  color: #FCA5A5;
+  border: 1px solid rgba(185,28,28,0.4);
+  display: block;
+}
+
+/* results log */
+.results-log {
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+}
+.results-log summary {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
+.results-log summary:hover { color: rgba(255,255,255,0.6); }
+.results-log table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
+.results-log th {
+  text-align: left;
+  padding: 0.35rem 0.5rem;
+  color: rgba(255,255,255,0.35);
+  font-weight: 600;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.results-log td {
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.65);
+}
+
+/* ── RIGHT PANEL ─────────────────────────────────────── */
+#rightPanel {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  overflow: hidden;
+}
+
+/* ambient glow behind wheel */
+.wheel-glow {
+  position: absolute;
+  width: 700px; height: 700px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245,118,0,0.12) 0%, transparent 70%);
+  pointer-events: none;
+  transition: opacity 0.4s;
+}
+.wheel-glow.active { opacity: 1; animation: glowPulse 2s ease-in-out infinite; }
+@keyframes glowPulse {
+  0%,100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.08); opacity: 1.0; }
+}
+
+/* wheel container */
+.wheel-outer {
+  position: relative;
+  width: 520px; height: 520px;
+  flex-shrink: 0;
+}
+
+#wheelSvg {
+  width: 520px; height: 520px;
+  transition: filter 0.2s;
+  filter: drop-shadow(0 12px 40px rgba(26,54,92,0.5));
+}
+#wheelSvg.glowing {
+  filter:
+    drop-shadow(0 0 30px rgba(245,118,0,0.8))
+    drop-shadow(0 12px 40px rgba(26,54,92,0.5));
+}
+
+/* pointer */
+.pointer {
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+.pointer svg { display: block; filter: drop-shadow(0 2px 8px rgba(245,118,0,0.7)); }
+
+/* spin status text */
+.spin-status {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 300;
+  font-style: italic;
+  color: rgba(255,255,255,0.75);
+  text-align: center;
+  margin-top: 2rem;
+  min-height: 2.2rem;
+  letter-spacing: 0.01em;
+}
+
+/* ── REVEAL OVERLAY ──────────────────────────────────── */
+#revealOverlay {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  background: rgba(8,15,30,0.88);
+  backdrop-filter: blur(8px);
+  z-index: 20;
+  animation: fadeIn 0.4s ease forwards;
+}
+#revealOverlay.show { display: flex; }
+
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+.reveal-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  animation: popIn 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+@keyframes popIn {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.winner-label {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 300;
+  font-style: italic;
+  color: rgba(255,255,255,0.7);
+  text-align: center;
+}
+
+.prize-card-reveal {
+  background: linear-gradient(135deg, rgba(240,180,41,0.15) 0%, rgba(245,118,0,0.1) 100%);
+  border: 2px solid rgba(240,180,41,0.45);
+  border-radius: 24px;
+  padding: 2.5rem 4rem;
+  text-align: center;
+  min-width: 360px;
+  position: relative;
+  overflow: hidden;
+}
+.prize-card-reveal::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(240,180,41,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+.prize-card-reveal.depleted-card {
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(255,255,255,0.15);
+}
+.big-emoji {
+  font-size: 5rem;
+  display: block;
+  margin-bottom: 0.75rem;
+  animation: emojiPop 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.2s both;
+}
+@keyframes emojiPop {
+  0% { transform: scale(0) rotate(-20deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+.prize-title-reveal {
+  font-family: 'Fraunces', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 0.4rem;
+  line-height: 1.1;
+}
+.prize-card-reveal.depleted-card .prize-title-reveal { color: rgba(255,255,255,0.4); }
+.prize-sub-reveal {
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.5);
+}
+
+.congrats-msg {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.55);
+  text-align: center;
+  max-width: 340px;
+}
+
+.btn-row {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.next-btn {
+  padding: 0.9rem 2.2rem;
+  border: none;
+  border-radius: 14px;
+  background: var(--orange);
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(245,118,0,0.4);
+  transition: background 0.2s, transform 0.1s;
+}
+.next-btn:hover { background: #E06B00; }
+.next-btn:active { transform: scale(0.97); }
+
+.download-btn {
+  padding: 0.9rem 1.6rem;
+  border: 1.5px solid rgba(255,255,255,0.25);
+  border-radius: 14px;
+  background: transparent;
+  color: rgba(255,255,255,0.7);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.download-btn:hover {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  border-color: rgba(255,255,255,0.4);
+}
+
+/* ── FLASH OVERLAY ───────────────────────────────────── */
+#flashOverlay {
+  position: fixed; inset: 0;
+  background: rgba(245,118,0,0.15);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 998;
+  transition: opacity 0.08s;
+}
+
+/* ── CONFETTI ─────────────────────────────────────────── */
+#confettiCanvas {
+  position: fixed; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 999;
+}
+
+/* ── ADMIN MODAL ─────────────────────────────────────── */
+#resetModal {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(8,15,30,0.75);
+  z-index: 1100;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(6px);
+}
+.reset-box {
+  background: #111B2E;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  width: 90%;
+  max-width: 360px;
+  text-align: center;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+}
+.reset-box .rb-icon { font-size: 2rem; margin-bottom: 0.6rem; }
+.reset-box .rb-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 0.3rem;
+}
+.reset-box .rb-desc {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 1.25rem;
+}
+.reset-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid rgba(255,255,255,0.15);
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  color: #fff;
+  background: rgba(255,255,255,0.07);
+  outline: none;
+  text-align: center;
+  letter-spacing: 0.25em;
+  margin-bottom: 0.6rem;
+}
+.reset-input:focus { border-color: var(--orange); }
+.reset-error {
+  font-size: 0.78rem;
+  color: #FCA5A5;
+  min-height: 1.1rem;
+  margin-bottom: 0.6rem;
+}
+.reset-btns { display: flex; gap: 0.6rem; }
+.reset-btns button {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.reset-btns .cancel {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.5);
+}
+.reset-btns .confirm {
+  background: var(--orange);
+  border: none;
+  color: #fff;
+  box-shadow: 0 3px 12px rgba(245,118,0,0.4);
+}
+
+/* admin trigger */
+#adminTrigger {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: none;
+  border: none;
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.12);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: 0.1em;
+  padding: 0.3rem 0.6rem;
+  z-index: 100;
+  transition: color 0.2s;
+}
+#adminTrigger:hover { color: rgba(255,255,255,0.4); }
+
+/* pulse keyframe */
+@keyframes drumPulse {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+.pulsing { animation: drumPulse 0.2s ease-in-out infinite; }
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+<canvas id="confettiCanvas"></canvas>
+<div id="flashOverlay"></div>
+
+<!-- ── LEFT PANEL ──────────────────────────────────── -->
+<div id="leftPanel">
+
+  <div class="logo-mark"><span class="lo">alice.</span><span class="lc">care</span></div>
+  <div class="tagline">Team Appreciation Raffle</div>
+
+  <div class="section-label">Available Prizes</div>
+  <div id="prizeList"></div>
+
+  <div class="entry-block">
+    <div class="section-label" style="margin-bottom:1rem;">Your Turn</div>
+    <div id="alertBox" class="alert"></div>
+    <label class="field-label" for="caregiverName">Enter your full name</label>
+    <input class="field-input" type="text" id="caregiverName"
+      placeholder="e.g. Maria Gonzalez" autocomplete="off"
+      onkeydown="if(event.key==='Enter') startSpin()" />
+    <button class="spin-btn" id="spinBtn" onclick="startSpin()">Spin the Wheel ✦</button>
+  </div>
+
+  <details class="results-log" id="resultsLog" style="display:none; margin-top:1.5rem;">
+    <summary>Session results</summary>
+    <table>
+      <thead><tr><th>Name</th><th>Prize</th><th>Time</th></tr></thead>
+      <tbody id="resultsBody"></tbody>
+    </table>
+  </details>
+
+</div>
+
+<!-- ── RIGHT PANEL ─────────────────────────────────── -->
+<div id="rightPanel">
+
+  <div class="wheel-glow" id="wheelGlow"></div>
+
+  <div class="wheel-outer">
+    <div class="pointer">
+      <svg width="32" height="44" viewBox="0 0 32 44">
+        <polygon points="16,44 0,8 32,8" fill="#F57600"/>
+        <rect x="10" y="0" width="12" height="12" rx="3" fill="#F57600"/>
+        <polygon points="16,40 3,10 29,10" fill="rgba(255,255,255,0.15)"/>
+      </svg>
+    </div>
+    <svg id="wheelSvg" viewBox="0 0 520 520" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+
+  <div class="spin-status" id="spinStatus">Enter your name and spin!</div>
+
+  <!-- Reveal overlay inside right panel -->
+  <div id="revealOverlay">
+    <div class="reveal-inner">
+      <div class="winner-label" id="winnerLabel"></div>
+      <div class="prize-card-reveal" id="prizeBadge">
+        <span class="big-emoji" id="bigEmoji"></span>
+        <div class="prize-title-reveal" id="prizeTitle"></div>
+        <div class="prize-sub-reveal" id="prizeSub"></div>
+      </div>
+      <div class="congrats-msg" id="congratsMsg"></div>
+      <div class="btn-row">
+        <button class="next-btn" onclick="resetForNext()">Next Caregiver</button>
+        <button class="download-btn" onclick="downloadResults()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Save Results
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── ADMIN RESET MODAL ──────────────────────────── -->
+<div id="resetModal" style="display:none;">
+  <div class="reset-box">
+    <div class="rb-icon">🔐</div>
+    <div class="rb-title">Admin Reset</div>
+    <div class="rb-desc">Enter the admin code to clear all counts and entries.</div>
+    <input class="reset-input" type="password" id="resetCodeInput"
+      placeholder="• • • • • • • •"
+      onkeydown="if(event.key==='Enter') confirmReset()" />
+    <div class="reset-error" id="resetError"></div>
+    <div class="reset-btns">
+      <button class="cancel" onclick="closeResetModal()">Cancel</button>
+      <button class="confirm" onclick="confirmReset()">Reset</button>
+    </div>
+  </div>
+</div>
+
+<button id="adminTrigger" onclick="openResetModal()">admin</button>
+
+<script>
+// ── CONSTANTS ─────────────────────────────────────────
+const STORAGE_KEY = 'alicecare_raffle_v1';
+const ENTRIES_KEY = 'alicecare_raffle_entries_v1';
+const RESET_CODE  = '19731972';
+
+const PRIZES = [
+  { id:'target',    label:'Target Gift Card',    emoji:'🎯', qty:3,        isGiftCard:true,  weight:11, msg:'Shop your favorites at Target!',       congrats:'What a wonderful prize!' },
+  { id:'starbucks', label:'Starbucks Gift Card', emoji:'☕', qty:3,        isGiftCard:true,  weight:12, msg:'Enjoy your favorite drinks on us!',     congrats:'Coffee on us, always!' },
+  { id:'mugs',      label:'Coffee Mugs',         emoji:'🫖', qty:2,        isGiftCard:false, weight:22, msg:'A cozy mug just for you.',              congrats:'Perfect for your morning routine!' },
+  { id:'sweets',    label:'Sweets and Snacks',   emoji:'🍫', qty:Infinity, isGiftCard:false, weight:55, msg:'A sweet treat to brighten your day!',  congrats:'Enjoy every bite!' }
+];
+
+const WEDGE_COLORS = [
+  { base:'#C25200', mid:'#E06000', light:'#F57600' },   // target   orange
+  { base:'#0A5C2E', mid:'#127A3D', light:'#1A9E52' },   // starbucks green
+  { base:'#0D2547', mid:'#163562', light:'#1F4A85' },   // mugs     navy
+  { base:'#8A5C08', mid:'#B07510', light:'#D4960A' },   // sweets   gold
+];
+
+const WHEEL_SLOTS = [
+  {p:PRIZES[0],c:0},{p:PRIZES[3],c:3},{p:PRIZES[1],c:1},{p:PRIZES[2],c:2},
+  {p:PRIZES[3],c:3},{p:PRIZES[0],c:0},{p:PRIZES[3],c:3},{p:PRIZES[1],c:1},
+  {p:PRIZES[2],c:2},{p:PRIZES[3],c:3},{p:PRIZES[0],c:0},{p:PRIZES[1],c:1},
+];
+
+const N     = WHEEL_SLOTS.length;
+const SLICE = 360 / N;
+let currentAngle = 0;
+let isSpinning   = false;
+
+// ── STORAGE ───────────────────────────────────────────
+function loadState()   { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; } }
+function saveState(s)  { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
+function loadEntries() { try { return JSON.parse(localStorage.getItem(ENTRIES_KEY)) || []; } catch { return []; } }
+function saveEntries(e){ localStorage.setItem(ENTRIES_KEY, JSON.stringify(e)); }
+function getRemaining(state, prize) {
+  if (prize.qty === Infinity) return Infinity;
+  return Math.max(0, prize.qty - (state[prize.id] || 0));
+}
+
+// ── ANIMATED STARFIELD BACKGROUND ─────────────────────
+(function() {
+  const canvas = document.getElementById('bgCanvas');
+  const ctx    = canvas.getContext('2d');
+  let W, H, stars = [];
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function initStars() {
+    stars = Array.from({length: 180}, () => ({
+      x: Math.random() * W, y: Math.random() * H,
+      r: 0.4 + Math.random() * 1.8,
+      speed: 0.02 + Math.random() * 0.06,
+      opacity: 0.1 + Math.random() * 0.5,
+      phase: Math.random() * Math.PI * 2,
+      freq: 0.003 + Math.random() * 0.008
+    }));
+  }
+
+  function drawBg(t) {
+    ctx.clearRect(0, 0, W, H);
+
+    // deep gradient
+    const g = ctx.createRadialGradient(W*0.65, H*0.5, 0, W*0.65, H*0.5, W*0.7);
+    g.addColorStop(0,   'rgba(20,10,40,0)');
+    g.addColorStop(0.5, 'rgba(8,15,30,0)');
+    g.addColorStop(1,   'rgba(4,8,18,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+
+    // orange nebula glow on right
+    const og = ctx.createRadialGradient(W*0.75, H*0.45, 0, W*0.75, H*0.45, W*0.38);
+    og.addColorStop(0,   'rgba(245,118,0,0.05)');
+    og.addColorStop(0.5, 'rgba(245,118,0,0.02)');
+    og.addColorStop(1,   'transparent');
+    ctx.fillStyle = og;
+    ctx.fillRect(0, 0, W, H);
+
+    // stars
+    stars.forEach(s => {
+      const osc = Math.sin(t * s.freq + s.phase);
+      const a   = s.opacity * (0.6 + 0.4 * osc);
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${a})`;
+      ctx.fill();
+    });
+
+    requestAnimationFrame(drawBg);
+  }
+
+  window.addEventListener('resize', () => { resize(); initStars(); });
+  resize(); initStars();
+  requestAnimationFrame(drawBg);
+})();
+
+// ── BUILD WHEEL ───────────────────────────────────────
+function buildWheel() {
+  const svg = document.getElementById('wheelSvg');
+  svg.innerHTML = '';
+  const cx = 260, cy = 260, r = 240, innerR = 58;
+  const state = loadState();
+
+  WHEEL_SLOTS.forEach((slot, i) => {
+    const startDeg = i * SLICE - 90;
+    const endDeg   = startDeg + SLICE;
+    const startR   = startDeg * Math.PI / 180;
+    const endR     = endDeg   * Math.PI / 180;
+
+    const depleted  = getRemaining(state, slot.p) === 0;
+    const col       = WEDGE_COLORS[slot.c];
+    const fillColor = depleted ? '#1A1A2E' : col.mid;
+    const rimColor  = depleted ? '#2A2A3E' : col.light;
+
+    const x1 = cx + r * Math.cos(startR), y1 = cy + r * Math.sin(startR);
+    const x2 = cx + r * Math.cos(endR),   y2 = cy + r * Math.sin(endR);
+    const xi1 = cx + innerR * Math.cos(endR),   yi1 = cy + innerR * Math.sin(endR);
+    const xi2 = cx + innerR * Math.cos(startR), yi2 = cy + innerR * Math.sin(startR);
+
+    const d = `M ${xi2} ${yi2} L ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2} L ${xi1} ${yi1} A ${innerR} ${innerR} 0 0 0 ${xi2} ${yi2} Z`;
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d', d);
+    path.setAttribute('fill', fillColor);
+    path.setAttribute('stroke', rimColor);
+    path.setAttribute('stroke-width', '2.5');
+    svg.appendChild(path);
+
+    // separator line
+    const sep = document.createElementNS('http://www.w3.org/2000/svg','line');
+    sep.setAttribute('x1', cx + innerR * Math.cos(startR));
+    sep.setAttribute('y1', cy + innerR * Math.sin(startR));
+    sep.setAttribute('x2', cx + r * Math.cos(startR));
+    sep.setAttribute('y2', cy + r * Math.sin(startR));
+    sep.setAttribute('stroke', 'rgba(255,255,255,0.18)');
+    sep.setAttribute('stroke-width', '1.5');
+    svg.appendChild(sep);
+
+    // label group
+    const midDeg = startDeg + SLICE / 2;
+    const midR   = midDeg * Math.PI / 180;
+    const labelR = innerR + (r - innerR) * 0.54;
+    const lx = cx + labelR * Math.cos(midR);
+    const ly = cy + labelR * Math.sin(midR);
+
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('transform', `translate(${lx},${ly}) rotate(${midDeg + 90})`);
+
+    const emoji = document.createElementNS('http://www.w3.org/2000/svg','text');
+    emoji.setAttribute('text-anchor','middle');
+    emoji.setAttribute('dominant-baseline','middle');
+    emoji.setAttribute('font-size', depleted ? '16' : '20');
+    emoji.setAttribute('y', '-12');
+    emoji.setAttribute('opacity', depleted ? '0.3' : '1');
+    emoji.textContent = slot.p.emoji;
+    g.appendChild(emoji);
+
+    const short = slot.p.label.replace(' Gift Card','').replace(' and Snacks','');
+    const lbl = document.createElementNS('http://www.w3.org/2000/svg','text');
+    lbl.setAttribute('text-anchor','middle');
+    lbl.setAttribute('dominant-baseline','middle');
+    lbl.setAttribute('font-size','9');
+    lbl.setAttribute('font-family','DM Sans, sans-serif');
+    lbl.setAttribute('font-weight','600');
+    lbl.setAttribute('fill', depleted ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.9)');
+    lbl.setAttribute('y','8');
+    lbl.textContent = short;
+    g.appendChild(lbl);
+    svg.appendChild(g);
+  });
+
+  // outer decorative ring
+  const rimOut = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  rimOut.setAttribute('cx',cx); rimOut.setAttribute('cy',cy); rimOut.setAttribute('r',r+6);
+  rimOut.setAttribute('fill','none');
+  rimOut.setAttribute('stroke','rgba(245,118,0,0.55)');
+  rimOut.setAttribute('stroke-width','4');
+  svg.appendChild(rimOut);
+
+  // inner ring
+  const rimIn = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  rimIn.setAttribute('cx',cx); rimIn.setAttribute('cy',cy); rimIn.setAttribute('r',r);
+  rimIn.setAttribute('fill','none');
+  rimIn.setAttribute('stroke','rgba(255,255,255,0.15)');
+  rimIn.setAttribute('stroke-width','1.5');
+  svg.appendChild(rimIn);
+
+  // hub outer
+  const hubRing = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  hubRing.setAttribute('cx',cx); hubRing.setAttribute('cy',cy); hubRing.setAttribute('r',innerR+8);
+  hubRing.setAttribute('fill','#080F1E');
+  hubRing.setAttribute('stroke','rgba(245,118,0,0.5)');
+  hubRing.setAttribute('stroke-width','3');
+  svg.appendChild(hubRing);
+
+  const hub = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  hub.setAttribute('cx',cx); hub.setAttribute('cy',cy); hub.setAttribute('r',innerR);
+  hub.setAttribute('fill','#0D1A30');
+  svg.appendChild(hub);
+
+  const hubTxt = document.createElementNS('http://www.w3.org/2000/svg','text');
+  hubTxt.setAttribute('x',cx); hubTxt.setAttribute('y',cy);
+  hubTxt.setAttribute('text-anchor','middle'); hubTxt.setAttribute('dominant-baseline','middle');
+  hubTxt.setAttribute('font-size','36'); hubTxt.setAttribute('font-family','Fraunces, serif');
+  hubTxt.setAttribute('font-weight','700'); hubTxt.setAttribute('fill','#F57600');
+  hubTxt.textContent = '?';
+  svg.appendChild(hubTxt);
+
+  svg.style.transform = `rotate(${currentAngle}deg)`;
+}
+
+// ── PRIZE BOARD ───────────────────────────────────────
+function buildPrizeList() {
+  const state = loadState();
+  const list  = document.getElementById('prizeList');
+  list.innerHTML = '';
+  PRIZES.forEach(p => {
+    const rem     = getRemaining(state, p);
+    const depleted = rem === 0;
+    const row = document.createElement('div');
+    row.className = 'prize-row' + (depleted ? ' depleted' : '');
+    const label = p.qty === Infinity ? 'Unlimited' : (depleted ? 'None left' : rem + ' remaining');
+    row.innerHTML = `<div class="prize-name"><span class="pemoji">${p.emoji}</span>${p.label}</div><div class="prize-count">${label}</div>`;
+    list.appendChild(row);
+  });
+}
+
+// ── ALERT ─────────────────────────────────────────────
+function showAlert(msg) {
+  const b = document.getElementById('alertBox');
+  b.className = 'alert error'; b.textContent = msg;
+}
+function clearAlert() {
+  const b = document.getElementById('alertBox');
+  b.className = 'alert'; b.textContent = '';
+}
+
+// ── WEIGHTED PRIZE PICKER ─────────────────────────────
+function pickPrize(state) {
+  const available = PRIZES.filter(p => getRemaining(state, p) > 0);
+  if (!available.length) return PRIZES[3];
+  const totalWeight = available.reduce((s, p) => s + p.weight, 0);
+  let roll = Math.random() * totalWeight;
+  for (const p of available) { roll -= p.weight; if (roll <= 0) return p; }
+  return available[available.length - 1];
+}
+
+// ── WHEEL GEOMETRY ────────────────────────────────────
+function findSlotForPrize(prizeId) {
+  const matches = [];
+  WHEEL_SLOTS.forEach((s, i) => { if (s.p.id === prizeId) matches.push(i); });
+  return matches[Math.floor(Math.random() * matches.length)];
+}
+function calcTargetAngle(slotIndex, extraSpins) {
+  const slotCenter = slotIndex * SLICE + SLICE / 2;
+  return (360 - slotCenter) % 360 + extraSpins * 360;
+}
+
+// ── START SPIN ────────────────────────────────────────
+function startSpin() {
+  if (isSpinning) return;
+  clearAlert();
+  const nameInput = document.getElementById('caregiverName');
+  const name = nameInput.value.trim();
+  if (!name || name.length < 2) { showAlert('Please enter your full name to spin.'); nameInput.focus(); return; }
+
+  const entries = loadEntries();
+  const norm = name.toLowerCase().replace(/\s+/g,' ');
+  if (entries.find(e => e.name.toLowerCase().replace(/\s+/g,' ') === norm)) {
+    showAlert('You have already entered the raffle. Each caregiver gets one spin.');
+    return;
+  }
+
+  const state = loadState();
+  const prize = pickPrize(state);
+  isSpinning  = true;
+  document.getElementById('spinBtn').disabled = true;
+  document.getElementById('revealOverlay').className = '';
+  document.getElementById('revealOverlay').style.display = 'none';
+  document.getElementById('wheelGlow').classList.add('active');
+
+  const extraSpins = prize.isGiftCard ? 9 + Math.floor(Math.random()*5) : 5 + Math.floor(Math.random()*3);
+  const slotIdx    = findSlotForPrize(prize.id);
+  const targetDelta = calcTargetAngle(slotIdx, extraSpins);
+  animateWheel(targetDelta, prize, name, state, entries);
+}
+
+// ── WHEEL ANIMATION ───────────────────────────────────
+function animateWheel(targetDelta, prize, name, state, entries) {
+  const svg      = document.getElementById('wheelSvg');
+  const statusEl = document.getElementById('spinStatus');
+  const startAngle = currentAngle;
+  const endAngle   = startAngle + targetDelta;
+  const totalMs    = prize.isGiftCard ? 7500 + Math.random()*2000 : 4200 + Math.random()*1500;
+  const startTime  = performance.now();
+
+  const msgs = ['Spinning the wheel...','Here we go!','And it could be...','Almost there...','Just a little more...','The wheel decides!','Fingers crossed...','Could this be the one?','Ohhh so close...'];
+  let msgI = 0;
+  const msgTimer = setInterval(() => { statusEl.textContent = msgs[msgI++ % msgs.length]; }, prize.isGiftCard ? 880 : 700);
+
+  let pulsing = false;
+  let lastTickAngle = startAngle;
+  const flashOverlay = document.getElementById('flashOverlay');
+
+  function easeInOutPow(t, pow) {
+    return t < 0.5 ? Math.pow(2*t,pow)/2 : 1-Math.pow(2*(1-t),pow)/2;
+  }
+  function customEase(t) {
+    if (t < 0.55) return easeInOutPow(t/0.55, 2.8) * 0.75;
+    if (t < 0.85) return 0.75 + ((t-0.55)/0.3) * 0.18;
+    return 0.93 + ((t-0.85)/0.15) * 0.07;
+  }
+
+  function frame(now) {
+    const elapsed = now - startTime;
+    const rawT    = Math.min(elapsed / totalMs, 1);
+    const easedT  = customEase(rawT);
+    const angle   = startAngle + (endAngle - startAngle) * easedT;
+    currentAngle  = angle;
+    svg.style.transform = `rotate(${angle}deg)`;
+
+    // tick flash per wedge
+    const norm = ((angle % 360)+360)%360;
+    const prev = ((lastTickAngle % 360)+360)%360;
+    if (Math.abs(norm - prev) >= SLICE * 0.88) {
+      svg.classList.add('glowing');
+      setTimeout(() => svg.classList.remove('glowing'), 70);
+      lastTickAngle = angle;
+      if (rawT > 0.15 && rawT < 0.92) {
+        flashOverlay.style.opacity = '1';
+        setTimeout(() => flashOverlay.style.opacity = '0', 55);
+      }
+    }
+
+    if (rawT > 0.82 && !pulsing) {
+      pulsing = true;
+      svg.classList.add('pulsing');
+      statusEl.textContent = 'Ohhh so close...';
+    }
+
+    if (rawT < 1) {
+      requestAnimationFrame(frame);
+    } else {
+      clearInterval(msgTimer);
+      svg.classList.remove('pulsing','glowing');
+      statusEl.textContent = '';
+      flashOverlay.style.opacity = '0';
+      document.getElementById('wheelGlow').classList.remove('active');
+      setTimeout(() => revealPrize(prize, name, state, entries), 500);
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+// ── REVEAL ────────────────────────────────────────────
+function revealPrize(prize, name, state, entries) {
+  const isDepleted = getRemaining(state, prize) === 0;
+  if (!isDepleted) { state[prize.id] = (state[prize.id] || 0) + 1; saveState(state); }
+
+  const entry = { name, prize: prize.label, emoji: prize.emoji, time: new Date().toLocaleString(), depleted: isDepleted };
+  entries.push(entry);
+  saveEntries(entries);
+
+  buildPrizeList(); buildWheel(); updateResultsTable(entries);
+
+  const badge = document.getElementById('prizeBadge');
+  document.getElementById('winnerLabel').textContent = name + ',';
+  document.getElementById('bigEmoji').textContent    = isDepleted ? '🍫' : prize.emoji;
+
+  if (isDepleted) {
+    badge.className = 'prize-card-reveal depleted-card';
+    document.getElementById('prizeTitle').textContent = 'Sweets and Snacks';
+    document.getElementById('prizeSub').textContent   = 'Your original pick was claimed — sweet treats await!';
+    document.getElementById('congratsMsg').textContent = 'Thank you for spinning. Enjoy your snacks!';
+  } else {
+    badge.className = 'prize-card-reveal';
+    document.getElementById('prizeTitle').textContent = prize.label;
+    document.getElementById('prizeSub').textContent   = prize.msg;
+    document.getElementById('congratsMsg').textContent = prize.congrats + ' Thank you for all you do.';
+    setTimeout(launchConfetti, 250);
+  }
+
+  const overlay = document.getElementById('revealOverlay');
+  overlay.style.display = 'flex';
+  overlay.className = 'show';
+  isSpinning = false;
+}
+
+// ── NEXT CAREGIVER ────────────────────────────────────
+function resetForNext() {
+  document.getElementById('caregiverName').value = '';
+  clearAlert();
+  document.getElementById('spinBtn').disabled = false;
+  document.getElementById('revealOverlay').style.display = 'none';
+  document.getElementById('revealOverlay').className = '';
+  document.getElementById('spinStatus').textContent = 'Enter your name and spin!';
+  buildPrizeList(); buildWheel();
+  document.getElementById('caregiverName').focus();
+}
+
+// ── RESULTS TABLE ─────────────────────────────────────
+function updateResultsTable(entries) {
+  const log  = document.getElementById('resultsLog');
+  const body = document.getElementById('resultsBody');
+  log.style.display = 'block';
+  body.innerHTML = entries.map(e =>
+    `<tr><td>${e.name}</td><td>${e.emoji} ${e.prize}</td><td>${e.time}</td></tr>`
+  ).join('');
+}
+
+// ── CSV DOWNLOAD ──────────────────────────────────────
+function downloadResults() {
+  const entries = loadEntries();
+  if (!entries.length) return;
+  const lines = ['Name,Prize,Time', ...entries.map(e => `"${e.name}","${e.emoji} ${e.prize}","${e.time}"`)];
+  const blob = new Blob([lines.join('\n')], {type:'text/csv'});
+  const url  = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'alice_care_raffle_results.csv';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+// ── CONFETTI ──────────────────────────────────────────
+function launchConfetti() {
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx    = canvas.getContext('2d');
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  const colors = ['#F57600','#1A365C','#F0B429','#2E7D50','#E8513A','#5B8AD5','#fff','#FFD580'];
+  const pieces = Array.from({length:200}, () => ({
+    x: Math.random()*canvas.width, y: -20 - Math.random()*300,
+    r: 5 + Math.random()*6, d: 1.8 + Math.random()*3.5,
+    color: colors[Math.floor(Math.random()*colors.length)],
+    tiltAngle:0, tiltSpeed: 0.04 + Math.random()*0.12,
+    shape: Math.random() > 0.5 ? 'circle' : 'rect'
+  }));
+  let fr = 0;
+  function draw() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p => {
+      p.tiltAngle += p.tiltSpeed; p.y += p.d; p.x += Math.sin(p.tiltAngle)*2;
+      const tilt = Math.sin(p.tiltAngle)*15;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(tilt*Math.PI/180);
+      ctx.fillStyle = p.color;
+      if (p.shape==='circle') { ctx.beginPath(); ctx.arc(0,0,p.r,0,Math.PI*2); ctx.fill(); }
+      else ctx.fillRect(-p.r,-p.r*0.5,p.r*2,p.r);
+      ctx.restore();
+    });
+    fr++;
+    if (fr < 280) requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  draw();
+}
+
+// ── ADMIN RESET ───────────────────────────────────────
+function openResetModal() {
+  document.getElementById('resetCodeInput').value = '';
+  document.getElementById('resetError').textContent = '';
+  const m = document.getElementById('resetModal');
+  m.style.display = 'flex';
+  setTimeout(() => document.getElementById('resetCodeInput').focus(), 80);
+}
+function closeResetModal() { document.getElementById('resetModal').style.display = 'none'; }
+function confirmReset() {
+  const code = document.getElementById('resetCodeInput').value.trim();
+  if (code !== RESET_CODE) {
+    document.getElementById('resetError').textContent = 'Incorrect code. Try again.';
+    document.getElementById('resetCodeInput').value = '';
+    document.getElementById('resetCodeInput').focus(); return;
+  }
+  localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(ENTRIES_KEY);
+  closeResetModal();
+  document.getElementById('caregiverName').value = '';
+  clearAlert();
+  document.getElementById('spinBtn').disabled = false;
+  document.getElementById('revealOverlay').style.display = 'none';
+  document.getElementById('revealOverlay').className = '';
+  document.getElementById('spinStatus').textContent = 'Enter your name and spin!';
+  document.getElementById('resultsLog').style.display = 'none';
+  document.getElementById('resultsBody').innerHTML = '';
+  document.getElementById('wheelGlow').classList.remove('active');
+  isSpinning = false; currentAngle = 0;
+  buildPrizeList(); buildWheel();
+}
+document.getElementById('resetModal').addEventListener('click', function(e) {
+  if (e.target === this) closeResetModal();
+});
+
+// ── INIT ──────────────────────────────────────────────
+buildPrizeList();
+buildWheel();
+const existing = loadEntries();
+if (existing.length) updateResultsTable(existing);
+document.getElementById('caregiverName').focus();
+</script>
+</body>
+</html>
