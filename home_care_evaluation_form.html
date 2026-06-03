@@ -9,6 +9,8 @@
     <title>Alice Care | Home Care Evaluation</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html { font-size: 16px; -webkit-text-size-adjust: 100%; }
@@ -152,6 +154,8 @@
         .btn-secondary:hover, .btn-secondary:active { background: #142947; }
         .btn-outline { background: transparent; color: #1A365C; border: 2px solid #1A365C; }
         .btn-outline:hover, .btn-outline:active { background: #1A365C; color: white; }
+        .btn-draft { background: #2e7d52; color: white; }
+        .btn-draft:hover, .btn-draft:active { background: #25633f; }
         .btn-small { padding: 10px 16px; font-size: 13px; min-height: 44px; }
         
         /* Form Actions */
@@ -1046,7 +1050,8 @@
         </form>
 
         <div class="form-actions">
-            <button type="button" class="btn btn-primary" onclick="saveForm()">Submit & Save</button>
+            <button type="button" class="btn btn-draft" onclick="saveDraft()">Save Draft</button>
+            <button type="button" class="btn btn-primary" onclick="submitForm()">Submit &amp; Save</button>
             <button type="button" class="btn btn-secondary" onclick="generatePDF()">Generate PDF</button>
             <button type="button" class="btn btn-outline" onclick="clearForm()">Clear Form</button>
         </div>
@@ -1396,13 +1401,15 @@
             return data;
         }
 
-        function saveForm() {
+        // ── Save Draft: persists data locally + to backend; does NOT mark as submitted ──
+        function saveDraft() {
             var data = getFormData();
             if (!data.firstName || !data.lastName) {
                 showToast('Please enter client name', 'error');
                 return;
             }
-            showToast('Saving...', 'info');
+            data.formStatus = 'draft';
+            showToast('Saving draft...', 'info');
 
             fetch(SCRIPT_URL, {
                 method: 'POST',
@@ -1412,7 +1419,7 @@
             })
             .then(function() {
                 localStorage.setItem('evaluation_' + data.recordId, JSON.stringify(data));
-                showToast('Saved successfully!', 'success');
+                showToast('Draft saved!', 'success');
                 document.getElementById('recordId').value = data.recordId;
                 document.getElementById('submissionTimestamp').value = data.submissionTimestamp;
                 if (isEditMode) {
@@ -1422,7 +1429,39 @@
             })
             .catch(function() {
                 localStorage.setItem('evaluation_' + data.recordId, JSON.stringify(data));
-                showToast('Saved locally', 'success');
+                showToast('Draft saved locally', 'success');
+            });
+        }
+
+        // ── Submit & Save: marks the record as submitted and sends to backend ──
+        function submitForm() {
+            var data = getFormData();
+            if (!data.firstName || !data.lastName) {
+                showToast('Please enter client name', 'error');
+                return;
+            }
+            data.formStatus = 'submitted';
+            showToast('Submitting...', 'info');
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'save', data: data })
+            })
+            .then(function() {
+                localStorage.setItem('evaluation_' + data.recordId, JSON.stringify(data));
+                showToast('Submitted successfully!', 'success');
+                document.getElementById('recordId').value = data.recordId;
+                document.getElementById('submissionTimestamp').value = data.submissionTimestamp;
+                if (isEditMode) {
+                    currentRecordId = data.recordId;
+                    showEditBanner(data);
+                }
+            })
+            .catch(function() {
+                localStorage.setItem('evaluation_' + data.recordId, JSON.stringify(data));
+                showToast('Submitted locally', 'success');
             });
         }
 
@@ -1521,71 +1560,620 @@
             return isIOS || isDesktopSafari;
         }
 
+        // ── Document-style PDF Generator ──────────────────────────────────────
+        // Produces a reader-friendly summary document using jsPDF + autoTable.
+        // All form data is read from live DOM values — no screenshot/canvas used.
+        // ──────────────────────────────────────────────────────────────────────
         function generatePDF() {
             var data = getFormData();
-            var name = ((data.firstName || 'Client') + '_' + (data.lastName || 'Unknown')).replace(/\s+/g, '_');
+            var clientName = ((data.firstName || '') + ' ' + (data.lastName || '')).trim() || 'Unknown Client';
             var today = new Date();
             var dateStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
-            var filename = 'HomeCare_Eval_' + name + '_' + dateStr + '.pdf';
+            var filename = 'HomeCare_Eval_' + clientName.replace(/\s+/g, '_') + '_' + dateStr + '.pdf';
 
-            // Step 1: sync all live form values to HTML attributes (fixes text-not-appearing bug)
-            syncFormValues(document);
+            showToast('Building document PDF...', 'info');
 
-            // Step 2: Safari / iOS — use native print dialog (Save as PDF)
-            if (isSafariBrowser()) {
-                showToast('Opening print dialog — choose Save as PDF', 'info');
-                // Brief delay so the toast renders before print dialog blocks the UI
-                setTimeout(function() {
-                    window.print();
-                }, 300);
-                return;
-            }
+            try {
+                var jsPDFLib = window.jspdf ? window.jspdf.jsPDF : window.jsPDF;
+                if (!jsPDFLib) { throw new Error('jsPDF not loaded'); }
+                var doc = new jsPDFLib({ unit: 'mm', format: 'a4', orientation: 'portrait' });
 
-            // Step 3: Chrome / Firefox — use html2pdf with onclone sync
-            showToast('Generating PDF... please wait', 'info');
+                // ── Design tokens ──
+                var NAVY    = [26, 54, 92];
+                var ORANGE  = [245, 118, 0];
+                var WHITE   = [255, 255, 255];
+                var LGRAY   = [245, 247, 250];
+                var MGRAY   = [211, 215, 223];
+                var DKTEXT  = [61, 61, 61];
+                var SUBTEXT = [100, 110, 130];
 
-            var actionBar = document.querySelector('.action-buttons');
-            var editBanner = document.getElementById('editBanner');
-            var navBar = document.querySelector('.nav-bar');
-            var toast = document.getElementById('toast');
-            if (actionBar)  actionBar.style.display  = 'none';
-            if (editBanner) editBanner.style.display = 'none';
-            if (navBar)     navBar.style.display     = 'none';
-            if (toast)      toast.style.display      = 'none';
+                var PAGE_W  = 210;
+                var PAGE_H  = 297;
+                var ML      = 14;   // left margin
+                var MR      = 14;   // right margin
+                var BODY_W  = PAGE_W - ML - MR;
+                var y       = 0;    // current Y cursor
 
-            var element = document.querySelector('.container');
-            var opt = {
-                margin: [10, 8, 10, 8],
-                filename: filename,
-                image: { type: 'jpeg', quality: 0.95 },
-                html2canvas: {
-                    scale: 1.5,
-                    useCORS: true,
-                    scrollY: 0,
-                    logging: false,
-                    // onclone runs on the cloned DOM before rendering — sync values again here
-                    onclone: function(clonedDoc) {
-                        syncFormValues(clonedDoc);
+                // ── Helpers ────────────────────────────────────────────────
+                function val(k) {
+                    var v = data[k];
+                    if (v === undefined || v === null || v === '') return '';
+                    if (v === true)  return 'Yes';
+                    if (v === false) return '';
+                    return String(v);
+                }
+                function yesNo(k) { return val(k) || ''; }
+                function checkNew(needed) {
+                    if (y + needed > PAGE_H - 18) { doc.addPage(); y = 18; }
+                }
+                function drawPageHeader() {
+                    // Orange top stripe
+                    doc.setFillColor(245, 118, 0);
+                    doc.rect(0, 0, PAGE_W, 9, 'F');
+                    // Navy footer stripe
+                    doc.setFillColor(26, 54, 92);
+                    doc.rect(0, PAGE_H - 8, PAGE_W, 8, 'F');
+                    // Footer text
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(7);
+                    doc.setTextColor(200, 210, 220);
+                    doc.text('alice.care | Home Care Evaluation', ML, PAGE_H - 3);
+                    doc.text('Page ' + doc.internal.getCurrentPageInfo().pageNumber, PAGE_W - MR, PAGE_H - 3, { align: 'right' });
+                }
+
+                // ── Cover / Title Page ─────────────────────────────────────
+                // Navy background block
+                doc.setFillColor(...NAVY);
+                doc.rect(0, 0, PAGE_W, 72, 'F');
+                // Orange accent bar
+                doc.setFillColor(...ORANGE);
+                doc.rect(0, 72, PAGE_W, 3, 'F');
+                // Logo: "alice." orange "care" white
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(32);
+                doc.setTextColor(...ORANGE);
+                doc.text('alice.', ML, 30);
+                var aliceW = doc.getTextWidth('alice.');
+                doc.setTextColor(...WHITE);
+                doc.text('care', ML + aliceW, 30);
+                // Subtitle
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(11);
+                doc.setTextColor(180, 200, 220);
+                doc.text('Home Care Evaluation Summary', ML, 40);
+                // Client name large
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(20);
+                doc.setTextColor(...WHITE);
+                doc.text(clientName, ML, 56);
+                // Eval date right-aligned
+                var evalDate = val('evaluationDate') || dateStr;
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(9);
+                doc.setTextColor(180, 200, 220);
+                doc.text('Evaluation Date: ' + evalDate, PAGE_W - MR, 56, { align: 'right' });
+                // Record ID
+                if (val('recordId')) {
+                    doc.setFontSize(7.5);
+                    doc.setTextColor(140, 160, 185);
+                    doc.text('Record ID: ' + val('recordId'), ML, 66);
+                }
+                // Background body
+                doc.setFillColor(248, 249, 252);
+                doc.rect(0, 75, PAGE_W, PAGE_H - 75, 'F');
+                // Quick summary box
+                y = 84;
+                doc.setFillColor(...WHITE);
+                doc.roundedRect(ML, y, BODY_W, 52, 3, 3, 'F');
+                doc.setDrawColor(...MGRAY);
+                doc.setLineWidth(0.3);
+                doc.roundedRect(ML, y, BODY_W, 52, 3, 3, 'S');
+                // Quick-glance fields
+                var qFields = [
+                    ['Date of Birth', val('dob')],
+                    ['Age', val('age')],
+                    ['Gender', val('gender')],
+                    ['Marital Status', val('maritalStatus')],
+                    ['Phone', val('phone')],
+                    ['Living Arrangement', val('livingArrangement')],
+                    ['Care Level', val('careLevel')],
+                    ['Fall Risk', val('fallRiskLevel')]
+                ];
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(8);
+                doc.setTextColor(...NAVY);
+                doc.text('CLIENT AT A GLANCE', ML + 5, y + 8);
+                doc.setDrawColor(...MGRAY);
+                doc.line(ML + 5, y + 10, ML + BODY_W - 5, y + 10);
+                var qx = ML + 5;
+                var qy = y + 17;
+                var qColW = (BODY_W - 10) / 2;
+                qFields.forEach(function(f, i) {
+                    var col = i % 2;
+                    var row = Math.floor(i / 2);
+                    var fx = qx + col * qColW;
+                    var fy = qy + row * 8.5;
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(7.5);
+                    doc.setTextColor(...SUBTEXT);
+                    doc.text(f[0] + ':', fx, fy);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setTextColor(...DKTEXT);
+                    doc.text(f[1] || 'Not specified', fx + 36, fy);
+                });
+                // Orange footer on cover
+                doc.setFillColor(...ORANGE);
+                doc.rect(0, PAGE_H - 8, PAGE_W, 8, 'F');
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(7);
+                doc.setTextColor(...WHITE);
+                doc.text('alice.care | Home Care Evaluation', ML, PAGE_H - 3);
+                doc.text('Page 1', PAGE_W - MR, PAGE_H - 3, { align: 'right' });
+
+                // ── Helper: draw section header ────────────────────────────
+                function sectionHead(title, isOrange) {
+                    checkNew(14);
+                    var bg = isOrange ? ORANGE : NAVY;
+                    doc.setFillColor(...bg);
+                    doc.rect(ML, y, BODY_W, 8, 'F');
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(8.5);
+                    doc.setTextColor(...WHITE);
+                    doc.text(title.toUpperCase(), ML + 4, y + 5.5);
+                    y += 10;
+                }
+
+                // ── Helper: draw subsection title ──────────────────────────
+                function subHead(title) {
+                    checkNew(10);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(8);
+                    doc.setTextColor(...NAVY);
+                    // Orange left accent bar
+                    doc.setFillColor(...ORANGE);
+                    doc.rect(ML, y, 2, 5, 'F');
+                    doc.text(title, ML + 4, y + 4);
+                    y += 7;
+                }
+
+                // ── Helper: two-column label/value row ─────────────────────
+                function fieldRow(label, value, labelW) {
+                    if (!value && value !== 0) return;
+                    checkNew(8);
+                    var lw = labelW || 50;
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(8);
+                    doc.setTextColor(...SUBTEXT);
+                    doc.text(label + ':', ML, y);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setTextColor(...DKTEXT);
+                    // Wrap long values
+                    var wrapped = doc.splitTextToSize(String(value), BODY_W - lw - 4);
+                    doc.text(wrapped, ML + lw, y);
+                    y += (wrapped.length * 4.5) + 1.5;
+                }
+
+                // ── Helper: two-per-row grid ───────────────────────────────
+                function fieldGrid(pairs, labelW) {
+                    var lw = labelW || 38;
+                    var colW = BODY_W / 2;
+                    for (var i = 0; i < pairs.length; i += 2) {
+                        checkNew(7);
+                        var a = pairs[i];
+                        var b = pairs[i + 1];
+                        if (a && a[1]) {
+                            doc.setFont('helvetica', 'normal');
+                            doc.setFontSize(7.5);
+                            doc.setTextColor(...SUBTEXT);
+                            doc.text(a[0] + ':', ML, y);
+                            doc.setFont('helvetica', 'bold');
+                            doc.setTextColor(...DKTEXT);
+                            doc.text(String(a[1]), ML + lw, y);
+                        }
+                        if (b && b[1]) {
+                            var bx = ML + colW;
+                            doc.setFont('helvetica', 'normal');
+                            doc.setFontSize(7.5);
+                            doc.setTextColor(...SUBTEXT);
+                            doc.text(b[0] + ':', bx, y);
+                            doc.setFont('helvetica', 'bold');
+                            doc.setTextColor(...DKTEXT);
+                            doc.text(String(b[1]), bx + lw, y);
+                        }
+                        y += 5.5;
                     }
-                },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['css', 'legacy'] }
-            };
+                    y += 1;
+                }
 
-            html2pdf().set(opt).from(element).save()
-            .then(function() {
+                // ── Helper: autoTable wrapper ──────────────────────────────
+                function drawTable(head, body, opts) {
+                    if (!body || body.length === 0) return;
+                    var hasData = body.some(function(r) { return r.some(function(c) { return c && c !== ''; }); });
+                    if (!hasData) return;
+                    doc.autoTable(Object.assign({
+                        head: [head],
+                        body: body,
+                        startY: y,
+                        margin: { left: ML, right: MR },
+                        tableWidth: BODY_W,
+                        styles: { fontSize: 7.5, cellPadding: 2.5, textColor: DKTEXT, lineColor: MGRAY, lineWidth: 0.2, font: 'helvetica' },
+                        headStyles: { fillColor: NAVY, textColor: WHITE, fontStyle: 'bold', fontSize: 8 },
+                        alternateRowStyles: { fillColor: LGRAY },
+                        didDrawPage: function(d) { drawPageHeader(); y = d.cursor.y; }
+                    }, opts || {}));
+                    y = doc.lastAutoTable.finalY + 4;
+                }
+
+                // ── Helper: care-requirements table ───────────────────────
+                function careReqTable(title, rows) {
+                    var hasData = rows.some(function(r) { return r[1] || r[2] || r[3] || r[4]; });
+                    if (!hasData) return;
+                    subHead(title);
+                    drawTable(
+                        ['Task', 'Full Assist', 'Partial', 'Standby', 'None'],
+                        rows.map(function(r) {
+                            return [r[0], r[1] ? 'X' : '', r[2] ? 'X' : '', r[3] ? 'X' : '', r[4] ? 'X' : ''];
+                        }),
+                        { columnStyles: { 0: { cellWidth: 55 }, 1: { halign: 'center', cellWidth: 28 }, 2: { halign: 'center', cellWidth: 28 }, 3: { halign: 'center', cellWidth: 28 }, 4: { halign: 'center' } } }
+                    );
+                }
+
+                // ══ PAGE 2+ CONTENT ═══════════════════════════════════════
+                doc.addPage();
+                drawPageHeader();
+                y = 18;
+
+                // ── 1. Client Personal Information ─────────────────────────
+                sectionHead('Client Personal Information');
+                fieldGrid([
+                    ['First Name', val('firstName')], ['Last Name', val('lastName')],
+                    ['Gender', val('gender')], ['Date of Birth', val('dob')],
+                    ['Age', val('age')], ['Marital Status', val('maritalStatus')],
+                    ['Phone', val('phone')], ['First Language', val('firstLanguage')],
+                    ['2nd Language', val('secondLanguage')], ['Height', val('height')],
+                    ['Weight', val('weight')]
+                ]);
+                var addr = [val('unitNumber') ? 'Unit ' + val('unitNumber') + ', ' : '', val('streetAddress'), val('city') ? ', ' + val('city') : '', val('state') ? ', ' + val('state') : '', val('zipCode') ? ' ' + val('zipCode') : ''].join('').trim().replace(/^,\s*/, '');
+                if (addr) fieldRow('Address', addr, 30);
+                y += 2;
+
+                // ── 2. Authorized Contacts ──────────────────────────────────
+                sectionHead('Authorized Contacts', true);
+                var pName = [val('primaryFirstName'), val('primaryLastName')].filter(Boolean).join(' ');
+                if (pName) {
+                    subHead('Primary Contact');
+                    fieldGrid([
+                        ['Name', pName], ['Relation', val('primaryRelation')],
+                        ['Cell', val('primaryCellPhone')], ['Home', val('primaryHomePhone')],
+                        ['Work', val('primaryWorkPhone')], ['Email', val('primaryEmail')]
+                    ]);
+                    if (val('primaryAddress')) fieldRow('Address', val('primaryAddress'), 30);
+                }
+                var sName = [val('secondaryFirstName'), val('secondaryLastName')].filter(Boolean).join(' ');
+                if (sName) {
+                    subHead('Secondary Contact');
+                    fieldGrid([
+                        ['Name', sName], ['Relation', val('secondaryRelation')],
+                        ['Phone', val('secondaryPhone')], ['Email', val('secondaryEmail')]
+                    ]);
+                    if (val('secondaryLocation')) fieldRow('Location', val('secondaryLocation'), 30);
+                }
+                y += 2;
+
+                // ── 3. Communication Details ───────────────────────────────
+                sectionHead('Communication Details');
+                var commMethods = [];
+                if (data.commPhone) commMethods.push('Phone');
+                if (data.commEmail) commMethods.push('Email');
+                if (data.commVideoChat) commMethods.push('Video Chat');
+                if (commMethods.length) fieldRow('Methods', commMethods.join(', '), 30);
+                fieldGrid([
+                    ['Has Landline', yesNo('hasLandline')], ['Landline #', val('landlineNumber')],
+                    ['Has Cell', yesNo('hasCellphone')], ['Cell #', val('cellNumber')],
+                    ['Owns Computer', yesNo('ownsComputer')], ['Can Operate', yesNo('canOperateComputer')],
+                    ['Can Access Email', yesNo('canAccessEmail')], ['Client Email', val('clientEmail')],
+                    ['Has WiFi', yesNo('hasWifi')], ['WiFi Network', val('wifiNetwork')]
+                ]);
+                y += 2;
+
+                // ── 4. Living Situation ─────────────────────────────────────
+                sectionHead('Living Situation', true);
+                fieldGrid([
+                    ['Living Arrangement', val('livingArrangement')], ['Care Level', val('careLevel')]
+                ]);
+                y += 2;
+
+                // ── 5. Care Requirements ───────────────────────────────────
+                sectionHead('Care Requirements');
+                careReqTable('Personal Care', [
+                    ['Bathing', data.bathingFull, data.bathingPartial, data.bathingStandby, data.bathingNone],
+                    ['Grooming', data.groomingFull, data.groomingPartial, data.groomingStandby, data.groomingNone],
+                    ['Oral Care', data.oralFull, data.oralPartial, data.oralStandby, data.oralNone],
+                    ['Dressing Upper', data.dressingUpperFull, data.dressingUpperPartial, data.dressingUpperStandby, data.dressingUpperNone],
+                    ['Dressing Lower', data.dressingLowerFull, data.dressingLowerPartial, data.dressingLowerStandby, data.dressingLowerNone],
+                    ['Toileting', data.toiletingFull, data.toiletingPartial, data.toiletingStandby, data.toiletingNone],
+                    ['Incontinence', data.incontinenceFull, data.incontinencePartial, data.incontinenceStandby, data.incontinenceNone],
+                    ['Skin Care', data.skinCareFull, data.skinCarePartial, data.skinCareStandby, data.skinCareNone]
+                ]);
+                careReqTable('Meals', [
+                    ['Breakfast', data.breakfastFull, data.breakfastPartial, data.breakfastStandby, data.breakfastNone],
+                    ['Lunch', data.lunchFull, data.lunchPartial, data.lunchStandby, data.lunchNone],
+                    ['Dinner', data.dinnerFull, data.dinnerPartial, data.dinnerStandby, data.dinnerNone],
+                    ['Snacks', data.snacksFull, data.snacksPartial, data.snacksStandby, data.snacksNone]
+                ]);
+                careReqTable('Home Environment', [
+                    ['Make Bed', data.makeBedFull, data.makeBedPartial, data.makeBedStandby, data.makeBedNone],
+                    ['Change Bed', data.changeBedFull, data.changeBedPartial, data.changeBedStandby, data.changeBedNone],
+                    ['Laundry', data.laundryFull, data.laundryPartial, data.laundryStandby, data.laundryNone]
+                ]);
+                careReqTable('Activity / Movement', [
+                    ['Transfers', data.transfersFull, data.transfersPartial, data.transfersStandby, data.transfersNone],
+                    ['Walking', data.walkingFull, data.walkingPartial, data.walkingStandby, data.walkingNone],
+                    ['Positioning', data.positioningFull, data.positioningPartial, data.positioningStandby, data.positioningNone]
+                ]);
+                careReqTable('Housekeeping', [
+                    ['Vacuuming', data.vacuumingFull, data.vacuumingPartial, data.vacuumingStandby, data.vacuumingNone],
+                    ['Dusting', data.dustingFull, data.dustingPartial, data.dustingStandby, data.dustingNone],
+                    ['Kitchen Clean', data.kitchenFull, data.kitchenPartial, data.kitchenStandby, data.kitchenNone],
+                    ['Bathroom Clean', data.bathroomFull, data.bathroomPartial, data.bathroomStandby, data.bathroomNone]
+                ]);
+                careReqTable('Social Engagement', [
+                    ['Physical Participate', data.physicalParticipateAssistFull, data.physicalParticipateAssistPartial, data.physicalParticipateAssistStandby, data.physicalParticipateAssistNone]
+                ]);
+                y += 2;
+
+                // ── 6. Hearing & Vision ────────────────────────────────────
+                sectionHead('Hearing & Vision', true);
+                fieldGrid([
+                    ['Vision Issues', val('visionIssues')], ['Vision Assistance', val('visionAssistance')],
+                    ['Hearing Aids', yesNo('hearingAids')], ['Hearing Assistance', val('hearingAssistance')]
+                ]);
+                y += 2;
+
+                // ── 7. Reminders & Mobility ────────────────────────────────
+                sectionHead('Reminders & Mobility');
+                fieldGrid([
+                    ['Needs Reminders', yesNo('needsReminders')], ['Mobility Aid', val('mobilityAid')]
+                ]);
+                y += 2;
+
+                // ── 8. Home Environment ────────────────────────────────────
+                sectionHead('Home Environment', true);
+                fieldGrid([
+                    ['Home Type', val('homeType')], ['Entry Access', val('entryAccess')],
+                    ['Key Location', val('keyLocation')], ['Alarm Code', val('alarmCode')],
+                    ['Pets', yesNo('hasPets')], ['Pet Type/Name', val('petDetails')],
+                    ['Pet concerns', val('petConcerns')]
+                ]);
+                y += 2;
+
+                // ── 9. Fall Risk Assessment ────────────────────────────────
+                sectionHead('Fall Risk Assessment');
+                fieldGrid([
+                    ['Fall Risk Level', val('fallRiskLevel')],
+                    ['Recent Falls', yesNo('recentFalls')],
+                    ['Meds Impact', val('medsImpact')],
+                    ['Vision Assess.', val('visionAssessment')],
+                    ['Hearing Assess.', val('hearingAssessment')],
+                    ['Mobility Assess.', val('mobilityAssessment')],
+                    ['Environment', val('physicalEnvironment')],
+                    ['Bladder/Bowel', val('bladderBowel')]
+                ]);
+                if (val('fallInterventions')) fieldRow('General Interventions', val('fallInterventions'), 42);
+                if (val('lowInterventions')) fieldRow('Low Risk Interventions', val('lowInterventions'), 42);
+                if (val('moderateInterventions')) fieldRow('Moderate Interventions', val('moderateInterventions'), 42);
+                if (val('highInterventions')) fieldRow('High Interventions', val('highInterventions'), 42);
+                y += 2;
+
+                // ── 10. Verbal Communication ───────────────────────────────
+                sectionHead('Verbal Communication', true);
+                fieldRow('Communication Ability', val('communicationAbility'), 50);
+                var likesDislikes = [
+                    ['Activity (Hobbies/Sports)', val('activityLikes'), val('activityDislikes')],
+                    ['Social (Music/Movies/TV)', val('socialLikes'), val('socialDislikes')],
+                    ['Facial (Makeup/Shaving)', val('facialLikes'), val('facialDislikes')],
+                    ['Other', val('otherLikes'), val('otherDislikes')]
+                ].filter(function(r) { return r[1] || r[2]; });
+                if (likesDislikes.length) {
+                    drawTable(['Category', 'Likes', 'Dislikes'], likesDislikes,
+                        { columnStyles: { 0: { cellWidth: 52 } } });
+                }
+                y += 2;
+
+                // ── 11. Chronic Physical Issues ────────────────────────────
+                sectionHead('Chronic Physical Issues');
+                var painRows = [];
+                for (var p = 1; p <= 4; p++) {
+                    var pr = [val('pain'+p+'_desc'), val('pain'+p+'_onset'), val('pain'+p+'_expressed'), val('pain'+p+'_remedy')];
+                    if (pr.some(Boolean)) painRows.push(pr);
+                }
+                if (painRows.length) {
+                    drawTable(['Pain Description', 'Onset', 'How Expressed', 'Remedy'], painRows);
+                }
+                y += 2;
+
+                // ── 12. Food & Drink Preferences ──────────────────────────
+                sectionHead('Food & Drink Preferences', true);
+                fieldGrid([
+                    ['Has Allergies', yesNo('hasAllergies')], ['Allergies List', val('allergiesList')],
+                    ['Dietary Restrictions', yesNo('hasRestrictions')], ['Restrictions', val('restrictionsList')],
+                    ['Foods Liked', val('foodLikesList')], ['Foods Disliked', val('foodDislikesList')],
+                    ['Dietitian Recs', val('dietitianRecsList')], ['Needs Thickener', yesNo('needsThickener')],
+                    ['Thickener Type', val('thickenerType')], ['Alcohol Permitted', yesNo('alcoholPermitted')],
+                    ['Alcohol Restrictions', val('alcoholRestrictions')]
+                ]);
+                if (val('foodComments')) fieldRow('Food Comments', val('foodComments'), 35);
+                y += 2;
+
+                // ── 13. Emergency Information ──────────────────────────────
+                sectionHead('Emergency Information');
+                fieldGrid([
+                    ['Medical Card #', val('medicalCard')], ['Medical Insurance', val('medicalInsurance')],
+                    ['Emergency Contact', val('medContactFirstName')], ['Contact Phone', val('medContactFirstPhone')],
+                    ['2nd Contact', val('medContactLastName')], ['2nd Contact Phone', val('medContactLastPhone')],
+                    ['GP/Physician', val('gpName')], ['GP Address', val('gpAddress')],
+                    ['Neighbor', val('neighborName')], ['Neighbor Phone', val('neighborPhone')],
+                    ['Client Smokes', yesNo('clientSmokes')], ['Smoking Frequency', val('smokingFrequency')],
+                    ['Has Directives', yesNo('hasDirectives')]
+                ]);
+                if (val('allAllergies')) fieldRow('All Allergies', val('allAllergies'), 35);
+                y += 2;
+
+                // ── 14. Medical Status / Diagnoses ─────────────────────────
+                sectionHead('Medical Status / Diagnosis', true);
+                var diagnoses = [];
+                var diagMap = { diagDementia: 'Dementia', diagParkinsons: "Parkinson's", diagMS: 'MS', diagDiabetes: 'Diabetes', diagCancer: 'Cancer', diagStroke: 'Stroke', diagHeart: 'Heart Disease', diagArthritis: 'Arthritis', diagMacular: 'Macular Degen.', diagOther: 'Other' };
+                Object.keys(diagMap).forEach(function(k) { if (data[k]) diagnoses.push(diagMap[k]); });
+                if (diagnoses.length) fieldRow('Diagnoses', diagnoses.join(', '), 30);
+                if (val('medicalDetails')) fieldRow('Medical Details', val('medicalDetails'), 30);
+                y += 2;
+
+                // ── 15. Medications ────────────────────────────────────────
+                sectionHead('Medications');
+                fieldRow('Med Reminders', yesNo('needsMedReminders'), 35);
+                var medRows = [];
+                for (var m = 1; m <= 5; m++) {
+                    var mr = [val('med'+m+'_name'), val('med'+m+'_purpose'), val('med'+m+'_dose'), val('med'+m+'_route'), val('med'+m+'_admin'), val('med'+m+'_freq')];
+                    if (mr.some(Boolean)) medRows.push(mr);
+                }
+                if (medRows.length) {
+                    drawTable(['Name', 'Purpose', 'Dose', 'Route', 'Admin By', 'Frequency'], medRows,
+                        { columnStyles: { 0: { cellWidth: 32 }, 1: { cellWidth: 38 } } });
+                }
+                y += 2;
+
+                // ── 16. Vitamins / Supplements ─────────────────────────────
+                sectionHead('Vitamins / Supplements', true);
+                var vitRows = [];
+                for (var v = 1; v <= 3; v++) {
+                    var vr = [val('vit'+v+'_name'), val('vit'+v+'_purpose'), val('vit'+v+'_perday'), val('vit'+v+'_freq')];
+                    if (vr.some(Boolean)) vitRows.push(vr);
+                }
+                if (vitRows.length) {
+                    drawTable(['Name', 'Purpose', 'Per Day', 'Frequency'], vitRows);
+                }
+                y += 2;
+
+                // ── 17. Weekly Activities ──────────────────────────────────
+                sectionHead('Weekly Activities');
+                var actRows = [];
+                for (var a = 1; a <= 3; a++) {
+                    var ar = [val('act'+a+'_type'), val('act'+a+'_days'), val('act'+a+'_times'), val('act'+a+'_location')];
+                    if (ar.some(Boolean)) actRows.push(ar);
+                }
+                if (actRows.length) {
+                    drawTable(['Activity', 'Day(s)', 'Time(s)', 'Location'], actRows);
+                }
+                y += 2;
+
+                // ── 18. Transportation ─────────────────────────────────────
+                sectionHead('Transportation', true);
+                subHead('Caregiver Transportation');
+                fieldGrid([
+                    ['Needs Transport', yesNo('needsCaregiverTransport')], ['CG Can Drive', yesNo('caregiverCanDrive')],
+                    ['Transport Details', val('caregiverDriveDetails')], ['Use Company Car', yesNo('useCompanyCar')],
+                    ['Use Client Car', yesNo('useOwnCar')], ['CG Parking', val('caregiverParking')]
+                ]);
+                subHead('Client Vehicle');
+                fieldGrid([
+                    ['Client Drives', yesNo('clientDrives')], ['Vehicle', val('vehicleModel') + (val('vehicleYear') ? ' (' + val('vehicleYear') + ')' : '')],
+                    ['License Plate', val('vehiclePlate')], ['Insurance Co', val('insuranceCompany')],
+                    ['Policy #', val('insurancePolicy')], ['Insurance Contact', val('insuranceContact')],
+                    ['Insurance Expiry', val('insuranceExpiry')], ['Driving Restrictions', yesNo('hasDrivingRestrictions')],
+                    ['Restriction Details', val('drivingRestrictions')], ['Roadside Assist', yesNo('hasRoadsideAssistance')],
+                    ['Roadside Company', val('roadsideCompany')], ['Parking', val('parkingLocation')],
+                    ['Wheelchair Permit', yesNo('hasWheelchairPermit')], ['Permit Location', val('wheelchairPermitLocation')]
+                ]);
+                if (val('transportNotes')) fieldRow('Transport Notes', val('transportNotes'), 35);
+                y += 2;
+
+                // ── 19. Required Services ──────────────────────────────────
+                sectionHead('Required Services');
+                var services = [];
+                if (data.serviceHourly) services.push('Hourly');
+                if (data.serviceLiveIn24) services.push('Live In 24h');
+                if (data.serviceLiveOut24) services.push('Live Out 24h');
+                if (data.serviceOvernight) services.push('Overnight');
+                if (data.serviceRespite) services.push('Respite');
+                if (data.serviceOnCall) services.push('On Call');
+                if (services.length) fieldRow('Selected Services', services.join(', '), 40);
+                y += 2;
+
+                // ── 20. Visit Schedule ─────────────────────────────────────
+                sectionHead('Visit Schedule', true);
+                var days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+                var schedRows = [];
+                days.forEach(function(d) {
+                    var dayKey = 'schedule' + d;
+                    if (data[dayKey]) {
+                        var t1 = val('schedule' + d + 'Time1');
+                        var t2 = val('schedule' + d + 'Time2');
+                        schedRows.push([d, t1 || '', t2 || '']);
+                    }
+                });
+                if (schedRows.length) {
+                    drawTable(['Day', 'Start Time', 'End Time'], schedRows,
+                        { columnStyles: { 0: { cellWidth: 25 }, 1: { cellWidth: 50 }, 2: { cellWidth: 50 } } });
+                }
+                y += 2;
+
+                // ── 21. Care Plan Review ───────────────────────────────────
+                sectionHead('Care Plan Review');
+                fieldGrid([
+                    ['Review Frequency', val('reviewFrequency')], ['Next Review Date', val('nextReviewDate')]
+                ]);
+                if (val('carePlanNotes')) fieldRow('Care Plan Notes', val('carePlanNotes'), 38);
+                y += 4;
+
+                // ── Signature Block ────────────────────────────────────────
+                checkNew(40);
+                doc.setFillColor(...LGRAY);
+                doc.roundedRect(ML, y, BODY_W, 32, 2, 2, 'F');
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(8);
+                doc.setTextColor(...NAVY);
+                doc.text('SIGNATURES', ML + 5, y + 7);
+                doc.setDrawColor(...MGRAY);
+                var halfW = (BODY_W - 10) / 2;
+                // Client signature line
+                doc.line(ML + 5, y + 22, ML + 5 + halfW - 5, y + 22);
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(7);
+                doc.setTextColor(...SUBTEXT);
+                doc.text('Client / Authorized Representative', ML + 5, y + 26);
+                doc.text('Date: _______________', ML + 5, y + 30);
+                // Assessor signature line
+                var sx2 = ML + 5 + halfW + 5;
+                doc.line(sx2, y + 22, sx2 + halfW - 5, y + 22);
+                doc.text('Assessor / Coordinator', sx2, y + 26);
+                doc.text('Date: _______________', sx2, y + 30);
+                y += 36;
+
+                // ── Page headers on all pages after page 1 ─────────────────
+                var totalPages = doc.internal.getNumberOfPages();
+                for (var pg = 2; pg <= totalPages; pg++) {
+                    doc.setPage(pg);
+                    drawPageHeader();
+                    // Running header
+                    doc.setFillColor(248, 249, 252);
+                    doc.rect(0, 9, PAGE_W, 9, 'F');
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(7.5);
+                    doc.setTextColor(...SUBTEXT);
+                    doc.text('Home Care Evaluation: ' + clientName, ML, 15);
+                    doc.text('Eval Date: ' + evalDate, PAGE_W - MR, 15, { align: 'right' });
+                    doc.setDrawColor(...MGRAY);
+                    doc.line(ML, 17.5, PAGE_W - MR, 17.5);
+                }
+
+                doc.save(filename);
                 showToast('PDF downloaded: ' + filename, 'success');
-            })
-            .catch(function(err) {
+
+            } catch(err) {
                 console.error('PDF generation error:', err);
-                showToast('PDF failed — try using Print (Ctrl+P) to save as PDF', 'error');
-            })
-            .finally(function() {
-                if (actionBar)  actionBar.style.display  = '';
-                if (editBanner) editBanner.style.display = '';
-                if (navBar)     navBar.style.display     = '';
-                if (toast)      toast.style.display      = '';
-            });
+                showToast('PDF error — check console. Falling back to print.', 'error');
+                setTimeout(function() { window.print(); }, 400);
+            }
         }
 
         function showToast(msg, type) {
