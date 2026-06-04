@@ -4070,10 +4070,12 @@
             console.log('🔍 Getting all cities from database...');
             console.log('Total organizations:', state.organizations.length);
             
-            // Get ALL unique cities from Active organizations
+            // Get ALL unique cities from Active organizations (trimmed, original casing preserved)
             state.organizations.forEach((org) => {
-                if (org.City && org.Status === 'Active') {
-                    citiesSet.add(org.City);
+                const status = (org.Status || '').trim().toLowerCase();
+                const city = (org.City || '').trim();
+                if (city && status === 'active') {
+                    citiesSet.add(city);
                 }
             });
             
@@ -4086,13 +4088,21 @@
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
-            console.log(`🏙️ Getting organizations for city: ${city}`);
+            const cityNorm = (city || '').trim().toLowerCase();
+            console.log(`🏙️ Getting organizations for city: "${city}" (normalized: "${cityNorm}")`);
+            console.log(`   Total orgs in state: ${state.organizations.length}`);
             
-            const orgs = state.organizations.filter(org => 
-                org.City === city && org.Status === 'Active'
-            );
+            const orgs = state.organizations.filter(org => {
+                const orgCity = (org.City || '').trim().toLowerCase();
+                const orgStatus = (org.Status || '').trim().toLowerCase();
+                return orgCity === cityNorm && orgStatus === 'active';
+            });
             
-            console.log(`  Found ${orgs.length} active organizations in ${city}`);
+            console.log(`  Found ${orgs.length} active organizations in "${city}"`);
+            if (orgs.length === 0 && state.organizations.length > 0) {
+                const sample = state.organizations.slice(0, 3).map(o => `City="${o.City}" Status="${o.Status}"`);
+                console.warn(`  Sample org data: ${sample.join(' | ')}`);
+            }
             
             return orgs.map(org => {
                 let nextVisitDue = null;
@@ -4308,6 +4318,13 @@ END:VEVENT
 
         function generateRoutePlan() {
             console.log('🚀 GENERATE ROUTE PLAN STARTED');
+            console.log('   state.organizations count:', state.organizations.length);
+            console.log('   state.user:', state.user ? state.user.email : 'null');
+            
+            if (state.organizations.length === 0) {
+                showToast('No organization data loaded yet. Please wait for data to finish loading, then try again.', 'warning');
+                return;
+            }
             
             // Get selected cities from checkboxes
             const checkedBoxes = document.querySelectorAll('.route-city-checkbox input[type="checkbox"]:checked');
@@ -5396,7 +5413,16 @@ END:VEVENT
                 if (tabId === 'settings') renderSettings();
                 if (tabId === 'checkin') renderCheckinAssets();
                 if (tabId === 'directory') { renderDirectory(); closeDetailPanel(); }
-                if (tabId === 'visits') { populateRouteZones(); populateRouteCities(); }
+                if (tabId === 'visits') {
+                    populateRouteZones();
+                    populateRouteCities();
+                    const plannerContent = document.getElementById('routePlannerContent');
+                    const plannerToggle = document.querySelector('.route-planner-toggle');
+                    if (plannerContent && plannerContent.style.display === 'none') {
+                        plannerContent.style.display = 'block';
+                        if (plannerToggle) plannerToggle.classList.add('open');
+                    }
+                }
             } catch (err) {
                 console.error('Error in switchTab:', err);
             }
