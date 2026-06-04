@@ -1781,13 +1781,18 @@
             flex-wrap: wrap;
             gap: 15px;
             margin-bottom: 15px;
-            align-items: flex-end;
+            align-items: flex-start;
         }
 
         .route-planner-controls > div {
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
+        }
+
+        .route-planner-controls > div.rp-buttons {
+            align-self: flex-end;
+            padding-bottom: 0;
         }
 
         .route-planner-controls select,
@@ -2575,7 +2580,7 @@
                                min="0" max="60" step="5" value="15">
                     </div>
                     
-                    <div style="display: flex; align-items: flex-end; gap: 10px; min-width: 280px;">
+                    <div class="rp-buttons" style="display: flex; align-items: flex-end; gap: 10px; min-width: 280px;">
                         <button onclick="generateRoutePlan()" class="btn btn-primary" style="flex: 1; height: 40px; margin: 0; font-weight: bold;">
                             Generate
                         </button>
@@ -4383,7 +4388,8 @@ END:VEVENT
             
             if (combinedRoute.length === 0) {
                 console.warn('⚠️ No organizations found for selected cities');
-                showToast('No organizations found. Check that organizations have Status=Active and are in the selected cities.', 'warning');
+                const selectedCityNames = selectedOptions.join(', ');
+                showToast(`No Active organizations found in: ${selectedCityNames}. Check that organizations have Status = Active and the correct City value.`, 'warning');
                 return;
             }
             
@@ -5390,6 +5396,7 @@ END:VEVENT
                 if (tabId === 'settings') renderSettings();
                 if (tabId === 'checkin') renderCheckinAssets();
                 if (tabId === 'directory') { renderDirectory(); closeDetailPanel(); }
+                if (tabId === 'visits') { populateRouteZones(); populateRouteCities(); }
             } catch (err) {
                 console.error('Error in switchTab:', err);
             }
