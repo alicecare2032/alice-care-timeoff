@@ -4071,10 +4071,12 @@
             console.log('Total organizations:', state.organizations.length);
             
             // Get ALL unique cities from Active organizations (trimmed, original casing preserved)
+            // Treat missing/null Status as Active (Pipedrive-imported orgs have no Status field)
             state.organizations.forEach((org) => {
                 const status = (org.Status || '').trim().toLowerCase();
                 const city = (org.City || '').trim();
-                if (city && status === 'active') {
+                const isActive = !status || status === 'active';
+                if (city && isActive) {
                     citiesSet.add(city);
                 }
             });
@@ -4095,7 +4097,9 @@
             const orgs = state.organizations.filter(org => {
                 const orgCity = (org.City || '').trim().toLowerCase();
                 const orgStatus = (org.Status || '').trim().toLowerCase();
-                return orgCity === cityNorm && orgStatus === 'active';
+                // Treat missing/null Status as Active (Pipedrive-imported orgs have no Status field)
+                const isActive = !orgStatus || orgStatus === 'active';
+                return orgCity === cityNorm && isActive;
             });
             
             console.log(`  Found ${orgs.length} active organizations in "${city}"`);
@@ -4136,11 +4140,27 @@
         }
 
         function generateRoute(city, startTime, durationMinutes, travelBuffer = 0, planDate = null) {
+            // Debug: show all unique City+Status combos in state
+            const cityNorm = (city || '').trim().toLowerCase();
+            const allCities = [...new Set(state.organizations.map(o => (o.City||'').trim()))].sort();
+            const allStatuses = [...new Set(state.organizations.map(o => (o.Status||'').trim()))].sort();
+            console.log(`🔍 generateRoute("${city}") → normalized: "${cityNorm}"`);
+            console.log(`   All cities in state (${state.organizations.length} orgs):`, allCities);
+            console.log(`   All status values in state:`, allStatuses);
+            
+            // Show exact matches
+            const exactMatches = state.organizations.filter(o => (o.City||'').trim() === city.trim());
+            const normMatches  = state.organizations.filter(o => (o.City||'').trim().toLowerCase() === cityNorm);
+            console.log(`   Exact city matches: ${exactMatches.length}, Norm matches: ${normMatches.length}`);
+            if (normMatches.length > 0) {
+                console.log(`   Sample matched orgs:`, normMatches.slice(0,3).map(o => ({City:o.City, Status:o.Status, Name:o.Name})));
+            }
+
             let overdue = getOverdueOrganizations(city);
             let sorted = sortByDistance(overdue);
             
             if (sorted.length === 0) {
-                showToast('No organizations in ' + city, 'warning');
+                console.warn(`⚠️ No orgs returned for "${city}". Check Status values above.`);
                 return [];
             }
             
@@ -4240,7 +4260,7 @@ END:VTIMEZONE
                 const description = `Organization: ${stop.Name}
 Address: ${stop.Address}, ${stop.City}, ${stop.State} ${stop.Zip}
 Phone: ${stop.Phone || 'N/A'}
-Last Visited: ${stop.Last_Visit ? new Date(stop.Last_Visit).toLocaleDateString() : 'Never'}
+Last Visited: ${(stop.Last_activity_date || stop.Last_Visit) ? new Date(stop.Last_activity_date || stop.Last_Visit).toLocaleDateString() : 'Never'}
 Days Overdue: ${stop.DaysOverdue}
 Status: ${stop.Status}`;
 
@@ -4366,11 +4386,30 @@ END:VEVENT
             console.log('✅ All validations passed');
             
             // Combine routes from all selected cities
+            // Use direct org lookup by city name (normalized) to avoid string-match misses
             let combinedRoute = [];
             selectedOptions.forEach(city => {
                 console.log('📞 Generating route for city:', city);
-                const route = generateRoute(city, startTime, duration, travelBuffer, planDate);
-                combinedRoute = combinedRoute.concat(route);
+                const cityNorm = (city || '').trim().toLowerCase();
+                
+                // Find orgs whose City field normalizes to the same value
+                const matchingCities = [...new Set(
+                    state.organizations
+                        .filter(o => (o.City||'').trim().toLowerCase() === cityNorm)
+                        .map(o => (o.City||'').trim())
+                )];
+                
+                console.log(`   Matching city strings for "${city}":`, matchingCities);
+                
+                if (matchingCities.length === 0) {
+                    console.warn(`   No orgs found for city "${city}" - skipping`);
+                } else {
+                    // Use the actual city string from the org record, not the checkbox value
+                    matchingCities.forEach(actualCity => {
+                        const route = generateRoute(actualCity, startTime, duration, travelBuffer, planDate);
+                        combinedRoute = combinedRoute.concat(route);
+                    });
+                }
             });
             
             // Re-sequence the combined route with travel buffer
@@ -4723,10 +4762,14 @@ END:VEVENT
             let matchCount = 0;
             
             state.organizations.forEach(org => {
-                if (org.Status === 'Active' && org.City && org.Zone) {
-                    // Match organization ZONE field against the zone CODE parameter
-                    if (org.Zone.trim() === zone.trim()) {
-                        citiesSet.add(org.City);
+                const orgStatus = (org.Status || '').trim().toLowerCase();
+                const orgCity = (org.City || '').trim();
+                const orgZone = (org.Zone || '').trim();
+                // Treat missing/null Status as Active (Pipedrive-imported orgs have no Status field)
+                const isActive = !orgStatus || orgStatus === 'active';
+                if (isActive && orgCity && orgZone) {
+                    if (orgZone === zone.trim()) {
+                        citiesSet.add(orgCity);
                         matchCount++;
                     }
                 }
@@ -4752,7 +4795,12 @@ END:VEVENT
             const selectedZone = zoneSelect.value;
             const cities = getCitiesForZone(selectedZone);
             
-            // Clear existing checkboxes
+            // Preserve checked state before clearing
+            const prevChecked = new Set(
+                Array.from(citiesContainer.querySelectorAll('input[type="checkbox"]:checked'))
+                    .map(cb => cb.value)
+            );
+
             citiesContainer.innerHTML = '';
             
             console.log(`📍 Cities for zone "${selectedZone}":`, cities);
@@ -4762,7 +4810,7 @@ END:VEVENT
                 return;
             }
             
-            // Add checkboxes for each city
+            // Add checkboxes for each city, restoring checked state
             cities.forEach(city => {
                 const checkboxDiv = document.createElement('div');
                 checkboxDiv.className = 'route-city-checkbox';
@@ -4771,6 +4819,7 @@ END:VEVENT
                 checkbox.type = 'checkbox';
                 checkbox.value = city;
                 checkbox.id = `city_${city.replace(/\s+/g, '_')}`;
+                checkbox.checked = prevChecked.has(city);
                 
                 const label = document.createElement('label');
                 label.htmlFor = checkbox.id;
@@ -4796,6 +4845,12 @@ END:VEVENT
             const cities = getRoutePlannerCities();
             console.log('📍 Initial cities available:', cities);
             
+            // Preserve currently-checked cities before rebuilding
+            const previouslyChecked = new Set(
+                Array.from(citiesContainer.querySelectorAll('input[type="checkbox"]:checked'))
+                    .map(cb => cb.value)
+            );
+            
             citiesContainer.innerHTML = '';
             
             cities.forEach(city => {
@@ -4806,6 +4861,7 @@ END:VEVENT
                 checkbox.type = 'checkbox';
                 checkbox.value = city;
                 checkbox.id = `city_${city.replace(/\s+/g, '_')}`;
+                checkbox.checked = previouslyChecked.has(city);
                 
                 const label = document.createElement('label');
                 label.htmlFor = checkbox.id;
