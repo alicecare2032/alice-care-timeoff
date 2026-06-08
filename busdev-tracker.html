@@ -4281,12 +4281,12 @@ END:VTIMEZONE
                 console.log(`      Start: ${startDateTime} (from ${stop._arrivalDate})`);
                 console.log(`      End: ${endDateTime} (from ${stop._departureDate})`);
                 
-                const addrLine1  = (stop.Address  || '').trim();
-                const addrLine2  = (stop.Address2 || '').trim();
-                const addrCity   = (stop.City     || '').trim();
-                const addrState  = (stop.State    || 'CA').trim();
-                const addrZip    = (stop.Zip      || '').trim();
-                const addrPhone  = (stop.Phone    || 'N/A').trim();
+                const addrLine1  = String(stop.Address  || '').trim();
+                const addrLine2  = String(stop.Address2 || '').trim();
+                const addrCity   = String(stop.City     || '').trim();
+                const addrState  = String(stop.State    || 'CA').trim();
+                const addrZip    = String(stop.Zip      || '').trim();
+                const addrPhone  = String(stop.Phone    || 'N/A').trim();
                 const streetFull = addrLine2 ? `${addrLine1}, ${addrLine2}` : addrLine1;
                 const fullAddress = [streetFull, addrCity, `${addrState} ${addrZip}`].filter(Boolean).join(', ');
                 const lastVisitRaw = stop.Last_activity_date || stop.Last_Visit;
@@ -4729,11 +4729,12 @@ END:VEVENT
         }
 
         function buildAddressString(stop) {
-            const line1  = (stop.Address  || '').trim();
-            const line2  = (stop.Address2 || '').trim();
-            const city   = (stop.City     || '').trim();
-            const state  = (stop.State    || 'CA').trim();
-            const zip    = (stop.Zip      || '').trim();
+            // Use String() first — Zip/State can be numbers from Google Sheets
+            const line1  = String(stop.Address  || '').trim();
+            const line2  = String(stop.Address2 || '').trim();
+            const city   = String(stop.City     || '').trim();
+            const state  = String(stop.State    || 'CA').trim();
+            const zip    = String(stop.Zip      || '').trim();
             const street = line2 ? `${line1}, ${line2}` : line1;
             return [street, city, state, zip].filter(Boolean).join(', ');
         }
