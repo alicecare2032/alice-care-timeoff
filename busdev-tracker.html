@@ -3974,27 +3974,45 @@
             showToast('✅ Session extended for 8 more hours', 'success');
         }
         
+        // ── LOGIN PAUSED ──────────────────────────────────────────────
+        // Set to false to re-enable Google login requirement.
+        const LOGIN_PAUSED = true;
+        // ─────────────────────────────────────────────────────────────
+
         function updateAuthUI() {
             const signedInSection = document.getElementById('signedInSection');
             const signedOutSection = document.getElementById('signedOutSection');
             const loginGate = document.getElementById('loginGate');
             const mainApp = document.getElementById('mainApp');
-            
+
+            // When login is paused, inject a default admin user and show the app
+            if (LOGIN_PAUSED && !state.user) {
+                state.user = {
+                    name: 'Guest',
+                    email: 'guest@alicecare.com',
+                    role: 'Admin',
+                    zones: ['SMF', 'SDG'],
+                    active: true
+                };
+            }
+
             if (state.user) {
-                // User is authenticated
-                signedInSection.style.display = 'flex';
-                signedOutSection.style.display = 'none';
-                document.getElementById('userName').textContent = state.user.name || state.user.email;
-                document.getElementById('userZones').textContent = state.user.zones?.join(', ') || 'All';
-                
+                // User is authenticated (or login is paused)
+                if (signedInSection) signedInSection.style.display = 'flex';
+                if (signedOutSection) signedOutSection.style.display = 'none';
+                const userNameEl = document.getElementById('userName');
+                const userZonesEl = document.getElementById('userZones');
+                if (userNameEl) userNameEl.textContent = state.user.name || state.user.email;
+                if (userZonesEl) userZonesEl.textContent = state.user.zones?.join(', ') || 'All';
+
                 // Show main app, hide login gate
                 if (loginGate) loginGate.classList.add('hidden');
                 if (mainApp) mainApp.style.display = 'block';
             } else {
                 // User is not authenticated
-                signedInSection.style.display = 'none';
-                signedOutSection.style.display = 'block';
-                
+                if (signedInSection) signedInSection.style.display = 'none';
+                if (signedOutSection) signedOutSection.style.display = 'block';
+
                 // Hide main app, show login gate
                 if (loginGate) loginGate.classList.remove('hidden');
                 if (mainApp) mainApp.style.display = 'none';
