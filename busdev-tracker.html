@@ -2558,6 +2558,18 @@
                         </div>
                     </div>
                     
+                    <div style="min-width: 260px; flex-basis: 100%;">
+                        <label for="routeStartAddress" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">
+                            📍 Starting Point
+                        </label>
+                        <input type="text" id="routeStartAddress" class="form-input"
+                               placeholder="e.g. 8146 Greenback Ln, Fair Oaks, CA"
+                               style="width: 100%;">
+                        <div style="font-size: 11px; color: #888; margin-top: 3px;">
+                            Enter your starting address — route will be optimized from here
+                        </div>
+                    </div>
+
                     <div style="min-width: 140px;">
                         <label for="routePlanDate" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">Plan Date</label>
                         <input type="date" id="routePlanDate" class="form-input">
@@ -4152,8 +4164,63 @@
             }).sort((a, b) => b.DaysOverdue - a.DaysOverdue); // CHANGED: Show ALL organizations, not just overdue
         }
 
+        // Geocode a single address via Nominatim (OSM) — returns {lat, lon} or null
+        async function geocodeAddress(address) {
+            if (!address || !address.trim()) return null;
+            try {
+                const q = encodeURIComponent(address.trim());
+                const url = `https://nominatim.openstreetmap.org/search?q=${q}&format=json&limit=1&countrycodes=us`;
+                const res = await fetch(url, {
+                    headers: { 'Accept-Language': 'en', 'User-Agent': 'AliceCareRoutePlanner/1.0' }
+                });
+                const data = await res.json();
+                if (data && data.length > 0) {
+                    return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
+                }
+            } catch (e) {
+                console.warn('Geocode failed for:', address, e);
+            }
+            return null;
+        }
+
+        // Haversine distance in miles between two {lat,lon} points
+        function haversineDistance(a, b) {
+            const R = 3958.8; // Earth radius miles
+            const dLat = (b.lat - a.lat) * Math.PI / 180;
+            const dLon = (b.lon - a.lon) * Math.PI / 180;
+            const sinLat = Math.sin(dLat / 2);
+            const sinLon = Math.sin(dLon / 2);
+            const c = sinLat * sinLat +
+                Math.cos(a.lat * Math.PI / 180) * Math.cos(b.lat * Math.PI / 180) * sinLon * sinLon;
+            return R * 2 * Math.atan2(Math.sqrt(c), Math.sqrt(1 - c));
+        }
+
+        // Nearest-neighbor TSP from a fixed origin point
+        // Returns orgs reordered to minimize total travel distance
+        function nearestNeighborRoute(orgs, originCoord) {
+            if (orgs.length === 0) return orgs;
+            const remaining = orgs.map((org, i) => ({ ...org, _idx: i }));
+            const ordered = [];
+            let current = originCoord;
+
+            while (remaining.length > 0) {
+                let bestIdx = 0;
+                let bestDist = Infinity;
+                remaining.forEach((org, i) => {
+                    if (!org._coord) return;
+                    const d = haversineDistance(current, org._coord);
+                    if (d < bestDist) { bestDist = d; bestIdx = i; }
+                });
+                const next = remaining.splice(bestIdx, 1)[0];
+                if (next._coord) current = next._coord;
+                ordered.push(next);
+            }
+            return ordered;
+        }
+
+        // Legacy sync fallback — zip-code sort (used when geocoding unavailable)
         function sortByDistance(organizations) {
-            return organizations.sort((a, b) => {
+            return [...organizations].sort((a, b) => {
                 const zipA = (a.Zip || '').toString().trim();
                 const zipB = (b.Zip || '').toString().trim();
                 if (zipA !== zipB) return zipA.localeCompare(zipB);
@@ -4368,7 +4435,7 @@ END:VEVENT
             populateRouteCities();
         }
 
-        function generateRoutePlan() {
+        async function generateRoutePlan() {
             console.log('🚀 GENERATE ROUTE PLAN STARTED');
             console.log('   state.organizations count:', state.organizations.length);
             console.log('   state.user:', state.user ? state.user.email : 'null');
@@ -4417,59 +4484,78 @@ END:VEVENT
             
             console.log('✅ All validations passed');
             
-            // Combine routes from all selected cities
-            // Use direct org lookup by city name (normalized) to avoid string-match misses
-            let combinedRoute = [];
+            // ── Collect all matching orgs across selected cities ──────────────
+            let allMatchedOrgs = [];
             selectedOptions.forEach(city => {
-                console.log('📞 Generating route for city:', city);
                 const cityNorm = (city || '').trim().toLowerCase();
-                
-                // Find orgs whose City field normalizes to the same value
                 const matchingCities = [...new Set(
                     state.organizations
                         .filter(o => (o.City||'').trim().toLowerCase() === cityNorm)
                         .map(o => (o.City||'').trim())
                 )];
-                
-                console.log(`   Matching city strings for "${city}":`, matchingCities);
-                
-                if (matchingCities.length === 0) {
-                    console.warn(`   No orgs found for city "${city}" - skipping`);
-                } else {
-                    // Use the actual city string from the org record, not the checkbox value
-                    matchingCities.forEach(actualCity => {
-                        const route = generateRoute(actualCity, startTime, duration, travelBuffer, planDate);
-                        combinedRoute = combinedRoute.concat(route);
-                    });
-                }
+                matchingCities.forEach(actualCity => {
+                    const orgs = getOverdueOrganizations(actualCity);
+                    allMatchedOrgs = allMatchedOrgs.concat(orgs);
+                });
             });
+
+            if (allMatchedOrgs.length === 0) {
+                showToast(`No Active organizations found in: ${selectedOptions.join(', ')}.`, 'warning');
+                return;
+            }
+
+            // ── Geocode all orgs + starting point ────────────────────────────
+            const startAddress = (document.getElementById('routeStartAddress')?.value || '').trim();
+            showToast(`Geocoding ${allMatchedOrgs.length} stops — please wait...`, 'info');
+            showLoading(true);
+
+            // Geocode starting point
+            let originCoord = null;
+            if (startAddress) {
+                originCoord = await geocodeAddress(startAddress);
+                if (!originCoord) {
+                    console.warn('Could not geocode starting address:', startAddress);
+                }
+            }
+
+            // Geocode each org (batch with small delay to respect Nominatim rate limit: 1 req/sec)
+            for (let i = 0; i < allMatchedOrgs.length; i++) {
+                const org = allMatchedOrgs[i];
+                const addr = buildAddressString(org);
+                if (addr) {
+                    org._coord = await geocodeAddress(addr);
+                    if (i < allMatchedOrgs.length - 1) {
+                        await new Promise(r => setTimeout(r, 1100)); // Nominatim: max 1 req/sec
+                    }
+                }
+            }
+            showLoading(false);
+
+            // ── Optimize route order ──────────────────────────────────────────
+            let sortedOrgs;
+            const geocodedCount = allMatchedOrgs.filter(o => o._coord).length;
+            console.log(`Geocoded ${geocodedCount}/${allMatchedOrgs.length} stops`);
+
+            if (geocodedCount >= 2 && (originCoord || geocodedCount >= 2)) {
+                // Use nearest-neighbor from origin (or first geocoded stop if no origin)
+                const effectiveOrigin = originCoord ||
+                    allMatchedOrgs.find(o => o._coord)?._coord;
+                sortedOrgs = nearestNeighborRoute(allMatchedOrgs, effectiveOrigin);
+                showToast(`Route optimized using ${geocodedCount} geocoded locations`, 'success');
+            } else {
+                // Fallback: zip-code sort
+                sortedOrgs = sortByDistance(allMatchedOrgs);
+                if (!originCoord && !startAddress) {
+                    showToast('Tip: Enter a starting address for an optimized route', 'info');
+                } else {
+                    showToast('Geocoding unavailable — sorted by zip code instead', 'warning');
+                }
+            }
+
+            // ── Build timed route from sorted orgs ───────────────────────────
+            let combinedRoute = buildTimedRoute(sortedOrgs, startTime, duration, travelBuffer, planDate);
             
-            // Re-sequence the combined route with travel buffer
-            combinedRoute.forEach((stop, index) => {
-                stop.Order = index + 1;
-                
-                // ✅ FIXED: Create date using selected planDate in LOCAL timezone (not UTC)
-                let arrivalTime;
-                if (planDate) {
-                    const [year, month, day] = planDate.split('-').map(Number);
-                    arrivalTime = new Date(year, month - 1, day, parseInt(startTime.split(':')[0]), parseInt(startTime.split(':')[1]), 0);
-                } else {
-                    arrivalTime = new Date();
-                    arrivalTime.setHours(parseInt(startTime.split(':')[0]), parseInt(startTime.split(':')[1]), 0);
-                }
-                
-                // Add cumulative time: (index * (duration + travel))
-                const cumulativeMinutes = index * (duration + travelBuffer);
-                arrivalTime.setTime(arrivalTime.getTime() + cumulativeMinutes * 60000);
-                
-                const departureTime = new Date(arrivalTime);
-                departureTime.setTime(departureTime.getTime() + duration * 60000);
-                
-                stop.EstimatedArrivalTime = arrivalTime.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit', hour12: true});
-                stop.EstimatedDepartureTime = departureTime.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit', hour12: true});
-                stop._arrivalDate = arrivalTime;
-                stop._departureDate = departureTime;
-            });
+
             
             console.log('Route generated:', combinedRoute.length, 'total stops');
             console.log('Route dates will be for:', planDate);
@@ -4818,6 +4904,35 @@ END:VEVENT
                     showToast(`Apple Maps opened — shows first to last stop. Use Google Maps for the full sequence.`, 'info');
                 }
             }
+        }
+
+        // Build a timed stop list from a pre-sorted org array
+        function buildTimedRoute(sortedOrgs, startTime, durationMinutes, travelBuffer, planDate) {
+            let [hours, minutes] = startTime.split(':').map(Number);
+            let currentTime;
+            if (planDate) {
+                const [year, month, day] = planDate.split('-').map(Number);
+                currentTime = new Date(year, month - 1, day, hours, minutes, 0, 0);
+            } else {
+                currentTime = new Date();
+                currentTime.setHours(hours, minutes, 0, 0);
+            }
+
+            return sortedOrgs.map((org, index) => {
+                const arrivalTime   = new Date(currentTime);
+                const departureTime = new Date(currentTime.getTime() + durationMinutes * 60000);
+                const result = {
+                    ...org,
+                    Order: index + 1,
+                    EstimatedArrivalTime:   arrivalTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
+                    EstimatedDepartureTime: departureTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
+                    _arrivalDate:   arrivalTime,
+                    _departureDate: departureTime,
+                    Include: true
+                };
+                currentTime = new Date(departureTime.getTime() + travelBuffer * 60000);
+                return result;
+            });
         }
 
         // ============================================
