@@ -4346,19 +4346,16 @@ END:VEVENT
 
         function downloadICS(icsContent, filename) {
             try {
+                // Use data: URI — works on file://, GitHub Pages, and all browsers
+                const encoded = encodeURIComponent(icsContent);
+                const dataUri = 'data:text/calendar;charset=utf-8,' + encoded;
                 const element = document.createElement('a');
-                const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                
-                element.setAttribute('href', url);
+                element.setAttribute('href', dataUri);
                 element.setAttribute('download', filename);
                 element.style.display = 'none';
-                
                 document.body.appendChild(element);
                 element.click();
                 document.body.removeChild(element);
-                
-                URL.revokeObjectURL(url);
                 showToast(`✅ Downloaded: ${filename}`, 'success');
             } catch (err) {
                 console.error('Download error:', err);
@@ -4768,8 +4765,16 @@ END:VEVENT
                 url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}${waypoints ? '&waypoints=' + waypoints : ''}&travelmode=driving`;
             }
 
-            window.open(url, '_blank');
-            showToast(`Opening ${stops.length}-stop route in Google Maps`, 'success');
+            // Use location.href to avoid popup blocker; opens in same tab
+            // User can use browser back button to return
+            const a = document.createElement('a');
+            a.href = url;
+            a.target = '_blank';
+            a.rel = 'noopener';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showToast(`Opening ${stops.length}-stop route in Google Maps...`, 'success');
         }
 
         function openAppleMapsRoute() {
@@ -4793,7 +4798,10 @@ END:VEVENT
 
             if (stops.length === 1) {
                 const addr = encodeURIComponent(buildAddressString(stops[0]));
-                window.open(`https://maps.apple.com/?q=${addr}&dirflg=d`, '_blank');
+                const a = document.createElement('a');
+                a.href = `https://maps.apple.com/?q=${addr}&dirflg=d`;
+                a.target = '_blank'; a.rel = 'noopener';
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
             } else {
                 // Apple Maps multi-stop: use saddr/daddr chain
                 // Build a maps.apple.com URL with the full address sequence
@@ -4802,9 +4810,11 @@ END:VEVENT
                 // Apple Maps doesn't support true multi-waypoint in URLs; open first→last
                 // and note the limitation to the user
                 const url = `https://maps.apple.com/?saddr=${origin}&daddr=${destination}&dirflg=d`;
-                window.open(url, '_blank');
+                const a = document.createElement('a');
+                a.href = url; a.target = '_blank'; a.rel = 'noopener';
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
                 if (stops.length > 2) {
-                    showToast(`Apple Maps opened with ${stops.length} stops — it shows first to last only. Use Google Maps for the full multi-stop route.`, 'info');
+                    showToast(`Apple Maps opened — shows first to last stop. Use Google Maps for the full sequence.`, 'info');
                 }
             }
         }
