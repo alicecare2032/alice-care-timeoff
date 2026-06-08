@@ -5548,60 +5548,72 @@ END:VEVENT
 
         async function apiPost(action, data) {
             try {
-                console.log('📤 POST Request:', action);
+                console.log('📤 JSONP Write Request:', action);
                 console.log('Data:', JSON.stringify(data, null, 2));
-                
-                // Google Apps Script doesn't support CORS with JSON, so use no-cors
-                const response = await fetch(APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',  // Bypass CORS check - required for Google Apps Script
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action, token: googleIdToken, ...data })
+
+                // Use JSONP (GET via <script>) — only method that works cross-origin with GAS
+                // Pass payload as a single encoded parameter to avoid URL length issues
+                const payload = JSON.stringify({ action, token: googleIdToken, ...data });
+                const callbackName = 'cb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                const url = APPS_SCRIPT_URL
+                    + '?callback=' + callbackName
+                    + '&action=' + encodeURIComponent(action)
+                    + '&payload=' + encodeURIComponent(payload);
+
+                const result = await new Promise((resolve, reject) => {
+                    window[callbackName] = function(response) {
+                        delete window[callbackName];
+                        const s = document.getElementById(callbackName);
+                        if (s) s.remove();
+                        resolve(response);
+                    };
+                    const script = document.createElement('script');
+                    script.id = callbackName;
+                    script.src = url;
+                    script.onerror = () => {
+                        delete window[callbackName];
+                        script.remove();
+                        reject(new Error('Write request failed: ' + action));
+                    };
+                    document.body.appendChild(script);
+                    setTimeout(() => {
+                        if (window[callbackName]) {
+                            delete window[callbackName];
+                            const s = document.getElementById(callbackName);
+                            if (s) s.remove();
+                            reject(new Error('Timeout: ' + action));
+                        }
+                    }, 30000);
                 });
-                
-                console.log('✅ POST sent (no-cors mode)');
-                
-                // Brief delay for server processing
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                
-                // ✅ NEW: Reload data from server to verify save and get the real ID
-                console.log('🔄 Reloading data from server to verify save...');
-                try {
-                    const verifyResponse = await apiCall('getAllData');
-                    if (verifyResponse && verifyResponse.success) {
-                        // Update local state with server data
-                        state.organizations = verifyResponse.data?.organizations || state.organizations;
-                        state.contacts = verifyResponse.data?.contacts || state.contacts;
-                        state.visits = verifyResponse.data?.visits || state.visits;
-                        state.teamMembers = verifyResponse.data?.teamMembers || state.teamMembers;
-                        state.emailTemplates = verifyResponse.data?.emailTemplates || state.emailTemplates;
-                        state.assetCategories = verifyResponse.data?.assetCategories || state.assetCategories;
-                        state.assetItems = verifyResponse.data?.assetItems || state.assetItems;
-                        state.stockHistory = verifyResponse.data?.stockHistory || state.stockHistory;
-                        
-                        // Update cache with verified data
-                        localStorage.setItem('busdev_cache', JSON.stringify({
-                            organizations: state.organizations,
-                            contacts: state.contacts,
-                            visits: state.visits,
-                            teamMembers: state.teamMembers,
-                            emailTemplates: state.emailTemplates,
-                            assetCategories: state.assetCategories,
-                            assetItems: state.assetItems,
-                            stockHistory: state.stockHistory,
-                            settings: state.settings,
-                            user: state.user,
-                            timestamp: Date.now()
-                        }));
-                        
-                        console.log('✅ Data verified and cache updated');
-                        console.log('   Visits count:', state.visits.length);
-                    }
-                } catch (verifyErr) {
-                    console.warn('⚠️ Could not verify save:', verifyErr);
+
+                console.log('✅ Write response:', result);
+
+                // Reload state from server after successful write
+                if (result && result.success) {
+                    try {
+                        const verifyResponse = await apiCall('getAllData');
+                        if (verifyResponse && verifyResponse.success) {
+                            state.organizations = verifyResponse.data?.organizations || state.organizations;
+                            state.contacts      = verifyResponse.data?.contacts      || state.contacts;
+                            state.visits        = verifyResponse.data?.visits        || state.visits;
+                            state.teamMembers   = verifyResponse.data?.teamMembers   || state.teamMembers;
+                            state.emailTemplates = verifyResponse.data?.emailTemplates || state.emailTemplates;
+                            state.assetCategories = verifyResponse.data?.assetCategories || state.assetCategories;
+                            state.assetItems    = verifyResponse.data?.assetItems    || state.assetItems;
+                            state.stockHistory  = verifyResponse.data?.stockHistory  || state.stockHistory;
+                            localStorage.setItem('busdev_cache', JSON.stringify({
+                                organizations: state.organizations, contacts: state.contacts,
+                                visits: state.visits, teamMembers: state.teamMembers,
+                                emailTemplates: state.emailTemplates, assetCategories: state.assetCategories,
+                                assetItems: state.assetItems, stockHistory: state.stockHistory,
+                                settings: state.settings, user: state.user, timestamp: Date.now()
+                            }));
+                            console.log('✅ State reloaded after write');
+                        }
+                    } catch (e) { console.warn('Could not reload after write:', e); }
                 }
-                
-                return { success: true, message: 'Data sent to server' };
+
+                return result || { success: true };
             } catch (err) { 
                 console.error('❌ POST error:', err);
                 return { success: false, error: err.message }; 
