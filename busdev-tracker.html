@@ -2599,6 +2599,15 @@
                     <button onclick="exportRouteToCalendar()" class="btn btn-success" style="width: 100%;">
                         📅 Export to Google Calendar (ICS)
                     </button>
+
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <button onclick="openGoogleMapsRoute()" class="btn btn-primary" style="flex: 1;">
+                            🗺️ Open in Google Maps
+                        </button>
+                        <button onclick="openAppleMapsRoute()" class="btn btn-secondary" style="flex: 1;">
+                            🍎 Open in Apple Maps
+                        </button>
+                    </div>
                     
                     <button onclick="saveRoutePlan()" class="btn btn-info" style="width: 100%; margin-top: 10px;">
                         💾 Save Route Plan
@@ -4272,22 +4281,16 @@ END:VTIMEZONE
                 console.log(`      Start: ${startDateTime} (from ${stop._arrivalDate})`);
                 console.log(`      End: ${endDateTime} (from ${stop._departureDate})`);
                 
-                // Build full address — include Address2 (suite/unit) when present
                 const addrLine1  = (stop.Address  || '').trim();
                 const addrLine2  = (stop.Address2 || '').trim();
                 const addrCity   = (stop.City     || '').trim();
                 const addrState  = (stop.State    || 'CA').trim();
                 const addrZip    = (stop.Zip      || '').trim();
                 const addrPhone  = (stop.Phone    || 'N/A').trim();
-
-                // Street string: "4362 Auburn Blvd, Suite 304" or just "4362 Auburn Blvd"
                 const streetFull = addrLine2 ? `${addrLine1}, ${addrLine2}` : addrLine1;
-                // Full navigable address: "4362 Auburn Blvd, Suite 304, Sacramento, CA 95841"
                 const fullAddress = [streetFull, addrCity, `${addrState} ${addrZip}`].filter(Boolean).join(', ');
-
                 const lastVisitRaw = stop.Last_activity_date || stop.Last_Visit;
                 const lastVisitStr = lastVisitRaw ? new Date(lastVisitRaw).toLocaleDateString() : 'Never';
-
                 const description = `Stop ${stop.Order} of ${route.filter(s => s.Include).length}
 Organization: ${stop.Name}
 Address: ${fullAddress}
@@ -4725,6 +4728,84 @@ END:VEVENT
             } catch (err) {
                 console.error('Export error:', err);
                 showToast('Failed to export route', 'error');
+            }
+        }
+
+        function buildAddressString(stop) {
+            const line1  = (stop.Address  || '').trim();
+            const line2  = (stop.Address2 || '').trim();
+            const city   = (stop.City     || '').trim();
+            const state  = (stop.State    || 'CA').trim();
+            const zip    = (stop.Zip      || '').trim();
+            const street = line2 ? `${line1}, ${line2}` : line1;
+            return [street, city, state, zip].filter(Boolean).join(', ');
+        }
+
+        function openGoogleMapsRoute() {
+            if (!state.currentRoute || state.currentRoute.length === 0) {
+                showToast('No route to open', 'warning');
+                return;
+            }
+            const stops = state.currentRoute.filter(s => s.Include);
+            if (stops.length === 0) {
+                showToast('Please select at least one stop', 'warning');
+                return;
+            }
+
+            // Google Maps directions URL supports up to 10 waypoints
+            // Format: /dir/origin/waypoint1/waypoint2/.../destination
+            // We use the first stop as origin, last as destination, rest as waypoints
+            const addresses = stops.map(s => encodeURIComponent(buildAddressString(s)));
+
+            let url;
+            if (addresses.length === 1) {
+                // Single stop — just open as a place search
+                url = `https://www.google.com/maps/search/?api=1&query=${addresses[0]}`;
+            } else {
+                const origin      = addresses[0];
+                const destination = addresses[addresses.length - 1];
+                const waypoints   = addresses.slice(1, -1).join('|');
+                url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}${waypoints ? '&waypoints=' + waypoints : ''}&travelmode=driving`;
+            }
+
+            window.open(url, '_blank');
+            showToast(`Opening ${stops.length}-stop route in Google Maps`, 'success');
+        }
+
+        function openAppleMapsRoute() {
+            if (!state.currentRoute || state.currentRoute.length === 0) {
+                showToast('No route to open', 'warning');
+                return;
+            }
+            const stops = state.currentRoute.filter(s => s.Include);
+            if (stops.length === 0) {
+                showToast('Please select at least one stop', 'warning');
+                return;
+            }
+
+            // Apple Maps supports multi-stop via the maps.apple.com URL scheme
+            // For multi-stop, we open each stop as a waypoint using the daddr parameter
+            // Apple Maps only natively supports origin + 1 destination in URL, so
+            // for multiple stops we open as a Google Maps link which works on all devices,
+            // but on iOS we use the maps:// scheme to open the last stop in Apple Maps
+            // Best cross-device approach: use the Apple Maps search for first stop and
+            // open a shareable link for full route
+
+            if (stops.length === 1) {
+                const addr = encodeURIComponent(buildAddressString(stops[0]));
+                window.open(`https://maps.apple.com/?q=${addr}&dirflg=d`, '_blank');
+            } else {
+                // Apple Maps multi-stop: use saddr/daddr chain
+                // Build a maps.apple.com URL with the full address sequence
+                const origin = encodeURIComponent(buildAddressString(stops[0]));
+                const destination = encodeURIComponent(buildAddressString(stops[stops.length - 1]));
+                // Apple Maps doesn't support true multi-waypoint in URLs; open first→last
+                // and note the limitation to the user
+                const url = `https://maps.apple.com/?saddr=${origin}&daddr=${destination}&dirflg=d`;
+                window.open(url, '_blank');
+                if (stops.length > 2) {
+                    showToast(`Apple Maps opened with ${stops.length} stops — it shows first to last only. Use Google Maps for the full multi-stop route.`, 'info');
+                }
             }
         }
 
