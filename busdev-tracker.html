@@ -3985,7 +3985,6 @@
             const loginGate = document.getElementById('loginGate');
             const mainApp = document.getElementById('mainApp');
 
-            // When login is paused, inject a default admin user and show the app
             if (LOGIN_PAUSED && !state.user) {
                 state.user = {
                     name: 'Guest',
@@ -3997,23 +3996,17 @@
             }
 
             if (state.user) {
-                // User is authenticated (or login is paused)
                 if (signedInSection) signedInSection.style.display = 'flex';
                 if (signedOutSection) signedOutSection.style.display = 'none';
                 const userNameEl = document.getElementById('userName');
                 const userZonesEl = document.getElementById('userZones');
                 if (userNameEl) userNameEl.textContent = state.user.name || state.user.email;
                 if (userZonesEl) userZonesEl.textContent = state.user.zones?.join(', ') || 'All';
-
-                // Show main app, hide login gate
                 if (loginGate) loginGate.classList.add('hidden');
                 if (mainApp) mainApp.style.display = 'block';
             } else {
-                // User is not authenticated
                 if (signedInSection) signedInSection.style.display = 'none';
                 if (signedOutSection) signedOutSection.style.display = 'block';
-
-                // Hide main app, show login gate
                 if (loginGate) loginGate.classList.remove('hidden');
                 if (mainApp) mainApp.style.display = 'none';
             }
@@ -4279,12 +4272,29 @@ END:VTIMEZONE
                 console.log(`      Start: ${startDateTime} (from ${stop._arrivalDate})`);
                 console.log(`      End: ${endDateTime} (from ${stop._departureDate})`);
                 
-                const description = `Organization: ${stop.Name}
-Address: ${stop.Address}, ${stop.City}, ${stop.State} ${stop.Zip}
-Phone: ${stop.Phone || 'N/A'}
-Last Visited: ${(stop.Last_activity_date || stop.Last_Visit) ? new Date(stop.Last_activity_date || stop.Last_Visit).toLocaleDateString() : 'Never'}
-Days Overdue: ${stop.DaysOverdue}
-Status: ${stop.Status}`;
+                // Build full address — include Address2 (suite/unit) when present
+                const addrLine1  = (stop.Address  || '').trim();
+                const addrLine2  = (stop.Address2 || '').trim();
+                const addrCity   = (stop.City     || '').trim();
+                const addrState  = (stop.State    || 'CA').trim();
+                const addrZip    = (stop.Zip      || '').trim();
+                const addrPhone  = (stop.Phone    || 'N/A').trim();
+
+                // Street string: "4362 Auburn Blvd, Suite 304" or just "4362 Auburn Blvd"
+                const streetFull = addrLine2 ? `${addrLine1}, ${addrLine2}` : addrLine1;
+                // Full navigable address: "4362 Auburn Blvd, Suite 304, Sacramento, CA 95841"
+                const fullAddress = [streetFull, addrCity, `${addrState} ${addrZip}`].filter(Boolean).join(', ');
+
+                const lastVisitRaw = stop.Last_activity_date || stop.Last_Visit;
+                const lastVisitStr = lastVisitRaw ? new Date(lastVisitRaw).toLocaleDateString() : 'Never';
+
+                const description = `Stop ${stop.Order} of ${route.filter(s => s.Include).length}
+Organization: ${stop.Name}
+Address: ${fullAddress}
+Phone: ${addrPhone}
+Last Visited: ${lastVisitStr}
+Days Overdue: ${stop.DaysOverdue || 0}
+Notes: ${(stop.Notes || '').trim() || 'None'}`;
 
                 icsContent += `BEGIN:VEVENT
 UID:${uid}
@@ -4293,8 +4303,8 @@ DTSTART;TZID=America/Los_Angeles:${startDateTime}
 DTEND;TZID=America/Los_Angeles:${endDateTime}
 SUMMARY:Stop ${stop.Order}: ${stop.Name}
 DESCRIPTION:${escapeICSString(description)}
-LOCATION:${stop.Address}, ${stop.City}, ${stop.State} ${stop.Zip}
-CATEGORIES:Route Planning,Alice Care,Business Development
+LOCATION:${escapeICSString(fullAddress)}
+CATEGORIES:Route Planning\,Alice Care\,Business Development
 PRIORITY:5
 TRANSP:OPAQUE
 STATUS:CONFIRMED
@@ -5016,18 +5026,21 @@ END:VEVENT
             initQuillEditors();
             setupEventListeners();
             getLocation();
-            
-            // Wait for Google library to load
-            if (typeof google !== 'undefined') {
-                initGoogleSignIn();
+
+            if (typeof LOGIN_PAUSED !== 'undefined' && LOGIN_PAUSED) {
+                updateAuthUI();
             } else {
-                setTimeout(() => {
-                    if (typeof google !== 'undefined') {
-                        initGoogleSignIn();
-                    }
-                }, 1000);
+                if (typeof google !== 'undefined') {
+                    initGoogleSignIn();
+                } else {
+                    setTimeout(() => {
+                        if (typeof google !== 'undefined') {
+                            initGoogleSignIn();
+                        }
+                    }, 1000);
+                }
             }
-            
+
             initApp();
         });
         
