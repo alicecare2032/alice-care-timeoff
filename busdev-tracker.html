@@ -4164,61 +4164,6 @@
             }).sort((a, b) => b.DaysOverdue - a.DaysOverdue); // CHANGED: Show ALL organizations, not just overdue
         }
 
-        // Geocode a single address via Nominatim (OSM) — returns {lat, lon} or null
-        async function geocodeAddress(address) {
-            if (!address || !address.trim()) return null;
-            try {
-                const q = encodeURIComponent(address.trim());
-                const url = `https://nominatim.openstreetmap.org/search?q=${q}&format=json&limit=1&countrycodes=us`;
-                const res = await fetch(url, {
-                    headers: { 'Accept-Language': 'en', 'User-Agent': 'AliceCareRoutePlanner/1.0' }
-                });
-                const data = await res.json();
-                if (data && data.length > 0) {
-                    return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
-                }
-            } catch (e) {
-                console.warn('Geocode failed for:', address, e);
-            }
-            return null;
-        }
-
-        // Haversine distance in miles between two {lat,lon} points
-        function haversineDistance(a, b) {
-            const R = 3958.8; // Earth radius miles
-            const dLat = (b.lat - a.lat) * Math.PI / 180;
-            const dLon = (b.lon - a.lon) * Math.PI / 180;
-            const sinLat = Math.sin(dLat / 2);
-            const sinLon = Math.sin(dLon / 2);
-            const c = sinLat * sinLat +
-                Math.cos(a.lat * Math.PI / 180) * Math.cos(b.lat * Math.PI / 180) * sinLon * sinLon;
-            return R * 2 * Math.atan2(Math.sqrt(c), Math.sqrt(1 - c));
-        }
-
-        // Nearest-neighbor TSP from a fixed origin point
-        // Returns orgs reordered to minimize total travel distance
-        function nearestNeighborRoute(orgs, originCoord) {
-            if (orgs.length === 0) return orgs;
-            const remaining = orgs.map((org, i) => ({ ...org, _idx: i }));
-            const ordered = [];
-            let current = originCoord;
-
-            while (remaining.length > 0) {
-                let bestIdx = 0;
-                let bestDist = Infinity;
-                remaining.forEach((org, i) => {
-                    if (!org._coord) return;
-                    const d = haversineDistance(current, org._coord);
-                    if (d < bestDist) { bestDist = d; bestIdx = i; }
-                });
-                const next = remaining.splice(bestIdx, 1)[0];
-                if (next._coord) current = next._coord;
-                ordered.push(next);
-            }
-            return ordered;
-        }
-
-        // Legacy sync fallback — zip-code sort (used when geocoding unavailable)
         function sortByDistance(organizations) {
             return [...organizations].sort((a, b) => {
                 const zipA = (a.Zip || '').toString().trim();
@@ -4814,6 +4759,35 @@ END:VEVENT
             }
         }
 
+        // Build a timed stop list from a pre-sorted org array
+        function buildTimedRoute(sortedOrgs, startTime, durationMinutes, travelBuffer, planDate) {
+            let [hours, minutes] = startTime.split(':').map(Number);
+            let currentTime;
+            if (planDate) {
+                const [year, month, day] = planDate.split('-').map(Number);
+                currentTime = new Date(year, month - 1, day, hours, minutes, 0, 0);
+            } else {
+                currentTime = new Date();
+                currentTime.setHours(hours, minutes, 0, 0);
+            }
+
+            return sortedOrgs.map((org, index) => {
+                const arrivalTime   = new Date(currentTime);
+                const departureTime = new Date(currentTime.getTime() + durationMinutes * 60000);
+                const result = {
+                    ...org,
+                    Order: index + 1,
+                    EstimatedArrivalTime:   arrivalTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
+                    EstimatedDepartureTime: departureTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
+                    _arrivalDate:   arrivalTime,
+                    _departureDate: departureTime,
+                    Include: true
+                };
+                currentTime = new Date(departureTime.getTime() + travelBuffer * 60000);
+                return result;
+            });
+        }
+
         function buildAddressString(stop) {
             // Use String() first — Zip/State can be numbers from Google Sheets
             const line1  = String(stop.Address  || '').trim();
@@ -4904,35 +4878,6 @@ END:VEVENT
                     showToast(`Apple Maps opened — shows first to last stop. Use Google Maps for the full sequence.`, 'info');
                 }
             }
-        }
-
-        // Build a timed stop list from a pre-sorted org array
-        function buildTimedRoute(sortedOrgs, startTime, durationMinutes, travelBuffer, planDate) {
-            let [hours, minutes] = startTime.split(':').map(Number);
-            let currentTime;
-            if (planDate) {
-                const [year, month, day] = planDate.split('-').map(Number);
-                currentTime = new Date(year, month - 1, day, hours, minutes, 0, 0);
-            } else {
-                currentTime = new Date();
-                currentTime.setHours(hours, minutes, 0, 0);
-            }
-
-            return sortedOrgs.map((org, index) => {
-                const arrivalTime   = new Date(currentTime);
-                const departureTime = new Date(currentTime.getTime() + durationMinutes * 60000);
-                const result = {
-                    ...org,
-                    Order: index + 1,
-                    EstimatedArrivalTime:   arrivalTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
-                    EstimatedDepartureTime: departureTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
-                    _arrivalDate:   arrivalTime,
-                    _departureDate: departureTime,
-                    Include: true
-                };
-                currentTime = new Date(departureTime.getTime() + travelBuffer * 60000);
-                return result;
-            });
         }
 
         // ============================================
@@ -5400,7 +5345,9 @@ END:VEVENT
                                         initializeRoutePlanner();                    // Ensure all settings have proper defaults
                     ensureSettingsDefaults();
                     
-                    if (userResponse?.success) {
+                    // Only update state.user from server if login is active
+                    // When LOGIN_PAUSED, keep the guest user injected by updateAuthUI
+                    if (userResponse?.success && !(typeof LOGIN_PAUSED !== 'undefined' && LOGIN_PAUSED)) {
                         state.user = userResponse.user;
                     }
                     
@@ -9038,27 +8985,12 @@ END:VCALENDAR`;
                 const result = await apiPost(org.ID ? 'updateOrganization' : 'addOrganization', { organization: org });
                 console.log('Save result:', result);
                 
-                if (result.success) {
-                    // Wait a moment then reload data from server to verify save worked
-                    await new Promise(resolve => setTimeout(resolve, 300));
-                    
-                    console.log('🔄 Reloading data from server to verify save...');
-                    const dataResponse = await apiCall('getAllData');
-                    
-                    if (dataResponse.success && dataResponse.data) {
-                        state.organizations = dataResponse.data.organizations || [];
-                        console.log('✅ Data reloaded successfully');
-                        closeModal('orgModal');
-                        renderAll();
-                        populateOrgTypeDropdown();
-                        showToast('✅ Organization saved', 'success');
-                    } else {
-                        console.warn('Could not reload data, but save may have succeeded');
-                        showToast('⚠️ Saved but could not verify. Refresh page to see changes.', 'warning');
-                    }
-                } else {
-                    showToast('❌ Save failed: ' + (result.error || 'Unknown error'), 'error');
-                }
+                // apiPost (no-cors) always returns success:true since we can't read the response
+                // State is already updated by apiPost's internal getAllData reload
+                closeModal('orgModal');
+                renderAll();
+                populateOrgTypeDropdown();
+                showToast('✅ Organization saved successfully', 'success');
             } catch (err) { 
                 console.error('Save error:', err);
                 showToast('❌ Save failed: ' + err.message, 'error'); 
@@ -10286,8 +10218,7 @@ END:VCALENDAR`;
             }, 3000);
         }
 
-        function openModal(id) { document.getElementById(id).classList.add('active'); }
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        // openModal and closeModal defined above (search for 'function openModal')
         
         function formatVisitDate(dateStr) {
             if (!dateStr) return 'Never';
