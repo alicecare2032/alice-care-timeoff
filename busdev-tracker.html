@@ -4134,8 +4134,12 @@
 
         function sortByDistance(organizations) {
             return organizations.sort((a, b) => {
-                if (a.Zip !== b.Zip) return a.Zip.localeCompare(b.Zip);
-                return a.Address.localeCompare(b.Address);
+                const zipA = (a.Zip || '').toString().trim();
+                const zipB = (b.Zip || '').toString().trim();
+                if (zipA !== zipB) return zipA.localeCompare(zipB);
+                const addrA = (a.Address || '').toString().trim();
+                const addrB = (b.Address || '').toString().trim();
+                return addrA.localeCompare(addrB);
             });
         }
 
