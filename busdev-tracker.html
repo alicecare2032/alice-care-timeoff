@@ -2571,7 +2571,7 @@
                     <div style="min-width: 140px;">
                         <label for="routeVisitDuration" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">Visit (min)</label>
                         <input type="number" id="routeVisitDuration" class="form-input" 
-                               min="15" max="120" step="5" value="30">
+                               min="5" max="240" step="5" value="30">
                     </div>
                     
                     <div style="min-width: 140px;">
@@ -4395,8 +4395,8 @@ END:VEVENT
                 return;
             }
             
-            if (!duration || duration < 15) {
-                showToast('Visit duration must be at least 15 minutes', 'warning');
+            if (!duration || duration < 5) {
+                showToast('Visit duration must be at least 5 minutes', 'warning');
                 return;
             }
             
