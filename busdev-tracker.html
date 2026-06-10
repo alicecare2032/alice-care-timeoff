@@ -2559,15 +2559,37 @@
                         </div>
                     </div>
                     
+                    <div style="min-width: 280px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">
+                            Org Types
+                            <span style="font-weight:normal; font-size:11px; color:#888; margin-left:6px;">
+                                (<a href="#" onclick="routeToggleAllTypes(true);return false;" style="color:var(--primary)">All</a>
+                                / <a href="#" onclick="routeToggleAllTypes(false);return false;" style="color:var(--primary)">None</a>)
+                            </span>
+                        </label>
+                        <div id="routeOrgTypeCheckboxes" class="route-city-checkboxes" style="background:white;border-radius:6px;padding:8px;max-height:150px;overflow-y:auto;border:1px solid #ddd;">
+                            <!-- Populated by populateRouteOrgTypes() -->
+                        </div>
+                    </div>
+
                     <div style="min-width: 260px; flex-basis: 100%;">
-                        <label for="routeStartAddress" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">
                             📍 Starting Point
                         </label>
-                        <input type="text" id="routeStartAddress" class="form-input"
-                               placeholder="e.g. 8146 Greenback Ln, Fair Oaks, CA"
-                               style="width: 100%;">
-                        <div style="font-size: 11px; color: #888; margin-top: 3px;">
-                            Enter your starting address — route will be optimized from here
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <input type="text" id="routeStartAddress" class="form-input"
+                                   placeholder="e.g. 8146 Greenback Ln, Fair Oaks, CA"
+                                   style="flex: 1;"
+                                   oninput="if(!this.value.trim()){state.currentStartCoord=null;const h=document.getElementById('routeStartAddressHint');if(h){h.style.color='#888';h.textContent='Type an address or tap Use GPS — route will start from here';}}">
+                            <button type="button" onclick="useGPSForStart()" class="btn btn-secondary"
+                                    id="gpsStartBtn"
+                                    title="Use my current GPS location"
+                                    style="white-space: nowrap; height: 40px; padding: 0 12px; flex-shrink: 0;">
+                                📡 Use GPS
+                            </button>
+                        </div>
+                        <div id="routeStartAddressHint" style="font-size: 11px; color: #888; margin-top: 3px;">
+                            Type an address or tap Use GPS — route will start from here
                         </div>
                     </div>
 
@@ -4132,12 +4154,18 @@
             console.log(`🏙️ Getting organizations for city: "${city}" (normalized: "${cityNorm}")`);
             console.log(`   Total orgs in state: ${state.organizations.length}`);
             
+            const selectedTypes = getSelectedOrgTypes(); // null=all, []=none, [...]=specific
             const orgs = state.organizations.filter(org => {
                 const orgCity = (org.City || '').trim().toLowerCase();
-                const orgStatus = (org.Status || '').trim().toLowerCase();
-                // Treat missing/null Status as Active (Pipedrive-imported orgs have no Status field)
-                const isActive = !orgStatus || orgStatus === 'active';
-                return orgCity === cityNorm && isActive;
+                if (orgCity !== cityNorm) return false;
+                if (!isActiveOrg(org)) return false;
+                // Apply org type filter
+                if (selectedTypes !== null) {
+                    const orgType = (org.Type || '').trim();
+                    if (selectedTypes.length === 0) return false;
+                    if (!selectedTypes.includes(orgType)) return false;
+                }
+                return true;
             });
             
             console.log(`  Found ${orgs.length} active organizations in "${city}"`);
@@ -4404,6 +4432,17 @@ END:VEVENT
             const startTime = document.getElementById('routeStartTime').value;
             const duration = parseInt(document.getElementById('routeVisitDuration').value);
             const travelBuffer = parseInt(document.getElementById('routeTravelBuffer').value) || 0;
+            const startAddress = (document.getElementById('routeStartAddress')?.value || '').trim();
+
+            // Store starting point on state so Maps links can use it as origin
+            // If GPS was already captured, keep those coords; otherwise clear them
+            if (!startAddress) {
+                state.currentStartCoord = null;
+                state.currentStartAddress = '';
+            } else {
+                state.currentStartAddress = startAddress;
+                // state.currentStartCoord already set if GPS was used
+            }
             
             console.log('  Cities selected:', selectedOptions);
             console.log('  Zone:', zone);
@@ -4503,6 +4542,7 @@ END:VEVENT
             state.currentRouteZone = zone;
             state.currentRoutePlanDate = planDate;
             state.currentTravelBuffer = travelBuffer;
+            state.currentStartAddress = startAddress || state.currentStartAddress || '';
             
             console.log('✅ Route plan ready for display');
             console.log('   Plan date stored:', state.currentRoutePlanDate);
@@ -4758,37 +4798,193 @@ END:VEVENT
             if (!state.currentRoute || state.currentRoute.length === 0) { showToast('No route to open', 'warning'); return; }
             const stops = state.currentRoute.filter(s => s.Include);
             if (stops.length === 0) { showToast('Please select at least one stop', 'warning'); return; }
-            const addresses = stops.map(s => encodeURIComponent(buildAddressString(s)));
-            let url;
-            if (addresses.length === 1) {
-                url = `https://www.google.com/maps/search/?api=1&query=${addresses[0]}`;
+
+            // Build origin from GPS coords or typed address
+            let origin;
+            if (state.currentStartCoord) {
+                origin = encodeURIComponent(`${state.currentStartCoord.lat},${state.currentStartCoord.lon}`);
+            } else if (state.currentStartAddress) {
+                origin = encodeURIComponent(state.currentStartAddress);
             } else {
-                const origin = addresses[0];
-                const destination = addresses[addresses.length - 1];
-                const waypoints = addresses.slice(1, -1).join('|');
-                url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}${waypoints ? '&waypoints=' + waypoints : ''}&travelmode=driving`;
+                origin = null;
             }
+
+            const stopAddresses = stops.map(s => encodeURIComponent(buildAddressString(s)));
+            let url;
+
+            if (!origin && stopAddresses.length === 1) {
+                url = `https://www.google.com/maps/search/?api=1&query=${stopAddresses[0]}`;
+            } else {
+                // With a starting point: origin → stops[0] → ... → stops[last]
+                // Without: stops[0] → ... → stops[last]
+                const routeOrigin  = origin || stopAddresses[0];
+                const destination  = stopAddresses[stopAddresses.length - 1];
+                const waypointList = origin
+                    ? stopAddresses.slice(0, -1)          // all stops except last are waypoints
+                    : stopAddresses.slice(1, -1);          // first is origin, last is dest
+                const waypoints = waypointList.join('|');
+                url = `https://www.google.com/maps/dir/?api=1&origin=${routeOrigin}&destination=${destination}${waypoints ? '&waypoints=' + waypoints : ''}&travelmode=driving`;
+            }
+
             const a = document.createElement('a');
             a.href = url; a.target = '_blank'; a.rel = 'noopener';
             document.body.appendChild(a); a.click(); document.body.removeChild(a);
-            showToast(`Opening ${stops.length}-stop route in Google Maps...`, 'success');
+            const label = origin ? `from your starting point` : `(no starting point set)`;
+            showToast(`Opening ${stops.length}-stop route in Google Maps ${label}`, 'success');
         }
 
         function openAppleMapsRoute() {
             if (!state.currentRoute || state.currentRoute.length === 0) { showToast('No route to open', 'warning'); return; }
             const stops = state.currentRoute.filter(s => s.Include);
             if (stops.length === 0) { showToast('Please select at least one stop', 'warning'); return; }
+
+            // Build saddr from GPS coords or typed address
+            let saddr;
+            if (state.currentStartCoord) {
+                saddr = encodeURIComponent(`${state.currentStartCoord.lat},${state.currentStartCoord.lon}`);
+            } else if (state.currentStartAddress) {
+                saddr = encodeURIComponent(state.currentStartAddress);
+            } else {
+                saddr = null;
+            }
+
             const a = document.createElement('a');
             if (stops.length === 1) {
-                a.href = `https://maps.apple.com/?q=${encodeURIComponent(buildAddressString(stops[0]))}&dirflg=d`;
+                const dest = encodeURIComponent(buildAddressString(stops[0]));
+                a.href = saddr
+                    ? `https://maps.apple.com/?saddr=${saddr}&daddr=${dest}&dirflg=d`
+                    : `https://maps.apple.com/?q=${dest}&dirflg=d`;
             } else {
-                const origin = encodeURIComponent(buildAddressString(stops[0]));
-                const destination = encodeURIComponent(buildAddressString(stops[stops.length - 1]));
-                a.href = `https://maps.apple.com/?saddr=${origin}&daddr=${destination}&dirflg=d`;
-                if (stops.length > 2) showToast('Apple Maps opened — shows first to last stop. Use Google Maps for full sequence.', 'info');
+                const dest = encodeURIComponent(buildAddressString(stops[stops.length - 1]));
+                const from = saddr || encodeURIComponent(buildAddressString(stops[0]));
+                a.href = `https://maps.apple.com/?saddr=${from}&daddr=${dest}&dirflg=d`;
+                if (stops.length > 2) showToast('Apple Maps shows first to last stop. Use Google Maps for the full multi-stop sequence.', 'info');
             }
             a.target = '_blank'; a.rel = 'noopener';
             document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        }
+
+        function populateRouteOrgTypes() {
+            const container = document.getElementById('routeOrgTypeCheckboxes');
+            if (!container) return;
+
+            // Preserve checked state
+            const prevChecked = new Set(
+                Array.from(container.querySelectorAll('input[type="checkbox"]:checked'))
+                    .map(cb => cb.value)
+            );
+
+            // Collect unique non-empty types from all active orgs
+            const types = [...new Set(
+                state.organizations
+                    .filter(o => isActiveOrg(o) && o.Type && o.Type.trim())
+                    .map(o => o.Type.trim())
+            )].sort();
+
+            container.innerHTML = '';
+
+            if (types.length === 0) {
+                container.innerHTML = '<div style="padding:8px;color:#999;font-size:12px;">No types found</div>';
+                return;
+            }
+
+            types.forEach(type => {
+                const div = document.createElement('div');
+                div.className = 'route-city-checkbox';
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.value = type;
+                cb.id = `orgtype_${type.replace(/\s+/g, '_')}`;
+                // Default: all checked (include all types); restore previous selection if any
+                cb.checked = prevChecked.size === 0 ? true : prevChecked.has(type);
+                const label = document.createElement('label');
+                label.htmlFor = cb.id;
+                label.textContent = type;
+                div.appendChild(cb); div.appendChild(label);
+                container.appendChild(div);
+            });
+        }
+
+        function routeToggleAllTypes(checked) {
+            const container = document.getElementById('routeOrgTypeCheckboxes');
+            if (!container) return;
+            container.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = checked);
+        }
+
+        function getSelectedOrgTypes() {
+            const container = document.getElementById('routeOrgTypeCheckboxes');
+            if (!container) return null; // null = no filter applied
+            const all  = Array.from(container.querySelectorAll('input[type="checkbox"]'));
+            const checked = all.filter(cb => cb.checked).map(cb => cb.value);
+            // If everything is checked (or nothing rendered), return null = no filtering
+            if (checked.length === 0) return []; // none checked = show nothing
+            if (checked.length === all.length) return null; // all checked = no filter
+            return checked;
+        }
+
+        function useGPSForStart() {
+            const btn = document.getElementById('gpsStartBtn');
+            const hint = document.getElementById('routeStartAddressHint');
+            const input = document.getElementById('routeStartAddress');
+
+            if (!navigator.geolocation) {
+                showToast('GPS not available on this device', 'error');
+                return;
+            }
+
+            btn.textContent = '⏳ Locating...';
+            btn.disabled = true;
+            if (hint) hint.textContent = 'Getting your location...';
+
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
+
+                    // Store coords directly on state for route optimization
+                    state.currentStartCoord = { lat, lon };
+
+                    // Reverse geocode to get a human-readable address
+                    try {
+                        const res = await fetch(
+                            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
+                            { headers: { 'Accept-Language': 'en', 'User-Agent': 'AliceCareRoutePlanner/1.0' } }
+                        );
+                        const data = await res.json();
+                        const addr = data.display_name || `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+                        // Use a shorter form: house number + road + city
+                        const a = data.address || {};
+                        const short = [
+                            (a.house_number || '') + ' ' + (a.road || ''),
+                            a.city || a.town || a.village || a.county || '',
+                            a.state || ''
+                        ].map(s => s.trim()).filter(Boolean).join(', ');
+                        input.value = short || addr;
+                        if (hint) hint.style.color = '#2d8a4e';
+                        if (hint) hint.textContent = `📡 GPS location captured (${lat.toFixed(4)}, ${lon.toFixed(4)})`;
+                    } catch(e) {
+                        input.value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+                        if (hint) hint.textContent = `📡 GPS: ${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+                    }
+
+                    btn.textContent = '📡 Use GPS';
+                    btn.disabled = false;
+                    showToast('Starting point set from GPS', 'success');
+                },
+                (err) => {
+                    btn.textContent = '📡 Use GPS';
+                    btn.disabled = false;
+                    if (hint) hint.style.color = '#c0392b';
+                    if (hint) hint.textContent = 'GPS failed — please type an address manually';
+                    const msgs = {
+                        1: 'Location permission denied. Please allow location access.',
+                        2: 'Location unavailable. Try again or type an address.',
+                        3: 'Location request timed out. Try again.'
+                    };
+                    showToast(msgs[err.code] || 'GPS error', 'warning');
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+            );
         }
 
         // ============================================
@@ -5064,7 +5260,8 @@ END:VEVENT
 
         function initializeRoutePlanner() {
             populateRouteZones();
-            populateRouteCities();  // Use the new checkbox population function
+            populateRouteCities();
+            populateRouteOrgTypes();
             
             // Set today as default date
             const today = getLocalDateString();
@@ -5605,6 +5802,7 @@ END:VEVENT
                 if (tabId === 'visits') {
                     populateRouteZones();
                     populateRouteCities();
+                    populateRouteOrgTypes();
                     const plannerContent = document.getElementById('routePlannerContent');
                     const plannerToggle = document.querySelector('.route-planner-toggle');
                     if (plannerContent && plannerContent.style.display === 'none') {
