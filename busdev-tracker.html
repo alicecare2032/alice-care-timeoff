@@ -2319,9 +2319,46 @@
             <div class="checkin-card">
                 <div class="checkin-header">
                     <div class="checkin-title">Visit Check-In</div>
-                    <div class="checkin-gps" id="gpsStatus">
+                    <div class="checkin-gps" id="gpsStatus" onclick="refreshGPSLocation()"
+                         title="Tap to update GPS location" style="cursor:pointer;">
                         <span class="material-icons-outlined">location_searching</span>
                         <span>Getting GPS...</span>
+                    </div>
+                </div>
+
+                <!-- GPS Location Bar -->
+                <div id="gpsLocationBar" style="
+                    background: rgba(255,255,255,0.12);
+                    border-radius: 8px;
+                    padding: 10px 14px;
+                    margin-bottom: 14px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 10px;
+                    flex-wrap: wrap;
+                ">
+                    <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:0;">
+                        <span class="material-icons-outlined" style="color:rgba(255,255,255,0.7); font-size:18px;" id="gpsBarIcon">location_searching</span>
+                        <div style="min-width:0;">
+                            <div id="gpsBarAddress" style="color:rgba(255,255,255,0.95); font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                Locating...
+                            </div>
+                            <div id="gpsBarCoords" style="color:rgba(255,255,255,0.55); font-size:11px; margin-top:1px;">
+                                &mdash;
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:6px; flex-shrink:0;">
+                        <button onclick="refreshGPSLocation()" id="gpsRefreshBtn"
+                                style="background:rgba(255,255,255,0.2); border:none; border-radius:6px; color:white; padding:6px 12px; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px; white-space:nowrap;">
+                            <span class="material-icons-outlined" style="font-size:14px;">refresh</span> Update
+                        </button>
+                        <button onclick="useGPSAsRouteStart()" id="gpsUseForRouteBtn"
+                                style="background:rgba(255,255,255,0.2); border:none; border-radius:6px; color:white; padding:6px 12px; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px; white-space:nowrap;"
+                                title="Use this location as the starting point in the Route Planner">
+                            <span class="material-icons-outlined" style="font-size:14px;">alt_route</span> Use as Route Start
+                        </button>
                     </div>
                 </div>
 
@@ -7722,24 +7759,132 @@ END:VEVENT
             return null;
         }
         
+        function updateGPSBar(status, lat, lon, address) {
+            const icon    = document.getElementById('gpsBarIcon');
+            const addrEl  = document.getElementById('gpsBarAddress');
+            const coordEl = document.getElementById('gpsBarCoords');
+            const badge   = document.getElementById('gpsStatus');
+            const bar     = document.getElementById('gpsLocationBar');
+
+            if (status === 'loading') {
+                if (icon)    { icon.textContent = 'location_searching'; icon.style.color = 'rgba(255,255,255,0.7)'; }
+                if (addrEl)  addrEl.textContent = 'Locating...';
+                if (coordEl) coordEl.textContent = '—';
+                if (badge)   { badge.className = 'checkin-gps'; badge.innerHTML = '<span class="material-icons-outlined">location_searching</span><span>Getting GPS...</span>'; }
+            } else if (status === 'ok') {
+                if (icon)    { icon.textContent = 'location_on'; icon.style.color = '#a8f0c6'; }
+                if (addrEl)  addrEl.textContent = address || `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+                if (coordEl) coordEl.textContent = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+                if (badge)   { badge.className = 'checkin-gps active'; badge.innerHTML = '<span class="material-icons-outlined">location_on</span><span>GPS Ready</span>'; }
+            } else {
+                if (icon)    { icon.textContent = 'location_off'; icon.style.color = '#f5a0a0'; }
+                if (addrEl)  addrEl.textContent = 'Location unavailable';
+                if (coordEl) coordEl.textContent = 'Tap Update to try again';
+                if (badge)   { badge.className = 'checkin-gps error'; badge.innerHTML = '<span class="material-icons-outlined">location_off</span><span>No GPS</span>'; }
+            }
+        }
+
+        async function refreshGPSLocation() {
+            const btn = document.getElementById('gpsRefreshBtn');
+            if (btn) { btn.disabled = true; btn.innerHTML = '<span class="material-icons-outlined" style="font-size:14px;">hourglass_empty</span> Updating...'; }
+            updateGPSBar('loading');
+
+            if (!navigator.geolocation) {
+                updateGPSBar('error');
+                showToast('GPS not supported on this device', 'error');
+                if (btn) { btn.disabled = false; btn.innerHTML = '<span class="material-icons-outlined" style="font-size:14px;">refresh</span> Update'; }
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
+                    state.currentLocation = { lat, lng: lon };
+
+                    // Reverse geocode for human-readable address
+                    let address = '';
+                    try {
+                        const res = await fetch(
+                            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
+                            { headers: { 'Accept-Language': 'en', 'User-Agent': 'AliceCareRoutePlanner/1.0' } }
+                        );
+                        const data = await res.json();
+                        const a = data.address || {};
+                        address = [
+                            ((a.house_number || '') + ' ' + (a.road || '')).trim(),
+                            a.city || a.town || a.village || '',
+                            a.state || ''
+                        ].filter(Boolean).join(', ');
+                    } catch(e) { /* silent */ }
+
+                    state.currentLocationAddress = address;
+                    updateGPSBar('ok', lat, lon, address);
+                    loadNearbyOrganizations();
+                    showToast('📍 Location updated', 'success');
+                    if (btn) { btn.disabled = false; btn.innerHTML = '<span class="material-icons-outlined" style="font-size:14px;">refresh</span> Update'; }
+                },
+                (err) => {
+                    updateGPSBar('error');
+                    const msgs = { 1: 'Permission denied — allow location access and try again.', 2: 'Location unavailable. Try again.', 3: 'Timed out. Try again.' };
+                    showToast(msgs[err.code] || 'GPS error', 'warning');
+                    if (btn) { btn.disabled = false; btn.innerHTML = '<span class="material-icons-outlined" style="font-size:14px;">refresh</span> Update'; }
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        }
+
+        function useGPSAsRouteStart() {
+            if (!state.currentLocation) {
+                showToast('No GPS location yet — tap Update first', 'warning');
+                return;
+            }
+            // Store coords for route planner
+            state.currentStartCoord = { lat: state.currentLocation.lat, lon: state.currentLocation.lng };
+            state.currentStartAddress = state.currentLocationAddress || `${state.currentLocation.lat.toFixed(5)}, ${state.currentLocation.lng.toFixed(5)}`;
+
+            // Also populate the route planner input field if visible
+            const input = document.getElementById('routeStartAddress');
+            if (input) input.value = state.currentStartAddress;
+            const hint  = document.getElementById('routeStartAddressHint');
+            if (hint) { hint.style.color = '#2d8a4e'; hint.textContent = `📡 GPS location set (${state.currentLocation.lat.toFixed(4)}, ${state.currentLocation.lng.toFixed(4)})`; }
+
+            showToast('✅ GPS location set as route starting point', 'success');
+        }
+
         function getLocation() {
             const gpsEl = document.getElementById('gpsStatus');
             loadGeoCache();
             
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
-                    pos => {
-                        state.currentLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                        gpsEl.className = 'checkin-gps active';
-                        gpsEl.innerHTML = `<span class="material-icons-outlined">location_on</span><span>GPS Ready</span>`;
-                        
-                        // Load nearby organizations
+                    async pos => {
+                        const lat = pos.coords.latitude;
+                        const lon = pos.coords.longitude;
+                        state.currentLocation = { lat, lng: lon };
+
+                        // Reverse geocode on first load
+                        let address = '';
+                        try {
+                            const res = await fetch(
+                                `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
+                                { headers: { 'Accept-Language': 'en', 'User-Agent': 'AliceCareRoutePlanner/1.0' } }
+                            );
+                            const data = await res.json();
+                            const a = data.address || {};
+                            address = [
+                                ((a.house_number || '') + ' ' + (a.road || '')).trim(),
+                                a.city || a.town || a.village || '',
+                                a.state || ''
+                            ].filter(Boolean).join(', ');
+                        } catch(e) { /* silent */ }
+
+                        state.currentLocationAddress = address;
+                        updateGPSBar('ok', lat, lon, address);
                         loadNearbyOrganizations();
                     },
                     err => {
-                        gpsEl.className = 'checkin-gps error';
-                        gpsEl.innerHTML = `<span class="material-icons-outlined">location_off</span><span>No GPS</span>`;
-                        // Hide near me section if no GPS
+                        updateGPSBar('error');
                         document.getElementById('nearMeSection').style.display = 'none';
                     }
                 );
