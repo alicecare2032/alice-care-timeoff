@@ -2558,18 +2558,6 @@
                         </div>
                     </div>
                     
-                    <div style="min-width: 260px; flex-basis: 100%;">
-                        <label for="routeStartAddress" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">
-                            📍 Starting Point
-                        </label>
-                        <input type="text" id="routeStartAddress" class="form-input"
-                               placeholder="e.g. 8146 Greenback Ln, Fair Oaks, CA"
-                               style="width: 100%;">
-                        <div style="font-size: 11px; color: #888; margin-top: 3px;">
-                            Enter your starting address — route will be optimized from here
-                        </div>
-                    </div>
-
                     <div style="min-width: 140px;">
                         <label for="routePlanDate" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">Plan Date</label>
                         <input type="date" id="routePlanDate" class="form-input">
@@ -2611,15 +2599,6 @@
                     <button onclick="exportRouteToCalendar()" class="btn btn-success" style="width: 100%;">
                         📅 Export to Google Calendar (ICS)
                     </button>
-
-                    <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <button onclick="openGoogleMapsRoute()" class="btn btn-primary" style="flex: 1;">
-                            🗺️ Open in Google Maps
-                        </button>
-                        <button onclick="openAppleMapsRoute()" class="btn btn-secondary" style="flex: 1;">
-                            🍎 Open in Apple Maps
-                        </button>
-                    </div>
                     
                     <button onclick="saveRoutePlan()" class="btn btn-info" style="width: 100%; margin-top: 10px;">
                         💾 Save Route Plan
@@ -3863,6 +3842,12 @@
         function isAdmin() {
             return state.user?.role === 'Admin';
         }
+
+        // Treat missing/empty Status as Active (Pipedrive-imported orgs have no Status field)
+        function isActiveOrg(org) {
+            const s = (org.Status || '').trim().toLowerCase();
+            return !s || s === 'active';
+        }
         
         function isRep() {
             return state.user?.role === 'Rep' || !state.user?.role;
@@ -3995,39 +3980,28 @@
             showToast('✅ Session extended for 8 more hours', 'success');
         }
         
-        // ── LOGIN PAUSED ──────────────────────────────────────────────
-        // Set to false to re-enable Google login requirement.
-        const LOGIN_PAUSED = true;
-        // ─────────────────────────────────────────────────────────────
-
         function updateAuthUI() {
             const signedInSection = document.getElementById('signedInSection');
             const signedOutSection = document.getElementById('signedOutSection');
             const loginGate = document.getElementById('loginGate');
             const mainApp = document.getElementById('mainApp');
-
-            if (LOGIN_PAUSED && !state.user) {
-                state.user = {
-                    name: 'Guest',
-                    email: 'guest@alicecare.com',
-                    role: 'Admin',
-                    zones: ['SMF', 'SDG'],
-                    active: true
-                };
-            }
-
+            
             if (state.user) {
-                if (signedInSection) signedInSection.style.display = 'flex';
-                if (signedOutSection) signedOutSection.style.display = 'none';
-                const userNameEl = document.getElementById('userName');
-                const userZonesEl = document.getElementById('userZones');
-                if (userNameEl) userNameEl.textContent = state.user.name || state.user.email;
-                if (userZonesEl) userZonesEl.textContent = state.user.zones?.join(', ') || 'All';
+                // User is authenticated
+                signedInSection.style.display = 'flex';
+                signedOutSection.style.display = 'none';
+                document.getElementById('userName').textContent = state.user.name || state.user.email;
+                document.getElementById('userZones').textContent = state.user.zones?.join(', ') || 'All';
+                
+                // Show main app, hide login gate
                 if (loginGate) loginGate.classList.add('hidden');
                 if (mainApp) mainApp.style.display = 'block';
             } else {
-                if (signedInSection) signedInSection.style.display = 'none';
-                if (signedOutSection) signedOutSection.style.display = 'block';
+                // User is not authenticated
+                signedInSection.style.display = 'none';
+                signedOutSection.style.display = 'block';
+                
+                // Hide main app, show login gate
                 if (loginGate) loginGate.classList.remove('hidden');
                 if (mainApp) mainApp.style.display = 'none';
             }
@@ -4165,13 +4139,9 @@
         }
 
         function sortByDistance(organizations) {
-            return [...organizations].sort((a, b) => {
-                const zipA = (a.Zip || '').toString().trim();
-                const zipB = (b.Zip || '').toString().trim();
-                if (zipA !== zipB) return zipA.localeCompare(zipB);
-                const addrA = (a.Address || '').toString().trim();
-                const addrB = (b.Address || '').toString().trim();
-                return addrA.localeCompare(addrB);
+            return organizations.sort((a, b) => {
+                if (a.Zip !== b.Zip) return a.Zip.localeCompare(b.Zip);
+                return a.Address.localeCompare(b.Address);
             });
         }
 
@@ -4293,23 +4263,12 @@ END:VTIMEZONE
                 console.log(`      Start: ${startDateTime} (from ${stop._arrivalDate})`);
                 console.log(`      End: ${endDateTime} (from ${stop._departureDate})`);
                 
-                const addrLine1  = String(stop.Address  || '').trim();
-                const addrLine2  = String(stop.Address2 || '').trim();
-                const addrCity   = String(stop.City     || '').trim();
-                const addrState  = String(stop.State    || 'CA').trim();
-                const addrZip    = String(stop.Zip      || '').trim();
-                const addrPhone  = String(stop.Phone    || 'N/A').trim();
-                const streetFull = addrLine2 ? `${addrLine1}, ${addrLine2}` : addrLine1;
-                const fullAddress = [streetFull, addrCity, `${addrState} ${addrZip}`].filter(Boolean).join(', ');
-                const lastVisitRaw = stop.Last_activity_date || stop.Last_Visit;
-                const lastVisitStr = lastVisitRaw ? new Date(lastVisitRaw).toLocaleDateString() : 'Never';
-                const description = `Stop ${stop.Order} of ${route.filter(s => s.Include).length}
-Organization: ${stop.Name}
-Address: ${fullAddress}
-Phone: ${addrPhone}
-Last Visited: ${lastVisitStr}
-Days Overdue: ${stop.DaysOverdue || 0}
-Notes: ${(stop.Notes || '').trim() || 'None'}`;
+                const description = `Organization: ${stop.Name}
+Address: ${stop.Address}, ${stop.City}, ${stop.State} ${stop.Zip}
+Phone: ${stop.Phone || 'N/A'}
+Last Visited: ${(stop.Last_activity_date || stop.Last_Visit) ? new Date(stop.Last_activity_date || stop.Last_Visit).toLocaleDateString() : 'Never'}
+Days Overdue: ${stop.DaysOverdue}
+Status: ${stop.Status}`;
 
                 icsContent += `BEGIN:VEVENT
 UID:${uid}
@@ -4318,8 +4277,8 @@ DTSTART;TZID=America/Los_Angeles:${startDateTime}
 DTEND;TZID=America/Los_Angeles:${endDateTime}
 SUMMARY:Stop ${stop.Order}: ${stop.Name}
 DESCRIPTION:${escapeICSString(description)}
-LOCATION:${escapeICSString(fullAddress)}
-CATEGORIES:Route Planning\,Alice Care\,Business Development
+LOCATION:${stop.Address}, ${stop.City}, ${stop.State} ${stop.Zip}
+CATEGORIES:Route Planning,Alice Care,Business Development
 PRIORITY:5
 TRANSP:OPAQUE
 STATUS:CONFIRMED
@@ -4358,16 +4317,19 @@ END:VEVENT
 
         function downloadICS(icsContent, filename) {
             try {
-                // Use data: URI — works on file://, GitHub Pages, and all browsers
-                const encoded = encodeURIComponent(icsContent);
-                const dataUri = 'data:text/calendar;charset=utf-8,' + encoded;
                 const element = document.createElement('a');
-                element.setAttribute('href', dataUri);
+                const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                
+                element.setAttribute('href', url);
                 element.setAttribute('download', filename);
                 element.style.display = 'none';
+                
                 document.body.appendChild(element);
                 element.click();
                 document.body.removeChild(element);
+                
+                URL.revokeObjectURL(url);
                 showToast(`✅ Downloaded: ${filename}`, 'success');
             } catch (err) {
                 console.error('Download error:', err);
@@ -4380,7 +4342,7 @@ END:VEVENT
             populateRouteCities();
         }
 
-        async function generateRoutePlan() {
+        function generateRoutePlan() {
             console.log('🚀 GENERATE ROUTE PLAN STARTED');
             console.log('   state.organizations count:', state.organizations.length);
             console.log('   state.user:', state.user ? state.user.email : 'null');
@@ -4429,78 +4391,59 @@ END:VEVENT
             
             console.log('✅ All validations passed');
             
-            // ── Collect all matching orgs across selected cities ──────────────
-            let allMatchedOrgs = [];
+            // Combine routes from all selected cities
+            // Use direct org lookup by city name (normalized) to avoid string-match misses
+            let combinedRoute = [];
             selectedOptions.forEach(city => {
+                console.log('📞 Generating route for city:', city);
                 const cityNorm = (city || '').trim().toLowerCase();
+                
+                // Find orgs whose City field normalizes to the same value
                 const matchingCities = [...new Set(
                     state.organizations
                         .filter(o => (o.City||'').trim().toLowerCase() === cityNorm)
                         .map(o => (o.City||'').trim())
                 )];
-                matchingCities.forEach(actualCity => {
-                    const orgs = getOverdueOrganizations(actualCity);
-                    allMatchedOrgs = allMatchedOrgs.concat(orgs);
-                });
-            });
-
-            if (allMatchedOrgs.length === 0) {
-                showToast(`No Active organizations found in: ${selectedOptions.join(', ')}.`, 'warning');
-                return;
-            }
-
-            // ── Geocode all orgs + starting point ────────────────────────────
-            const startAddress = (document.getElementById('routeStartAddress')?.value || '').trim();
-            showToast(`Geocoding ${allMatchedOrgs.length} stops — please wait...`, 'info');
-            showLoading(true);
-
-            // Geocode starting point
-            let originCoord = null;
-            if (startAddress) {
-                originCoord = await geocodeAddress(startAddress);
-                if (!originCoord) {
-                    console.warn('Could not geocode starting address:', startAddress);
-                }
-            }
-
-            // Geocode each org (batch with small delay to respect Nominatim rate limit: 1 req/sec)
-            for (let i = 0; i < allMatchedOrgs.length; i++) {
-                const org = allMatchedOrgs[i];
-                const addr = buildAddressString(org);
-                if (addr) {
-                    org._coord = await geocodeAddress(addr);
-                    if (i < allMatchedOrgs.length - 1) {
-                        await new Promise(r => setTimeout(r, 1100)); // Nominatim: max 1 req/sec
-                    }
-                }
-            }
-            showLoading(false);
-
-            // ── Optimize route order ──────────────────────────────────────────
-            let sortedOrgs;
-            const geocodedCount = allMatchedOrgs.filter(o => o._coord).length;
-            console.log(`Geocoded ${geocodedCount}/${allMatchedOrgs.length} stops`);
-
-            if (geocodedCount >= 2 && (originCoord || geocodedCount >= 2)) {
-                // Use nearest-neighbor from origin (or first geocoded stop if no origin)
-                const effectiveOrigin = originCoord ||
-                    allMatchedOrgs.find(o => o._coord)?._coord;
-                sortedOrgs = nearestNeighborRoute(allMatchedOrgs, effectiveOrigin);
-                showToast(`Route optimized using ${geocodedCount} geocoded locations`, 'success');
-            } else {
-                // Fallback: zip-code sort
-                sortedOrgs = sortByDistance(allMatchedOrgs);
-                if (!originCoord && !startAddress) {
-                    showToast('Tip: Enter a starting address for an optimized route', 'info');
+                
+                console.log(`   Matching city strings for "${city}":`, matchingCities);
+                
+                if (matchingCities.length === 0) {
+                    console.warn(`   No orgs found for city "${city}" - skipping`);
                 } else {
-                    showToast('Geocoding unavailable — sorted by zip code instead', 'warning');
+                    // Use the actual city string from the org record, not the checkbox value
+                    matchingCities.forEach(actualCity => {
+                        const route = generateRoute(actualCity, startTime, duration, travelBuffer, planDate);
+                        combinedRoute = combinedRoute.concat(route);
+                    });
                 }
-            }
-
-            // ── Build timed route from sorted orgs ───────────────────────────
-            let combinedRoute = buildTimedRoute(sortedOrgs, startTime, duration, travelBuffer, planDate);
+            });
             
-
+            // Re-sequence the combined route with travel buffer
+            combinedRoute.forEach((stop, index) => {
+                stop.Order = index + 1;
+                
+                // ✅ FIXED: Create date using selected planDate in LOCAL timezone (not UTC)
+                let arrivalTime;
+                if (planDate) {
+                    const [year, month, day] = planDate.split('-').map(Number);
+                    arrivalTime = new Date(year, month - 1, day, parseInt(startTime.split(':')[0]), parseInt(startTime.split(':')[1]), 0);
+                } else {
+                    arrivalTime = new Date();
+                    arrivalTime.setHours(parseInt(startTime.split(':')[0]), parseInt(startTime.split(':')[1]), 0);
+                }
+                
+                // Add cumulative time: (index * (duration + travel))
+                const cumulativeMinutes = index * (duration + travelBuffer);
+                arrivalTime.setTime(arrivalTime.getTime() + cumulativeMinutes * 60000);
+                
+                const departureTime = new Date(arrivalTime);
+                departureTime.setTime(departureTime.getTime() + duration * 60000);
+                
+                stop.EstimatedArrivalTime = arrivalTime.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit', hour12: true});
+                stop.EstimatedDepartureTime = departureTime.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit', hour12: true});
+                stop._arrivalDate = arrivalTime;
+                stop._departureDate = departureTime;
+            });
             
             console.log('Route generated:', combinedRoute.length, 'total stops');
             console.log('Route dates will be for:', planDate);
@@ -4756,127 +4699,6 @@ END:VEVENT
             } catch (err) {
                 console.error('Export error:', err);
                 showToast('Failed to export route', 'error');
-            }
-        }
-
-        // Build a timed stop list from a pre-sorted org array
-        function buildTimedRoute(sortedOrgs, startTime, durationMinutes, travelBuffer, planDate) {
-            let [hours, minutes] = startTime.split(':').map(Number);
-            let currentTime;
-            if (planDate) {
-                const [year, month, day] = planDate.split('-').map(Number);
-                currentTime = new Date(year, month - 1, day, hours, minutes, 0, 0);
-            } else {
-                currentTime = new Date();
-                currentTime.setHours(hours, minutes, 0, 0);
-            }
-
-            return sortedOrgs.map((org, index) => {
-                const arrivalTime   = new Date(currentTime);
-                const departureTime = new Date(currentTime.getTime() + durationMinutes * 60000);
-                const result = {
-                    ...org,
-                    Order: index + 1,
-                    EstimatedArrivalTime:   arrivalTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
-                    EstimatedDepartureTime: departureTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
-                    _arrivalDate:   arrivalTime,
-                    _departureDate: departureTime,
-                    Include: true
-                };
-                currentTime = new Date(departureTime.getTime() + travelBuffer * 60000);
-                return result;
-            });
-        }
-
-        function buildAddressString(stop) {
-            // Use String() first — Zip/State can be numbers from Google Sheets
-            const line1  = String(stop.Address  || '').trim();
-            const line2  = String(stop.Address2 || '').trim();
-            const city   = String(stop.City     || '').trim();
-            const state  = String(stop.State    || 'CA').trim();
-            const zip    = String(stop.Zip      || '').trim();
-            const street = line2 ? `${line1}, ${line2}` : line1;
-            return [street, city, state, zip].filter(Boolean).join(', ');
-        }
-
-        function openGoogleMapsRoute() {
-            if (!state.currentRoute || state.currentRoute.length === 0) {
-                showToast('No route to open', 'warning');
-                return;
-            }
-            const stops = state.currentRoute.filter(s => s.Include);
-            if (stops.length === 0) {
-                showToast('Please select at least one stop', 'warning');
-                return;
-            }
-
-            // Google Maps directions URL supports up to 10 waypoints
-            // Format: /dir/origin/waypoint1/waypoint2/.../destination
-            // We use the first stop as origin, last as destination, rest as waypoints
-            const addresses = stops.map(s => encodeURIComponent(buildAddressString(s)));
-
-            let url;
-            if (addresses.length === 1) {
-                // Single stop — just open as a place search
-                url = `https://www.google.com/maps/search/?api=1&query=${addresses[0]}`;
-            } else {
-                const origin      = addresses[0];
-                const destination = addresses[addresses.length - 1];
-                const waypoints   = addresses.slice(1, -1).join('|');
-                url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}${waypoints ? '&waypoints=' + waypoints : ''}&travelmode=driving`;
-            }
-
-            // Use location.href to avoid popup blocker; opens in same tab
-            // User can use browser back button to return
-            const a = document.createElement('a');
-            a.href = url;
-            a.target = '_blank';
-            a.rel = 'noopener';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            showToast(`Opening ${stops.length}-stop route in Google Maps...`, 'success');
-        }
-
-        function openAppleMapsRoute() {
-            if (!state.currentRoute || state.currentRoute.length === 0) {
-                showToast('No route to open', 'warning');
-                return;
-            }
-            const stops = state.currentRoute.filter(s => s.Include);
-            if (stops.length === 0) {
-                showToast('Please select at least one stop', 'warning');
-                return;
-            }
-
-            // Apple Maps supports multi-stop via the maps.apple.com URL scheme
-            // For multi-stop, we open each stop as a waypoint using the daddr parameter
-            // Apple Maps only natively supports origin + 1 destination in URL, so
-            // for multiple stops we open as a Google Maps link which works on all devices,
-            // but on iOS we use the maps:// scheme to open the last stop in Apple Maps
-            // Best cross-device approach: use the Apple Maps search for first stop and
-            // open a shareable link for full route
-
-            if (stops.length === 1) {
-                const addr = encodeURIComponent(buildAddressString(stops[0]));
-                const a = document.createElement('a');
-                a.href = `https://maps.apple.com/?q=${addr}&dirflg=d`;
-                a.target = '_blank'; a.rel = 'noopener';
-                document.body.appendChild(a); a.click(); document.body.removeChild(a);
-            } else {
-                // Apple Maps multi-stop: use saddr/daddr chain
-                // Build a maps.apple.com URL with the full address sequence
-                const origin = encodeURIComponent(buildAddressString(stops[0]));
-                const destination = encodeURIComponent(buildAddressString(stops[stops.length - 1]));
-                // Apple Maps doesn't support true multi-waypoint in URLs; open first→last
-                // and note the limitation to the user
-                const url = `https://maps.apple.com/?saddr=${origin}&daddr=${destination}&dirflg=d`;
-                const a = document.createElement('a');
-                a.href = url; a.target = '_blank'; a.rel = 'noopener';
-                document.body.appendChild(a); a.click(); document.body.removeChild(a);
-                if (stops.length > 2) {
-                    showToast(`Apple Maps opened — shows first to last stop. Use Google Maps for the full sequence.`, 'info');
-                }
             }
         }
 
@@ -5178,21 +5000,18 @@ END:VEVENT
             initQuillEditors();
             setupEventListeners();
             getLocation();
-
-            if (typeof LOGIN_PAUSED !== 'undefined' && LOGIN_PAUSED) {
-                updateAuthUI();
+            
+            // Wait for Google library to load
+            if (typeof google !== 'undefined') {
+                initGoogleSignIn();
             } else {
-                if (typeof google !== 'undefined') {
-                    initGoogleSignIn();
-                } else {
-                    setTimeout(() => {
-                        if (typeof google !== 'undefined') {
-                            initGoogleSignIn();
-                        }
-                    }, 1000);
-                }
+                setTimeout(() => {
+                    if (typeof google !== 'undefined') {
+                        initGoogleSignIn();
+                    }
+                }, 1000);
             }
-
+            
             initApp();
         });
         
@@ -5345,9 +5164,7 @@ END:VEVENT
                                         initializeRoutePlanner();                    // Ensure all settings have proper defaults
                     ensureSettingsDefaults();
                     
-                    // Only update state.user from server if login is active
-                    // When LOGIN_PAUSED, keep the guest user injected by updateAuthUI
-                    if (userResponse?.success && !(typeof LOGIN_PAUSED !== 'undefined' && LOGIN_PAUSED)) {
+                    if (userResponse?.success) {
                         state.user = userResponse.user;
                     }
                     
@@ -5548,72 +5365,60 @@ END:VEVENT
 
         async function apiPost(action, data) {
             try {
-                console.log('📤 JSONP Write Request:', action);
+                console.log('📤 POST Request:', action);
                 console.log('Data:', JSON.stringify(data, null, 2));
-
-                // Use JSONP (GET via <script>) — only method that works cross-origin with GAS
-                // Pass payload as a single encoded parameter to avoid URL length issues
-                const payload = JSON.stringify({ action, token: googleIdToken, ...data });
-                const callbackName = 'cb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                const url = APPS_SCRIPT_URL
-                    + '?callback=' + callbackName
-                    + '&action=' + encodeURIComponent(action)
-                    + '&payload=' + encodeURIComponent(payload);
-
-                const result = await new Promise((resolve, reject) => {
-                    window[callbackName] = function(response) {
-                        delete window[callbackName];
-                        const s = document.getElementById(callbackName);
-                        if (s) s.remove();
-                        resolve(response);
-                    };
-                    const script = document.createElement('script');
-                    script.id = callbackName;
-                    script.src = url;
-                    script.onerror = () => {
-                        delete window[callbackName];
-                        script.remove();
-                        reject(new Error('Write request failed: ' + action));
-                    };
-                    document.body.appendChild(script);
-                    setTimeout(() => {
-                        if (window[callbackName]) {
-                            delete window[callbackName];
-                            const s = document.getElementById(callbackName);
-                            if (s) s.remove();
-                            reject(new Error('Timeout: ' + action));
-                        }
-                    }, 30000);
+                
+                // Google Apps Script doesn't support CORS with JSON, so use no-cors
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',  // Bypass CORS check - required for Google Apps Script
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action, token: googleIdToken, ...data })
                 });
-
-                console.log('✅ Write response:', result);
-
-                // Reload state from server after successful write
-                if (result && result.success) {
-                    try {
-                        const verifyResponse = await apiCall('getAllData');
-                        if (verifyResponse && verifyResponse.success) {
-                            state.organizations = verifyResponse.data?.organizations || state.organizations;
-                            state.contacts      = verifyResponse.data?.contacts      || state.contacts;
-                            state.visits        = verifyResponse.data?.visits        || state.visits;
-                            state.teamMembers   = verifyResponse.data?.teamMembers   || state.teamMembers;
-                            state.emailTemplates = verifyResponse.data?.emailTemplates || state.emailTemplates;
-                            state.assetCategories = verifyResponse.data?.assetCategories || state.assetCategories;
-                            state.assetItems    = verifyResponse.data?.assetItems    || state.assetItems;
-                            state.stockHistory  = verifyResponse.data?.stockHistory  || state.stockHistory;
-                            localStorage.setItem('busdev_cache', JSON.stringify({
-                                organizations: state.organizations, contacts: state.contacts,
-                                visits: state.visits, teamMembers: state.teamMembers,
-                                emailTemplates: state.emailTemplates, assetCategories: state.assetCategories,
-                                assetItems: state.assetItems, stockHistory: state.stockHistory,
-                                settings: state.settings, user: state.user, timestamp: Date.now()
-                            }));
-                            console.log('✅ State reloaded after write');
-                        }
-                    } catch (e) { console.warn('Could not reload after write:', e); }
+                
+                console.log('✅ POST sent (no-cors mode)');
+                
+                // Brief delay for server processing
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // ✅ NEW: Reload data from server to verify save and get the real ID
+                console.log('🔄 Reloading data from server to verify save...');
+                try {
+                    const verifyResponse = await apiCall('getAllData');
+                    if (verifyResponse && verifyResponse.success) {
+                        // Update local state with server data
+                        state.organizations = verifyResponse.data?.organizations || state.organizations;
+                        state.contacts = verifyResponse.data?.contacts || state.contacts;
+                        state.visits = verifyResponse.data?.visits || state.visits;
+                        state.teamMembers = verifyResponse.data?.teamMembers || state.teamMembers;
+                        state.emailTemplates = verifyResponse.data?.emailTemplates || state.emailTemplates;
+                        state.assetCategories = verifyResponse.data?.assetCategories || state.assetCategories;
+                        state.assetItems = verifyResponse.data?.assetItems || state.assetItems;
+                        state.stockHistory = verifyResponse.data?.stockHistory || state.stockHistory;
+                        
+                        // Update cache with verified data
+                        localStorage.setItem('busdev_cache', JSON.stringify({
+                            organizations: state.organizations,
+                            contacts: state.contacts,
+                            visits: state.visits,
+                            teamMembers: state.teamMembers,
+                            emailTemplates: state.emailTemplates,
+                            assetCategories: state.assetCategories,
+                            assetItems: state.assetItems,
+                            stockHistory: state.stockHistory,
+                            settings: state.settings,
+                            user: state.user,
+                            timestamp: Date.now()
+                        }));
+                        
+                        console.log('✅ Data verified and cache updated');
+                        console.log('   Visits count:', state.visits.length);
+                    }
+                } catch (verifyErr) {
+                    console.warn('⚠️ Could not verify save:', verifyErr);
                 }
-
-                return result || { success: true };
+                
+                return { success: true, message: 'Data sent to server' };
             } catch (err) { 
                 console.error('❌ POST error:', err);
                 return { success: false, error: err.message }; 
@@ -7611,7 +7416,7 @@ END:VEVENT
             nearMeLoading.style.display = 'inline';
             nearMeList.innerHTML = '<div style="color: rgba(255,255,255,0.6); font-size: 13px; padding: 8px;">Finding nearby organizations...</div>';
             
-            const activeOrgs = state.organizations.filter(o => o.Status === 'Active' && o.Address && o.City);
+            const activeOrgs = state.organizations.filter(o => isActiveOrg(o) && o.Address && o.City);
             const orgsWithDistance = [];
             
             // Process organizations in batches to avoid rate limiting
@@ -8413,7 +8218,7 @@ END:VCALENDAR`;
             
             // Filter organizations - sorted A-Z
             let filteredOrgs = state.organizations
-                .filter(o => o.Status === 'Active')
+                .filter(o => isActiveOrg(o))
                 .sort((a, b) => (a.Name || '').localeCompare(b.Name || ''));
             
             if (zoneFilter) {
@@ -8541,7 +8346,7 @@ END:VCALENDAR`;
             const zoneFilter = document.getElementById('composeZoneFilter').value;
             const searchTerm = (document.getElementById('composeRecipientSearch').value || '').toLowerCase();
             
-            let orgs = state.organizations.filter(o => o.Status === 'Active');
+            let orgs = state.organizations.filter(o => isActiveOrg(o));
             if (zoneFilter) orgs = orgs.filter(o => o.Zone === zoneFilter);
             if (searchTerm) {
                 orgs = orgs.filter(o => 
@@ -8997,12 +8802,27 @@ END:VCALENDAR`;
                 const result = await apiPost(org.ID ? 'updateOrganization' : 'addOrganization', { organization: org });
                 console.log('Save result:', result);
                 
-                // apiPost (no-cors) always returns success:true since we can't read the response
-                // State is already updated by apiPost's internal getAllData reload
-                closeModal('orgModal');
-                renderAll();
-                populateOrgTypeDropdown();
-                showToast('✅ Organization saved successfully', 'success');
+                if (result.success) {
+                    // Wait a moment then reload data from server to verify save worked
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                    
+                    console.log('🔄 Reloading data from server to verify save...');
+                    const dataResponse = await apiCall('getAllData');
+                    
+                    if (dataResponse.success && dataResponse.data) {
+                        state.organizations = dataResponse.data.organizations || [];
+                        console.log('✅ Data reloaded successfully');
+                        closeModal('orgModal');
+                        renderAll();
+                        populateOrgTypeDropdown();
+                        showToast('✅ Organization saved', 'success');
+                    } else {
+                        console.warn('Could not reload data, but save may have succeeded');
+                        showToast('⚠️ Saved but could not verify. Refresh page to see changes.', 'warning');
+                    }
+                } else {
+                    showToast('❌ Save failed: ' + (result.error || 'Unknown error'), 'error');
+                }
             } catch (err) { 
                 console.error('Save error:', err);
                 showToast('❌ Save failed: ' + err.message, 'error'); 
@@ -9129,8 +8949,8 @@ END:VCALENDAR`;
             }
             
             // Filter organizations by name (case insensitive, partial match)
-            const matches = state.organizations.filter(org => 
-                org.Name.toLowerCase().includes(searchTerm)
+            const matches = state.organizations.filter(org =>
+                org.Name && org.Name.toLowerCase().includes(searchTerm)
             ).slice(0, 10); // Limit to 10 suggestions
             
             if (matches.length === 0) {
@@ -9172,7 +8992,7 @@ END:VCALENDAR`;
             
             // Filter organizations by name (case insensitive, partial match)
             let matches = state.organizations.filter(org => 
-                org.Name.toLowerCase().includes(searchTerm) && org.Status === 'Active'
+                org.Name && org.Name.toLowerCase().includes(searchTerm) && isActiveOrg(org)
             );
             
             // If we have location, calculate and sort by distance
@@ -10230,7 +10050,8 @@ END:VCALENDAR`;
             }, 3000);
         }
 
-        // openModal and closeModal defined above (search for 'function openModal')
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
         
         function formatVisitDate(dateStr) {
             if (!dateStr) return 'Never';
