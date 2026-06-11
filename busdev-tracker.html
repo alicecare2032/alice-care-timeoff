@@ -2319,9 +2319,27 @@
             <div class="checkin-card">
                 <div class="checkin-header">
                     <div class="checkin-title">Visit Check-In</div>
-                    <div class="checkin-gps" id="gpsStatus">
+                    <div class="checkin-gps" id="gpsStatus" onclick="refreshGPSLocation()" title="Tap to update GPS" style="cursor:pointer;">
                         <span class="material-icons-outlined">location_searching</span>
                         <span>Getting GPS...</span>
+                    </div>
+                </div>
+
+                <div id="gpsLocationBar" style="background:rgba(255,255,255,0.12);border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+                    <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">
+                        <span class="material-icons-outlined" style="color:rgba(255,255,255,0.7);font-size:18px;" id="gpsBarIcon">location_searching</span>
+                        <div style="min-width:0;">
+                            <div id="gpsBarAddress" style="color:rgba(255,255,255,0.95);font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Locating...</div>
+                            <div id="gpsBarCoords" style="color:rgba(255,255,255,0.55);font-size:11px;margin-top:1px;">&mdash;</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:6px;flex-shrink:0;">
+                        <button onclick="refreshGPSLocation()" id="gpsRefreshBtn" style="background:rgba(255,255,255,0.2);border:none;border-radius:6px;color:white;padding:6px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;">
+                            <span class="material-icons-outlined" style="font-size:14px;">refresh</span> Update
+                        </button>
+                        <button onclick="useGPSAsRouteStart()" style="background:rgba(255,255,255,0.2);border:none;border-radius:6px;color:white;padding:6px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;" title="Use as route starting point">
+                            <span class="material-icons-outlined" style="font-size:14px;">alt_route</span> Use as Route Start
+                        </button>
                     </div>
                 </div>
 
@@ -2355,11 +2373,10 @@
                 </select>
 
                 <!-- ✅ NEW: Notes/Comment Field -->
-                <!-- Drop-off location -->
                 <div style="margin-bottom: 16px;">
                     <label style="display: block; color: rgba(255,255,255,0.8); font-size: 13px; margin-bottom: 6px; font-weight: 500;">
                         <span class="material-icons-outlined" style="font-size: 16px; vertical-align: middle;">place</span> Dropped Off At
-                        <span style="color:rgba(255,255,255,0.5); font-size:11px; font-weight:400; margin-left:4px;">Where materials were left</span>
+                        <span style="color:rgba(255,255,255,0.5);font-size:11px;font-weight:400;margin-left:4px;">Where materials were left</span>
                     </label>
                     <input type="text" id="checkinDroppedAt" class="checkin-org-select"
                            placeholder="e.g. Front desk, Social Worker's office, Nursing station..."
@@ -2508,6 +2525,7 @@
                                     <span class="material-icons-outlined">person_add</span>
                                 </button>
                             </div>
+                            <div style="font-size: 12px; color: var(--gray-500); padding: 2px 0;" id="directoryResultCount"></div>
                         </div>
                         <div class="card-body" style="padding: 0;">
                             <div class="table-container">
@@ -2570,6 +2588,68 @@
                         </div>
                     </div>
                     
+                    <div style="min-width: 280px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">
+                            Org Types
+                            <span style="font-weight:normal; font-size:11px; color:#888; margin-left:6px;">
+                                (<a href="#" onclick="routeToggleAllTypes(true);return false;" style="color:var(--primary)">All</a>
+                                / <a href="#" onclick="routeToggleAllTypes(false);return false;" style="color:var(--primary)">None</a>)
+                            </span>
+                        </label>
+                        <div id="routeOrgTypeCheckboxes" class="route-city-checkboxes" style="background:white;border-radius:6px;padding:8px;max-height:150px;overflow-y:auto;border:1px solid #ddd;"></div>
+                    </div>
+
+                    <div style="min-width: 260px; flex-basis: 100%;">
+                        <label for="routeStartAddress" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">
+                            📍 Starting Point
+                        </label>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <input type="text" id="routeStartAddress" class="form-input"
+                                   placeholder="e.g. 8146 Greenback Ln, Fair Oaks, CA"
+                                   style="flex: 1;"
+                                   oninput="if(!this.value.trim()){state.currentStartCoord=null;const h=document.getElementById('routeStartAddressHint');if(h){h.style.color='#888';h.textContent='Type an address or tap Use GPS — route will start from here';}}">
+                            <button type="button" onclick="useGPSForStart()" class="btn btn-secondary"
+                                    id="gpsStartBtn" title="Use my current GPS location"
+                                    style="white-space:nowrap;height:40px;padding:0 12px;flex-shrink:0;">
+                                📡 Use GPS
+                            </button>
+                        </div>
+                        <div id="routeStartAddressHint" style="font-size:11px;color:#888;margin-top:3px;">
+                            Type an address or tap Use GPS — route will start from here
+                        </div>
+                    </div>
+
+                    <div style="min-width: 280px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">
+                            Org Types
+                            <span style="font-weight:normal; font-size:11px; color:#888; margin-left:6px;">
+                                (<a href="#" onclick="routeToggleAllTypes(true);return false;" style="color:var(--primary)">All</a>
+                                / <a href="#" onclick="routeToggleAllTypes(false);return false;" style="color:var(--primary)">None</a>)
+                            </span>
+                        </label>
+                        <div id="routeOrgTypeCheckboxes" class="route-city-checkboxes" style="background:white;border-radius:6px;padding:8px;max-height:150px;overflow-y:auto;border:1px solid #ddd;"></div>
+                    </div>
+
+                    <div style="min-width: 260px; flex-basis: 100%;">
+                        <label for="routeStartAddress" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">
+                            📍 Starting Point
+                        </label>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <input type="text" id="routeStartAddress" class="form-input"
+                                   placeholder="e.g. 8146 Greenback Ln, Fair Oaks, CA"
+                                   style="flex: 1;"
+                                   oninput="if(!this.value.trim()){state.currentStartCoord=null;const h=document.getElementById('routeStartAddressHint');if(h){h.style.color='#888';h.textContent='Type an address or tap Use GPS — route will start from here';}}">
+                            <button type="button" onclick="useGPSForStart()" class="btn btn-secondary"
+                                    id="gpsStartBtn" title="Use my current GPS location"
+                                    style="white-space:nowrap;height:40px;padding:0 12px;flex-shrink:0;">
+                                📡 Use GPS
+                            </button>
+                        </div>
+                        <div id="routeStartAddressHint" style="font-size:11px;color:#888;margin-top:3px;">
+                            Type an address or tap Use GPS — route will start from here
+                        </div>
+                    </div>
+
                     <div style="min-width: 140px;">
                         <label for="routePlanDate" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">Plan Date</label>
                         <input type="date" id="routePlanDate" class="form-input">
@@ -2583,7 +2663,7 @@
                     <div style="min-width: 140px;">
                         <label for="routeVisitDuration" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">Visit (min)</label>
                         <input type="number" id="routeVisitDuration" class="form-input" 
-                               min="15" max="120" step="5" value="30">
+                               min="5" max="240" step="5" value="30">
                     </div>
                     
                     <div style="min-width: 140px;">
@@ -2611,6 +2691,15 @@
                     <button onclick="exportRouteToCalendar()" class="btn btn-success" style="width: 100%;">
                         📅 Export to Google Calendar (ICS)
                     </button>
+
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <button onclick="openGoogleMapsRoute()" class="btn btn-primary" style="flex: 1;">
+                            🗺️ Open in Google Maps
+                        </button>
+                        <button onclick="openAppleMapsRoute()" class="btn btn-secondary" style="flex: 1;">
+                            🍎 Open in Apple Maps
+                        </button>
+                    </div>
                     
                     <button onclick="saveRoutePlan()" class="btn btn-info" style="width: 100%; margin-top: 10px;">
                         💾 Save Route Plan
@@ -3854,6 +3943,17 @@
         function isAdmin() {
             return state.user?.role === 'Admin';
         }
+
+        // Treat missing/empty Status as Active (Pipedrive-imported orgs have no Status field)
+        function isActiveOrg(org) {
+            const s = (org.Status || '').trim().toLowerCase();
+            return !s || s === 'active';
+        }
+
+        function isActiveOrg(org) {
+            const s = (org.Status || '').trim().toLowerCase();
+            return !s || s === 'active';
+        }
         
         function isRep() {
             return state.user?.role === 'Rep' || !state.user?.role;
@@ -3986,28 +4086,40 @@
             showToast('✅ Session extended for 8 more hours', 'success');
         }
         
+        // ── LOGIN_PAUSED ───────────────────────────────────────────────
+        // true  = skip Google login, use guest Admin account
+        // false = require Google login (re-enable when ready)
+        const LOGIN_PAUSED = true;
+        // ──────────────────────────────────────────────────────────────
+
         function updateAuthUI() {
             const signedInSection = document.getElementById('signedInSection');
             const signedOutSection = document.getElementById('signedOutSection');
             const loginGate = document.getElementById('loginGate');
             const mainApp = document.getElementById('mainApp');
-            
+
+            if (LOGIN_PAUSED && !state.user) {
+                state.user = {
+                    name: 'Guest',
+                    email: 'guest@alicecare.com',
+                    role: 'Admin',
+                    zones: ['SMF', 'SDG'],
+                    active: true
+                };
+            }
+
             if (state.user) {
-                // User is authenticated
-                signedInSection.style.display = 'flex';
-                signedOutSection.style.display = 'none';
-                document.getElementById('userName').textContent = state.user.name || state.user.email;
-                document.getElementById('userZones').textContent = state.user.zones?.join(', ') || 'All';
-                
-                // Show main app, hide login gate
+                if (signedInSection) signedInSection.style.display = 'flex';
+                if (signedOutSection) signedOutSection.style.display = 'none';
+                const userNameEl = document.getElementById('userName');
+                const userZonesEl = document.getElementById('userZones');
+                if (userNameEl) userNameEl.textContent = state.user.name || state.user.email;
+                if (userZonesEl) userZonesEl.textContent = state.user.zones?.join(', ') || 'All';
                 if (loginGate) loginGate.classList.add('hidden');
                 if (mainApp) mainApp.style.display = 'block';
             } else {
-                // User is not authenticated
-                signedInSection.style.display = 'none';
-                signedOutSection.style.display = 'block';
-                
-                // Hide main app, show login gate
+                if (signedInSection) signedInSection.style.display = 'none';
+                if (signedOutSection) signedOutSection.style.display = 'block';
                 if (loginGate) loginGate.classList.remove('hidden');
                 if (mainApp) mainApp.style.display = 'none';
             }
@@ -4106,12 +4218,17 @@
             console.log(`🏙️ Getting organizations for city: "${city}" (normalized: "${cityNorm}")`);
             console.log(`   Total orgs in state: ${state.organizations.length}`);
             
+            const selectedTypes = getSelectedOrgTypes();
             const orgs = state.organizations.filter(org => {
                 const orgCity = (org.City || '').trim().toLowerCase();
-                const orgStatus = (org.Status || '').trim().toLowerCase();
-                // Treat missing/null Status as Active (Pipedrive-imported orgs have no Status field)
-                const isActive = !orgStatus || orgStatus === 'active';
-                return orgCity === cityNorm && isActive;
+                if (orgCity !== cityNorm) return false;
+                if (!isActiveOrg(org)) return false;
+                if (selectedTypes !== null) {
+                    const orgType = (org.Type || '').trim();
+                    if (selectedTypes.length === 0) return false;
+                    if (!selectedTypes.includes(orgType)) return false;
+                }
+                return true;
             });
             
             console.log(`  Found ${orgs.length} active organizations in "${city}"`);
@@ -4145,9 +4262,13 @@
         }
 
         function sortByDistance(organizations) {
-            return organizations.sort((a, b) => {
-                if (a.Zip !== b.Zip) return a.Zip.localeCompare(b.Zip);
-                return a.Address.localeCompare(b.Address);
+            return [...organizations].sort((a, b) => {
+                const zipA = String(a.Zip || '').trim();
+                const zipB = String(b.Zip || '').trim();
+                if (zipA !== zipB) return zipA.localeCompare(zipB);
+                const addrA = String(a.Address || '').trim();
+                const addrB = String(b.Address || '').trim();
+                return addrA.localeCompare(addrB);
             });
         }
 
@@ -4269,12 +4390,23 @@ END:VTIMEZONE
                 console.log(`      Start: ${startDateTime} (from ${stop._arrivalDate})`);
                 console.log(`      End: ${endDateTime} (from ${stop._departureDate})`);
                 
-                const description = `Organization: ${stop.Name}
-Address: ${stop.Address}, ${stop.City}, ${stop.State} ${stop.Zip}
-Phone: ${stop.Phone || 'N/A'}
-Last Visited: ${(stop.Last_activity_date || stop.Last_Visit) ? new Date(stop.Last_activity_date || stop.Last_Visit).toLocaleDateString() : 'Never'}
-Days Overdue: ${stop.DaysOverdue}
-Status: ${stop.Status}`;
+                const addrLine1  = String(stop.Address  || '').trim();
+                const addrLine2  = String(stop.Address2 || '').trim();
+                const addrCity   = String(stop.City     || '').trim();
+                const addrState  = String(stop.State    || 'CA').trim();
+                const addrZip    = String(stop.Zip      || '').trim();
+                const addrPhone  = String(stop.Phone    || 'N/A').trim();
+                const streetFull = addrLine2 ? `${addrLine1}, ${addrLine2}` : addrLine1;
+                const fullAddress = [streetFull, addrCity, `${addrState} ${addrZip}`].filter(Boolean).join(', ');
+                const lastVisitRaw = stop.Last_activity_date || stop.Last_Visit;
+                const lastVisitStr = lastVisitRaw ? new Date(lastVisitRaw).toLocaleDateString() : 'Never';
+                const description = `Stop ${stop.Order} of ${route.filter(s => s.Include).length}
+Organization: ${stop.Name}
+Address: ${fullAddress}
+Phone: ${addrPhone}
+Last Visited: ${lastVisitStr}
+Days Overdue: ${stop.DaysOverdue || 0}
+Notes: ${(stop.Notes || '').trim() || 'None'}`;
 
                 icsContent += `BEGIN:VEVENT
 UID:${uid}
@@ -4283,8 +4415,8 @@ DTSTART;TZID=America/Los_Angeles:${startDateTime}
 DTEND;TZID=America/Los_Angeles:${endDateTime}
 SUMMARY:Stop ${stop.Order}: ${stop.Name}
 DESCRIPTION:${escapeICSString(description)}
-LOCATION:${stop.Address}, ${stop.City}, ${stop.State} ${stop.Zip}
-CATEGORIES:Route Planning,Alice Care,Business Development
+LOCATION:${escapeICSString(fullAddress)}
+CATEGORIES:Route Planning\,Alice Care\,Business Development
 PRIORITY:5
 TRANSP:OPAQUE
 STATUS:CONFIRMED
@@ -4323,19 +4455,13 @@ END:VEVENT
 
         function downloadICS(icsContent, filename) {
             try {
-                const element = document.createElement('a');
-                const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                
-                element.setAttribute('href', url);
-                element.setAttribute('download', filename);
-                element.style.display = 'none';
-                
-                document.body.appendChild(element);
-                element.click();
-                document.body.removeChild(element);
-                
-                URL.revokeObjectURL(url);
+                const a = document.createElement('a');
+                a.setAttribute('href', 'data:text/calendar;charset=utf-8,' + encodeURIComponent(icsContent));
+                a.setAttribute('download', filename);
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
                 showToast(`✅ Downloaded: ${filename}`, 'success');
             } catch (err) {
                 console.error('Download error:', err);
@@ -4348,7 +4474,7 @@ END:VEVENT
             populateRouteCities();
         }
 
-        function generateRoutePlan() {
+        async function generateRoutePlan() {
             console.log('🚀 GENERATE ROUTE PLAN STARTED');
             console.log('   state.organizations count:', state.organizations.length);
             console.log('   state.user:', state.user ? state.user.email : 'null');
@@ -4390,66 +4516,85 @@ END:VEVENT
                 return;
             }
             
-            if (!duration || duration < 15) {
-                showToast('Visit duration must be at least 15 minutes', 'warning');
+            if (!duration || duration < 5) {
+                showToast('Visit duration must be at least 5 minutes', 'warning');
                 return;
             }
             
             console.log('✅ All validations passed');
             
-            // Combine routes from all selected cities
-            // Use direct org lookup by city name (normalized) to avoid string-match misses
-            let combinedRoute = [];
+            // ── Collect all matching orgs across selected cities ──────────────
+            let allMatchedOrgs = [];
             selectedOptions.forEach(city => {
-                console.log('📞 Generating route for city:', city);
                 const cityNorm = (city || '').trim().toLowerCase();
-                
-                // Find orgs whose City field normalizes to the same value
                 const matchingCities = [...new Set(
                     state.organizations
                         .filter(o => (o.City||'').trim().toLowerCase() === cityNorm)
                         .map(o => (o.City||'').trim())
                 )];
-                
-                console.log(`   Matching city strings for "${city}":`, matchingCities);
-                
-                if (matchingCities.length === 0) {
-                    console.warn(`   No orgs found for city "${city}" - skipping`);
-                } else {
-                    // Use the actual city string from the org record, not the checkbox value
-                    matchingCities.forEach(actualCity => {
-                        const route = generateRoute(actualCity, startTime, duration, travelBuffer, planDate);
-                        combinedRoute = combinedRoute.concat(route);
-                    });
-                }
+                matchingCities.forEach(actualCity => {
+                    const orgs = getOverdueOrganizations(actualCity);
+                    allMatchedOrgs = allMatchedOrgs.concat(orgs);
+                });
             });
+
+            if (allMatchedOrgs.length === 0) {
+                showToast(`No Active organizations found in: ${selectedOptions.join(', ')}.`, 'warning');
+                return;
+            }
+
+            // ── Geocode all orgs + starting point ────────────────────────────
+            const startAddress = (document.getElementById('routeStartAddress')?.value || '').trim();
+            showToast(`Geocoding ${allMatchedOrgs.length} stops — please wait...`, 'info');
+            showLoading(true);
+
+            // Geocode starting point
+            let originCoord = null;
+            if (startAddress) {
+                originCoord = await geocodeAddress(startAddress);
+                if (!originCoord) {
+                    console.warn('Could not geocode starting address:', startAddress);
+                }
+            }
+
+            // Geocode each org (batch with small delay to respect Nominatim rate limit: 1 req/sec)
+            for (let i = 0; i < allMatchedOrgs.length; i++) {
+                const org = allMatchedOrgs[i];
+                const addr = buildAddressString(org);
+                if (addr) {
+                    org._coord = await geocodeAddress(addr);
+                    if (i < allMatchedOrgs.length - 1) {
+                        await new Promise(r => setTimeout(r, 1100)); // Nominatim: max 1 req/sec
+                    }
+                }
+            }
+            showLoading(false);
+
+            // ── Optimize route order ──────────────────────────────────────────
+            let sortedOrgs;
+            const geocodedCount = allMatchedOrgs.filter(o => o._coord).length;
+            console.log(`Geocoded ${geocodedCount}/${allMatchedOrgs.length} stops`);
+
+            if (geocodedCount >= 2 && (originCoord || geocodedCount >= 2)) {
+                // Use nearest-neighbor from origin (or first geocoded stop if no origin)
+                const effectiveOrigin = originCoord ||
+                    allMatchedOrgs.find(o => o._coord)?._coord;
+                sortedOrgs = nearestNeighborRoute(allMatchedOrgs, effectiveOrigin);
+                showToast(`Route optimized using ${geocodedCount} geocoded locations`, 'success');
+            } else {
+                // Fallback: zip-code sort
+                sortedOrgs = sortByDistance(allMatchedOrgs);
+                if (!originCoord && !startAddress) {
+                    showToast('Tip: Enter a starting address for an optimized route', 'info');
+                } else {
+                    showToast('Geocoding unavailable — sorted by zip code instead', 'warning');
+                }
+            }
+
+            // ── Build timed route from sorted orgs ───────────────────────────
+            let combinedRoute = buildTimedRoute(sortedOrgs, startTime, duration, travelBuffer, planDate);
             
-            // Re-sequence the combined route with travel buffer
-            combinedRoute.forEach((stop, index) => {
-                stop.Order = index + 1;
-                
-                // ✅ FIXED: Create date using selected planDate in LOCAL timezone (not UTC)
-                let arrivalTime;
-                if (planDate) {
-                    const [year, month, day] = planDate.split('-').map(Number);
-                    arrivalTime = new Date(year, month - 1, day, parseInt(startTime.split(':')[0]), parseInt(startTime.split(':')[1]), 0);
-                } else {
-                    arrivalTime = new Date();
-                    arrivalTime.setHours(parseInt(startTime.split(':')[0]), parseInt(startTime.split(':')[1]), 0);
-                }
-                
-                // Add cumulative time: (index * (duration + travel))
-                const cumulativeMinutes = index * (duration + travelBuffer);
-                arrivalTime.setTime(arrivalTime.getTime() + cumulativeMinutes * 60000);
-                
-                const departureTime = new Date(arrivalTime);
-                departureTime.setTime(departureTime.getTime() + duration * 60000);
-                
-                stop.EstimatedArrivalTime = arrivalTime.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit', hour12: true});
-                stop.EstimatedDepartureTime = departureTime.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit', hour12: true});
-                stop._arrivalDate = arrivalTime;
-                stop._departureDate = departureTime;
-            });
+
             
             console.log('Route generated:', combinedRoute.length, 'total stops');
             console.log('Route dates will be for:', planDate);
@@ -4706,6 +4851,224 @@ END:VEVENT
                 console.error('Export error:', err);
                 showToast('Failed to export route', 'error');
             }
+        }
+
+        // Build a timed stop list from a pre-sorted org array
+        function buildTimedRoute(sortedOrgs, startTime, durationMinutes, travelBuffer, planDate) {
+            let [hours, minutes] = startTime.split(':').map(Number);
+            let currentTime;
+            if (planDate) {
+                const [year, month, day] = planDate.split('-').map(Number);
+                currentTime = new Date(year, month - 1, day, hours, minutes, 0, 0);
+            } else {
+                currentTime = new Date();
+                currentTime.setHours(hours, minutes, 0, 0);
+            }
+
+            return sortedOrgs.map((org, index) => {
+                const arrivalTime   = new Date(currentTime);
+                const departureTime = new Date(currentTime.getTime() + durationMinutes * 60000);
+                const result = {
+                    ...org,
+                    Order: index + 1,
+                    EstimatedArrivalTime:   arrivalTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
+                    EstimatedDepartureTime: departureTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
+                    _arrivalDate:   arrivalTime,
+                    _departureDate: departureTime,
+                    Include: true
+                };
+                currentTime = new Date(departureTime.getTime() + travelBuffer * 60000);
+                return result;
+            });
+        }
+
+        function buildAddressString(stop) {
+            // Use String() first — Zip/State can be numbers from Google Sheets
+            const line1  = String(stop.Address  || '').trim();
+            const line2  = String(stop.Address2 || '').trim();
+            const city   = String(stop.City     || '').trim();
+            const state  = String(stop.State    || 'CA').trim();
+            const zip    = String(stop.Zip      || '').trim();
+            const street = line2 ? `${line1}, ${line2}` : line1;
+            return [street, city, state, zip].filter(Boolean).join(', ');
+        }
+
+        function openGoogleMapsRoute() {
+            if (!state.currentRoute || state.currentRoute.length === 0) {
+                showToast('No route to open', 'warning');
+                return;
+            }
+            const stops = state.currentRoute.filter(s => s.Include);
+            if (stops.length === 0) {
+                showToast('Please select at least one stop', 'warning');
+                return;
+            }
+
+            // Google Maps directions URL supports up to 10 waypoints
+            // Format: /dir/origin/waypoint1/waypoint2/.../destination
+            // We use the first stop as origin, last as destination, rest as waypoints
+            const addresses = stops.map(s => encodeURIComponent(buildAddressString(s)));
+
+            let url;
+            if (addresses.length === 1) {
+                // Single stop — just open as a place search
+                url = `https://www.google.com/maps/search/?api=1&query=${addresses[0]}`;
+            } else {
+                const origin      = addresses[0];
+                const destination = addresses[addresses.length - 1];
+                const waypoints   = addresses.slice(1, -1).join('|');
+                url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}${waypoints ? '&waypoints=' + waypoints : ''}&travelmode=driving`;
+            }
+
+            // Use location.href to avoid popup blocker; opens in same tab
+            // User can use browser back button to return
+            const a = document.createElement('a');
+            a.href = url;
+            a.target = '_blank';
+            a.rel = 'noopener';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showToast(`Opening ${stops.length}-stop route in Google Maps...`, 'success');
+        }
+
+        function openAppleMapsRoute() {
+            if (!state.currentRoute || state.currentRoute.length === 0) {
+                showToast('No route to open', 'warning');
+                return;
+            }
+            const stops = state.currentRoute.filter(s => s.Include);
+            if (stops.length === 0) {
+                showToast('Please select at least one stop', 'warning');
+                return;
+            }
+
+            // Apple Maps supports multi-stop via the maps.apple.com URL scheme
+            // For multi-stop, we open each stop as a waypoint using the daddr parameter
+            // Apple Maps only natively supports origin + 1 destination in URL, so
+            // for multiple stops we open as a Google Maps link which works on all devices,
+            // but on iOS we use the maps:// scheme to open the last stop in Apple Maps
+            // Best cross-device approach: use the Apple Maps search for first stop and
+            // open a shareable link for full route
+
+            if (stops.length === 1) {
+                const addr = encodeURIComponent(buildAddressString(stops[0]));
+                const a = document.createElement('a');
+                a.href = `https://maps.apple.com/?q=${addr}&dirflg=d`;
+                a.target = '_blank'; a.rel = 'noopener';
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            } else {
+                // Apple Maps multi-stop: use saddr/daddr chain
+                // Build a maps.apple.com URL with the full address sequence
+                const origin = encodeURIComponent(buildAddressString(stops[0]));
+                const destination = encodeURIComponent(buildAddressString(stops[stops.length - 1]));
+                // Apple Maps doesn't support true multi-waypoint in URLs; open first→last
+                // and note the limitation to the user
+                const url = `https://maps.apple.com/?saddr=${origin}&daddr=${destination}&dirflg=d`;
+                const a = document.createElement('a');
+                a.href = url; a.target = '_blank'; a.rel = 'noopener';
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                if (stops.length > 2) {
+                    showToast(`Apple Maps opened — shows first to last stop. Use Google Maps for the full sequence.`, 'info');
+                }
+            }
+        }
+
+        // Build a timed stop list from a pre-sorted org array
+        function buildTimedRoute(sortedOrgs, startTime, durationMinutes, travelBuffer, planDate) {
+            let [hours, minutes] = startTime.split(':').map(Number);
+            let currentTime;
+            if (planDate) {
+                const [year, month, day] = planDate.split('-').map(Number);
+                currentTime = new Date(year, month - 1, day, hours, minutes, 0, 0);
+            } else {
+                currentTime = new Date();
+                currentTime.setHours(hours, minutes, 0, 0);
+            }
+
+            return sortedOrgs.map((org, index) => {
+                const arrivalTime   = new Date(currentTime);
+                const departureTime = new Date(currentTime.getTime() + durationMinutes * 60000);
+                const result = {
+                    ...org,
+                    Order: index + 1,
+                    EstimatedArrivalTime:   arrivalTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
+                    EstimatedDepartureTime: departureTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
+                    _arrivalDate:   arrivalTime,
+                    _departureDate: departureTime,
+                    Include: true
+                };
+                currentTime = new Date(departureTime.getTime() + travelBuffer * 60000);
+                return result;
+            });
+        }
+
+        function updateGPSBar(status, lat, lon, address) {
+            const icon    = document.getElementById('gpsBarIcon');
+            const addrEl  = document.getElementById('gpsBarAddress');
+            const coordEl = document.getElementById('gpsBarCoords');
+            const badge   = document.getElementById('gpsStatus');
+            if (status === 'loading') {
+                if (icon)    { icon.textContent = 'location_searching'; icon.style.color = 'rgba(255,255,255,0.7)'; }
+                if (addrEl)  addrEl.textContent = 'Locating...';
+                if (coordEl) coordEl.textContent = '—';
+                if (badge)   { badge.className = 'checkin-gps'; badge.innerHTML = '<span class="material-icons-outlined">location_searching</span><span>Getting GPS...</span>'; }
+            } else if (status === 'ok') {
+                if (icon)    { icon.textContent = 'location_on'; icon.style.color = '#a8f0c6'; }
+                if (addrEl)  addrEl.textContent = address || `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+                if (coordEl) coordEl.textContent = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+                if (badge)   { badge.className = 'checkin-gps active'; badge.innerHTML = '<span class="material-icons-outlined">location_on</span><span>GPS Ready</span>'; }
+            } else {
+                if (icon)    { icon.textContent = 'location_off'; icon.style.color = '#f5a0a0'; }
+                if (addrEl)  addrEl.textContent = 'Location unavailable';
+                if (coordEl) coordEl.textContent = 'Tap Update to try again';
+                if (badge)   { badge.className = 'checkin-gps error'; badge.innerHTML = '<span class="material-icons-outlined">location_off</span><span>No GPS</span>'; }
+            }
+        }
+
+        // Haversine distance in miles
+        function haversineDistance(a, b) {
+            const R = 3958.8;
+            const dLat = (b.lat - a.lat) * Math.PI / 180;
+            const dLon = (b.lon - a.lon) * Math.PI / 180;
+            const sinLat = Math.sin(dLat/2), sinLon = Math.sin(dLon/2);
+            const c = sinLat*sinLat + Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*sinLon*sinLon;
+            return R * 2 * Math.atan2(Math.sqrt(c), Math.sqrt(1-c));
+        }
+
+        function populateRouteOrgTypes() {
+            const container = document.getElementById('routeOrgTypeCheckboxes');
+            if (!container) return;
+            const prevChecked = new Set(
+                Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value)
+            );
+            const types = [...new Set(
+                state.organizations.filter(o => isActiveOrg(o) && o.Type && o.Type.trim()).map(o => o.Type.trim())
+            )].sort();
+            container.innerHTML = '';
+            if (types.length === 0) { container.innerHTML = '<div style="padding:8px;color:#999;font-size:12px;">No types found</div>'; return; }
+            types.forEach(type => {
+                const div = document.createElement('div');
+                div.className = 'route-city-checkbox';
+                const cb = document.createElement('input');
+                cb.type = 'checkbox'; cb.value = type;
+                cb.id = `orgtype_${type.replace(/\s+/g,'_')}`;
+                cb.checked = prevChecked.size === 0 ? true : prevChecked.has(type);
+                const label = document.createElement('label');
+                label.htmlFor = cb.id; label.textContent = type;
+                div.appendChild(cb); div.appendChild(label);
+                container.appendChild(div);
+            });
+        }
+
+        function getSelectedOrgTypes() {
+            const container = document.getElementById('routeOrgTypeCheckboxes');
+            if (!container) return null;
+            const all = Array.from(container.querySelectorAll('input[type="checkbox"]'));
+            const checked = all.filter(cb => cb.checked).map(cb => cb.value);
+            if (checked.length === 0) return [];
+            if (checked.length === all.length) return null;
+            return checked;
         }
 
         // ============================================
@@ -4981,7 +5344,8 @@ END:VEVENT
 
         function initializeRoutePlanner() {
             populateRouteZones();
-            populateRouteCities();  // Use the new checkbox population function
+            populateRouteCities();
+            populateRouteOrgTypes();
             
             // Set today as default date
             const today = getLocalDateString();
@@ -5006,18 +5370,21 @@ END:VEVENT
             initQuillEditors();
             setupEventListeners();
             getLocation();
-            
-            // Wait for Google library to load
-            if (typeof google !== 'undefined') {
-                initGoogleSignIn();
+
+            if (typeof LOGIN_PAUSED !== 'undefined' && LOGIN_PAUSED) {
+                updateAuthUI();
             } else {
-                setTimeout(() => {
-                    if (typeof google !== 'undefined') {
-                        initGoogleSignIn();
-                    }
-                }, 1000);
+                if (typeof google !== 'undefined') {
+                    initGoogleSignIn();
+                } else {
+                    setTimeout(() => {
+                        if (typeof google !== 'undefined') {
+                            initGoogleSignIn();
+                        }
+                    }, 1000);
+                }
             }
-            
+
             initApp();
         });
         
@@ -5170,7 +5537,7 @@ END:VEVENT
                                         initializeRoutePlanner();                    // Ensure all settings have proper defaults
                     ensureSettingsDefaults();
                     
-                    if (userResponse?.success) {
+                    if (userResponse?.success && !(typeof LOGIN_PAUSED !== 'undefined' && LOGIN_PAUSED)) {
                         state.user = userResponse.user;
                     }
                     
@@ -5371,17 +5738,45 @@ END:VEVENT
 
         async function apiPost(action, data) {
             try {
-                console.log('📤 POST Request:', action);
-                console.log('Data:', JSON.stringify(data, null, 2));
-                
-                // Google Apps Script doesn't support CORS with JSON, so use no-cors
-                const response = await fetch(APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',  // Bypass CORS check - required for Google Apps Script
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action, token: googleIdToken, ...data })
+                console.log('📤 JSONP Write:', action);
+                const payload = JSON.stringify({ action, token: googleIdToken, ...data });
+                const cbName = 'cb_' + Date.now() + '_' + Math.random().toString(36).substr(2,9);
+                const url = APPS_SCRIPT_URL + '?callback=' + cbName
+                    + '&action=' + encodeURIComponent(action)
+                    + '&payload=' + encodeURIComponent(payload);
+
+                const result = await new Promise((resolve, reject) => {
+                    window[cbName] = r => { delete window[cbName]; const s=document.getElementById(cbName); if(s)s.remove(); resolve(r); };
+                    const s = document.createElement('script');
+                    s.id = cbName; s.src = url;
+                    s.onerror = () => { delete window[cbName]; s.remove(); reject(new Error('Write failed: '+action)); };
+                    document.body.appendChild(s);
+                    setTimeout(() => { if(window[cbName]){ delete window[cbName]; const s2=document.getElementById(cbName); if(s2)s2.remove(); reject(new Error('Timeout: '+action)); } }, 30000);
                 });
-                
+
+                if (result && result.success) {
+                    try {
+                        const v = await apiCall('getAllData');
+                        if (v && v.success && v.data) {
+                            state.organizations   = v.data.organizations   || state.organizations;
+                            state.contacts        = v.data.contacts        || state.contacts;
+                            state.visits          = v.data.visits          || state.visits;
+                            state.teamMembers     = v.data.teamMembers     || state.teamMembers;
+                            state.emailTemplates  = v.data.emailTemplates  || state.emailTemplates;
+                            state.assetCategories = v.data.assetCategories || state.assetCategories;
+                            state.assetItems      = v.data.assetItems      || state.assetItems;
+                            state.stockHistory    = v.data.stockHistory    || state.stockHistory;
+                            localStorage.setItem('busdev_cache', JSON.stringify({
+                                organizations:state.organizations,contacts:state.contacts,
+                                visits:state.visits,teamMembers:state.teamMembers,
+                                emailTemplates:state.emailTemplates,assetCategories:state.assetCategories,
+                                assetItems:state.assetItems,stockHistory:state.stockHistory,
+                                settings:state.settings,user:state.user,timestamp:Date.now()
+                            }));
+                        }
+                    } catch(e) { console.warn('Reload after write failed:', e); }
+                }
+                return result || { success: true };
                 console.log('✅ POST sent (no-cors mode)');
                 
                 // Brief delay for server processing
@@ -5484,6 +5879,7 @@ END:VEVENT
                 if (tabId === 'visits') {
                     populateRouteZones();
                     populateRouteCities();
+                    populateRouteOrgTypes();
                     const plannerContent = document.getElementById('routePlannerContent');
                     const plannerToggle = document.querySelector('.route-planner-toggle');
                     if (plannerContent && plannerContent.style.display === 'none') {
@@ -6201,11 +6597,18 @@ END:VEVENT
                         orgName: '',
                         orgId: org.ID,
                         zone: org.Zone || '',
-                        orgType: org.Type || '',  // ✅ NEW: Add org type to item
+                        orgType: org.Type || '',
                         contactInfo: `${org.City || ''} ${org.Phone ? '• ' + org.Phone : ''}`,
                         lastVisit: lastVisit,
                         email: org.Email || '',
-                        data: org
+                        data: org,
+                        // Expanded search corpus — all fields concatenated for matching
+                        searchText: [
+                            org.Name, org.Type, org.Zone, org.City, org.State,
+                            org.Address, org.Address2, org.Zip, org.Phone,
+                            org.Email, org.Website, org.Owner, org.Notes,
+                            org.Status, org.Visit_Frequency
+                        ].filter(Boolean).join(' ').toLowerCase()
                     });
                 });
             }
@@ -6222,24 +6625,28 @@ END:VEVENT
                         orgName: org?.Name || '',
                         orgId: c.Org_ID,
                         zone: org?.Zone || '',
-                        orgType: org?.Type || '',  // ✅ NEW: Add org type to item
+                        orgType: org?.Type || '',
                         contactInfo: `${c.Email || ''} ${c.Phone ? '• ' + c.Phone : ''}`,
                         lastVisit: lastVisit,
                         email: c.Email || '',
                         title: c.Title || '',
-                        data: c
+                        data: c,
+                        // Expanded search corpus
+                        searchText: [
+                            c.First_Name, c.Last_Name, c.Title, c.Email, c.Phone,
+                            c.Notes, org?.Name, org?.City, org?.Type, org?.Zone
+                        ].filter(Boolean).join(' ').toLowerCase()
                     });
                 });
             }
             
-            // Apply filters
+            // Apply filters — each word must match somewhere (AND logic)
             if (search) {
-                items = items.filter(i => 
-                    i.name.toLowerCase().includes(search) || 
-                    i.orgName.toLowerCase().includes(search) ||
-                    i.contactInfo.toLowerCase().includes(search) ||
-                    i.email.toLowerCase().includes(search)
-                );
+                const words = search.trim().split(/\s+/).filter(Boolean);
+                items = items.filter(i => {
+                    const corpus = i.searchText || [i.name, i.orgName, i.contactInfo, i.email].join(' ').toLowerCase();
+                    return words.every(word => corpus.includes(word));
+                });
             }
             if (zoneFilter) {
                 items = items.filter(i => i.zone === zoneFilter);
@@ -6265,15 +6672,36 @@ END:VEVENT
                 return directorySortAsc ? cmp : -cmp;
             });
             
+            // Update result count
+            const countEl = document.getElementById('directoryResultCount');
+            if (countEl) {
+                const total = (typeFilter !== 'contact' ? state.organizations.length : 0)
+                            + (typeFilter !== 'org' ? state.contacts.length : 0);
+                countEl.textContent = (search || zoneFilter || orgTypeFilter)
+                    ? `${items.length} of ${total} results`
+                    : `${total} total`;
+            }
+
             // Render table
             tableBody.innerHTML = items.map(item => {
                 const visitClass = getVisitDateClass(item.lastVisit);
                 const visitText = formatVisitDate(item.lastVisit);
                 
                 const safeId = String(item.id).replace(/'/g, "\\'");
+                // Highlight search terms in the name
+                function hlSearch(text) {
+                    if (!search || !text) return esc(text || '');
+                    const words = search.trim().split(/\s+/).filter(Boolean);
+                    let result = esc(text);
+                    words.forEach(word => {
+                        const re = new RegExp('(' + word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+                        result = result.replace(re, '<mark style="background:#fff3cd;padding:0 2px;border-radius:2px;">$1</mark>');
+                    });
+                    return result;
+                }
                 return `
                     <tr class="clickable-row" onclick="openDetailPanel('${item.type}', '${safeId}')">
-                        <td><strong>${esc(item.name)}</strong>${item.type === 'contact' && item.title ? `<br><small style="color:var(--gray-500)">${esc(item.title)}</small>` : (item.type === 'org' ? `<br><small style="color:var(--gray-500)">${esc(item.data?.Type || 'Organization')}</small>` : '')}</td>
+                        <td><strong>${hlSearch(item.name)}</strong>${item.type === 'contact' && item.title ? `<br><small style="color:var(--gray-500)">${esc(item.title)}</small>` : (item.type === 'org' ? `<br><small style="color:var(--gray-500)">${esc(item.data?.Type || 'Organization')}</small>` : '')}</td>
                         <td>${item.type === 'contact' ? esc(item.orgName) : '-'}</td>
                         <td>${item.zone ? `<span class="zone-badge">${item.zone}</span>` : '-'}</td>
                         <td style="font-size: 13px; color: var(--gray-600);">${esc(item.contactInfo) || '-'}</td>
@@ -7019,7 +7447,6 @@ END:VEVENT
                     : '-';
                 
                 const droppedDisplay = v.Dropped_Off_At ? esc(v.Dropped_Off_At) : '-';
-
                 return `<tr class="clickable-row" onclick="switchTab('directory'); setTimeout(() => openDetailPanel('org', '${v.Org_ID}'), 100);">
                     <td style="white-space: nowrap;">
                         <span class="material-icons-outlined" style="font-size: 14px; vertical-align: middle; color: var(--gray-500);">schedule</span>
@@ -7031,7 +7458,7 @@ END:VEVENT
                             ${esc(v.Outcome || 'No outcome')}
                         </span>
                     </td>
-                    <td style="font-size: 12px; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${droppedDisplay}">${droppedDisplay}</td>
+                    <td style="font-size:12px;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${droppedDisplay}">${droppedDisplay}</td>
                     <td style="font-size: 12px; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${esc(assetsDisplay)}">${esc(assetsDisplay)}</td>
                     <td style="font-size: 12px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${esc(v.Notes || '')}">${v.Notes ? esc(v.Notes) : '-'}</td>
                     <td>${followUpDisplay}</td>
@@ -7425,7 +7852,7 @@ END:VEVENT
             nearMeLoading.style.display = 'inline';
             nearMeList.innerHTML = '<div style="color: rgba(255,255,255,0.6); font-size: 13px; padding: 8px;">Finding nearby organizations...</div>';
             
-            const activeOrgs = state.organizations.filter(o => o.Status === 'Active' && o.Address && o.City);
+            const activeOrgs = state.organizations.filter(o => isActiveOrg(o) && o.Address && o.City);
             const orgsWithDistance = [];
             
             // Process organizations in batches to avoid rate limiting
@@ -7714,18 +8141,15 @@ END:VCALENDAR`;
             const followUpDescription = document.getElementById('followUpDescription').value.trim();
             
             const droppedAt = (document.getElementById('checkinDroppedAt')?.value || '').trim();
-
-            // Extract brochure counts from assetsUsed for dedicated columns
-            let brochuresGeneral = 0, brochuresHospice = 0, brochuresOther = 0;
+            let brochuresGeneral=0, brochuresHospice=0, brochuresOther=0;
             Object.entries(assetsUsed).forEach(([itemId, qty]) => {
                 const item = state.assetItems.find(a => a.ID === itemId);
                 if (!item) return;
                 const cat = (item.Category || item.Name || '').toLowerCase();
-                if (cat.includes('hospice'))       brochuresHospice  += qty;
+                if (cat.includes('hospice')) brochuresHospice += qty;
                 else if (cat.includes('general') || cat.includes('brochure')) brochuresGeneral += qty;
-                else                               brochuresOther    += qty;
+                else brochuresOther += qty;
             });
-
             const visit = {
                 Org_ID: orgId,
                 Visit_Date: getLocalDateString(now),
@@ -8246,7 +8670,7 @@ END:VCALENDAR`;
             
             // Filter organizations - sorted A-Z
             let filteredOrgs = state.organizations
-                .filter(o => o.Status === 'Active')
+                .filter(o => isActiveOrg(o))
                 .sort((a, b) => (a.Name || '').localeCompare(b.Name || ''));
             
             if (zoneFilter) {
@@ -8374,7 +8798,7 @@ END:VCALENDAR`;
             const zoneFilter = document.getElementById('composeZoneFilter').value;
             const searchTerm = (document.getElementById('composeRecipientSearch').value || '').toLowerCase();
             
-            let orgs = state.organizations.filter(o => o.Status === 'Active');
+            let orgs = state.organizations.filter(o => isActiveOrg(o));
             if (zoneFilter) orgs = orgs.filter(o => o.Zone === zoneFilter);
             if (searchTerm) {
                 orgs = orgs.filter(o => 
@@ -8830,27 +9254,10 @@ END:VCALENDAR`;
                 const result = await apiPost(org.ID ? 'updateOrganization' : 'addOrganization', { organization: org });
                 console.log('Save result:', result);
                 
-                if (result.success) {
-                    // Wait a moment then reload data from server to verify save worked
-                    await new Promise(resolve => setTimeout(resolve, 300));
-                    
-                    console.log('🔄 Reloading data from server to verify save...');
-                    const dataResponse = await apiCall('getAllData');
-                    
-                    if (dataResponse.success && dataResponse.data) {
-                        state.organizations = dataResponse.data.organizations || [];
-                        console.log('✅ Data reloaded successfully');
-                        closeModal('orgModal');
-                        renderAll();
-                        populateOrgTypeDropdown();
-                        showToast('✅ Organization saved', 'success');
-                    } else {
-                        console.warn('Could not reload data, but save may have succeeded');
-                        showToast('⚠️ Saved but could not verify. Refresh page to see changes.', 'warning');
-                    }
-                } else {
-                    showToast('❌ Save failed: ' + (result.error || 'Unknown error'), 'error');
-                }
+                closeModal('orgModal');
+                renderAll();
+                populateOrgTypeDropdown();
+                showToast('✅ Organization saved successfully', 'success');
             } catch (err) { 
                 console.error('Save error:', err);
                 showToast('❌ Save failed: ' + err.message, 'error'); 
@@ -8977,8 +9384,8 @@ END:VCALENDAR`;
             }
             
             // Filter organizations by name (case insensitive, partial match)
-            const matches = state.organizations.filter(org => 
-                org.Name.toLowerCase().includes(searchTerm)
+            const matches = state.organizations.filter(org =>
+                org.Name && org.Name.toLowerCase().includes(searchTerm)
             ).slice(0, 10); // Limit to 10 suggestions
             
             if (matches.length === 0) {
@@ -9020,7 +9427,7 @@ END:VCALENDAR`;
             
             // Filter organizations by name (case insensitive, partial match)
             let matches = state.organizations.filter(org => 
-                org.Name.toLowerCase().includes(searchTerm) && org.Status === 'Active'
+                org.Name && org.Name.toLowerCase().includes(searchTerm) && isActiveOrg(org)
             );
             
             // If we have location, calculate and sort by distance
@@ -9967,50 +10374,30 @@ END:VCALENDAR`;
             return `${year}-${month}-${day}`;
         }
         
-        // Parse a date string and return YYYY-MM-DD in local timezone
         function normalizeDate(dateValue) {
             if (!dateValue) return '';
-
-            // Already a Date object
-            if (dateValue instanceof Date) {
-                return getLocalDateString(dateValue);
-            }
-
+            if (dateValue instanceof Date) return getLocalDateString(dateValue);
             const str = String(dateValue).trim();
-
-            // Already YYYY-MM-DD — return as-is (most common case from GAS)
+            // Already YYYY-MM-DD
             if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
-
-            // Google Sheets exports as "YYYY-MM-DD HH:MM:SS" with a space — replace space with T
-            // so Safari/mobile can parse it (new Date("2026-05-24 00:00:00") = NaN on Safari)
-            if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(str)) {
-                const isoStr = str.replace(' ', 'T');
-                // Parse as local time by extracting parts directly
-                const [datePart] = isoStr.split('T');
-                return datePart;
-            }
-
-            // ISO with T: "2026-05-24T00:00:00.000Z" — extract date part in local tz
+            // GAS exports "YYYY-MM-DD HH:MM:SS" — strip time, no parsing needed
+            if (/^\d{4}-\d{2}-\d{2} /.test(str)) return str.split(' ')[0];
+            // ISO with T
             if (/^\d{4}-\d{2}-\d{2}T/.test(str)) {
-                // If Z or +offset, convert to local
                 const d = new Date(str);
                 if (!isNaN(d.getTime())) return getLocalDateString(d);
+                return str.split('T')[0];
             }
-
-            // US format MM/DD/YYYY
+            // MM/DD/YYYY
             if (str.includes('/')) {
-                const parts = str.split('/');
-                if (parts.length === 3) {
-                    const d = new Date(parseInt(parts[2]), parseInt(parts[0]) - 1, parseInt(parts[1]));
+                const p = str.split('/');
+                if (p.length === 3) {
+                    const d = new Date(parseInt(p[2]), parseInt(p[0]) - 1, parseInt(p[1]));
                     if (!isNaN(d.getTime())) return getLocalDateString(d);
                 }
             }
-
-            // Fallback: try native parse
             const d = new Date(str);
             if (!isNaN(d.getTime())) return getLocalDateString(d);
-
-            console.warn('Could not parse date:', dateValue);
             return str;
         }
         
@@ -10087,8 +10474,7 @@ END:VCALENDAR`;
             }, 3000);
         }
 
-        function openModal(id) { document.getElementById(id).classList.add('active'); }
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        // openModal / closeModal defined above
         
         function formatVisitDate(dateStr) {
             if (!dateStr) return 'Never';
