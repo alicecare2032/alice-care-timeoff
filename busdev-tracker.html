@@ -2619,36 +2619,6 @@
                         </div>
                     </div>
 
-                    <div style="min-width: 280px;">
-                        <label style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">
-                            Org Types
-                            <span style="font-weight:normal; font-size:11px; color:#888; margin-left:6px;">
-                                (<a href="#" onclick="routeToggleAllTypes(true);return false;" style="color:var(--primary)">All</a>
-                                / <a href="#" onclick="routeToggleAllTypes(false);return false;" style="color:var(--primary)">None</a>)
-                            </span>
-                        </label>
-                        <div id="routeOrgTypeCheckboxes" class="route-city-checkboxes" style="background:white;border-radius:6px;padding:8px;max-height:150px;overflow-y:auto;border:1px solid #ddd;"></div>
-                    </div>
-
-                    <div style="min-width: 260px; flex-basis: 100%;">
-                        <label for="routeStartAddress" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">
-                            📍 Starting Point
-                        </label>
-                        <div style="display: flex; gap: 8px; align-items: center;">
-                            <input type="text" id="routeStartAddress" class="form-input"
-                                   placeholder="e.g. 8146 Greenback Ln, Fair Oaks, CA"
-                                   style="flex: 1;"
-                                   oninput="if(!this.value.trim()){state.currentStartCoord=null;const h=document.getElementById('routeStartAddressHint');if(h){h.style.color='#888';h.textContent='Type an address or tap Use GPS — route will start from here';}}">
-                            <button type="button" onclick="useGPSForStart()" class="btn btn-secondary"
-                                    id="gpsStartBtn" title="Use my current GPS location"
-                                    style="white-space:nowrap;height:40px;padding:0 12px;flex-shrink:0;">
-                                📡 Use GPS
-                            </button>
-                        </div>
-                        <div id="routeStartAddressHint" style="font-size:11px;color:#888;margin-top:3px;">
-                            Type an address or tap Use GPS — route will start from here
-                        </div>
-                    </div>
 
                     <div style="min-width: 140px;">
                         <label for="routePlanDate" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">Plan Date</label>
@@ -7821,27 +7791,46 @@ END:VEVENT
         }
         
         function getLocation() {
-            const gpsEl = document.getElementById('gpsStatus');
             loadGeoCache();
-            
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    pos => {
-                        state.currentLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                        gpsEl.className = 'checkin-gps active';
-                        gpsEl.innerHTML = `<span class="material-icons-outlined">location_on</span><span>GPS Ready</span>`;
-                        
-                        // Load nearby organizations
-                        loadNearbyOrganizations();
-                    },
-                    err => {
-                        gpsEl.className = 'checkin-gps error';
-                        gpsEl.innerHTML = `<span class="material-icons-outlined">location_off</span><span>No GPS</span>`;
-                        // Hide near me section if no GPS
-                        document.getElementById('nearMeSection').style.display = 'none';
-                    }
-                );
+            updateGPSBar('loading');
+
+            if (!navigator.geolocation) {
+                updateGPSBar('error');
+                return;
             }
+
+            navigator.geolocation.getCurrentPosition(
+                async pos => {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
+                    state.currentLocation = { lat, lng: lon };
+
+                    // Reverse geocode for readable address
+                    let address = '';
+                    try {
+                        const res = await fetch(
+                            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
+                            { headers: { 'Accept-Language': 'en', 'User-Agent': 'AliceCareRoutePlanner/1.0' } }
+                        );
+                        const data = await res.json();
+                        const a = data.address || {};
+                        address = [
+                            ((a.house_number || '') + ' ' + (a.road || '')).trim(),
+                            a.city || a.town || a.village || '',
+                            a.state || ''
+                        ].filter(Boolean).join(', ');
+                    } catch(e) { /* silent */ }
+
+                    state.currentLocationAddress = address;
+                    updateGPSBar('ok', lat, lon, address);
+                    loadNearbyOrganizations();
+                },
+                err => {
+                    updateGPSBar('error');
+                    const nearMeSection = document.getElementById('nearMeSection');
+                    if (nearMeSection) nearMeSection.style.display = 'none';
+                }
+            );
         }
         
         async function loadNearbyOrganizations() {
