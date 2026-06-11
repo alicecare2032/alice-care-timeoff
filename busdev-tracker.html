@@ -2319,46 +2319,9 @@
             <div class="checkin-card">
                 <div class="checkin-header">
                     <div class="checkin-title">Visit Check-In</div>
-                    <div class="checkin-gps" id="gpsStatus" onclick="refreshGPSLocation()"
-                         title="Tap to update GPS location" style="cursor:pointer;">
+                    <div class="checkin-gps" id="gpsStatus">
                         <span class="material-icons-outlined">location_searching</span>
                         <span>Getting GPS...</span>
-                    </div>
-                </div>
-
-                <!-- GPS Location Bar -->
-                <div id="gpsLocationBar" style="
-                    background: rgba(255,255,255,0.12);
-                    border-radius: 8px;
-                    padding: 10px 14px;
-                    margin-bottom: 14px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    gap: 10px;
-                    flex-wrap: wrap;
-                ">
-                    <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:0;">
-                        <span class="material-icons-outlined" style="color:rgba(255,255,255,0.7); font-size:18px;" id="gpsBarIcon">location_searching</span>
-                        <div style="min-width:0;">
-                            <div id="gpsBarAddress" style="color:rgba(255,255,255,0.95); font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                                Locating...
-                            </div>
-                            <div id="gpsBarCoords" style="color:rgba(255,255,255,0.55); font-size:11px; margin-top:1px;">
-                                &mdash;
-                            </div>
-                        </div>
-                    </div>
-                    <div style="display:flex; gap:6px; flex-shrink:0;">
-                        <button onclick="refreshGPSLocation()" id="gpsRefreshBtn"
-                                style="background:rgba(255,255,255,0.2); border:none; border-radius:6px; color:white; padding:6px 12px; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px; white-space:nowrap;">
-                            <span class="material-icons-outlined" style="font-size:14px;">refresh</span> Update
-                        </button>
-                        <button onclick="useGPSAsRouteStart()" id="gpsUseForRouteBtn"
-                                style="background:rgba(255,255,255,0.2); border:none; border-radius:6px; color:white; padding:6px 12px; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px; white-space:nowrap;"
-                                title="Use this location as the starting point in the Route Planner">
-                            <span class="material-icons-outlined" style="font-size:14px;">alt_route</span> Use as Route Start
-                        </button>
                     </div>
                 </div>
 
@@ -2392,6 +2355,17 @@
                 </select>
 
                 <!-- ✅ NEW: Notes/Comment Field -->
+                <!-- Drop-off location -->
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; color: rgba(255,255,255,0.8); font-size: 13px; margin-bottom: 6px; font-weight: 500;">
+                        <span class="material-icons-outlined" style="font-size: 16px; vertical-align: middle;">place</span> Dropped Off At
+                        <span style="color:rgba(255,255,255,0.5); font-size:11px; font-weight:400; margin-left:4px;">Where materials were left</span>
+                    </label>
+                    <input type="text" id="checkinDroppedAt" class="checkin-org-select"
+                           placeholder="e.g. Front desk, Social Worker's office, Nursing station..."
+                           style="width: 100%;">
+                </div>
+
                 <div style="margin-bottom: 16px;">
                     <label style="display: block; color: rgba(255,255,255,0.8); font-size: 13px; margin-bottom: 6px; font-weight: 500;">
                         <span class="material-icons-outlined" style="font-size: 16px; vertical-align: middle;">notes</span> Notes / Comments
@@ -2456,6 +2430,7 @@
                                     <th>Time</th>
                                     <th>Organization</th>
                                     <th>Outcome</th>
+                                    <th>Dropped Off At</th>
                                     <th>Materials</th>
                                     <th>Notes</th>
                                     <th>Follow-Up</th>
@@ -2533,7 +2508,6 @@
                                     <span class="material-icons-outlined">person_add</span>
                                 </button>
                             </div>
-                            <div style="font-size: 12px; color: var(--gray-500); padding: 2px 0;" id="directoryResultCount"></div>
                         </div>
                         <div class="card-body" style="padding: 0;">
                             <div class="table-container">
@@ -2596,40 +2570,6 @@
                         </div>
                     </div>
                     
-                    <div style="min-width: 280px;">
-                        <label style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">
-                            Org Types
-                            <span style="font-weight:normal; font-size:11px; color:#888; margin-left:6px;">
-                                (<a href="#" onclick="routeToggleAllTypes(true);return false;" style="color:var(--primary)">All</a>
-                                / <a href="#" onclick="routeToggleAllTypes(false);return false;" style="color:var(--primary)">None</a>)
-                            </span>
-                        </label>
-                        <div id="routeOrgTypeCheckboxes" class="route-city-checkboxes" style="background:white;border-radius:6px;padding:8px;max-height:150px;overflow-y:auto;border:1px solid #ddd;">
-                            <!-- Populated by populateRouteOrgTypes() -->
-                        </div>
-                    </div>
-
-                    <div style="min-width: 260px; flex-basis: 100%;">
-                        <label style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">
-                            📍 Starting Point
-                        </label>
-                        <div style="display: flex; gap: 8px; align-items: center;">
-                            <input type="text" id="routeStartAddress" class="form-input"
-                                   placeholder="e.g. 8146 Greenback Ln, Fair Oaks, CA"
-                                   style="flex: 1;"
-                                   oninput="if(!this.value.trim()){state.currentStartCoord=null;const h=document.getElementById('routeStartAddressHint');if(h){h.style.color='#888';h.textContent='Type an address or tap Use GPS — route will start from here';}}">
-                            <button type="button" onclick="useGPSForStart()" class="btn btn-secondary"
-                                    id="gpsStartBtn"
-                                    title="Use my current GPS location"
-                                    style="white-space: nowrap; height: 40px; padding: 0 12px; flex-shrink: 0;">
-                                📡 Use GPS
-                            </button>
-                        </div>
-                        <div id="routeStartAddressHint" style="font-size: 11px; color: #888; margin-top: 3px;">
-                            Type an address or tap Use GPS — route will start from here
-                        </div>
-                    </div>
-
                     <div style="min-width: 140px;">
                         <label for="routePlanDate" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">Plan Date</label>
                         <input type="date" id="routePlanDate" class="form-input">
@@ -2643,7 +2583,7 @@
                     <div style="min-width: 140px;">
                         <label for="routeVisitDuration" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">Visit (min)</label>
                         <input type="number" id="routeVisitDuration" class="form-input" 
-                               min="5" max="240" step="5" value="30">
+                               min="15" max="120" step="5" value="30">
                     </div>
                     
                     <div style="min-width: 140px;">
@@ -2671,16 +2611,7 @@
                     <button onclick="exportRouteToCalendar()" class="btn btn-success" style="width: 100%;">
                         📅 Export to Google Calendar (ICS)
                     </button>
-
-                    <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <button onclick="openGoogleMapsRoute()" class="btn btn-primary" style="flex: 1;">
-                            🗺️ Open in Google Maps
-                        </button>
-                        <button onclick="openAppleMapsRoute()" class="btn btn-secondary" style="flex: 1;">
-                            🍎 Open in Apple Maps
-                        </button>
-                    </div>
-
+                    
                     <button onclick="saveRoutePlan()" class="btn btn-info" style="width: 100%; margin-top: 10px;">
                         💾 Save Route Plan
                     </button>
@@ -3923,11 +3854,6 @@
         function isAdmin() {
             return state.user?.role === 'Admin';
         }
-
-        function isActiveOrg(org) {
-            const s = (org.Status || '').trim().toLowerCase();
-            return !s || s === 'active';
-        }
         
         function isRep() {
             return state.user?.role === 'Rep' || !state.user?.role;
@@ -4060,39 +3986,28 @@
             showToast('✅ Session extended for 8 more hours', 'success');
         }
         
-        // ── LOGIN PAUSED ──────────────────────────────────────────────
-        // Set to false to re-enable Google login requirement.
-        const LOGIN_PAUSED = true;
-        // ─────────────────────────────────────────────────────────────
-
         function updateAuthUI() {
             const signedInSection = document.getElementById('signedInSection');
             const signedOutSection = document.getElementById('signedOutSection');
             const loginGate = document.getElementById('loginGate');
             const mainApp = document.getElementById('mainApp');
-
-            if (LOGIN_PAUSED && !state.user) {
-                state.user = {
-                    name: 'Guest',
-                    email: 'guest@alicecare.com',
-                    role: 'Admin',
-                    zones: ['SMF', 'SDG'],
-                    active: true
-                };
-            }
-
+            
             if (state.user) {
-                if (signedInSection) signedInSection.style.display = 'flex';
-                if (signedOutSection) signedOutSection.style.display = 'none';
-                const userNameEl = document.getElementById('userName');
-                const userZonesEl = document.getElementById('userZones');
-                if (userNameEl) userNameEl.textContent = state.user.name || state.user.email;
-                if (userZonesEl) userZonesEl.textContent = state.user.zones?.join(', ') || 'All';
+                // User is authenticated
+                signedInSection.style.display = 'flex';
+                signedOutSection.style.display = 'none';
+                document.getElementById('userName').textContent = state.user.name || state.user.email;
+                document.getElementById('userZones').textContent = state.user.zones?.join(', ') || 'All';
+                
+                // Show main app, hide login gate
                 if (loginGate) loginGate.classList.add('hidden');
                 if (mainApp) mainApp.style.display = 'block';
             } else {
-                if (signedInSection) signedInSection.style.display = 'none';
-                if (signedOutSection) signedOutSection.style.display = 'block';
+                // User is not authenticated
+                signedInSection.style.display = 'none';
+                signedOutSection.style.display = 'block';
+                
+                // Hide main app, show login gate
                 if (loginGate) loginGate.classList.remove('hidden');
                 if (mainApp) mainApp.style.display = 'none';
             }
@@ -4191,18 +4106,12 @@
             console.log(`🏙️ Getting organizations for city: "${city}" (normalized: "${cityNorm}")`);
             console.log(`   Total orgs in state: ${state.organizations.length}`);
             
-            const selectedTypes = getSelectedOrgTypes(); // null=all, []=none, [...]=specific
             const orgs = state.organizations.filter(org => {
                 const orgCity = (org.City || '').trim().toLowerCase();
-                if (orgCity !== cityNorm) return false;
-                if (!isActiveOrg(org)) return false;
-                // Apply org type filter
-                if (selectedTypes !== null) {
-                    const orgType = (org.Type || '').trim();
-                    if (selectedTypes.length === 0) return false;
-                    if (!selectedTypes.includes(orgType)) return false;
-                }
-                return true;
+                const orgStatus = (org.Status || '').trim().toLowerCase();
+                // Treat missing/null Status as Active (Pipedrive-imported orgs have no Status field)
+                const isActive = !orgStatus || orgStatus === 'active';
+                return orgCity === cityNorm && isActive;
             });
             
             console.log(`  Found ${orgs.length} active organizations in "${city}"`);
@@ -4236,13 +4145,9 @@
         }
 
         function sortByDistance(organizations) {
-            return [...organizations].sort((a, b) => {
-                const zipA = String(a.Zip || '').trim();
-                const zipB = String(b.Zip || '').trim();
-                if (zipA !== zipB) return zipA.localeCompare(zipB);
-                const addrA = String(a.Address || '').trim();
-                const addrB = String(b.Address || '').trim();
-                return addrA.localeCompare(addrB);
+            return organizations.sort((a, b) => {
+                if (a.Zip !== b.Zip) return a.Zip.localeCompare(b.Zip);
+                return a.Address.localeCompare(b.Address);
             });
         }
 
@@ -4364,23 +4269,12 @@ END:VTIMEZONE
                 console.log(`      Start: ${startDateTime} (from ${stop._arrivalDate})`);
                 console.log(`      End: ${endDateTime} (from ${stop._departureDate})`);
                 
-                const addrLine1  = String(stop.Address  || '').trim();
-                const addrLine2  = String(stop.Address2 || '').trim();
-                const addrCity   = String(stop.City     || '').trim();
-                const addrState  = String(stop.State    || 'CA').trim();
-                const addrZip    = String(stop.Zip      || '').trim();
-                const addrPhone  = String(stop.Phone    || 'N/A').trim();
-                const streetFull = addrLine2 ? `${addrLine1}, ${addrLine2}` : addrLine1;
-                const fullAddress = [streetFull, addrCity, `${addrState} ${addrZip}`].filter(Boolean).join(', ');
-                const lastVisitRaw = stop.Last_activity_date || stop.Last_Visit;
-                const lastVisitStr = lastVisitRaw ? new Date(lastVisitRaw).toLocaleDateString() : 'Never';
-                const description = `Stop ${stop.Order} of ${route.filter(s => s.Include).length}
-Organization: ${stop.Name}
-Address: ${fullAddress}
-Phone: ${addrPhone}
-Last Visited: ${lastVisitStr}
-Days Overdue: ${stop.DaysOverdue || 0}
-Notes: ${(stop.Notes || '').trim() || 'None'}`;
+                const description = `Organization: ${stop.Name}
+Address: ${stop.Address}, ${stop.City}, ${stop.State} ${stop.Zip}
+Phone: ${stop.Phone || 'N/A'}
+Last Visited: ${(stop.Last_activity_date || stop.Last_Visit) ? new Date(stop.Last_activity_date || stop.Last_Visit).toLocaleDateString() : 'Never'}
+Days Overdue: ${stop.DaysOverdue}
+Status: ${stop.Status}`;
 
                 icsContent += `BEGIN:VEVENT
 UID:${uid}
@@ -4389,7 +4283,7 @@ DTSTART;TZID=America/Los_Angeles:${startDateTime}
 DTEND;TZID=America/Los_Angeles:${endDateTime}
 SUMMARY:Stop ${stop.Order}: ${stop.Name}
 DESCRIPTION:${escapeICSString(description)}
-LOCATION:${escapeICSString(fullAddress)}
+LOCATION:${stop.Address}, ${stop.City}, ${stop.State} ${stop.Zip}
 CATEGORIES:Route Planning,Alice Care,Business Development
 PRIORITY:5
 TRANSP:OPAQUE
@@ -4429,15 +4323,19 @@ END:VEVENT
 
         function downloadICS(icsContent, filename) {
             try {
-                const encoded = encodeURIComponent(icsContent);
-                const dataUri = 'data:text/calendar;charset=utf-8,' + encoded;
                 const element = document.createElement('a');
-                element.setAttribute('href', dataUri);
+                const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                
+                element.setAttribute('href', url);
                 element.setAttribute('download', filename);
                 element.style.display = 'none';
+                
                 document.body.appendChild(element);
                 element.click();
                 document.body.removeChild(element);
+                
+                URL.revokeObjectURL(url);
                 showToast(`✅ Downloaded: ${filename}`, 'success');
             } catch (err) {
                 console.error('Download error:', err);
@@ -4469,17 +4367,6 @@ END:VEVENT
             const startTime = document.getElementById('routeStartTime').value;
             const duration = parseInt(document.getElementById('routeVisitDuration').value);
             const travelBuffer = parseInt(document.getElementById('routeTravelBuffer').value) || 0;
-            const startAddress = (document.getElementById('routeStartAddress')?.value || '').trim();
-
-            // Store starting point on state so Maps links can use it as origin
-            // If GPS was already captured, keep those coords; otherwise clear them
-            if (!startAddress) {
-                state.currentStartCoord = null;
-                state.currentStartAddress = '';
-            } else {
-                state.currentStartAddress = startAddress;
-                // state.currentStartCoord already set if GPS was used
-            }
             
             console.log('  Cities selected:', selectedOptions);
             console.log('  Zone:', zone);
@@ -4503,8 +4390,8 @@ END:VEVENT
                 return;
             }
             
-            if (!duration || duration < 5) {
-                showToast('Visit duration must be at least 5 minutes', 'warning');
+            if (!duration || duration < 15) {
+                showToast('Visit duration must be at least 15 minutes', 'warning');
                 return;
             }
             
@@ -4579,7 +4466,6 @@ END:VEVENT
             state.currentRouteZone = zone;
             state.currentRoutePlanDate = planDate;
             state.currentTravelBuffer = travelBuffer;
-            state.currentStartAddress = startAddress || state.currentStartAddress || '';
             
             console.log('✅ Route plan ready for display');
             console.log('   Plan date stored:', state.currentRoutePlanDate);
@@ -4820,208 +4706,6 @@ END:VEVENT
                 console.error('Export error:', err);
                 showToast('Failed to export route', 'error');
             }
-        }
-
-        function buildAddressString(stop) {
-            return [
-                String(stop.Address  || '').trim(),
-                String(stop.Address2 || '').trim(),
-                String(stop.City     || '').trim(),
-                (String(stop.State || 'CA').trim() + ' ' + String(stop.Zip || '').trim()).trim()
-            ].filter(Boolean).join(', ');
-        }
-
-        function openGoogleMapsRoute() {
-            if (!state.currentRoute || state.currentRoute.length === 0) { showToast('No route to open', 'warning'); return; }
-            const stops = state.currentRoute.filter(s => s.Include);
-            if (stops.length === 0) { showToast('Please select at least one stop', 'warning'); return; }
-
-            // Build origin from GPS coords or typed address
-            let origin;
-            if (state.currentStartCoord) {
-                origin = encodeURIComponent(`${state.currentStartCoord.lat},${state.currentStartCoord.lon}`);
-            } else if (state.currentStartAddress) {
-                origin = encodeURIComponent(state.currentStartAddress);
-            } else {
-                origin = null;
-            }
-
-            const stopAddresses = stops.map(s => encodeURIComponent(buildAddressString(s)));
-            let url;
-
-            if (!origin && stopAddresses.length === 1) {
-                url = `https://www.google.com/maps/search/?api=1&query=${stopAddresses[0]}`;
-            } else {
-                // With a starting point: origin → stops[0] → ... → stops[last]
-                // Without: stops[0] → ... → stops[last]
-                const routeOrigin  = origin || stopAddresses[0];
-                const destination  = stopAddresses[stopAddresses.length - 1];
-                const waypointList = origin
-                    ? stopAddresses.slice(0, -1)          // all stops except last are waypoints
-                    : stopAddresses.slice(1, -1);          // first is origin, last is dest
-                const waypoints = waypointList.join('|');
-                url = `https://www.google.com/maps/dir/?api=1&origin=${routeOrigin}&destination=${destination}${waypoints ? '&waypoints=' + waypoints : ''}&travelmode=driving`;
-            }
-
-            const a = document.createElement('a');
-            a.href = url; a.target = '_blank'; a.rel = 'noopener';
-            document.body.appendChild(a); a.click(); document.body.removeChild(a);
-            const label = origin ? `from your starting point` : `(no starting point set)`;
-            showToast(`Opening ${stops.length}-stop route in Google Maps ${label}`, 'success');
-        }
-
-        function openAppleMapsRoute() {
-            if (!state.currentRoute || state.currentRoute.length === 0) { showToast('No route to open', 'warning'); return; }
-            const stops = state.currentRoute.filter(s => s.Include);
-            if (stops.length === 0) { showToast('Please select at least one stop', 'warning'); return; }
-
-            // Build saddr from GPS coords or typed address
-            let saddr;
-            if (state.currentStartCoord) {
-                saddr = encodeURIComponent(`${state.currentStartCoord.lat},${state.currentStartCoord.lon}`);
-            } else if (state.currentStartAddress) {
-                saddr = encodeURIComponent(state.currentStartAddress);
-            } else {
-                saddr = null;
-            }
-
-            const a = document.createElement('a');
-            if (stops.length === 1) {
-                const dest = encodeURIComponent(buildAddressString(stops[0]));
-                a.href = saddr
-                    ? `https://maps.apple.com/?saddr=${saddr}&daddr=${dest}&dirflg=d`
-                    : `https://maps.apple.com/?q=${dest}&dirflg=d`;
-            } else {
-                const dest = encodeURIComponent(buildAddressString(stops[stops.length - 1]));
-                const from = saddr || encodeURIComponent(buildAddressString(stops[0]));
-                a.href = `https://maps.apple.com/?saddr=${from}&daddr=${dest}&dirflg=d`;
-                if (stops.length > 2) showToast('Apple Maps shows first to last stop. Use Google Maps for the full multi-stop sequence.', 'info');
-            }
-            a.target = '_blank'; a.rel = 'noopener';
-            document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        }
-
-        function populateRouteOrgTypes() {
-            const container = document.getElementById('routeOrgTypeCheckboxes');
-            if (!container) return;
-
-            // Preserve checked state
-            const prevChecked = new Set(
-                Array.from(container.querySelectorAll('input[type="checkbox"]:checked'))
-                    .map(cb => cb.value)
-            );
-
-            // Collect unique non-empty types from all active orgs
-            const types = [...new Set(
-                state.organizations
-                    .filter(o => isActiveOrg(o) && o.Type && o.Type.trim())
-                    .map(o => o.Type.trim())
-            )].sort();
-
-            container.innerHTML = '';
-
-            if (types.length === 0) {
-                container.innerHTML = '<div style="padding:8px;color:#999;font-size:12px;">No types found</div>';
-                return;
-            }
-
-            types.forEach(type => {
-                const div = document.createElement('div');
-                div.className = 'route-city-checkbox';
-                const cb = document.createElement('input');
-                cb.type = 'checkbox';
-                cb.value = type;
-                cb.id = `orgtype_${type.replace(/\s+/g, '_')}`;
-                // Default: all checked (include all types); restore previous selection if any
-                cb.checked = prevChecked.size === 0 ? true : prevChecked.has(type);
-                const label = document.createElement('label');
-                label.htmlFor = cb.id;
-                label.textContent = type;
-                div.appendChild(cb); div.appendChild(label);
-                container.appendChild(div);
-            });
-        }
-
-        function routeToggleAllTypes(checked) {
-            const container = document.getElementById('routeOrgTypeCheckboxes');
-            if (!container) return;
-            container.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = checked);
-        }
-
-        function getSelectedOrgTypes() {
-            const container = document.getElementById('routeOrgTypeCheckboxes');
-            if (!container) return null; // null = no filter applied
-            const all  = Array.from(container.querySelectorAll('input[type="checkbox"]'));
-            const checked = all.filter(cb => cb.checked).map(cb => cb.value);
-            // If everything is checked (or nothing rendered), return null = no filtering
-            if (checked.length === 0) return []; // none checked = show nothing
-            if (checked.length === all.length) return null; // all checked = no filter
-            return checked;
-        }
-
-        function useGPSForStart() {
-            const btn = document.getElementById('gpsStartBtn');
-            const hint = document.getElementById('routeStartAddressHint');
-            const input = document.getElementById('routeStartAddress');
-
-            if (!navigator.geolocation) {
-                showToast('GPS not available on this device', 'error');
-                return;
-            }
-
-            btn.textContent = '⏳ Locating...';
-            btn.disabled = true;
-            if (hint) hint.textContent = 'Getting your location...';
-
-            navigator.geolocation.getCurrentPosition(
-                async (pos) => {
-                    const lat = pos.coords.latitude;
-                    const lon = pos.coords.longitude;
-
-                    // Store coords directly on state for route optimization
-                    state.currentStartCoord = { lat, lon };
-
-                    // Reverse geocode to get a human-readable address
-                    try {
-                        const res = await fetch(
-                            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
-                            { headers: { 'Accept-Language': 'en', 'User-Agent': 'AliceCareRoutePlanner/1.0' } }
-                        );
-                        const data = await res.json();
-                        const addr = data.display_name || `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
-                        // Use a shorter form: house number + road + city
-                        const a = data.address || {};
-                        const short = [
-                            (a.house_number || '') + ' ' + (a.road || ''),
-                            a.city || a.town || a.village || a.county || '',
-                            a.state || ''
-                        ].map(s => s.trim()).filter(Boolean).join(', ');
-                        input.value = short || addr;
-                        if (hint) hint.style.color = '#2d8a4e';
-                        if (hint) hint.textContent = `📡 GPS location captured (${lat.toFixed(4)}, ${lon.toFixed(4)})`;
-                    } catch(e) {
-                        input.value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
-                        if (hint) hint.textContent = `📡 GPS: ${lat.toFixed(4)}, ${lon.toFixed(4)}`;
-                    }
-
-                    btn.textContent = '📡 Use GPS';
-                    btn.disabled = false;
-                    showToast('Starting point set from GPS', 'success');
-                },
-                (err) => {
-                    btn.textContent = '📡 Use GPS';
-                    btn.disabled = false;
-                    if (hint) hint.style.color = '#c0392b';
-                    if (hint) hint.textContent = 'GPS failed — please type an address manually';
-                    const msgs = {
-                        1: 'Location permission denied. Please allow location access.',
-                        2: 'Location unavailable. Try again or type an address.',
-                        3: 'Location request timed out. Try again.'
-                    };
-                    showToast(msgs[err.code] || 'GPS error', 'warning');
-                },
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
-            );
         }
 
         // ============================================
@@ -5297,8 +4981,7 @@ END:VEVENT
 
         function initializeRoutePlanner() {
             populateRouteZones();
-            populateRouteCities();
-            populateRouteOrgTypes();
+            populateRouteCities();  // Use the new checkbox population function
             
             // Set today as default date
             const today = getLocalDateString();
@@ -5323,21 +5006,18 @@ END:VEVENT
             initQuillEditors();
             setupEventListeners();
             getLocation();
-
-            if (typeof LOGIN_PAUSED !== 'undefined' && LOGIN_PAUSED) {
-                updateAuthUI();
+            
+            // Wait for Google library to load
+            if (typeof google !== 'undefined') {
+                initGoogleSignIn();
             } else {
-                if (typeof google !== 'undefined') {
-                    initGoogleSignIn();
-                } else {
-                    setTimeout(() => {
-                        if (typeof google !== 'undefined') {
-                            initGoogleSignIn();
-                        }
-                    }, 1000);
-                }
+                setTimeout(() => {
+                    if (typeof google !== 'undefined') {
+                        initGoogleSignIn();
+                    }
+                }, 1000);
             }
-
+            
             initApp();
         });
         
@@ -5490,7 +5170,7 @@ END:VEVENT
                                         initializeRoutePlanner();                    // Ensure all settings have proper defaults
                     ensureSettingsDefaults();
                     
-                    if (userResponse?.success && !(typeof LOGIN_PAUSED !== 'undefined' && LOGIN_PAUSED)) {
+                    if (userResponse?.success) {
                         state.user = userResponse.user;
                     }
                     
@@ -5691,52 +5371,17 @@ END:VEVENT
 
         async function apiPost(action, data) {
             try {
-                console.log('📤 JSONP Write Request:', action);
-                const payload = JSON.stringify({ action, token: googleIdToken, ...data });
-                const callbackName = 'cb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                const url = APPS_SCRIPT_URL
-                    + '?callback=' + callbackName
-                    + '&action=' + encodeURIComponent(action)
-                    + '&payload=' + encodeURIComponent(payload);
-
-                const result = await new Promise((resolve, reject) => {
-                    window[callbackName] = function(response) {
-                        delete window[callbackName];
-                        const s = document.getElementById(callbackName);
-                        if (s) s.remove();
-                        resolve(response);
-                    };
-                    const script = document.createElement('script');
-                    script.id = callbackName;
-                    script.src = url;
-                    script.onerror = () => { delete window[callbackName]; script.remove(); reject(new Error('Write failed: ' + action)); };
-                    document.body.appendChild(script);
-                    setTimeout(() => { if (window[callbackName]) { delete window[callbackName]; const s = document.getElementById(callbackName); if (s) s.remove(); reject(new Error('Timeout: ' + action)); } }, 30000);
+                console.log('📤 POST Request:', action);
+                console.log('Data:', JSON.stringify(data, null, 2));
+                
+                // Google Apps Script doesn't support CORS with JSON, so use no-cors
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',  // Bypass CORS check - required for Google Apps Script
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action, token: googleIdToken, ...data })
                 });
-
-                if (result && result.success) {
-                    try {
-                        const verifyResponse = await apiCall('getAllData');
-                        if (verifyResponse && verifyResponse.success) {
-                            state.organizations   = verifyResponse.data?.organizations   || state.organizations;
-                            state.contacts        = verifyResponse.data?.contacts        || state.contacts;
-                            state.visits          = verifyResponse.data?.visits          || state.visits;
-                            state.teamMembers     = verifyResponse.data?.teamMembers     || state.teamMembers;
-                            state.emailTemplates  = verifyResponse.data?.emailTemplates  || state.emailTemplates;
-                            state.assetCategories = verifyResponse.data?.assetCategories || state.assetCategories;
-                            state.assetItems      = verifyResponse.data?.assetItems      || state.assetItems;
-                            state.stockHistory    = verifyResponse.data?.stockHistory    || state.stockHistory;
-                            localStorage.setItem('busdev_cache', JSON.stringify({
-                                organizations: state.organizations, contacts: state.contacts,
-                                visits: state.visits, teamMembers: state.teamMembers,
-                                emailTemplates: state.emailTemplates, assetCategories: state.assetCategories,
-                                assetItems: state.assetItems, stockHistory: state.stockHistory,
-                                settings: state.settings, user: state.user, timestamp: Date.now()
-                            }));
-                        }
-                    } catch(e) { console.warn('Could not reload after write:', e); }
-                }
-                return result || { success: true };
+                
                 console.log('✅ POST sent (no-cors mode)');
                 
                 // Brief delay for server processing
@@ -5839,7 +5484,6 @@ END:VEVENT
                 if (tabId === 'visits') {
                     populateRouteZones();
                     populateRouteCities();
-                    populateRouteOrgTypes();
                     const plannerContent = document.getElementById('routePlannerContent');
                     const plannerToggle = document.querySelector('.route-planner-toggle');
                     if (plannerContent && plannerContent.style.display === 'none') {
@@ -6557,17 +6201,11 @@ END:VEVENT
                         orgName: '',
                         orgId: org.ID,
                         zone: org.Zone || '',
-                        orgType: org.Type || '',
+                        orgType: org.Type || '',  // ✅ NEW: Add org type to item
                         contactInfo: `${org.City || ''} ${org.Phone ? '• ' + org.Phone : ''}`,
                         lastVisit: lastVisit,
                         email: org.Email || '',
-                        data: org,
-                        searchText: [
-                            org.Name, org.Type, org.Zone, org.City, org.State,
-                            org.Address, org.Address2, org.Zip, org.Phone,
-                            org.Email, org.Website, org.Owner, org.Notes,
-                            org.Status, org.Visit_Frequency
-                        ].filter(Boolean).join(' ').toLowerCase()
+                        data: org
                     });
                 });
             }
@@ -6584,27 +6222,24 @@ END:VEVENT
                         orgName: org?.Name || '',
                         orgId: c.Org_ID,
                         zone: org?.Zone || '',
-                        orgType: org?.Type || '',
+                        orgType: org?.Type || '',  // ✅ NEW: Add org type to item
                         contactInfo: `${c.Email || ''} ${c.Phone ? '• ' + c.Phone : ''}`,
                         lastVisit: lastVisit,
                         email: c.Email || '',
                         title: c.Title || '',
-                        data: c,
-                        searchText: [
-                            c.First_Name, c.Last_Name, c.Title, c.Email, c.Phone,
-                            c.Notes, org?.Name, org?.City, org?.Type, org?.Zone
-                        ].filter(Boolean).join(' ').toLowerCase()
+                        data: c
                     });
                 });
             }
             
-            // Apply filters — each word must match somewhere (AND logic)
+            // Apply filters
             if (search) {
-                const words = search.trim().split(/\s+/).filter(Boolean);
-                items = items.filter(i => {
-                    const corpus = i.searchText || [i.name, i.orgName, i.contactInfo, i.email].join(' ').toLowerCase();
-                    return words.every(word => corpus.includes(word));
-                });
+                items = items.filter(i => 
+                    i.name.toLowerCase().includes(search) || 
+                    i.orgName.toLowerCase().includes(search) ||
+                    i.contactInfo.toLowerCase().includes(search) ||
+                    i.email.toLowerCase().includes(search)
+                );
             }
             if (zoneFilter) {
                 items = items.filter(i => i.zone === zoneFilter);
@@ -6630,16 +6265,6 @@ END:VEVENT
                 return directorySortAsc ? cmp : -cmp;
             });
             
-            // Update result count
-            const countEl = document.getElementById('directoryResultCount');
-            if (countEl) {
-                const total = (typeFilter !== 'contact' ? state.organizations.length : 0)
-                            + (typeFilter !== 'org' ? state.contacts.length : 0);
-                countEl.textContent = (search || zoneFilter || orgTypeFilter)
-                    ? `${items.length} of ${total} results`
-                    : `${total} total`;
-            }
-
             // Render table
             tableBody.innerHTML = items.map(item => {
                 const visitClass = getVisitDateClass(item.lastVisit);
@@ -7393,6 +7018,8 @@ END:VEVENT
                     ? `<span class="status-badge" style="background: var(--info-light); color: var(--info);">${formatDateForDisplay(v.Follow_Up_Date)}</span>`
                     : '-';
                 
+                const droppedDisplay = v.Dropped_Off_At ? esc(v.Dropped_Off_At) : '-';
+
                 return `<tr class="clickable-row" onclick="switchTab('directory'); setTimeout(() => openDetailPanel('org', '${v.Org_ID}'), 100);">
                     <td style="white-space: nowrap;">
                         <span class="material-icons-outlined" style="font-size: 14px; vertical-align: middle; color: var(--gray-500);">schedule</span>
@@ -7404,6 +7031,7 @@ END:VEVENT
                             ${esc(v.Outcome || 'No outcome')}
                         </span>
                     </td>
+                    <td style="font-size: 12px; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${droppedDisplay}">${droppedDisplay}</td>
                     <td style="font-size: 12px; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${esc(assetsDisplay)}">${esc(assetsDisplay)}</td>
                     <td style="font-size: 12px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${esc(v.Notes || '')}">${v.Notes ? esc(v.Notes) : '-'}</td>
                     <td>${followUpDisplay}</td>
@@ -7759,132 +7387,24 @@ END:VEVENT
             return null;
         }
         
-        function updateGPSBar(status, lat, lon, address) {
-            const icon    = document.getElementById('gpsBarIcon');
-            const addrEl  = document.getElementById('gpsBarAddress');
-            const coordEl = document.getElementById('gpsBarCoords');
-            const badge   = document.getElementById('gpsStatus');
-            const bar     = document.getElementById('gpsLocationBar');
-
-            if (status === 'loading') {
-                if (icon)    { icon.textContent = 'location_searching'; icon.style.color = 'rgba(255,255,255,0.7)'; }
-                if (addrEl)  addrEl.textContent = 'Locating...';
-                if (coordEl) coordEl.textContent = '—';
-                if (badge)   { badge.className = 'checkin-gps'; badge.innerHTML = '<span class="material-icons-outlined">location_searching</span><span>Getting GPS...</span>'; }
-            } else if (status === 'ok') {
-                if (icon)    { icon.textContent = 'location_on'; icon.style.color = '#a8f0c6'; }
-                if (addrEl)  addrEl.textContent = address || `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
-                if (coordEl) coordEl.textContent = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
-                if (badge)   { badge.className = 'checkin-gps active'; badge.innerHTML = '<span class="material-icons-outlined">location_on</span><span>GPS Ready</span>'; }
-            } else {
-                if (icon)    { icon.textContent = 'location_off'; icon.style.color = '#f5a0a0'; }
-                if (addrEl)  addrEl.textContent = 'Location unavailable';
-                if (coordEl) coordEl.textContent = 'Tap Update to try again';
-                if (badge)   { badge.className = 'checkin-gps error'; badge.innerHTML = '<span class="material-icons-outlined">location_off</span><span>No GPS</span>'; }
-            }
-        }
-
-        async function refreshGPSLocation() {
-            const btn = document.getElementById('gpsRefreshBtn');
-            if (btn) { btn.disabled = true; btn.innerHTML = '<span class="material-icons-outlined" style="font-size:14px;">hourglass_empty</span> Updating...'; }
-            updateGPSBar('loading');
-
-            if (!navigator.geolocation) {
-                updateGPSBar('error');
-                showToast('GPS not supported on this device', 'error');
-                if (btn) { btn.disabled = false; btn.innerHTML = '<span class="material-icons-outlined" style="font-size:14px;">refresh</span> Update'; }
-                return;
-            }
-
-            navigator.geolocation.getCurrentPosition(
-                async (pos) => {
-                    const lat = pos.coords.latitude;
-                    const lon = pos.coords.longitude;
-                    state.currentLocation = { lat, lng: lon };
-
-                    // Reverse geocode for human-readable address
-                    let address = '';
-                    try {
-                        const res = await fetch(
-                            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
-                            { headers: { 'Accept-Language': 'en', 'User-Agent': 'AliceCareRoutePlanner/1.0' } }
-                        );
-                        const data = await res.json();
-                        const a = data.address || {};
-                        address = [
-                            ((a.house_number || '') + ' ' + (a.road || '')).trim(),
-                            a.city || a.town || a.village || '',
-                            a.state || ''
-                        ].filter(Boolean).join(', ');
-                    } catch(e) { /* silent */ }
-
-                    state.currentLocationAddress = address;
-                    updateGPSBar('ok', lat, lon, address);
-                    loadNearbyOrganizations();
-                    showToast('📍 Location updated', 'success');
-                    if (btn) { btn.disabled = false; btn.innerHTML = '<span class="material-icons-outlined" style="font-size:14px;">refresh</span> Update'; }
-                },
-                (err) => {
-                    updateGPSBar('error');
-                    const msgs = { 1: 'Permission denied — allow location access and try again.', 2: 'Location unavailable. Try again.', 3: 'Timed out. Try again.' };
-                    showToast(msgs[err.code] || 'GPS error', 'warning');
-                    if (btn) { btn.disabled = false; btn.innerHTML = '<span class="material-icons-outlined" style="font-size:14px;">refresh</span> Update'; }
-                },
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-            );
-        }
-
-        function useGPSAsRouteStart() {
-            if (!state.currentLocation) {
-                showToast('No GPS location yet — tap Update first', 'warning');
-                return;
-            }
-            // Store coords for route planner
-            state.currentStartCoord = { lat: state.currentLocation.lat, lon: state.currentLocation.lng };
-            state.currentStartAddress = state.currentLocationAddress || `${state.currentLocation.lat.toFixed(5)}, ${state.currentLocation.lng.toFixed(5)}`;
-
-            // Also populate the route planner input field if visible
-            const input = document.getElementById('routeStartAddress');
-            if (input) input.value = state.currentStartAddress;
-            const hint  = document.getElementById('routeStartAddressHint');
-            if (hint) { hint.style.color = '#2d8a4e'; hint.textContent = `📡 GPS location set (${state.currentLocation.lat.toFixed(4)}, ${state.currentLocation.lng.toFixed(4)})`; }
-
-            showToast('✅ GPS location set as route starting point', 'success');
-        }
-
         function getLocation() {
             const gpsEl = document.getElementById('gpsStatus');
             loadGeoCache();
             
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
-                    async pos => {
-                        const lat = pos.coords.latitude;
-                        const lon = pos.coords.longitude;
-                        state.currentLocation = { lat, lng: lon };
-
-                        // Reverse geocode on first load
-                        let address = '';
-                        try {
-                            const res = await fetch(
-                                `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
-                                { headers: { 'Accept-Language': 'en', 'User-Agent': 'AliceCareRoutePlanner/1.0' } }
-                            );
-                            const data = await res.json();
-                            const a = data.address || {};
-                            address = [
-                                ((a.house_number || '') + ' ' + (a.road || '')).trim(),
-                                a.city || a.town || a.village || '',
-                                a.state || ''
-                            ].filter(Boolean).join(', ');
-                        } catch(e) { /* silent */ }
-
-                        state.currentLocationAddress = address;
-                        updateGPSBar('ok', lat, lon, address);
+                    pos => {
+                        state.currentLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                        gpsEl.className = 'checkin-gps active';
+                        gpsEl.innerHTML = `<span class="material-icons-outlined">location_on</span><span>GPS Ready</span>`;
+                        
+                        // Load nearby organizations
                         loadNearbyOrganizations();
                     },
                     err => {
-                        updateGPSBar('error');
+                        gpsEl.className = 'checkin-gps error';
+                        gpsEl.innerHTML = `<span class="material-icons-outlined">location_off</span><span>No GPS</span>`;
+                        // Hide near me section if no GPS
                         document.getElementById('nearMeSection').style.display = 'none';
                     }
                 );
@@ -7905,7 +7425,7 @@ END:VEVENT
             nearMeLoading.style.display = 'inline';
             nearMeList.innerHTML = '<div style="color: rgba(255,255,255,0.6); font-size: 13px; padding: 8px;">Finding nearby organizations...</div>';
             
-            const activeOrgs = state.organizations.filter(o => isActiveOrg(o) && o.Address && o.City);
+            const activeOrgs = state.organizations.filter(o => o.Status === 'Active' && o.Address && o.City);
             const orgsWithDistance = [];
             
             // Process organizations in batches to avoid rate limiting
@@ -8193,12 +7713,29 @@ END:VCALENDAR`;
             const followUpTime = document.getElementById('followUpTime').value;
             const followUpDescription = document.getElementById('followUpDescription').value.trim();
             
+            const droppedAt = (document.getElementById('checkinDroppedAt')?.value || '').trim();
+
+            // Extract brochure counts from assetsUsed for dedicated columns
+            let brochuresGeneral = 0, brochuresHospice = 0, brochuresOther = 0;
+            Object.entries(assetsUsed).forEach(([itemId, qty]) => {
+                const item = state.assetItems.find(a => a.ID === itemId);
+                if (!item) return;
+                const cat = (item.Category || item.Name || '').toLowerCase();
+                if (cat.includes('hospice'))       brochuresHospice  += qty;
+                else if (cat.includes('general') || cat.includes('brochure')) brochuresGeneral += qty;
+                else                               brochuresOther    += qty;
+            });
+
             const visit = {
                 Org_ID: orgId,
-                Visit_Date: getLocalDateString(now),  // ✅ Use local date, not UTC
-                Check_In_Time: localTimeString,  // ✅ Explicitly local time HH:MM
+                Visit_Date: getLocalDateString(now),
+                Check_In_Time: localTimeString,
                 Outcome: document.getElementById('checkinOutcome').value,
                 Assets_Used: JSON.stringify(assetsUsed),
+                Brochures_General: brochuresGeneral,
+                Brochures_Hospice: brochuresHospice,
+                Brochures_Other: brochuresOther,
+                Dropped_Off_At: droppedAt,
                 Notes: notes,
                 Follow_Up_Date: followUpDate || '',
                 Follow_Up_Notes: followUpDescription || '',
@@ -8235,6 +7772,8 @@ END:VCALENDAR`;
                 document.getElementById('checkinOrg').value = '';
                 document.getElementById('checkinOrgSearch').value = '';
                 document.getElementById('checkinNotes').value = '';
+                const dEl = document.getElementById('checkinDroppedAt');
+                if (dEl) dEl.value = '';
                 document.getElementById('followUpDate').value = '';
                 document.getElementById('followUpDescription').value = '';
                 document.getElementById('followUpSection').style.display = 'none';
@@ -8835,7 +8374,7 @@ END:VCALENDAR`;
             const zoneFilter = document.getElementById('composeZoneFilter').value;
             const searchTerm = (document.getElementById('composeRecipientSearch').value || '').toLowerCase();
             
-            let orgs = state.organizations.filter(o => isActiveOrg(o));
+            let orgs = state.organizations.filter(o => o.Status === 'Active');
             if (zoneFilter) orgs = orgs.filter(o => o.Zone === zoneFilter);
             if (searchTerm) {
                 orgs = orgs.filter(o => 
@@ -9291,10 +8830,27 @@ END:VCALENDAR`;
                 const result = await apiPost(org.ID ? 'updateOrganization' : 'addOrganization', { organization: org });
                 console.log('Save result:', result);
                 
-                closeModal('orgModal');
-                renderAll();
-                populateOrgTypeDropdown();
-                showToast('✅ Organization saved successfully', 'success');
+                if (result.success) {
+                    // Wait a moment then reload data from server to verify save worked
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                    
+                    console.log('🔄 Reloading data from server to verify save...');
+                    const dataResponse = await apiCall('getAllData');
+                    
+                    if (dataResponse.success && dataResponse.data) {
+                        state.organizations = dataResponse.data.organizations || [];
+                        console.log('✅ Data reloaded successfully');
+                        closeModal('orgModal');
+                        renderAll();
+                        populateOrgTypeDropdown();
+                        showToast('✅ Organization saved', 'success');
+                    } else {
+                        console.warn('Could not reload data, but save may have succeeded');
+                        showToast('⚠️ Saved but could not verify. Refresh page to see changes.', 'warning');
+                    }
+                } else {
+                    showToast('❌ Save failed: ' + (result.error || 'Unknown error'), 'error');
+                }
             } catch (err) { 
                 console.error('Save error:', err);
                 showToast('❌ Save failed: ' + err.message, 'error'); 
@@ -9464,7 +9020,7 @@ END:VCALENDAR`;
             
             // Filter organizations by name (case insensitive, partial match)
             let matches = state.organizations.filter(org => 
-                org.Name && org.Name.toLowerCase().includes(searchTerm) && isActiveOrg(org)
+                org.Name.toLowerCase().includes(searchTerm) && org.Status === 'Active'
             );
             
             // If we have location, calculate and sort by distance
@@ -10414,39 +9970,48 @@ END:VCALENDAR`;
         // Parse a date string and return YYYY-MM-DD in local timezone
         function normalizeDate(dateValue) {
             if (!dateValue) return '';
-            
-            // If it's already a Date object
+
+            // Already a Date object
             if (dateValue instanceof Date) {
                 return getLocalDateString(dateValue);
             }
-            
-            // If it's a string
+
             const str = String(dateValue).trim();
-            
-            // Handle various formats
-            // ISO format: 2024-12-13T00:00:00.000Z or 2024-12-13
-            // US format: 12/13/2024
-            // Google Sheets format: Fri Dec 13 2024...
-            
-            let date;
-            
-            // Try parsing directly (handles ISO and most standard formats)
-            date = new Date(str);
-            
-            // If invalid, try MM/DD/YYYY
-            if (isNaN(date.getTime()) && str.includes('/')) {
+
+            // Already YYYY-MM-DD — return as-is (most common case from GAS)
+            if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
+
+            // Google Sheets exports as "YYYY-MM-DD HH:MM:SS" with a space — replace space with T
+            // so Safari/mobile can parse it (new Date("2026-05-24 00:00:00") = NaN on Safari)
+            if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(str)) {
+                const isoStr = str.replace(' ', 'T');
+                // Parse as local time by extracting parts directly
+                const [datePart] = isoStr.split('T');
+                return datePart;
+            }
+
+            // ISO with T: "2026-05-24T00:00:00.000Z" — extract date part in local tz
+            if (/^\d{4}-\d{2}-\d{2}T/.test(str)) {
+                // If Z or +offset, convert to local
+                const d = new Date(str);
+                if (!isNaN(d.getTime())) return getLocalDateString(d);
+            }
+
+            // US format MM/DD/YYYY
+            if (str.includes('/')) {
                 const parts = str.split('/');
                 if (parts.length === 3) {
-                    date = new Date(parts[2], parts[0] - 1, parts[1]);
+                    const d = new Date(parseInt(parts[2]), parseInt(parts[0]) - 1, parseInt(parts[1]));
+                    if (!isNaN(d.getTime())) return getLocalDateString(d);
                 }
             }
-            
-            if (isNaN(date.getTime())) {
-                console.warn('Could not parse date:', dateValue);
-                return str; // Return original string as fallback
-            }
-            
-            return getLocalDateString(date);
+
+            // Fallback: try native parse
+            const d = new Date(str);
+            if (!isNaN(d.getTime())) return getLocalDateString(d);
+
+            console.warn('Could not parse date:', dateValue);
+            return str;
         }
         
         // Compare if a visit date matches today (handles timezone and format differences)
@@ -10522,7 +10087,8 @@ END:VCALENDAR`;
             }, 3000);
         }
 
-        // openModal and closeModal defined above
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
         
         function formatVisitDate(dateStr) {
             if (!dateStr) return 'Never';
