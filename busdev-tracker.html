@@ -3980,6 +3980,8 @@
         
         // ✅ NEW: Filter visits by user (reps see only their own visits)
         function filterVisitsByUser(visits) {
+            // When login is paused, show all visits regardless of user state
+            if (typeof LOGIN_PAUSED !== 'undefined' && LOGIN_PAUSED) return visits;
             if (!state.user) return [];
             if (isAdmin()) return visits; // Admin sees all visits
             
@@ -5488,6 +5490,9 @@ END:VEVENT
                     state.settings = cached.settings || state.settings;
                     state.user = cached.user || null;
                     ensureSettingsDefaults();
+                    // Inject guest user before renderAll when LOGIN_PAUSED
+                    // so filterVisitsByUser sees a valid user
+                    updateAuthUI();
                     updateUserDisplay();
                     renderAll();
                     console.log('✅ Loaded from cache - Orgs:', state.organizations.length, 'Visits:', state.visits.length);
@@ -5556,6 +5561,7 @@ END:VEVENT
                         timestamp: Date.now()
                     }));
                     
+                    updateAuthUI();
                     updateUserDisplay();
                     renderAll();
                     checkLowStock();
