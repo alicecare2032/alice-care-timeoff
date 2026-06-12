@@ -5043,6 +5043,110 @@ END:VEVENT
             return checked;
         }
 
+        // Shared helper: reverse geocode lat/lon to short address string
+        async function reverseGeocode(lat, lon) {
+            try {
+                const res = await fetch(
+                    `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
+                    { headers: { 'Accept-Language': 'en', 'User-Agent': 'AliceCareRoutePlanner/1.0' } }
+                );
+                const data = await res.json();
+                const a = data.address || {};
+                return [
+                    ((a.house_number || '') + ' ' + (a.road || '')).trim(),
+                    a.city || a.town || a.village || '',
+                    a.state || ''
+                ].filter(Boolean).join(', ');
+            } catch(e) { return ''; }
+        }
+
+        // 📡 Use GPS button in the Route Planner Starting Point field
+        async function useGPSForStart() {
+            const btn  = document.getElementById('gpsStartBtn');
+            const hint = document.getElementById('routeStartAddressHint');
+            const input = document.getElementById('routeStartAddress');
+
+            if (!navigator.geolocation) {
+                showToast('GPS not available on this device', 'error');
+                return;
+            }
+            if (btn)  { btn.textContent = '⏳...'; btn.disabled = true; }
+            if (hint) { hint.style.color = '#888'; hint.textContent = 'Getting your location...'; }
+
+            navigator.geolocation.getCurrentPosition(
+                async pos => {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
+                    state.currentStartCoord   = { lat, lon };
+                    const address = await reverseGeocode(lat, lon);
+                    state.currentStartAddress = address || `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+                    if (input) input.value = state.currentStartAddress;
+                    if (hint)  { hint.style.color = '#2d8a4e'; hint.textContent = `📡 GPS set (${lat.toFixed(4)}, ${lon.toFixed(4)})`; }
+                    if (btn)   { btn.textContent = '📡 Use GPS'; btn.disabled = false; }
+                    showToast('Starting point set from GPS', 'success');
+                },
+                err => {
+                    if (btn)  { btn.textContent = '📡 Use GPS'; btn.disabled = false; }
+                    if (hint) { hint.style.color = '#c0392b'; hint.textContent = 'GPS failed — type an address manually'; }
+                    const msgs = { 1: 'Location permission denied.', 2: 'Location unavailable.', 3: 'Location timed out.' };
+                    showToast(msgs[err.code] || 'GPS error', 'warning');
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+            );
+        }
+
+        // 🔄 Update GPS button in the check-in GPS bar
+        async function refreshGPSLocation() {
+            const btn = document.getElementById('gpsRefreshBtn');
+            if (btn) { btn.disabled = true; btn.innerHTML = '<span class="material-icons-outlined" style="font-size:14px;">hourglass_empty</span> Updating...'; }
+            updateGPSBar('loading');
+
+            if (!navigator.geolocation) {
+                updateGPSBar('error');
+                showToast('GPS not supported on this device', 'error');
+                if (btn) { btn.disabled = false; btn.innerHTML = '<span class="material-icons-outlined" style="font-size:14px;">refresh</span> Update'; }
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                async pos => {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
+                    state.currentLocation = { lat, lng: lon };
+                    const address = await reverseGeocode(lat, lon);
+                    state.currentLocationAddress = address;
+                    updateGPSBar('ok', lat, lon, address);
+                    loadNearbyOrganizations();
+                    showToast('📍 Location updated', 'success');
+                    if (btn) { btn.disabled = false; btn.innerHTML = '<span class="material-icons-outlined" style="font-size:14px;">refresh</span> Update'; }
+                },
+                err => {
+                    updateGPSBar('error');
+                    const msgs = { 1: 'Permission denied.', 2: 'Unavailable.', 3: 'Timed out.' };
+                    showToast(msgs[err.code] || 'GPS error', 'warning');
+                    if (btn) { btn.disabled = false; btn.innerHTML = '<span class="material-icons-outlined" style="font-size:14px;">refresh</span> Update'; }
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        }
+
+        // ➡️ Copy current GPS location into the route planner starting point
+        function useGPSAsRouteStart() {
+            if (!state.currentLocation) {
+                showToast('No GPS location yet — tap Update first', 'warning');
+                return;
+            }
+            state.currentStartCoord   = { lat: state.currentLocation.lat, lon: state.currentLocation.lng };
+            state.currentStartAddress = state.currentLocationAddress
+                || `${state.currentLocation.lat.toFixed(5)}, ${state.currentLocation.lng.toFixed(5)}`;
+
+            const input = document.getElementById('routeStartAddress');
+            if (input) input.value = state.currentStartAddress;
+            const hint = document.getElementById('routeStartAddressHint');
+            if (hint) { hint.style.color = '#2d8a4e'; hint.textContent = `📡 GPS location set (${state.currentLocation.lat.toFixed(4)}, ${state.currentLocation.lng.toFixed(4)})`; }
+            showToast('✅ GPS location set as route starting point', 'success');
+        }
+
         // ============================================
         // ZONE & CITY FILTERING FUNCTIONS
         // ============================================
@@ -7887,23 +7991,34 @@ END:VEVENT
                 return;
             }
             
-            nearMeList.innerHTML = nearest.map(org => `
-                <div onclick="selectCheckinOrganization('${org.ID}', '${esc(org.Name).replace(/'/g, "\\'")}'); this.parentElement.querySelectorAll('.near-me-item').forEach(el => el.style.background = 'rgba(255,255,255,0.1)'); this.style.background = 'rgba(245,118,0,0.3)';" 
-                     class="near-me-item"
-                     style="background: rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; cursor: pointer; transition: all 0.2s;">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                        <div style="flex: 1;">
+            nearMeList.innerHTML = nearest.map(org => {
+                const addr = buildAddressString(org);
+                const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(addr)}&travelmode=driving`;
+                const distLabel = org.distance < 0.1 ? '< 0.1' : org.distance.toFixed(1);
+                return `
+                <div class="near-me-item"
+                     style="background: rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; transition: all 0.2s;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                        <div style="flex: 1; cursor: pointer;"
+                             onclick="selectCheckinOrganization('${org.ID}', '${esc(org.Name).replace(/'/g, "\\'")}'); this.closest('.near-me-item').parentElement.querySelectorAll('.near-me-item').forEach(el => el.style.background = 'rgba(255,255,255,0.1)'); this.closest('.near-me-item').style.background = 'rgba(245,118,0,0.3)';">
                             <div style="color: white; font-weight: 600; font-size: 14px;">${esc(org.Name)}</div>
                             <div style="color: rgba(255,255,255,0.6); font-size: 12px; margin-top: 2px;">
-                                ${esc(org.Address)}, ${esc(org.City)}
+                                ${esc(org.Address || '')}${org.City ? ', ' + esc(org.City) : ''}
                             </div>
                         </div>
-                        <div style="background: var(--orange); color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; white-space: nowrap;">
-                            ${org.distance < 0.1 ? '< 0.1' : org.distance.toFixed(1)} mi
+                        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0;">
+                            <div style="background: var(--orange); color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; white-space: nowrap;">
+                                ${distLabel} mi
+                            </div>
+                            <a href="${mapsUrl}" target="_blank" rel="noopener"
+                               onclick="event.stopPropagation();"
+                               style="background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 6px; padding: 4px 10px; font-size: 11px; cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 3px; white-space: nowrap;">
+                                🗺️ Navigate
+                            </a>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
         }
 
         // ============================================
