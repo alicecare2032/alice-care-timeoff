@@ -30,10 +30,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-si
 .hero h1{font-family:var(--font-serif);font-size:30px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:8px;}
 .hero h1 em{font-style:italic;color:var(--gold-lt);}
 .hero-sub{font-family:var(--font-mono);font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.5px;max-width:760px;}
+.sync-badge{display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:6px 14px;border-radius:20px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);font-family:var(--font-mono);font-size:10px;color:rgba(255,255,255,.6);}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--text3);}
+.sync-dot.ok{background:#4dc4b0;}
+.sync-dot.err{background:#e07070;}
 
 .main{padding:36px 40px 60px;max-width:1360px;margin:0 auto;}
 
-/* THRESHOLD CARDS */
 .thresh-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:32px;}
 .thresh{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--sh);position:relative;overflow:hidden;}
 .thresh-top{position:absolute;top:0;left:0;right:0;height:3px;}
@@ -45,7 +48,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-si
 .thresh-val{font-family:var(--font-mono);font-size:22px;font-weight:500;color:var(--navy);margin-bottom:3px;}
 .thresh-note{font-family:var(--font-mono);font-size:9px;color:var(--text2);}
 
-/* PROGRESS */
 .progress-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;margin-bottom:32px;}
 .progress-head{background:var(--navy);padding:18px 26px;}
 .progress-title{font-family:var(--font-serif);font-size:16px;font-weight:600;color:#fff;}
@@ -56,25 +58,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-si
 .bar-label-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
 .bar-label{font-family:var(--font-mono);font-size:10px;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;}
 .bar-num{font-family:var(--font-mono);font-size:12px;font-weight:500;color:var(--navy);}
-.bar-track{height:14px;background:var(--surf2);border:1px solid var(--border);border-radius:7px;overflow:hidden;position:relative;}
-.bar-fill{height:100%;border-radius:7px 0 0 7px;transition:width .3s;}
-.bar-fill.committed{background:var(--teal);}
-.bar-marker{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--rose);}
-.bar-marker-lbl{position:absolute;top:-16px;font-family:var(--font-mono);font-size:8px;color:var(--rose);white-space:nowrap;transform:translateX(-50%);}
+.bar-track{height:14px;background:var(--surf2);border:1px solid var(--border);border-radius:7px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:7px 0 0 7px;transition:width .3s;background:var(--teal);}
 .gap-alert{margin-top:14px;padding:12px 16px;border-radius:6px;font-size:12px;display:flex;gap:10px;align-items:flex-start;}
 .gap-alert.need{background:var(--amber-bg);border:1px solid var(--amber-bd);color:var(--text2);}
 .gap-alert.reached{background:var(--teal-bg);border:1px solid var(--teal-bd);color:var(--text2);}
 .gap-alert.impossible{background:var(--rose-bg);border:1px solid var(--rose-bd);color:var(--text2);}
 .gap-alert strong{color:var(--navy);}
 
-/* TARGETS */
 .targets-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);padding:22px 26px;margin-bottom:32px;}
 .targets-title{font-family:var(--font-serif);font-size:15px;font-weight:600;color:var(--navy);margin-bottom:4px;}
 .targets-sub{font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:.5px;margin-bottom:14px;text-transform:uppercase;}
 .target-chips{display:flex;flex-wrap:wrap;gap:8px;}
 .target-chip{padding:5px 12px;border-radius:5px;font-family:var(--font-mono);font-size:10px;background:var(--amber-bg);color:var(--gold-dk);border:1px solid var(--amber-bd);}
 
-/* CONTROLS */
 .controls{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
 .ctl-search{padding:8px 12px;border:1px solid var(--border2);border-radius:6px;font-family:var(--font-mono);font-size:11px;background:var(--surface);min-width:180px;}
 .ctl-btn{padding:7px 14px;border-radius:6px;font-family:var(--font-mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;background:var(--surface);border:1px solid var(--border2);color:var(--text2);cursor:pointer;transition:all .15s;}
@@ -82,21 +79,19 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-si
 .ctl-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
 .save-status{font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-left:auto;}
 
-/* TABLE */
 .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;}
 .table-scroll{overflow-x:auto;}
-table{width:100%;border-collapse:collapse;min-width:1000px;}
-th{text-align:left;padding:12px 14px;font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);background:var(--surf2);border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;}
-th:hover{color:var(--gold-dk);}
-td{padding:9px 14px;border-bottom:1px solid var(--bg);font-size:12px;vertical-align:middle;}
+table{width:100%;border-collapse:collapse;min-width:1080px;}
+th{text-align:left;padding:12px 14px;font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);background:var(--surf2);border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:10px 14px;border-bottom:1px solid var(--bg);font-size:12px;vertical-align:top;}
 tr:hover td{background:var(--surf2);}
-.td-unit{font-family:var(--font-mono);font-weight:600;color:var(--navy);}
-.td-weight{font-family:var(--font-mono);color:var(--text2);}
+.td-unit{font-family:var(--font-mono);font-weight:600;color:var(--navy);white-space:nowrap;}
+.td-weight{font-family:var(--font-mono);color:var(--text2);white-space:nowrap;}
 .tier-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px;}
 .dot-premium{background:var(--gold);}
 .dot-standard{background:var(--sky);}
 .dot-value{background:var(--teal);}
-.field-input{width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-family:var(--font-sans);font-size:12px;background:var(--surf2);}
+.field-input{width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-family:var(--font-sans);font-size:12px;background:var(--surf2);margin-bottom:4px;}
 .field-input:focus{outline:none;border-color:var(--gold);background:#fff;}
 .status-select{width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-family:var(--font-mono);font-size:10px;background:var(--surf2);cursor:pointer;}
 .status-select:focus{outline:none;border-color:var(--gold);}
@@ -106,6 +101,17 @@ tr:hover td{background:var(--surf2);}
 .status-no{background:var(--rose-bg);color:var(--rose);border-color:var(--rose-bd);}
 .status-contacted{background:var(--sky-bg);color:var(--sky);border-color:var(--sky-bd);}
 .status-unknown{background:var(--surf2);color:var(--text3);}
+.builder-row{background:var(--purple-bg);}
+.builder-row:hover td{background:var(--purple-bg);}
+.small-btn{padding:5px 10px;border-radius:4px;font-family:var(--font-mono);font-size:9px;letter-spacing:.5px;text-transform:uppercase;border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;}
+.small-btn:hover{border-color:var(--gold);color:var(--gold-dk);}
+.small-btn.primary{background:var(--navy);color:#fff;border-color:var(--navy);}
+.claim-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-family:var(--font-mono);font-size:9px;background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal-bd);margin-bottom:4px;}
+.readonly-name{font-weight:500;color:var(--navy);}
+.readonly-contact{font-family:var(--font-mono);font-size:10px;color:var(--text2);}
+.verify-box{margin-top:6px;padding:8px;background:var(--amber-bg);border:1px solid var(--amber-bd);border-radius:4px;}
+.verify-box-lbl{font-family:var(--font-mono);font-size:9px;color:var(--gold-dk);margin-bottom:4px;}
+.row-error{font-family:var(--font-mono);font-size:9px;color:var(--rose);margin-top:4px;}
 
 .footer{max-width:1360px;margin:0 auto;padding:0 40px 40px;font-family:var(--font-mono);font-size:10px;color:var(--text3);}
 </style>
@@ -115,7 +121,8 @@ tr:hover td{background:var(--surf2);}
 <div class="hero">
   <div class="hero-tag">Governance &middot; Private Owner Outreach</div>
   <h1>Owner <em>Voting Majority</em> Tracker</h1>
-  <div class="hero-sub">The Paraiso Residences &middot; 43 private units &middot; 73.6% of total millesimis &middot; fill in owner names, contact info, and support status as you collect them. Totals update live.</div>
+  <div class="hero-sub">The Paraiso Residences &middot; 43 private units &middot; 73.6% of total millesimis &middot; claim your unit once, then confirm your contact info any time you need to change it.</div>
+  <div class="sync-badge"><span class="sync-dot" id="syncDot"></span><span id="syncText">Connecting to Google Sheet...</span></div>
 </div>
 
 <div class="main">
@@ -130,7 +137,7 @@ tr:hover td{background:var(--surf2);}
   <div class="progress-card">
     <div class="progress-head">
       <div class="progress-title">Live Voting Weight Progress</div>
-      <div class="progress-sub">Counts units marked Committed Yes below. Update owner status to see this move.</div>
+      <div class="progress-sub">Counts units marked Committed Yes below, pulled live from the Google Sheet.</div>
     </div>
     <div class="progress-body">
       <div class="bar-block">
@@ -138,18 +145,18 @@ tr:hover td{background:var(--surf2);}
           <div class="bar-label">Toward Simple Majority</div>
           <div class="bar-num" id="majNum">$0 of $17,548</div>
         </div>
-        <div class="bar-track"><div class="bar-fill committed" id="majBar" style="width:0%"></div></div>
+        <div class="bar-track"><div class="bar-fill" id="majBar" style="width:0%"></div></div>
       </div>
       <div class="bar-block">
         <div class="bar-label-row">
           <div class="bar-label">Toward 75% Supermajority (private ceiling $25,835)</div>
           <div class="bar-num" id="superNum">$0 of $26,321</div>
         </div>
-        <div class="bar-track"><div class="bar-fill committed" id="superBar" style="width:0%;background:var(--rose);"></div></div>
+        <div class="bar-track"><div class="bar-fill" id="superBar" style="width:0%;background:var(--rose);"></div></div>
       </div>
       <div class="gap-alert impossible">
         <span>&#9888;</span>
-        <span>A 75% supermajority cannot be reached by private owners alone. Private units cap out at 73.6% of total weight. Any qualified-majority vote needs at least some Builder-aligned support.</span>
+        <span>A 75% supermajority cannot be reached by private owners alone. Private units cap out at 73.6% of total weight. Check your bylaws for the exact threshold this specific resolution needs.</span>
       </div>
       <div class="gap-alert need" id="majAlert" style="margin-top:10px;"></div>
     </div>
@@ -164,11 +171,12 @@ tr:hover td{background:var(--surf2);}
   <div class="controls">
     <input class="ctl-search" id="search" type="text" placeholder="Search unit or owner..." oninput="render()">
     <button class="ctl-btn active" data-f="all" onclick="setStatusFilter('all',this)">All</button>
-    <button class="ctl-btn" data-f="unknown" onclick="setStatusFilter('unknown',this)">Unknown</button>
-    <button class="ctl-btn" data-f="contacted" onclick="setStatusFilter('contacted',this)">Contacted</button>
+    <button class="ctl-btn" data-f="unclaimed" onclick="setStatusFilter('unclaimed',this)">Unclaimed</button>
     <button class="ctl-btn" data-f="yes" onclick="setStatusFilter('yes',this)">Committed Yes</button>
     <button class="ctl-btn" data-f="no" onclick="setStatusFilter('no',this)">Opposed</button>
-    <span class="save-status" id="saveStatus">All changes save automatically</span>
+    <button class="ctl-btn" data-f="builder" onclick="setStatusFilter('builder',this)">Builder Units</button>
+    <button class="ctl-btn" onclick="loadFromSheet()">Refresh</button>
+    <span class="save-status" id="saveStatus"></span>
   </div>
 
   <div class="table-wrap">
@@ -176,12 +184,12 @@ tr:hover td{background:var(--surf2);}
       <table>
         <thead>
           <tr>
-            <th onclick="sortBy('u')">Unit #</th>
-            <th onclick="sortBy('mo')">Weight</th>
-            <th>Owner Name</th>
-            <th>Contact</th>
+            <th>Unit #</th>
+            <th>Weight</th>
+            <th>Owner</th>
             <th>Status</th>
             <th>Notes</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody id="tblBody"></tbody>
@@ -191,129 +199,158 @@ tr:hover td{background:var(--surf2);}
 
 </div>
 
-<div class="footer">Source unit and fee data from the owner payment schedule. Owner names, contact info, and status are entered manually and stored only in this tool.</div>
+<div class="footer">Live data source: Google Sheet linked via Apps Script. Unit and fee data is fixed; owner name, contact, status, and notes are entered by owners themselves and stored in the sheet.</div>
 
 <script>
-const PRIVATE_UNITS = [
+var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxuJUWuLh3clUqPRilu07Sexa23pq-KFYvrHhqSGb1HoVuLDCasSuic7xNnfXmL0qOJ_Q/exec';
+
+var BUILDER_SET = new Set(['1207','1210','1211','1212','1301','1302','1304','1305','1306','1308','1402','1403','1404','1408','1410']);
+
+var ALL_UNITS = [
   {u:'1101',mo:700},{u:'1102',mo:615},{u:'1103',mo:615},{u:'1104',mo:615},
   {u:'1105',mo:615},{u:'1106',mo:615},{u:'1107',mo:615},{u:'1108',mo:615},
   {u:'1109',mo:615},{u:'1110',mo:615},{u:'1111',mo:615},{u:'1112',mo:615},
   {u:'1113',mo:700},{u:'1114',mo:615},{u:'1115',mo:615},{u:'1116',mo:700},
   {u:'1117',mo:700},{u:'1118',mo:700},
   {u:'1201',mo:615},{u:'1202',mo:615},{u:'1203',mo:700},{u:'1204',mo:615},
-  {u:'1205',mo:615},{u:'1206',mo:615},{u:'1208',mo:615},{u:'1209',mo:535},
+  {u:'1205',mo:615},{u:'1206',mo:615},{u:'1207',mo:535},{u:'1208',mo:615},
+  {u:'1209',mo:535},{u:'1210',mo:700},{u:'1211',mo:700},{u:'1212',mo:700},
   {u:'1213',mo:535},{u:'1214',mo:535},{u:'1215',mo:535},{u:'1216',mo:615},
   {u:'1217',mo:615},{u:'1218',mo:535},
-  {u:'1303',mo:615},{u:'1307',mo:535},{u:'1309',mo:535},
-  {u:'1400',mo:535},{u:'1401',mo:535},{u:'1405',mo:535},{u:'1406',mo:535},
-  {u:'1407',mo:535},{u:'1409',mo:535},{u:'1411',mo:615},{u:'1412',mo:535},
+  {u:'1301',mo:535},{u:'1302',mo:535},{u:'1303',mo:615},{u:'1304',mo:535},
+  {u:'1305',mo:700},{u:'1306',mo:700},{u:'1307',mo:535},{u:'1308',mo:535},
+  {u:'1309',mo:535},
+  {u:'1400',mo:535},{u:'1401',mo:535},{u:'1402',mo:535},{u:'1403',mo:700},
+  {u:'1404',mo:535},{u:'1405',mo:535},{u:'1406',mo:535},{u:'1407',mo:535},
+  {u:'1408',mo:700},{u:'1409',mo:535},{u:'1410',mo:615},{u:'1411',mo:615},
+  {u:'1412',mo:535},
 ];
-PRIVATE_UNITS.forEach(r=>{
-  r.floor=r.u.substring(0,2);
-  r.tier=r.mo===700?'premium':r.mo===615?'standard':'value';
+ALL_UNITS.forEach(function(r){
+  r.floor = r.u.substring(0,2);
+  r.tier = r.mo===700?'premium':r.mo===615?'standard':'value';
+  r.builder = BUILDER_SET.has(r.u);
 });
+var PRIVATE_UNITS = ALL_UNITS.filter(function(r){ return !r.builder; });
 
-const TOTAL_WEIGHT = 35095;
-const MAJORITY_TARGET = Math.floor(TOTAL_WEIGHT/2)+1; // 17548
-const SUPER_TARGET = Math.ceil(TOTAL_WEIGHT*0.75); // 26321
-const PRIVATE_TOTAL = 25835;
+var TOTAL_WEIGHT = 35095;
+var MAJORITY_TARGET = Math.floor(TOTAL_WEIGHT/2)+1;
+var SUPER_TARGET = Math.ceil(TOTAL_WEIGHT*0.75);
 
-const STORE_KEY = 'paraiso-voting-tracker-v1';
-let ownerData = {}; // unit -> {name, contact, status, notes}
-let statusFilter = 'all';
-let sortKey = 'mo';
-let sortAsc = false;
-let saveTimer = null;
+var ownerData = {}; // unit -> {name, contact, status, notes, claimed}
+var statusFilter = 'all';
+var unlockedUnits = {}; // unit -> true once verified for editing this session
+var openEditUnit = null; // unit currently showing an edit/claim form
 
-async function loadData(){
+/* ---------- JSONP ---------- */
+function jsonp(url){
+  return new Promise(function(resolve, reject){
+    var cbName = 'jsonp_cb_' + Math.random().toString(36).slice(2);
+    var script = document.createElement('script');
+    window[cbName] = function(data){
+      resolve(data);
+      delete window[cbName];
+      script.remove();
+    };
+    script.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'callback=' + cbName;
+    script.onerror = function(){
+      reject(new Error('Network error contacting the sheet'));
+      delete window[cbName];
+      script.remove();
+    };
+    document.body.appendChild(script);
+  });
+}
+
+function setSyncStatus(state, text){
+  var dot = document.getElementById('syncDot');
+  dot.className = 'sync-dot' + (state ? ' ' + state : '');
+  document.getElementById('syncText').textContent = text;
+}
+
+async function loadFromSheet(){
+  setSyncStatus('', 'Syncing with Google Sheet...');
   try{
-    const res = await window.storage.get(STORE_KEY, false);
-    if(res && res.value){ ownerData = JSON.parse(res.value); }
-  }catch(e){ /* no data yet */ }
+    var res = await jsonp(APPS_SCRIPT_URL + '?action=list');
+    if(res && res.ok){
+      ownerData = {};
+      res.data.forEach(function(row){
+        ownerData[row.Unit] = {
+          name: row.OwnerName || '',
+          contact: row.Contact || '',
+          status: row.Status || 'unknown',
+          notes: row.Notes || '',
+          claimed: !!(row.OwnerName && String(row.OwnerName).trim() !== '')
+        };
+      });
+      setSyncStatus('ok', 'Synced with Google Sheet');
+    } else {
+      setSyncStatus('err', (res && res.error) ? res.error : 'Could not load data from the sheet');
+    }
+  } catch(e){
+    setSyncStatus('err', 'Could not reach the Google Sheet');
+  }
   render();
 }
 
-function scheduleSave(){
-  const el = document.getElementById('saveStatus');
-  el.textContent = 'Saving...';
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(async ()=>{
-    try{
-      await window.storage.set(STORE_KEY, JSON.stringify(ownerData), false);
-      el.textContent = 'All changes saved';
-    }catch(e){
-      el.textContent = 'Save failed, changes kept in this session only';
-    }
-  }, 400);
-}
-
 function getRow(u){
-  if(!ownerData[u]) ownerData[u] = {name:'', contact:'', status:'unknown', notes:''};
+  if(!ownerData[u]) ownerData[u] = {name:'', contact:'', status:'unknown', notes:'', claimed:false};
   return ownerData[u];
 }
 
 function setStatusFilter(f, btn){
   statusFilter = f;
-  document.querySelectorAll('.ctl-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.ctl-btn[data-f]').forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');
   render();
 }
 
-function sortBy(key){
-  if(sortKey===key) sortAsc=!sortAsc; else { sortKey=key; sortAsc = key==='u'; }
-  render();
-}
-
 function committedWeight(){
-  let sum = 0;
-  PRIVATE_UNITS.forEach(r=>{
-    const row = getRow(r.u);
-    if(row.status==='yes') sum += r.mo;
+  var sum = 0;
+  PRIVATE_UNITS.forEach(function(r){
+    if(getRow(r.u).status === 'yes') sum += r.mo;
   });
   return sum;
 }
 
 function updateProgress(){
-  const committed = committedWeight();
-  const majPct = Math.min(100, committed/MAJORITY_TARGET*100);
-  const superPct = Math.min(100, committed/SUPER_TARGET*100);
+  var committed = committedWeight();
+  var majPct = Math.min(100, committed/MAJORITY_TARGET*100);
+  var superPct = Math.min(100, committed/SUPER_TARGET*100);
   document.getElementById('majNum').textContent = '$'+committed.toLocaleString()+' of $'+MAJORITY_TARGET.toLocaleString();
   document.getElementById('superNum').textContent = '$'+committed.toLocaleString()+' of $'+SUPER_TARGET.toLocaleString();
   document.getElementById('majBar').style.width = majPct+'%';
   document.getElementById('superBar').style.width = superPct+'%';
 
-  const alertEl = document.getElementById('majAlert');
-  const gap = MAJORITY_TARGET - committed;
+  var alertEl = document.getElementById('majAlert');
+  var gap = MAJORITY_TARGET - committed;
   if(gap <= 0){
     alertEl.className = 'gap-alert reached';
-    alertEl.innerHTML = '<span>&#10003;</span><span><strong>Simple majority reached.</strong> Committed private weight now exceeds the $'+MAJORITY_TARGET.toLocaleString()+' threshold needed for an ordinary resolution.</span>';
+    alertEl.innerHTML = '<span>&#10003;</span><span><strong>Simple majority reached.</strong> Committed private weight exceeds the $'+MAJORITY_TARGET.toLocaleString()+' threshold.</span>';
   } else {
     alertEl.className = 'gap-alert need';
-    alertEl.innerHTML = '<span>&#8594;</span><span>Still need <strong>$'+gap.toLocaleString()+'</strong> more in committed weight to cross simple majority. See recommended targets below.</span>';
+    alertEl.innerHTML = '<span>&#8594;</span><span>Still need <strong>$'+gap.toLocaleString()+'</strong> more in committed weight to cross simple majority.</span>';
   }
 
-  // recommended targets: not-yet-committed units, sorted by weight desc, greedily fill the gap
-  const chipsEl = document.getElementById('targetChips');
+  var chipsEl = document.getElementById('targetChips');
   chipsEl.innerHTML = '';
   if(gap > 0){
-    const remaining = PRIVATE_UNITS
-      .filter(r=>getRow(r.u).status!=='yes')
-      .sort((a,b)=>b.mo-a.mo);
-    let acc = 0;
-    const picks = [];
-    for(const r of remaining){
+    var remaining = PRIVATE_UNITS
+      .filter(function(r){ return getRow(r.u).status !== 'yes'; })
+      .sort(function(a,b){ return b.mo - a.mo; });
+    var acc = 0, picks = [];
+    for(var i=0;i<remaining.length;i++){
       if(acc >= gap) break;
-      picks.push(r);
-      acc += r.mo;
+      picks.push(remaining[i]);
+      acc += remaining[i].mo;
     }
-    if(picks.length===0){
+    if(picks.length === 0){
       chipsEl.innerHTML = '<span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">No private units left to target.</span>';
     } else {
-      picks.forEach(r=>{
-        const row = getRow(r.u);
-        const chip = document.createElement('div');
+      picks.forEach(function(r){
+        var row = getRow(r.u);
+        var chip = document.createElement('div');
         chip.className = 'target-chip';
-        chip.textContent = 'Unit '+r.u+' ($'+r.mo+'/mo)'+(row.name?' - '+row.name:'');
+        chip.textContent = 'Unit '+r.u+' ($'+r.mo+'/mo)'+(row.name?' - '+row.name:(row.claimed?'':' - unclaimed'));
         chipsEl.appendChild(chip);
       });
     }
@@ -322,86 +359,194 @@ function updateProgress(){
   }
 }
 
-function render(){
-  const q = (document.getElementById('search').value||'').toLowerCase();
-  let data = [...PRIVATE_UNITS];
+function escapeHtml(s){
+  if(!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
-  if(statusFilter!=='all'){
-    data = data.filter(r=>getRow(r.u).status===statusFilter);
+function statusClass(status){
+  var map = {yes:'status-yes','lean-yes':'status-lean-yes','lean-no':'status-lean-no',no:'status-no',contacted:'status-contacted',unknown:'status-unknown'};
+  return map[status] || 'status-unknown';
+}
+function statusLabel(status){
+  var map = {yes:'Committed Yes','lean-yes':'Leaning Yes','lean-no':'Leaning No',no:'Opposed',contacted:'Contacted',unknown:'Unknown'};
+  return map[status] || 'Unknown';
+}
+
+function render(){
+  var q = (document.getElementById('search').value || '').toLowerCase();
+  var data = ALL_UNITS.slice();
+
+  if(statusFilter === 'builder'){
+    data = data.filter(function(r){ return r.builder; });
+  } else if(statusFilter === 'unclaimed'){
+    data = data.filter(function(r){ return !r.builder && !getRow(r.u).claimed; });
+  } else if(statusFilter !== 'all'){
+    data = data.filter(function(r){ return !r.builder && getRow(r.u).status === statusFilter; });
   }
   if(q){
-    data = data.filter(r=>{
-      const row = getRow(r.u);
-      return r.u.toLowerCase().includes(q) || (row.name||'').toLowerCase().includes(q);
+    data = data.filter(function(r){
+      var row = getRow(r.u);
+      return r.u.toLowerCase().indexOf(q) >= 0 || (row.name||'').toLowerCase().indexOf(q) >= 0;
     });
   }
-  data.sort((a,b)=>{
-    let av, bv;
-    if(sortKey==='u'){ av=a.u; bv=b.u; }
-    else { av=a.mo; bv=b.mo; }
-    if(av<bv) return sortAsc?-1:1;
-    if(av>bv) return sortAsc?1:-1;
-    return 0;
-  });
+  data.sort(function(a,b){ return b.mo - a.mo; });
 
-  const tbody = document.getElementById('tblBody');
+  var tbody = document.getElementById('tblBody');
   tbody.innerHTML = '';
-  data.forEach(r=>{
-    const row = getRow(r.u);
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="td-unit"><span class="tier-dot dot-${r.tier}"></span>${r.u}</td>
-      <td class="td-weight">$${r.mo}/mo</td>
-      <td><input class="field-input" data-u="${r.u}" data-f="name" value="${escapeHtml(row.name)}" placeholder="Owner name"></td>
-      <td><input class="field-input" data-u="${r.u}" data-f="contact" value="${escapeHtml(row.contact)}" placeholder="Email or phone"></td>
-      <td>
-        <select class="status-select ${statusClass(row.status)}" data-u="${r.u}" data-f="status">
-          <option value="unknown" ${row.status==='unknown'?'selected':''}>Unknown</option>
-          <option value="contacted" ${row.status==='contacted'?'selected':''}>Contacted</option>
-          <option value="yes" ${row.status==='yes'?'selected':''}>Committed Yes</option>
-          <option value="lean-yes" ${row.status==='lean-yes'?'selected':''}>Leaning Yes</option>
-          <option value="lean-no" ${row.status==='lean-no'?'selected':''}>Leaning No</option>
-          <option value="no" ${row.status==='no'?'selected':''}>Opposed</option>
-        </select>
-      </td>
-      <td><input class="field-input" data-u="${r.u}" data-f="notes" value="${escapeHtml(row.notes)}" placeholder="Notes"></td>
-    `;
-    tbody.appendChild(tr);
-  });
 
-  document.querySelectorAll('.field-input, .status-select').forEach(el=>{
-    el.addEventListener('change', onFieldChange);
-    if(el.tagName==='INPUT') el.addEventListener('keyup', onFieldChange);
+  data.forEach(function(r){
+    var tr = document.createElement('tr');
+
+    if(r.builder){
+      tr.className = 'builder-row';
+      tr.innerHTML =
+        '<td class="td-unit"><span class="tier-dot dot-'+r.tier+'"></span>'+r.u+'</td>'+
+        '<td class="td-weight">$'+r.mo+'/mo</td>'+
+        '<td colspan="4" style="font-family:var(--font-mono);font-size:10px;color:var(--purple);">Builder-owned - not claimable</td>';
+      tbody.appendChild(tr);
+      return;
+    }
+
+    var row = getRow(r.u);
+    var unit = r.u;
+    var weightCell = '<td class="td-unit"><span class="tier-dot dot-'+r.tier+'"></span>'+unit+'</td><td class="td-weight">$'+r.mo+'/mo</td>';
+
+    if(openEditUnit === unit){
+      tr.innerHTML = weightCell + buildFormCell(unit, row, row.claimed);
+    } else if(!row.claimed){
+      tr.innerHTML = weightCell +
+        '<td colspan="3" style="color:var(--text3);font-family:var(--font-mono);font-size:11px;">Unclaimed</td>'+
+        '<td><button class="small-btn primary" onclick="openForm(\''+unit+'\')">Claim Unit</button></td>';
+    } else {
+      var canEdit = !!unlockedUnits[unit];
+      tr.innerHTML = weightCell +
+        '<td><div class="claim-badge">Claimed</div><div class="readonly-name">'+escapeHtml(row.name)+'</div><div class="readonly-contact">'+escapeHtml(row.contact)+'</div></td>'+
+        '<td><span class="claim-badge '+statusClass(row.status)+'" style="background:transparent;">'+statusLabel(row.status)+'</span></td>'+
+        '<td style="color:var(--text2);">'+escapeHtml(row.notes)+'</td>'+
+        '<td>'+(canEdit
+          ? '<button class="small-btn primary" onclick="openForm(\''+unit+'\')">Edit</button>'
+          : '<button class="small-btn" onclick="promptVerify(\''+unit+'\')">Verify to Edit</button>')+
+        '</td>';
+    }
+    tbody.appendChild(tr);
   });
 
   updateProgress();
 }
 
-function onFieldChange(e){
-  const u = e.target.getAttribute('data-u');
-  const f = e.target.getAttribute('data-f');
-  const row = getRow(u);
-  row[f] = e.target.value;
-  if(f==='status'){
-    e.target.className = 'status-select ' + statusClass(row.status);
-    updateProgress();
-  } else {
-    updateProgress();
+function buildFormCell(unit, row, claimed){
+  var verifyHtml = claimed ? (
+    '<div class="verify-box"><div class="verify-box-lbl">Confirm the contact info used to claim this unit</div>'+
+    '<input class="field-input" id="auth-'+unit+'" placeholder="Original email or phone" value="'+escapeHtml(unlockedUnits[unit]||'')+'"></div>'
+  ) : '';
+  return (
+    '<td colspan="3">'+
+      '<input class="field-input" id="name-'+unit+'" placeholder="Owner name" value="'+escapeHtml(row.name)+'">'+
+      '<input class="field-input" id="contact-'+unit+'" placeholder="Email or phone" value="'+escapeHtml(row.contact)+'">'+
+      '<select class="status-select" id="status-'+unit+'">'+
+        ['unknown','contacted','yes','lean-yes','lean-no','no'].map(function(s){
+          return '<option value="'+s+'" '+(row.status===s?'selected':'')+'>'+statusLabel(s)+'</option>';
+        }).join('')+
+      '</select>'+
+      '<input class="field-input" id="notes-'+unit+'" placeholder="Notes" value="'+escapeHtml(row.notes)+'" style="margin-top:4px;">'+
+      verifyHtml+
+      '<div class="row-error" id="err-'+unit+'"></div>'+
+    '</td>'+
+    '<td style="white-space:nowrap;">'+
+      '<button class="small-btn primary" onclick="'+(claimed?'submitUpdate':'submitClaim')+'(\''+unit+'\')">Save</button> '+
+      '<button class="small-btn" onclick="closeForm()">Cancel</button>'+
+    '</td>'
+  );
+}
+
+function openForm(unit){
+  openEditUnit = unit;
+  render();
+}
+function closeForm(){
+  openEditUnit = null;
+  render();
+}
+function promptVerify(unit){
+  openEditUnit = unit;
+  render();
+}
+
+async function submitClaim(unit){
+  var name = document.getElementById('name-'+unit).value.trim();
+  var contact = document.getElementById('contact-'+unit).value.trim();
+  var status = document.getElementById('status-'+unit).value;
+  var notes = document.getElementById('notes-'+unit).value.trim();
+  var errEl = document.getElementById('err-'+unit);
+
+  if(!name || !contact){
+    errEl.textContent = 'Name and contact info are both required.';
+    return;
   }
-  scheduleSave();
+
+  errEl.textContent = 'Saving...';
+  var url = APPS_SCRIPT_URL + '?action=claim'
+    + '&unit=' + encodeURIComponent(unit)
+    + '&name=' + encodeURIComponent(name)
+    + '&contact=' + encodeURIComponent(contact)
+    + '&status=' + encodeURIComponent(status)
+    + '&notes=' + encodeURIComponent(notes);
+
+  try{
+    var res = await jsonp(url);
+    if(res && res.ok){
+      ownerData[unit] = {name:name, contact:contact, status:status, notes:notes, claimed:true};
+      unlockedUnits[unit] = contact;
+      openEditUnit = null;
+      render();
+    } else {
+      errEl.textContent = (res && res.error) ? res.error : 'Could not claim this unit.';
+    }
+  } catch(e){
+    errEl.textContent = 'Network error. Try again.';
+  }
 }
 
-function statusClass(status){
-  const map = {yes:'status-yes','lean-yes':'status-lean-yes','lean-no':'status-lean-no',no:'status-no',contacted:'status-contacted',unknown:'status-unknown'};
-  return map[status] || 'status-unknown';
+async function submitUpdate(unit){
+  var name = document.getElementById('name-'+unit).value.trim();
+  var contact = document.getElementById('contact-'+unit).value.trim();
+  var status = document.getElementById('status-'+unit).value;
+  var notes = document.getElementById('notes-'+unit).value.trim();
+  var authEl = document.getElementById('auth-'+unit);
+  var authContact = authEl ? authEl.value.trim() : (unlockedUnits[unit] || '');
+  var errEl = document.getElementById('err-'+unit);
+
+  if(!authContact){
+    errEl.textContent = 'Confirm the contact info used when this unit was claimed.';
+    return;
+  }
+
+  errEl.textContent = 'Saving...';
+  var url = APPS_SCRIPT_URL + '?action=update'
+    + '&unit=' + encodeURIComponent(unit)
+    + '&authcontact=' + encodeURIComponent(authContact)
+    + '&name=' + encodeURIComponent(name)
+    + '&contact=' + encodeURIComponent(contact)
+    + '&status=' + encodeURIComponent(status)
+    + '&notes=' + encodeURIComponent(notes);
+
+  try{
+    var res = await jsonp(url);
+    if(res && res.ok){
+      ownerData[unit] = {name:name, contact:contact, status:status, notes:notes, claimed:true};
+      unlockedUnits[unit] = contact;
+      openEditUnit = null;
+      render();
+    } else {
+      errEl.textContent = (res && res.error) ? res.error : 'That contact info did not match our records.';
+    }
+  } catch(e){
+    errEl.textContent = 'Network error. Try again.';
+  }
 }
 
-function escapeHtml(s){
-  if(!s) return '';
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-loadData();
+loadFromSheet();
 </script>
 </body>
 </html>
