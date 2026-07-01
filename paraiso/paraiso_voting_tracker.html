@@ -114,6 +114,47 @@ tr:hover td{background:var(--surf2);}
 .row-error{font-family:var(--font-mono);font-size:9px;color:var(--rose);margin-top:4px;}
 
 .footer{max-width:1360px;margin:0 auto;padding:0 40px 40px;font-family:var(--font-mono);font-size:10px;color:var(--text3);}
+
+.weight-note{background:var(--sky-bg);border:1px solid var(--sky-bd);border-radius:var(--r);padding:14px 18px;margin-bottom:24px;font-size:12px;color:var(--text2);line-height:1.5;}
+.weight-note strong{color:var(--navy);}
+
+@media (max-width: 760px){
+  .hero{padding:26px 18px 22px;}
+  .hero h1{font-size:22px;}
+  .hero-sub{font-size:10px;}
+  .sync-badge{font-size:9px;padding:5px 10px;}
+  .main{padding:22px 14px 40px;}
+  .thresh-row{grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:22px;}
+  .thresh{padding:14px;}
+  .thresh-val{font-size:17px;}
+  .progress-head{padding:14px 16px;}
+  .progress-body{padding:16px;}
+  .targets-card{padding:16px;}
+  .controls{gap:8px;}
+  .ctl-search{min-width:0;flex:1 1 100%;}
+  .ctl-btn{flex:1 1 auto;padding:7px 10px;font-size:8px;}
+  .save-status{flex:1 1 100%;margin-left:0;text-align:left;}
+
+  /* stacked card table for small screens */
+  .table-wrap{box-shadow:none;border:none;background:transparent;}
+  .table-scroll{overflow-x:visible;}
+  table, thead, tbody, th, td, tr{display:block;width:100%;}
+  thead{position:absolute;top:-9999px;left:-9999px;}
+  tbody tr{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);margin-bottom:12px;padding:10px 12px;}
+  tbody tr.builder-row{background:var(--purple-bg);}
+  td{border:none;padding:6px 0;position:relative;padding-left:38%;min-height:22px;}
+  td[colspan]{padding-left:0;}
+  td:not([colspan])::before{position:absolute;left:0;top:6px;width:34%;white-space:nowrap;font-family:var(--font-mono);font-size:8px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);content:attr(data-label);}
+  .td-unit{font-size:14px;padding-left:0 !important;}
+  .td-unit::before{content:none;}
+  .td-weight::before{content:none;position:static;}
+  .td-weight{padding-left:0;font-size:11px;color:var(--gold-dk);}
+  .field-input, .status-select{font-size:14px;padding:8px 10px;}
+  .small-btn{padding:8px 12px;font-size:10px;}
+  .bar-label-row{flex-wrap:wrap;gap:4px;}
+  .target-chips{gap:6px;}
+  .target-chip{font-size:9px;}
+}
 </style>
 </head>
 <body>
@@ -126,6 +167,10 @@ tr:hover td{background:var(--surf2);}
 </div>
 
 <div class="main">
+
+  <div class="weight-note">
+    <strong>What the $ figures mean:</strong> these are not money owed or collected. Each unit's monthly HOA fee is used here as a stand-in for voting weight (millesimis / ownership share), since fee tier is the closest proxy available from the payment schedule. If official millesimis percentages exist in your bylaws, those should replace this proxy.
+  </div>
 
   <div class="thresh-row">
     <div class="thresh"><div class="thresh-top gold"></div><div class="thresh-lbl">Total Fee Weight</div><div class="thresh-val">$35,095</div><div class="thresh-note">All 58 units combined</div></div>
@@ -428,10 +473,10 @@ function render(){
     } else {
       var canEdit = !!unlockedUnits[unit];
       tr.innerHTML = weightCell +
-        '<td><div class="claim-badge">Claimed</div><div class="readonly-name">'+escapeHtml(row.name)+'</div><div class="readonly-contact">'+escapeHtml(row.contact)+'</div></td>'+
-        '<td><span class="claim-badge '+statusClass(row.status)+'" style="background:transparent;">'+statusLabel(row.status)+'</span></td>'+
-        '<td style="color:var(--text2);">'+escapeHtml(row.notes)+'</td>'+
-        '<td>'+(canEdit
+        '<td data-label="Owner"><div class="claim-badge">Claimed</div><div class="readonly-name">'+escapeHtml(row.name)+'</div><div class="readonly-contact">'+escapeHtml(row.contact)+'</div></td>'+
+        '<td data-label="Status"><span class="claim-badge '+statusClass(row.status)+'" style="background:transparent;">'+statusLabel(row.status)+'</span></td>'+
+        '<td data-label="Notes" style="color:var(--text2);">'+escapeHtml(row.notes)+'</td>'+
+        '<td data-label="Actions">'+(canEdit
           ? '<button class="small-btn primary" onclick="openForm(\''+unit+'\')">Edit</button>'
           : '<button class="small-btn" onclick="promptVerify(\''+unit+'\')">Verify to Edit</button>')+
         '</td>';
@@ -460,7 +505,7 @@ function buildFormCell(unit, row, claimed){
       verifyHtml+
       '<div class="row-error" id="err-'+unit+'"></div>'+
     '</td>'+
-    '<td style="white-space:nowrap;">'+
+    '<td data-label="Actions" style="white-space:nowrap;">'+
       '<button class="small-btn primary" onclick="'+(claimed?'submitUpdate':'submitClaim')+'(\''+unit+'\')">Save</button> '+
       '<button class="small-btn" onclick="closeForm()">Cancel</button>'+
     '</td>'
