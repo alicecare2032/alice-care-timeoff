@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paraiso Residences - Owner Voting Majority Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f4f0;--surface:#fff;--surf2:#f9f8f5;--border:#e2dfd6;--border2:#ccc9be;
+  --navy:#1a2540;--navy2:#2d3f60;--text:#1a2540;--text2:#566070;--text3:#9aa4b4;
+  --gold:#a87820;--gold-lt:#c89840;--gold-dk:#8a6010;--gold-bg:rgba(168,120,32,.08);--gold-bd:rgba(168,120,32,.22);
+  --teal:#2a9d8a;--teal-bg:rgba(42,157,138,.08);--teal-bd:rgba(42,157,138,.22);
+  --sky:#2c6db0;--sky-bg:rgba(44,109,176,.08);--sky-bd:rgba(44,109,176,.22);
+  --rose:#c04040;--rose-bg:rgba(192,64,64,.08);--rose-bd:rgba(192,64,64,.22);
+  --amber:#c08420;--amber-bg:rgba(192,132,32,.08);--amber-bd:rgba(192,132,32,.22);
+  --purple:#7830b0;--purple-bg:rgba(120,48,176,.08);
+  --grad:linear-gradient(135deg,#a87820,#c89840,#8a6010);
+  --sh:0 2px 16px rgba(26,37,64,.07);--sh2:0 4px 24px rgba(26,37,64,.12);
+  --font-serif:'Playfair Display',serif;--font-sans:'IBM Plex Sans',sans-serif;--font-mono:'IBM Plex Mono',monospace;
+  --r:8px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-size:14px;line-height:1.6;}
+
+.hero{background:var(--navy);padding:40px 40px 32px;position:relative;overflow:hidden;}
+.hero::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad);}
+.hero-tag{font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:var(--gold-lt);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px;}
+.hero-tag::before{content:'';width:24px;height:1px;background:var(--gold-lt);}
+.hero h1{font-family:var(--font-serif);font-size:30px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:8px;}
+.hero h1 em{font-style:italic;color:var(--gold-lt);}
+.hero-sub{font-family:var(--font-mono);font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.5px;max-width:760px;}
+
+.main{padding:36px 40px 60px;max-width:1360px;margin:0 auto;}
+
+/* THRESHOLD CARDS */
+.thresh-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:32px;}
+.thresh{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--sh);position:relative;overflow:hidden;}
+.thresh-top{position:absolute;top:0;left:0;right:0;height:3px;}
+.thresh-top.gold{background:var(--grad);}
+.thresh-top.purple{background:linear-gradient(90deg,#7830b0,#a060d0);}
+.thresh-top.teal{background:linear-gradient(90deg,#2a9d8a,#60c4b0);}
+.thresh-top.rose{background:linear-gradient(90deg,#c04040,#e07070);}
+.thresh-lbl{font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;margin-bottom:8px;}
+.thresh-val{font-family:var(--font-mono);font-size:22px;font-weight:500;color:var(--navy);margin-bottom:3px;}
+.thresh-note{font-family:var(--font-mono);font-size:9px;color:var(--text2);}
+
+/* PROGRESS */
+.progress-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;margin-bottom:32px;}
+.progress-head{background:var(--navy);padding:18px 26px;}
+.progress-title{font-family:var(--font-serif);font-size:16px;font-weight:600;color:#fff;}
+.progress-sub{font-family:var(--font-mono);font-size:9px;color:rgba(255,255,255,.4);margin-top:2px;letter-spacing:.5px;}
+.progress-body{padding:26px;}
+.bar-block{margin-bottom:18px;}
+.bar-block:last-child{margin-bottom:0;}
+.bar-label-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
+.bar-label{font-family:var(--font-mono);font-size:10px;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;}
+.bar-num{font-family:var(--font-mono);font-size:12px;font-weight:500;color:var(--navy);}
+.bar-track{height:14px;background:var(--surf2);border:1px solid var(--border);border-radius:7px;overflow:hidden;position:relative;}
+.bar-fill{height:100%;border-radius:7px 0 0 7px;transition:width .3s;}
+.bar-fill.committed{background:var(--teal);}
+.bar-marker{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--rose);}
+.bar-marker-lbl{position:absolute;top:-16px;font-family:var(--font-mono);font-size:8px;color:var(--rose);white-space:nowrap;transform:translateX(-50%);}
+.gap-alert{margin-top:14px;padding:12px 16px;border-radius:6px;font-size:12px;display:flex;gap:10px;align-items:flex-start;}
+.gap-alert.need{background:var(--amber-bg);border:1px solid var(--amber-bd);color:var(--text2);}
+.gap-alert.reached{background:var(--teal-bg);border:1px solid var(--teal-bd);color:var(--text2);}
+.gap-alert.impossible{background:var(--rose-bg);border:1px solid var(--rose-bd);color:var(--text2);}
+.gap-alert strong{color:var(--navy);}
+
+/* TARGETS */
+.targets-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);padding:22px 26px;margin-bottom:32px;}
+.targets-title{font-family:var(--font-serif);font-size:15px;font-weight:600;color:var(--navy);margin-bottom:4px;}
+.targets-sub{font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:.5px;margin-bottom:14px;text-transform:uppercase;}
+.target-chips{display:flex;flex-wrap:wrap;gap:8px;}
+.target-chip{padding:5px 12px;border-radius:5px;font-family:var(--font-mono);font-size:10px;background:var(--amber-bg);color:var(--gold-dk);border:1px solid var(--amber-bd);}
+
+/* CONTROLS */
+.controls{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.ctl-search{padding:8px 12px;border:1px solid var(--border2);border-radius:6px;font-family:var(--font-mono);font-size:11px;background:var(--surface);min-width:180px;}
+.ctl-btn{padding:7px 14px;border-radius:6px;font-family:var(--font-mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;background:var(--surface);border:1px solid var(--border2);color:var(--text2);cursor:pointer;transition:all .15s;}
+.ctl-btn:hover{border-color:var(--gold);color:var(--gold-dk);}
+.ctl-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.save-status{font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-left:auto;}
+
+/* TABLE */
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;}
+.table-scroll{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;min-width:1000px;}
+th{text-align:left;padding:12px 14px;font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);background:var(--surf2);border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;}
+th:hover{color:var(--gold-dk);}
+td{padding:9px 14px;border-bottom:1px solid var(--bg);font-size:12px;vertical-align:middle;}
+tr:hover td{background:var(--surf2);}
+.td-unit{font-family:var(--font-mono);font-weight:600;color:var(--navy);}
+.td-weight{font-family:var(--font-mono);color:var(--text2);}
+.tier-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px;}
+.dot-premium{background:var(--gold);}
+.dot-standard{background:var(--sky);}
+.dot-value{background:var(--teal);}
+.field-input{width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-family:var(--font-sans);font-size:12px;background:var(--surf2);}
+.field-input:focus{outline:none;border-color:var(--gold);background:#fff;}
+.status-select{width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-family:var(--font-mono);font-size:10px;background:var(--surf2);cursor:pointer;}
+.status-select:focus{outline:none;border-color:var(--gold);}
+.status-yes{background:var(--teal-bg);color:var(--teal);border-color:var(--teal-bd);}
+.status-lean-yes{background:rgba(42,157,138,.04);color:var(--teal);}
+.status-lean-no{background:rgba(192,64,64,.04);color:var(--rose);}
+.status-no{background:var(--rose-bg);color:var(--rose);border-color:var(--rose-bd);}
+.status-contacted{background:var(--sky-bg);color:var(--sky);border-color:var(--sky-bd);}
+.status-unknown{background:var(--surf2);color:var(--text3);}
+
+.footer{max-width:1360px;margin:0 auto;padding:0 40px 40px;font-family:var(--font-mono);font-size:10px;color:var(--text3);}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-tag">Governance &middot; Private Owner Outreach</div>
+  <h1>Owner <em>Voting Majority</em> Tracker</h1>
+  <div class="hero-sub">The Paraiso Residences &middot; 43 private units &middot; 73.6% of total millesimis &middot; fill in owner names, contact info, and support status as you collect them. Totals update live.</div>
+</div>
+
+<div class="main">
+
+  <div class="thresh-row">
+    <div class="thresh"><div class="thresh-top gold"></div><div class="thresh-lbl">Total Fee Weight</div><div class="thresh-val">$35,095</div><div class="thresh-note">All 58 units combined</div></div>
+    <div class="thresh"><div class="thresh-top purple"></div><div class="thresh-lbl">Builder Weight (fixed)</div><div class="thresh-val">$9,260</div><div class="thresh-note">26.4% &middot; 15 units, not private</div></div>
+    <div class="thresh"><div class="thresh-top teal"></div><div class="thresh-lbl">Majority Needed</div><div class="thresh-val">$17,548</div><div class="thresh-note">50% + $1 of total weight</div></div>
+    <div class="thresh"><div class="thresh-top rose"></div><div class="thresh-lbl">Supermajority Needed</div><div class="thresh-val">$26,321</div><div class="thresh-note">75% &middot; exceeds private total</div></div>
+  </div>
+
+  <div class="progress-card">
+    <div class="progress-head">
+      <div class="progress-title">Live Voting Weight Progress</div>
+      <div class="progress-sub">Counts units marked Committed Yes below. Update owner status to see this move.</div>
+    </div>
+    <div class="progress-body">
+      <div class="bar-block">
+        <div class="bar-label-row">
+          <div class="bar-label">Toward Simple Majority</div>
+          <div class="bar-num" id="majNum">$0 of $17,548</div>
+        </div>
+        <div class="bar-track"><div class="bar-fill committed" id="majBar" style="width:0%"></div></div>
+      </div>
+      <div class="bar-block">
+        <div class="bar-label-row">
+          <div class="bar-label">Toward 75% Supermajority (private ceiling $25,835)</div>
+          <div class="bar-num" id="superNum">$0 of $26,321</div>
+        </div>
+        <div class="bar-track"><div class="bar-fill committed" id="superBar" style="width:0%;background:var(--rose);"></div></div>
+      </div>
+      <div class="gap-alert impossible">
+        <span>&#9888;</span>
+        <span>A 75% supermajority cannot be reached by private owners alone. Private units cap out at 73.6% of total weight. Any qualified-majority vote needs at least some Builder-aligned support.</span>
+      </div>
+      <div class="gap-alert need" id="majAlert" style="margin-top:10px;"></div>
+    </div>
+  </div>
+
+  <div class="targets-card">
+    <div class="targets-title">Recommended Outreach Targets</div>
+    <div class="targets-sub">Not-yet-committed private units, ranked by weight, needed to close the gap to simple majority</div>
+    <div class="target-chips" id="targetChips"></div>
+  </div>
+
+  <div class="controls">
+    <input class="ctl-search" id="search" type="text" placeholder="Search unit or owner..." oninput="render()">
+    <button class="ctl-btn active" data-f="all" onclick="setStatusFilter('all',this)">All</button>
+    <button class="ctl-btn" data-f="unknown" onclick="setStatusFilter('unknown',this)">Unknown</button>
+    <button class="ctl-btn" data-f="contacted" onclick="setStatusFilter('contacted',this)">Contacted</button>
+    <button class="ctl-btn" data-f="yes" onclick="setStatusFilter('yes',this)">Committed Yes</button>
+    <button class="ctl-btn" data-f="no" onclick="setStatusFilter('no',this)">Opposed</button>
+    <span class="save-status" id="saveStatus">All changes save automatically</span>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortBy('u')">Unit #</th>
+            <th onclick="sortBy('mo')">Weight</th>
+            <th>Owner Name</th>
+            <th>Contact</th>
+            <th>Status</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody id="tblBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">Source unit and fee data from the owner payment schedule. Owner names, contact info, and status are entered manually and stored only in this tool.</div>
+
+<script>
+const PRIVATE_UNITS = [
+  {u:'1101',mo:700},{u:'1102',mo:615},{u:'1103',mo:615},{u:'1104',mo:615},
+  {u:'1105',mo:615},{u:'1106',mo:615},{u:'1107',mo:615},{u:'1108',mo:615},
+  {u:'1109',mo:615},{u:'1110',mo:615},{u:'1111',mo:615},{u:'1112',mo:615},
+  {u:'1113',mo:700},{u:'1114',mo:615},{u:'1115',mo:615},{u:'1116',mo:700},
+  {u:'1117',mo:700},{u:'1118',mo:700},
+  {u:'1201',mo:615},{u:'1202',mo:615},{u:'1203',mo:700},{u:'1204',mo:615},
+  {u:'1205',mo:615},{u:'1206',mo:615},{u:'1208',mo:615},{u:'1209',mo:535},
+  {u:'1213',mo:535},{u:'1214',mo:535},{u:'1215',mo:535},{u:'1216',mo:615},
+  {u:'1217',mo:615},{u:'1218',mo:535},
+  {u:'1303',mo:615},{u:'1307',mo:535},{u:'1309',mo:535},
+  {u:'1400',mo:535},{u:'1401',mo:535},{u:'1405',mo:535},{u:'1406',mo:535},
+  {u:'1407',mo:535},{u:'1409',mo:535},{u:'1411',mo:615},{u:'1412',mo:535},
+];
+PRIVATE_UNITS.forEach(r=>{
+  r.floor=r.u.substring(0,2);
+  r.tier=r.mo===700?'premium':r.mo===615?'standard':'value';
+});
+
+const TOTAL_WEIGHT = 35095;
+const MAJORITY_TARGET = Math.floor(TOTAL_WEIGHT/2)+1; // 17548
+const SUPER_TARGET = Math.ceil(TOTAL_WEIGHT*0.75); // 26321
+const PRIVATE_TOTAL = 25835;
+
+const STORE_KEY = 'paraiso-voting-tracker-v1';
+let ownerData = {}; // unit -> {name, contact, status, notes}
+let statusFilter = 'all';
+let sortKey = 'mo';
+let sortAsc = false;
+let saveTimer = null;
+
+async function loadData(){
+  try{
+    const res = await window.storage.get(STORE_KEY, false);
+    if(res && res.value){ ownerData = JSON.parse(res.value); }
+  }catch(e){ /* no data yet */ }
+  render();
+}
+
+function scheduleSave(){
+  const el = document.getElementById('saveStatus');
+  el.textContent = 'Saving...';
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async ()=>{
+    try{
+      await window.storage.set(STORE_KEY, JSON.stringify(ownerData), false);
+      el.textContent = 'All changes saved';
+    }catch(e){
+      el.textContent = 'Save failed, changes kept in this session only';
+    }
+  }, 400);
+}
+
+function getRow(u){
+  if(!ownerData[u]) ownerData[u] = {name:'', contact:'', status:'unknown', notes:''};
+  return ownerData[u];
+}
+
+function setStatusFilter(f, btn){
+  statusFilter = f;
+  document.querySelectorAll('.ctl-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function sortBy(key){
+  if(sortKey===key) sortAsc=!sortAsc; else { sortKey=key; sortAsc = key==='u'; }
+  render();
+}
+
+function committedWeight(){
+  let sum = 0;
+  PRIVATE_UNITS.forEach(r=>{
+    const row = getRow(r.u);
+    if(row.status==='yes') sum += r.mo;
+  });
+  return sum;
+}
+
+function updateProgress(){
+  const committed = committedWeight();
+  const majPct = Math.min(100, committed/MAJORITY_TARGET*100);
+  const superPct = Math.min(100, committed/SUPER_TARGET*100);
+  document.getElementById('majNum').textContent = '$'+committed.toLocaleString()+' of $'+MAJORITY_TARGET.toLocaleString();
+  document.getElementById('superNum').textContent = '$'+committed.toLocaleString()+' of $'+SUPER_TARGET.toLocaleString();
+  document.getElementById('majBar').style.width = majPct+'%';
+  document.getElementById('superBar').style.width = superPct+'%';
+
+  const alertEl = document.getElementById('majAlert');
+  const gap = MAJORITY_TARGET - committed;
+  if(gap <= 0){
+    alertEl.className = 'gap-alert reached';
+    alertEl.innerHTML = '<span>&#10003;</span><span><strong>Simple majority reached.</strong> Committed private weight now exceeds the $'+MAJORITY_TARGET.toLocaleString()+' threshold needed for an ordinary resolution.</span>';
+  } else {
+    alertEl.className = 'gap-alert need';
+    alertEl.innerHTML = '<span>&#8594;</span><span>Still need <strong>$'+gap.toLocaleString()+'</strong> more in committed weight to cross simple majority. See recommended targets below.</span>';
+  }
+
+  // recommended targets: not-yet-committed units, sorted by weight desc, greedily fill the gap
+  const chipsEl = document.getElementById('targetChips');
+  chipsEl.innerHTML = '';
+  if(gap > 0){
+    const remaining = PRIVATE_UNITS
+      .filter(r=>getRow(r.u).status!=='yes')
+      .sort((a,b)=>b.mo-a.mo);
+    let acc = 0;
+    const picks = [];
+    for(const r of remaining){
+      if(acc >= gap) break;
+      picks.push(r);
+      acc += r.mo;
+    }
+    if(picks.length===0){
+      chipsEl.innerHTML = '<span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">No private units left to target.</span>';
+    } else {
+      picks.forEach(r=>{
+        const row = getRow(r.u);
+        const chip = document.createElement('div');
+        chip.className = 'target-chip';
+        chip.textContent = 'Unit '+r.u+' ($'+r.mo+'/mo)'+(row.name?' - '+row.name:'');
+        chipsEl.appendChild(chip);
+      });
+    }
+  } else {
+    chipsEl.innerHTML = '<span style="font-family:var(--font-mono);font-size:11px;color:var(--teal);">Majority already secured with current commitments.</span>';
+  }
+}
+
+function render(){
+  const q = (document.getElementById('search').value||'').toLowerCase();
+  let data = [...PRIVATE_UNITS];
+
+  if(statusFilter!=='all'){
+    data = data.filter(r=>getRow(r.u).status===statusFilter);
+  }
+  if(q){
+    data = data.filter(r=>{
+      const row = getRow(r.u);
+      return r.u.toLowerCase().includes(q) || (row.name||'').toLowerCase().includes(q);
+    });
+  }
+  data.sort((a,b)=>{
+    let av, bv;
+    if(sortKey==='u'){ av=a.u; bv=b.u; }
+    else { av=a.mo; bv=b.mo; }
+    if(av<bv) return sortAsc?-1:1;
+    if(av>bv) return sortAsc?1:-1;
+    return 0;
+  });
+
+  const tbody = document.getElementById('tblBody');
+  tbody.innerHTML = '';
+  data.forEach(r=>{
+    const row = getRow(r.u);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="td-unit"><span class="tier-dot dot-${r.tier}"></span>${r.u}</td>
+      <td class="td-weight">$${r.mo}/mo</td>
+      <td><input class="field-input" data-u="${r.u}" data-f="name" value="${escapeHtml(row.name)}" placeholder="Owner name"></td>
+      <td><input class="field-input" data-u="${r.u}" data-f="contact" value="${escapeHtml(row.contact)}" placeholder="Email or phone"></td>
+      <td>
+        <select class="status-select ${statusClass(row.status)}" data-u="${r.u}" data-f="status">
+          <option value="unknown" ${row.status==='unknown'?'selected':''}>Unknown</option>
+          <option value="contacted" ${row.status==='contacted'?'selected':''}>Contacted</option>
+          <option value="yes" ${row.status==='yes'?'selected':''}>Committed Yes</option>
+          <option value="lean-yes" ${row.status==='lean-yes'?'selected':''}>Leaning Yes</option>
+          <option value="lean-no" ${row.status==='lean-no'?'selected':''}>Leaning No</option>
+          <option value="no" ${row.status==='no'?'selected':''}>Opposed</option>
+        </select>
+      </td>
+      <td><input class="field-input" data-u="${r.u}" data-f="notes" value="${escapeHtml(row.notes)}" placeholder="Notes"></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.querySelectorAll('.field-input, .status-select').forEach(el=>{
+    el.addEventListener('change', onFieldChange);
+    if(el.tagName==='INPUT') el.addEventListener('keyup', onFieldChange);
+  });
+
+  updateProgress();
+}
+
+function onFieldChange(e){
+  const u = e.target.getAttribute('data-u');
+  const f = e.target.getAttribute('data-f');
+  const row = getRow(u);
+  row[f] = e.target.value;
+  if(f==='status'){
+    e.target.className = 'status-select ' + statusClass(row.status);
+    updateProgress();
+  } else {
+    updateProgress();
+  }
+  scheduleSave();
+}
+
+function statusClass(status){
+  const map = {yes:'status-yes','lean-yes':'status-lean-yes','lean-no':'status-lean-no',no:'status-no',contacted:'status-contacted',unknown:'status-unknown'};
+  return map[status] || 'status-unknown';
+}
+
+function escapeHtml(s){
+  if(!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+loadData();
+</script>
+</body>
+</html>
