@@ -246,14 +246,21 @@ function jsonp(url){
   return new Promise(function(resolve, reject){
     var cbName = 'jsonp_cb_' + Math.random().toString(36).slice(2);
     var script = document.createElement('script');
+    var timer = setTimeout(function(){
+      reject(new Error('Request timed out after 15 seconds'));
+      delete window[cbName];
+      script.remove();
+    }, 15000);
     window[cbName] = function(data){
+      clearTimeout(timer);
       resolve(data);
       delete window[cbName];
       script.remove();
     };
     script.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'callback=' + cbName;
     script.onerror = function(){
-      reject(new Error('Network error contacting the sheet'));
+      clearTimeout(timer);
+      reject(new Error('Script load failed, likely a blocked or invalid URL'));
       delete window[cbName];
       script.remove();
     };
@@ -504,7 +511,8 @@ async function submitClaim(unit){
       errEl.textContent = (res && res.error) ? res.error : 'Could not claim this unit.';
     }
   } catch(e){
-    errEl.textContent = 'Network error. Try again.';
+    console.error('Claim request failed:', e);
+    errEl.textContent = 'Request failed: ' + (e && e.message ? e.message : 'unknown error') + '. Check the browser console for details.';
   }
 }
 
@@ -542,7 +550,8 @@ async function submitUpdate(unit){
       errEl.textContent = (res && res.error) ? res.error : 'That contact info did not match our records.';
     }
   } catch(e){
-    errEl.textContent = 'Network error. Try again.';
+    console.error('Update request failed:', e);
+    errEl.textContent = 'Request failed: ' + (e && e.message ? e.message : 'unknown error') + '. Check the browser console for details.';
   }
 }
 
