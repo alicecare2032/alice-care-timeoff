@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Paraiso Residences - Owner Voting Majority Tracker</title>
+<title>Paraiso Residences: Owner Voting Majority Tracker</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -176,19 +176,19 @@ tr:hover td{background:var(--surf2);}
 <div class="main">
 
   <div class="weight-note">
-    <strong>What the $ figures mean:</strong> these are not money owed or collected. Each unit's monthly HOA fee is used here as a stand-in for voting weight (millesimis / ownership share), since fee tier is the closest proxy available from the payment schedule. If official millesimis percentages exist in your bylaws, those should replace this proxy.
+    <strong>What the $ figures mean:</strong> these are not money owed or collected. Each unit's monthly HOA fee is used here as a stand-in for its millesimal value, the ownership share that determines voting power, since fee tier is the closest proxy available from the payment schedule. If official millesimal values exist in your bylaws, those should replace this proxy.
   </div>
 
   <div class="thresh-row">
-    <div class="thresh"><div class="thresh-top gold"></div><div class="thresh-lbl">Total Fee Weight</div><div class="thresh-val">$35,095</div><div class="thresh-note">All 58 units combined</div></div>
-    <div class="thresh"><div class="thresh-top purple"></div><div class="thresh-lbl">Builder Weight (fixed)</div><div class="thresh-val">$9,260</div><div class="thresh-note">26.4% &middot; 15 units, not private</div></div>
-    <div class="thresh"><div class="thresh-top teal"></div><div class="thresh-lbl">Majority Needed</div><div class="thresh-val">$17,548</div><div class="thresh-note">50% + $1 of total weight</div></div>
+    <div class="thresh"><div class="thresh-top gold"></div><div class="thresh-lbl">Total Millesimal Value</div><div class="thresh-val">$35,095</div><div class="thresh-note">All 58 units combined</div></div>
+    <div class="thresh"><div class="thresh-top purple"></div><div class="thresh-lbl">Builder Millesimal Value (fixed)</div><div class="thresh-val">$9,260</div><div class="thresh-note">26.4% &middot; 15 units, not private</div></div>
+    <div class="thresh"><div class="thresh-top teal"></div><div class="thresh-lbl">Majority Needed</div><div class="thresh-val">$17,548</div><div class="thresh-note">50% plus $1 of total millesimal value</div></div>
     <div class="thresh"><div class="thresh-top rose"></div><div class="thresh-lbl">Supermajority Needed</div><div class="thresh-val">$26,321</div><div class="thresh-note">75% &middot; exceeds private total</div></div>
   </div>
 
   <div class="progress-card">
     <div class="progress-head">
-      <div class="progress-title">Live Voting Weight Progress</div>
+      <div class="progress-title">Live Millesimal Value Progress</div>
       <div class="progress-sub">Counts units marked Committed Yes below, pulled live from the Google Sheet.</div>
     </div>
     <div class="progress-body">
@@ -208,7 +208,7 @@ tr:hover td{background:var(--surf2);}
       </div>
       <div class="gap-alert impossible">
         <span>&#9888;</span>
-        <span>A 75% supermajority cannot be reached by private owners alone. Private units cap out at 73.6% of total weight. Check your bylaws for the exact threshold this specific resolution needs.</span>
+        <span>A 75% supermajority cannot be reached by private owners alone. Private units cap out at 73.6% of total millesimal value. Check your bylaws for the exact threshold this specific resolution needs.</span>
       </div>
       <div class="gap-alert need" id="majAlert" style="margin-top:10px;"></div>
     </div>
@@ -216,7 +216,7 @@ tr:hover td{background:var(--surf2);}
 
   <div class="targets-card">
     <div class="targets-title">Recommended Outreach Targets</div>
-    <div class="targets-sub">Not-yet-committed private units, ranked by weight, needed to close the gap to simple majority</div>
+    <div class="targets-sub">Not yet committed private units, ranked by millesimal value, needed to close the gap to simple majority</div>
     <div class="target-chips" id="targetChips"></div>
   </div>
 
@@ -237,7 +237,7 @@ tr:hover td{background:var(--surf2);}
         <thead>
           <tr>
             <th>Unit #</th>
-            <th>Weight</th>
+            <th>Millesimal Value</th>
             <th>Owner</th>
             <th>Status</th>
             <th>Notes</th>
@@ -409,7 +409,7 @@ function updateProgress(){
         var row = getRow(r.u);
         var chip = document.createElement('div');
         chip.className = 'target-chip';
-        chip.textContent = 'Unit '+r.u+' ($'+r.mo+'/mo)'+(row.name?' - '+row.name:(row.claimed?'':' - unclaimed'));
+        chip.textContent = 'Unit '+r.u+' ($'+r.mo+'/mo)'+(row.name?', '+row.name:(row.claimed?'':', unclaimed'));
         chipsEl.appendChild(chip);
       });
     }
@@ -462,7 +462,7 @@ function render(){
       tr.innerHTML =
         '<td class="td-unit"><span class="tier-dot dot-'+r.tier+'"></span>'+r.u+'</td>'+
         '<td class="td-weight">$'+r.mo+'/mo</td>'+
-        '<td colspan="4" style="font-family:var(--font-mono);font-size:10px;color:var(--purple);">Builder-owned - not claimable</td>';
+        '<td colspan="4" style="font-family:var(--font-mono);font-size:10px;color:var(--purple);">Builder-owned, not claimable</td>';
       tbody.appendChild(tr);
       return;
     }
