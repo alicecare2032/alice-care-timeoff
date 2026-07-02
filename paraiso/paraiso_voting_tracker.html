@@ -154,6 +154,10 @@ tr:hover td{background:var(--surf2);}
   .bar-label-row{flex-wrap:wrap;gap:4px;}
   .target-chips{gap:6px;}
   .target-chip{font-size:9px;}
+
+  .td-actions{padding-left:0 !important;margin-top:6px;display:flex;gap:8px;}
+  td.td-actions::before{content:none !important;}
+  .td-actions .small-btn{flex:1 1 auto;text-align:center;padding:11px 10px;font-size:11px;}
 }
 </style>
 </head>
@@ -469,14 +473,14 @@ function render(){
     } else if(!row.claimed){
       tr.innerHTML = weightCell +
         '<td colspan="3" style="color:var(--text3);font-family:var(--font-mono);font-size:11px;">Unclaimed</td>'+
-        '<td><button class="small-btn primary" onclick="openForm(\''+unit+'\')">Claim Unit</button></td>';
+        '<td class="td-actions"><button class="small-btn primary" onclick="openForm(\''+unit+'\')">Claim Unit</button></td>';
     } else {
       var canEdit = !!unlockedUnits[unit];
       tr.innerHTML = weightCell +
         '<td data-label="Owner"><div class="claim-badge">Claimed</div><div class="readonly-name">'+escapeHtml(row.name)+'</div><div class="readonly-contact">'+escapeHtml(row.contact)+'</div></td>'+
         '<td data-label="Status"><span class="claim-badge '+statusClass(row.status)+'" style="background:transparent;">'+statusLabel(row.status)+'</span></td>'+
         '<td data-label="Notes" style="color:var(--text2);">'+escapeHtml(row.notes)+'</td>'+
-        '<td data-label="Actions">'+(canEdit
+        '<td class="td-actions" data-label="Actions">'+(canEdit
           ? '<button class="small-btn primary" onclick="openForm(\''+unit+'\')">Edit</button>'
           : '<button class="small-btn" onclick="promptVerify(\''+unit+'\')">Verify to Edit</button>')+
         '</td>';
@@ -505,7 +509,7 @@ function buildFormCell(unit, row, claimed){
       verifyHtml+
       '<div class="row-error" id="err-'+unit+'"></div>'+
     '</td>'+
-    '<td data-label="Actions" style="white-space:nowrap;">'+
+    '<td class="td-actions" data-label="Actions">'+
       '<button class="small-btn primary" onclick="'+(claimed?'submitUpdate':'submitClaim')+'(\''+unit+'\')">Save</button> '+
       '<button class="small-btn" onclick="closeForm()">Cancel</button>'+
     '</td>'
