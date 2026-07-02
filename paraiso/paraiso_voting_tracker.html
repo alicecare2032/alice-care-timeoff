@@ -112,6 +112,8 @@ tr:hover td{background:var(--surf2);}
 .verify-box{margin-top:6px;padding:8px;background:var(--amber-bg);border:1px solid var(--amber-bd);border-radius:4px;}
 .verify-box-lbl{font-family:var(--font-mono);font-size:9px;color:var(--gold-dk);margin-bottom:4px;}
 .row-error{font-family:var(--font-mono);font-size:9px;color:var(--rose);margin-top:4px;}
+.form-topbar{display:flex;gap:8px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed var(--border2);position:sticky;top:0;background:var(--surface);z-index:2;}
+.form-topbar .small-btn{padding:8px 16px;font-size:10px;}
 
 .footer{max-width:1360px;margin:0 auto;padding:0 40px 40px;font-family:var(--font-mono);font-size:10px;color:var(--text3);}
 
@@ -466,6 +468,7 @@ function render(){
 
     var row = getRow(r.u);
     var unit = r.u;
+    tr.setAttribute('data-unit', unit);
     var weightCell = '<td class="td-unit"><span class="tier-dot dot-'+r.tier+'"></span>'+unit+'</td><td class="td-weight">$'+r.mo+'/mo</td>';
 
     if(openEditUnit === unit){
@@ -496,8 +499,12 @@ function buildFormCell(unit, row, claimed){
     '<div class="verify-box"><div class="verify-box-lbl">Confirm the contact info used to claim this unit</div>'+
     '<input class="field-input" id="auth-'+unit+'" placeholder="Original email or phone" value="'+escapeHtml(unlockedUnits[unit]||'')+'"></div>'
   ) : '';
+  var actionButtons =
+    '<button class="small-btn primary" onclick="'+(claimed?'submitUpdate':'submitClaim')+'(\''+unit+'\')">Save</button> '+
+    '<button class="small-btn" onclick="closeForm()">Cancel</button>';
   return (
     '<td colspan="3">'+
+      '<div class="form-topbar">'+actionButtons+'</div>'+
       '<input class="field-input" id="name-'+unit+'" placeholder="Owner name" value="'+escapeHtml(row.name)+'">'+
       '<input class="field-input" id="contact-'+unit+'" placeholder="Email or phone" value="'+escapeHtml(row.contact)+'">'+
       '<select class="status-select" id="status-'+unit+'">'+
@@ -509,16 +516,21 @@ function buildFormCell(unit, row, claimed){
       verifyHtml+
       '<div class="row-error" id="err-'+unit+'"></div>'+
     '</td>'+
-    '<td class="td-actions" data-label="Actions">'+
-      '<button class="small-btn primary" onclick="'+(claimed?'submitUpdate':'submitClaim')+'(\''+unit+'\')">Save</button> '+
-      '<button class="small-btn" onclick="closeForm()">Cancel</button>'+
-    '</td>'
+    '<td class="td-actions" data-label="Actions">'+actionButtons+'</td>'
   );
+}
+
+function scrollRowIntoView(unit){
+  setTimeout(function(){
+    var el = document.querySelector('tr[data-unit="'+unit+'"]');
+    if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  }, 60);
 }
 
 function openForm(unit){
   openEditUnit = unit;
   render();
+  scrollRowIntoView(unit);
 }
 function closeForm(){
   openEditUnit = null;
@@ -527,6 +539,7 @@ function closeForm(){
 function promptVerify(unit){
   openEditUnit = unit;
   render();
+  scrollRowIntoView(unit);
 }
 
 async function submitClaim(unit){
