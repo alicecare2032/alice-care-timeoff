@@ -139,10 +139,11 @@ tr:hover td{background:var(--surf2);}
 
   /* stacked card table for small screens */
   .table-wrap{box-shadow:none;border:none;background:transparent;}
-  .table-scroll{overflow-x:visible;}
+  .table-scroll{overflow-x:hidden;}
+  table{min-width:0;width:100%;}
   table, thead, tbody, th, td, tr{display:block;width:100%;}
   thead{position:absolute;top:-9999px;left:-9999px;}
-  tbody tr{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);margin-bottom:12px;padding:10px 12px;}
+  tbody tr{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);margin-bottom:12px;padding:10px 12px;overflow:hidden;box-sizing:border-box;}
   tbody tr.builder-row{background:var(--purple-bg);}
   td{border:none;padding:6px 0;position:relative;padding-left:38%;min-height:22px;}
   td[colspan]{padding-left:0;}
