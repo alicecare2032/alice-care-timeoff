@@ -435,6 +435,23 @@ function loadLiveStatuses(afterAction) {
         });
       }
 
+      // ---- REMOVE DELETED RECORDS ----
+      // The sheet is the source of truth. Any RAW record whose id+date key
+      // is no longer present in the live response was deleted upstream,
+      // so drop it here too. Guarded against an empty response, since a
+      // transient fetch glitch should never wipe the whole calendar.
+      if (requests.length > 0) {
+        const liveKeys = new Set(
+          requests
+            .map(req => (req.requestId || '') + '|' + toISODate(req.requestDate || req.date || ''))
+            .filter(k => k !== '|')
+        );
+        const beforeCount = RAW.length;
+        RAW = RAW.filter(r => liveKeys.has(r.id + '|' + r.date));
+        const removedCount = beforeCount - RAW.length;
+        if (removedCount > 0) console.log('[TimeOff Calendar] Removed', removedCount, 'deleted record(s) from RAW.');
+      }
+
       liveLoaded = true;
       if (indicator) {
         indicator.textContent = afterAction
