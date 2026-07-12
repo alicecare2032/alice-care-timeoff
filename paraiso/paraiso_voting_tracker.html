@@ -60,6 +60,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-si
 .bar-num{font-family:var(--font-mono);font-size:12px;font-weight:500;color:var(--navy);}
 .bar-track{height:14px;background:var(--surf2);border:1px solid var(--border);border-radius:7px;overflow:hidden;}
 .bar-fill{height:100%;border-radius:7px 0 0 7px;transition:width .3s;background:var(--teal);}
+.stack-track{height:16px;background:var(--surf2);border:1px solid var(--border);border-radius:7px;overflow:hidden;display:flex;}
+.stack-seg{height:100%;transition:width .3s;}
+.seg-builder{background:var(--purple);}
+.seg-claimed{background:var(--teal);}
+.seg-unclaimed{background:var(--amber);}
+.stack-legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px;}
+.legend-item{font-family:var(--font-mono);font-size:10px;color:var(--text2);display:flex;align-items:center;gap:6px;}
+.legend-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0;}
+.dot-builder{background:var(--purple);}
+.dot-claimed{background:var(--teal);}
+.dot-unclaimed{background:var(--amber);}
 .gap-alert{margin-top:14px;padding:12px 16px;border-radius:6px;font-size:12px;display:flex;gap:10px;align-items:flex-start;}
 .gap-alert.need{background:var(--amber-bg);border:1px solid var(--amber-bd);color:var(--text2);}
 .gap-alert.reached{background:var(--teal-bg);border:1px solid var(--teal-bd);color:var(--text2);}
@@ -157,6 +168,7 @@ tr:hover td{background:var(--surf2);}
   .bar-label-row{flex-wrap:wrap;gap:4px;}
   .target-chips{gap:6px;}
   .target-chip{font-size:9px;}
+  .stack-legend{gap:10px;}
 
   .td-actions{padding-left:0 !important;margin-top:6px;display:flex;gap:8px;}
   td.td-actions::before{content:none !important;}
@@ -194,6 +206,21 @@ tr:hover td{background:var(--surf2);}
     <div class="progress-body">
       <div class="bar-block">
         <div class="bar-label-row">
+          <div class="bar-label">Millesimal Value: Builder vs Claimed vs Unclaimed</div>
+        </div>
+        <div class="stack-track">
+          <div class="stack-seg seg-builder" id="segBuilder" style="width:0%"></div>
+          <div class="stack-seg seg-claimed" id="segClaimed" style="width:0%"></div>
+          <div class="stack-seg seg-unclaimed" id="segUnclaimed" style="width:0%"></div>
+        </div>
+        <div class="stack-legend">
+          <span class="legend-item"><span class="legend-dot dot-builder"></span><span id="legBuilder"></span></span>
+          <span class="legend-item"><span class="legend-dot dot-claimed"></span><span id="legClaimed"></span></span>
+          <span class="legend-item"><span class="legend-dot dot-unclaimed"></span><span id="legUnclaimed"></span></span>
+        </div>
+      </div>
+      <div class="bar-block">
+        <div class="bar-label-row">
           <div class="bar-label">Units Claimed</div>
           <div class="bar-num" id="claimedNum">0 of 43 private units claimed</div>
         </div>
@@ -218,6 +245,7 @@ tr:hover td{background:var(--surf2);}
         <span>A 75% supermajority cannot be reached by private owners alone. Private units cap out at 73.6% of total millesimal value. Check your bylaws for the exact threshold this specific resolution needs.</span>
       </div>
       <div class="gap-alert need" id="majAlert" style="margin-top:10px;"></div>
+      <div class="gap-alert need" id="unclaimedAlert" style="margin-top:10px;"></div>
     </div>
   </div>
 
@@ -294,6 +322,7 @@ var PRIVATE_UNITS = ALL_UNITS.filter(function(r){ return !r.builder; });
 var TOTAL_WEIGHT = 35095;
 var MAJORITY_TARGET = Math.floor(TOTAL_WEIGHT/2)+1;
 var SUPER_TARGET = Math.ceil(TOTAL_WEIGHT*0.75);
+var BUILDER_WEIGHT = ALL_UNITS.filter(function(r){ return r.builder; }).reduce(function(s,r){ return s+r.mo; }, 0);
 
 var ownerData = {}; // unit -> {name, contact, status, notes, claimed}
 var statusFilter = 'all';
@@ -386,6 +415,14 @@ function claimedCount(){
   return n;
 }
 
+function claimedWeight(){
+  var sum = 0;
+  PRIVATE_UNITS.forEach(function(r){
+    if(getRow(r.u).claimed) sum += r.mo;
+  });
+  return sum;
+}
+
 function updateProgress(){
   var committed = committedWeight();
   var majPct = Math.min(100, committed/MAJORITY_TARGET*100);
@@ -401,6 +438,29 @@ function updateProgress(){
   var claimedPct = totalPrivate ? (claimed/totalPrivate*100) : 0;
   document.getElementById('claimedNum').textContent = claimed.toLocaleString()+' of '+totalPrivate.toLocaleString()+' claimed · '+unclaimed.toLocaleString()+' still to claim';
   document.getElementById('claimedBar').style.width = claimedPct+'%';
+
+  var cWeight = claimedWeight();
+  var uWeight = (TOTAL_WEIGHT - BUILDER_WEIGHT) - cWeight;
+  var builderSharePct = BUILDER_WEIGHT / TOTAL_WEIGHT * 100;
+  var claimedSharePct = cWeight / TOTAL_WEIGHT * 100;
+  var unclaimedSharePct = uWeight / TOTAL_WEIGHT * 100;
+
+  document.getElementById('segBuilder').style.width = builderSharePct+'%';
+  document.getElementById('segClaimed').style.width = claimedSharePct+'%';
+  document.getElementById('segUnclaimed').style.width = unclaimedSharePct+'%';
+
+  document.getElementById('legBuilder').textContent = 'Builder (fixed): $'+BUILDER_WEIGHT.toLocaleString()+' ('+builderSharePct.toFixed(1)+'%)';
+  document.getElementById('legClaimed').textContent = 'Claimed, votable: $'+cWeight.toLocaleString()+' ('+claimedSharePct.toFixed(1)+'%)';
+  document.getElementById('legUnclaimed').textContent = 'Unclaimed, not yet votable: $'+uWeight.toLocaleString()+' ('+unclaimedSharePct.toFixed(1)+'%)';
+
+  var unclaimedAlertEl = document.getElementById('unclaimedAlert');
+  if(uWeight > 0){
+    unclaimedAlertEl.className = 'gap-alert need';
+    unclaimedAlertEl.innerHTML = '<span>&#9888;</span><span><strong>$'+uWeight.toLocaleString()+'</strong> in millesimal value ('+unclaimedSharePct.toFixed(1)+'% of the total) still sits in unclaimed units. Only claimed units can be counted toward a vote, so this weight is currently untracked and cannot be relied on.</span>';
+  } else {
+    unclaimedAlertEl.className = 'gap-alert reached';
+    unclaimedAlertEl.innerHTML = '<span>&#10003;</span><span>All private units are claimed. Every dollar of votable millesimal value is now tracked.</span>';
+  }
 
   var alertEl = document.getElementById('majAlert');
   var gap = MAJORITY_TARGET - committed;
