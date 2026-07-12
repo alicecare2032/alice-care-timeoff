@@ -194,6 +194,13 @@ tr:hover td{background:var(--surf2);}
     <div class="progress-body">
       <div class="bar-block">
         <div class="bar-label-row">
+          <div class="bar-label">Units Claimed</div>
+          <div class="bar-num" id="claimedNum">0 of 43 private units claimed</div>
+        </div>
+        <div class="bar-track"><div class="bar-fill" id="claimedBar" style="width:0%;background:var(--sky);"></div></div>
+      </div>
+      <div class="bar-block">
+        <div class="bar-label-row">
           <div class="bar-label">Toward Simple Majority</div>
           <div class="bar-num" id="majNum">$0 of $17,548</div>
         </div>
@@ -371,6 +378,14 @@ function committedWeight(){
   return sum;
 }
 
+function claimedCount(){
+  var n = 0;
+  PRIVATE_UNITS.forEach(function(r){
+    if(getRow(r.u).claimed) n++;
+  });
+  return n;
+}
+
 function updateProgress(){
   var committed = committedWeight();
   var majPct = Math.min(100, committed/MAJORITY_TARGET*100);
@@ -379,6 +394,13 @@ function updateProgress(){
   document.getElementById('superNum').textContent = '$'+committed.toLocaleString()+' of $'+SUPER_TARGET.toLocaleString();
   document.getElementById('majBar').style.width = majPct+'%';
   document.getElementById('superBar').style.width = superPct+'%';
+
+  var totalPrivate = PRIVATE_UNITS.length;
+  var claimed = claimedCount();
+  var unclaimed = totalPrivate - claimed;
+  var claimedPct = totalPrivate ? (claimed/totalPrivate*100) : 0;
+  document.getElementById('claimedNum').textContent = claimed.toLocaleString()+' of '+totalPrivate.toLocaleString()+' claimed · '+unclaimed.toLocaleString()+' still to claim';
+  document.getElementById('claimedBar').style.width = claimedPct+'%';
 
   var alertEl = document.getElementById('majAlert');
   var gap = MAJORITY_TARGET - committed;
