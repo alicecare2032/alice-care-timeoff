@@ -83,6 +83,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-si
 .target-chips{display:flex;flex-wrap:wrap;gap:8px;}
 .target-chip{padding:5px 12px;border-radius:5px;font-family:var(--font-mono);font-size:10px;background:var(--amber-bg);color:var(--gold-dk);border:1px solid var(--amber-bd);}
 
+.pin-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);}
+.pin-gate{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.pin-msg{font-family:var(--font-mono);font-size:10px;color:var(--text2);}
+.pin-input{width:130px;padding:7px 10px;border:1px solid var(--border2);border-radius:6px;font-family:var(--font-mono);font-size:12px;letter-spacing:2px;}
+.pin-input:focus{outline:none;border-color:var(--gold);}
+.pin-err{font-family:var(--font-mono);font-size:9px;color:var(--rose);}
+.lock-badge{font-family:var(--font-mono);font-size:10px;color:var(--teal);display:flex;align-items:center;gap:6px;}
+
 .controls{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
 .ctl-search{padding:8px 12px;border:1px solid var(--border2);border-radius:6px;font-family:var(--font-mono);font-size:11px;background:var(--surface);min-width:180px;}
 .ctl-btn{padding:7px 14px;border-radius:6px;font-family:var(--font-mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;background:var(--surface);border:1px solid var(--border2);color:var(--text2);cursor:pointer;transition:all .15s;}
@@ -147,6 +155,8 @@ tr:hover td{background:var(--surf2);}
   .ctl-search{min-width:0;flex:1 1 100%;}
   .ctl-btn{flex:1 1 auto;padding:7px 10px;font-size:8px;}
   .save-status{flex:1 1 100%;margin-left:0;text-align:left;}
+  .pin-bar{padding:12px;}
+  .pin-input{flex:1 1 100px;}
 
   /* stacked card table for small screens */
   .table-wrap{box-shadow:none;border:none;background:transparent;}
@@ -255,6 +265,19 @@ tr:hover td{background:var(--surf2);}
     <div class="target-chips" id="targetChips"></div>
   </div>
 
+  <div class="pin-bar">
+    <span id="pinLockedUI" class="pin-gate">
+      <span class="pin-msg">&#128274; Owner names and contact info are PIN-protected. Unclaimed units stay visible to everyone.</span>
+      <input class="pin-input" id="pinInput" type="password" placeholder="Enter PIN" maxlength="20" onkeydown="if(event.key==='Enter')tryUnlock();">
+      <button class="ctl-btn" onclick="tryUnlock()">Unlock</button>
+      <span class="pin-err" id="pinErr"></span>
+    </span>
+    <span id="pinUnlockedUI" class="pin-gate" style="display:none;">
+      <span class="lock-badge">&#128275; Unlocked &mdash; owner details visible on this device</span>
+      <button class="ctl-btn" onclick="lockView()">Lock</button>
+    </span>
+  </div>
+
   <div class="controls">
     <input class="ctl-search" id="search" type="text" placeholder="Search unit or owner..." oninput="render()">
     <button class="ctl-btn active" data-f="all" onclick="setStatusFilter('all',this)">All</button>
@@ -286,7 +309,7 @@ tr:hover td{background:var(--surf2);}
 
 </div>
 
-<div class="footer">Live data source: Google Sheet linked via Apps Script. Unit and fee data is fixed; owner name, contact, status, and notes are entered by owners themselves and stored in the sheet.</div>
+<div class="footer">Live data source: Google Sheet linked via Apps Script. Unit and fee data is fixed; owner name, contact, status, and notes are entered by owners themselves and stored in the sheet. Owner details are hidden behind a shared PIN in this page's display only; the underlying data feed is not independently access-controlled.</div>
 
 <script>
 var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxuJUWuLh3clUqPRilu07Sexa23pq-KFYvrHhqSGb1HoVuLDCasSuic7xNnfXmL0qOJ_Q/exec';
@@ -324,10 +347,43 @@ var MAJORITY_TARGET = Math.floor(TOTAL_WEIGHT/2)+1;
 var SUPER_TARGET = Math.ceil(TOTAL_WEIGHT*0.75);
 var BUILDER_WEIGHT = ALL_UNITS.filter(function(r){ return r.builder; }).reduce(function(s,r){ return s+r.mo; }, 0);
 
+var PIN_CODE = '20182026';
+var PIN_STORAGE_KEY = 'paraisoPinUnlocked';
+var pinUnlocked = false;
+try{ pinUnlocked = window.localStorage.getItem(PIN_STORAGE_KEY) === '1'; }catch(e){ pinUnlocked = false; }
+
 var ownerData = {}; // unit -> {name, contact, status, notes, claimed}
 var statusFilter = 'all';
 var unlockedUnits = {}; // unit -> true once verified for editing this session
 var openEditUnit = null; // unit currently showing an edit/claim form
+
+/* ---------- PIN gate ---------- */
+function updatePinUI(){
+  document.getElementById('pinLockedUI').style.display = pinUnlocked ? 'none' : 'flex';
+  document.getElementById('pinUnlockedUI').style.display = pinUnlocked ? 'flex' : 'none';
+}
+function tryUnlock(){
+  var input = document.getElementById('pinInput');
+  var errEl = document.getElementById('pinErr');
+  var val = (input.value || '').trim();
+  if(val === PIN_CODE){
+    pinUnlocked = true;
+    try{ window.localStorage.setItem(PIN_STORAGE_KEY, '1'); }catch(e){}
+    errEl.textContent = '';
+    input.value = '';
+    updatePinUI();
+    render();
+  } else {
+    errEl.textContent = 'Incorrect PIN.';
+  }
+}
+function lockView(){
+  pinUnlocked = false;
+  try{ window.localStorage.removeItem(PIN_STORAGE_KEY); }catch(e){}
+  openEditUnit = null;
+  updatePinUI();
+  render();
+}
 
 /* ---------- JSONP ---------- */
 function jsonp(url){
@@ -491,7 +547,11 @@ function updateProgress(){
         var row = getRow(r.u);
         var chip = document.createElement('div');
         chip.className = 'target-chip';
-        chip.textContent = 'Unit '+r.u+' ($'+r.mo+'/mo)'+(row.name?', '+row.name:(row.claimed?'':', unclaimed'));
+        var tag;
+        if(!row.claimed){ tag = ', unclaimed'; }
+        else if(pinUnlocked && row.name){ tag = ', '+row.name; }
+        else { tag = ', claimed'; }
+        chip.textContent = 'Unit '+r.u+' ($'+r.mo+'/mo)'+tag;
         chipsEl.appendChild(chip);
       });
     }
@@ -528,7 +588,8 @@ function render(){
   if(q){
     data = data.filter(function(r){
       var row = getRow(r.u);
-      return r.u.toLowerCase().indexOf(q) >= 0 || (row.name||'').toLowerCase().indexOf(q) >= 0;
+      var nameMatch = pinUnlocked && (row.name||'').toLowerCase().indexOf(q) >= 0;
+      return r.u.toLowerCase().indexOf(q) >= 0 || nameMatch;
     });
   }
   data.sort(function(a,b){ return b.mo - a.mo; });
@@ -554,12 +615,22 @@ function render(){
     tr.setAttribute('data-unit', unit);
     var weightCell = '<td class="td-unit"><span class="tier-dot dot-'+r.tier+'"></span>'+unit+'</td><td class="td-weight">$'+r.mo+'/mo</td>';
 
-    if(openEditUnit === unit){
-      tr.innerHTML = weightCell + buildFormCell(unit, row, row.claimed);
-    } else if(!row.claimed){
+    if(!row.claimed){
+      /* Unclaimed units stay open to everyone so any owner can find and claim theirs. */
+      if(openEditUnit === unit){
+        tr.innerHTML = weightCell + buildFormCell(unit, row, false);
+      } else {
+        tr.innerHTML = weightCell +
+          '<td colspan="3" style="color:var(--text3);font-family:var(--font-mono);font-size:11px;">Unclaimed</td>'+
+          '<td class="td-actions"><button class="small-btn primary" onclick="openForm(\''+unit+'\')">Claim Unit</button></td>';
+      }
+    } else if(!pinUnlocked){
+      /* Claimed units hide owner name/contact/status/notes until the shared PIN is entered above. */
       tr.innerHTML = weightCell +
-        '<td colspan="3" style="color:var(--text3);font-family:var(--font-mono);font-size:11px;">Unclaimed</td>'+
-        '<td class="td-actions"><button class="small-btn primary" onclick="openForm(\''+unit+'\')">Claim Unit</button></td>';
+        '<td colspan="3" style="color:var(--text3);font-family:var(--font-mono);font-size:11px;">&#128274; Claimed &middot; enter PIN above to view owner details</td>'+
+        '<td class="td-actions"></td>';
+    } else if(openEditUnit === unit){
+      tr.innerHTML = weightCell + buildFormCell(unit, row, true);
     } else {
       var canEdit = !!unlockedUnits[unit];
       tr.innerHTML = weightCell +
@@ -700,6 +771,7 @@ async function submitUpdate(unit){
   }
 }
 
+updatePinUI();
 loadFromSheet();
 </script>
 </body>
