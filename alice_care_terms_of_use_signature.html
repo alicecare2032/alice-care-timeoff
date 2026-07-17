@@ -9,7 +9,7 @@
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html { font-size: 16px; -webkit-text-size-adjust: 100%; }
-body { font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif; background: #E5ECF3; min-height: 100vh; padding: 15px; color: #3D3D3D; line-height: 1.5; }
+body { font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif; background: #E5ECF3; min-height: 100vh; padding: 15px; color: #3D3D3D; line-height: 1.5; overflow-x: hidden; }
 
 .nav-bar { max-width: 760px; margin: 0 auto 15px; background: white; padding: 12px 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(26,54,92,0.1); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
 .logo { font-size: 22px; font-weight: 700; }
@@ -67,7 +67,7 @@ label.required::after { content: " *"; color: #F57600; }
 .signature-wrap { border: 2px dashed #D3D7DF; border-radius: 8px; background: white; touch-action: none; }
 .signature-wrap.invalid { border-color: #c62828; }
 #sigCanvas { width: 100%; height: 180px; display: block; cursor: crosshair; touch-action: none; border-radius: 6px; }
-.sig-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+.sig-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; flex-wrap: wrap; gap: 8px; }
 .sig-hint { font-size: 11px; color: #888; }
 
 .checkbox-item { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; padding: 10px 12px; background: #f8fafc; border-radius: 8px; border: 2px solid transparent; transition: all 0.2s; }
@@ -113,13 +113,52 @@ label.required::after { content: " *"; color: #F57600; }
 .toast.error { background: #c62828; }
 .toast.success { background: #2e7d32; }
 
+/* iPad / tablet */
+@media (max-width: 768px) {
+    body { padding: 12px; }
+    .nav-bar { padding: 12px 16px; }
+    .header { padding: 20px 16px; }
+    .form-body { padding: 16px; }
+    .section-content { padding: 14px; }
+    .terms-box { max-height: 300px; }
+    .form-grid { gap: 12px; }
+}
+
+/* Phones */
 @media (max-width: 480px) {
     html { font-size: 15px; }
     body { padding: 8px; }
-    .header { padding: 18px; }
-    .header h1 { font-size: 18px; }
-    .form-body { padding: 14px; }
-    .form-grid { grid-template-columns: 1fr; }
+    .nav-bar { padding: 12px; border-radius: 10px; }
+    .logo { font-size: 19px; }
+    .nav-bar .tag { font-size: 11px; }
+    .container { border-radius: 10px; }
+    .header { padding: 16px; }
+    .header h1 { font-size: 17px; }
+    .header p { font-size: 12px; }
+    .form-body { padding: 12px; }
+    .section { margin-bottom: 18px; border-radius: 8px; }
+    .section-header { padding: 10px 14px; font-size: 13px; }
+    .section-content { padding: 12px; }
+    .notice { padding: 12px 14px; font-size: 12.5px; }
+    .terms-box { max-height: 260px; padding: 12px; font-size: 12px; }
+    .form-grid { grid-template-columns: 1fr; gap: 12px; }
+    .form-group.full-width { grid-column: 1; }
+    .initials-box { gap: 10px; }
+    .initials-box input { width: 76px; min-height: 46px; }
+    #sigCanvas { height: 160px; }
+    .sig-actions { justify-content: flex-start; }
+    .btn { width: 100%; }
+    .btn-outline { width: 100%; }
+    .form-actions { padding: 16px; }
+    .success-view { padding: 28px 16px; }
+    .record-box textarea { min-height: 180px; font-size: 11px; }
+    .toast { font-size: 13px; padding: 12px 20px; }
+}
+
+/* Safe area for iPhone notch/home indicator */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+    body { padding-bottom: calc(15px + env(safe-area-inset-bottom)); }
+    .toast { bottom: calc(20px + env(safe-area-inset-bottom)); }
 }
 </style>
 </head>
@@ -273,22 +312,18 @@ label.required::after { content: " *"; color: #F57600; }
 
         <div class="form-actions">
             <button type="button" class="btn btn-primary" id="submitBtn">Sign &amp; Agree</button>
-            <p class="legal-ack">Your signature and initials on the fee and cancellation summaries are required. Submitting opens a detailed confirmation email addressed to you, with a blind copy to tom@alicecare.com, for you to review and send.</p>
+            <p class="legal-ack">Your signature and initials on the fee and cancellation summaries are required. Submitting sends a detailed confirmation email automatically to you, with a blind copy to tom@alicecare.com. No email app needed.</p>
         </div>
     </div>
 
     <div class="success-view" id="successView">
         <div class="success-icon">&#10003;</div>
         <h2>Your agreement has been recorded</h2>
-        <p>Thank you, <span id="successName"></span>. Your email app should have opened with a detailed confirmation message addressed to you, with a blind copy to tom@alicecare.com.</p>
+        <p>Thank you, <span id="successName"></span>. A confirmation email was sent automatically to you, with a blind copy to tom@alicecare.com. Your agreement is on file with alice.care.</p>
         <div class="notice">
-            <strong>This step matters.</strong> alice.care only has your agreement on file once you press Send on that email. If you close this page without sending it, alice.care will have no record of your signature. Keep your reference number for any future questions: <strong id="successRefId"></strong>
+            <strong>Keep this for your records.</strong> Reference number: <strong id="successRefId"></strong>. If the confirmation email does not arrive within a few minutes, check your spam folder or use the button below to resend it.
         </div>
-        <div class="steps">
-            <p><strong>One step left:</strong> review the pre-filled email, then press send to complete your record with alice.care.</p>
-            <p>If your email app did not open (this happens if your device has no default mail app set), use the button below, or copy the record underneath and paste it into a new email yourself, addressed to yourself with a bcc to tom@alicecare.com.</p>
-        </div>
-        <button type="button" class="btn btn-outline" id="resendEmailBtn">Open Confirmation Email Again</button>
+        <button type="button" class="btn btn-outline" id="resendEmailBtn">Resend Confirmation Email</button>
 
         <div class="record-box">
             <label for="recordText">Your Signed Agreement Record</label>
@@ -301,6 +336,11 @@ label.required::after { content: " *"; color: #F57600; }
 <div class="toast" id="toast"></div>
 
 <script>
+// ---------- Email backend ----------
+// Paste the Web app URL you get after deploying the companion Google Apps
+// Script (alice_care_signature_mailer_AppsScript_Code.gs.txt) here.
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzs3y-jm39yvMx20KC5A4S2ua9h2oZGEYJ7JuabFElYq7toCnHF5gRU5oOUQY-lCO_c/exec';
+
 // ---------- Signature pad ----------
 var canvas = document.getElementById('sigCanvas');
 var ctx = canvas.getContext('2d');
@@ -310,8 +350,9 @@ var hasSignature = false;
 function resizeCanvas() {
     var ratio = window.devicePixelRatio || 1;
     var rect = canvas.getBoundingClientRect();
+    var h = rect.height || 180;
     canvas.width = rect.width * ratio;
-    canvas.height = 180 * ratio;
+    canvas.height = h * ratio;
     ctx.scale(ratio, ratio);
     ctx.strokeStyle = '#1A365C';
     ctx.lineWidth = 2.2;
@@ -321,10 +362,11 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener('resize', function () {
     var data = hasSignature ? canvas.toDataURL() : null;
+    var prevHeight = canvas.getBoundingClientRect().height || 180;
     resizeCanvas();
     if (data) {
         var img = new Image();
-        img.onload = function () { ctx.drawImage(img, 0, 0, canvas.width / (window.devicePixelRatio || 1), 180); };
+        img.onload = function () { ctx.drawImage(img, 0, 0, canvas.width / (window.devicePixelRatio || 1), prevHeight); };
         img.src = data;
     }
 });
@@ -392,7 +434,7 @@ function setError(errorId, show) {
 });
 
 // ---------- Submit ----------
-var lastMailto = '';
+var lastPayload = null;
 
 function buildRecordText(first, last, email, dateStr, feeInitials, cancelInitials, refId) {
     return 'Hello ' + first + ' ' + last + ',\n\n'
@@ -429,11 +471,17 @@ function buildRecordText(first, last, email, dateStr, feeInitials, cancelInitial
         + 'The alice.care Team';
 }
 
-function buildMailto(first, last, email, dateStr, feeInitials, cancelInitials, refId) {
-    var subject = 'Signed Terms of Use Confirmation - alice.care (Ref ' + refId + ')';
-    var body = buildRecordText(first, last, email, dateStr, feeInitials, cancelInitials, refId);
-    return 'mailto:' + encodeURIComponent(email) + '?bcc=' + encodeURIComponent('tom@alicecare.com')
-        + '&subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+function sendConfirmationEmail(payload) {
+    // Content-Type text/plain keeps this a "simple" request so the browser
+    // does not send a CORS preflight OPTIONS request, which Apps Script
+    // web apps do not support.
+    return fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+    }).then(function (res) {
+        return res.json();
+    });
 }
 
 document.getElementById('submitBtn').addEventListener('click', function () {
@@ -468,21 +516,40 @@ document.getElementById('submitBtn').addEventListener('click', function () {
     var dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
         + ' at ' + now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 
+    if (SCRIPT_URL.indexOf('PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE') !== -1) {
+        showToast('The email backend is not configured yet. Deploy the Apps Script and paste its URL into SCRIPT_URL.', 'error');
+        return;
+    }
+
     var submitBtn = document.getElementById('submitBtn');
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Processing...';
+    submitBtn.textContent = 'Sending...';
 
     var refId = 'AC-' + now.getTime().toString(36).toUpperCase();
     var recordText = buildRecordText(first, last, email, dateStr, feeInitials, cancelInitials, refId);
-    lastMailto = buildMailto(first, last, email, dateStr, feeInitials, cancelInitials, refId);
-    window.location.href = lastMailto;
+    var payload = {
+        email: email,
+        subject: 'Signed Terms of Use Confirmation - alice.care (Ref ' + refId + ')',
+        body: recordText,
+        refId: refId
+    };
+    lastPayload = payload;
 
-    document.getElementById('successName').textContent = first;
-    document.getElementById('successRefId').textContent = refId;
-    document.getElementById('recordText').value = recordText;
-    document.getElementById('formView').style.display = 'none';
-    document.getElementById('successView').classList.add('show');
-    showToast('Signature recorded. Confirmation email opened.', 'success');
+    sendConfirmationEmail(payload).then(function (data) {
+        if (!data || !data.success) {
+            throw new Error((data && data.error) || 'The email backend reported an error.');
+        }
+        document.getElementById('successName').textContent = first;
+        document.getElementById('successRefId').textContent = refId;
+        document.getElementById('recordText').value = recordText;
+        document.getElementById('formView').style.display = 'none';
+        document.getElementById('successView').classList.add('show');
+        showToast('Signature recorded. Confirmation email sent.', 'success');
+    }).catch(function (err) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Sign & Agree';
+        showToast('Could not send the confirmation email. Please try again. (' + err.message + ')', 'error');
+    });
 });
 
 document.getElementById('copyRecordBtn').addEventListener('click', function () {
@@ -507,7 +574,23 @@ document.getElementById('copyRecordBtn').addEventListener('click', function () {
 });
 
 document.getElementById('resendEmailBtn').addEventListener('click', function () {
-    if (lastMailto) { window.location.href = lastMailto; }
+    if (!lastPayload) return;
+    var btn = this;
+    btn.disabled = true;
+    btn.textContent = 'Resending...';
+    sendConfirmationEmail(lastPayload).then(function (data) {
+        btn.disabled = false;
+        btn.textContent = 'Resend Confirmation Email';
+        if (data && data.success) {
+            showToast('Confirmation email resent.', 'success');
+        } else {
+            showToast('Could not resend the email. Please try again.', 'error');
+        }
+    }).catch(function () {
+        btn.disabled = false;
+        btn.textContent = 'Resend Confirmation Email';
+        showToast('Could not resend the email. Please try again.', 'error');
+    });
 });
 </script>
 </body>
