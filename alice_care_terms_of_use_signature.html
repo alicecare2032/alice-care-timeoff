@@ -467,7 +467,7 @@ function buildRecordText(first, last, email, dateStr, feeInitials, cancelInitial
         + 'Date signed: ' + dateStr + '\n'
         + 'Fee & Late Payment initials: ' + feeInitials + '\n'
         + 'Cancellation Policy initials: ' + cancelInitials + '\n\n'
-        + 'Please press send to complete this confirmation with alice.care.\n\n'
+        + 'Please keep this email for your records.\n\n'
         + 'The alice.care Team';
 }
 
@@ -528,9 +528,12 @@ document.getElementById('submitBtn').addEventListener('click', function () {
     var refId = 'AC-' + now.getTime().toString(36).toUpperCase();
     var recordText = buildRecordText(first, last, email, dateStr, feeInitials, cancelInitials, refId);
     var payload = {
+        firstName: first,
+        lastName: last,
         email: email,
-        subject: 'Signed Terms of Use Confirmation - alice.care (Ref ' + refId + ')',
-        body: recordText,
+        dateStr: dateStr,
+        feeInitials: feeInitials,
+        cancelInitials: cancelInitials,
         refId: refId
     };
     lastPayload = payload;
