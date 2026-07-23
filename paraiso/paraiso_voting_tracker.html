@@ -412,6 +412,30 @@ function jsonp(url){
   });
 }
 
+/* Retries a jsonp call a couple of times before giving up. Google's script.google.com
+   endpoint can intermittently fail a single request (account-routing redirects, transient
+   network blips); a short retry smooths over most of those without the user noticing. */
+function wait(ms){
+  return new Promise(function(resolve){ setTimeout(resolve, ms); });
+}
+async function jsonpWithRetry(url, retries){
+  retries = typeof retries === 'number' ? retries : 2;
+  var lastErr = null;
+  for(var attempt = 0; attempt <= retries; attempt++){
+    try{
+      return await jsonp(url);
+    } catch(e){
+      lastErr = e;
+      if(attempt < retries){
+        await wait(700 + attempt * 500);
+      }
+    }
+  }
+  throw lastErr;
+}
+
+var CONNECTION_HELP = 'Could not reach Google\'s servers. This can happen if this browser is signed into more than one Google account. Try again, or open this page in a private/incognito window, or sign out of extra Google accounts in this browser and reload.';
+
 function setSyncStatus(state, text){
   var dot = document.getElementById('syncDot');
   dot.className = 'sync-dot' + (state ? ' ' + state : '');
@@ -421,7 +445,7 @@ function setSyncStatus(state, text){
 async function loadFromSheet(){
   setSyncStatus('', 'Syncing with Google Sheet...');
   try{
-    var res = await jsonp(APPS_SCRIPT_URL + '?action=list');
+    var res = await jsonpWithRetry(APPS_SCRIPT_URL + '?action=list', 2);
     if(res && res.ok){
       ownerData = {};
       res.data.forEach(function(row){
@@ -438,7 +462,8 @@ async function loadFromSheet(){
       setSyncStatus('err', (res && res.error) ? res.error : 'Could not load data from the sheet');
     }
   } catch(e){
-    setSyncStatus('err', 'Could not reach the Google Sheet');
+    console.error('List request failed:', e);
+    setSyncStatus('err', CONNECTION_HELP);
   }
   render();
 }
@@ -708,6 +733,31 @@ async function submitClaim(unit){
     return;
   }
 
+  /* Re-check with the sheet right before saving, so a unit someone else just claimed
+     a moment ago cannot be silently overwritten by a second claim submitted from a
+     stale page. */
+  errEl.textContent = 'Checking that this unit is still open...';
+  try{
+    var checkRes = await jsonpWithRetry(APPS_SCRIPT_URL + '?action=list', 1);
+    if(checkRes && checkRes.ok){
+      var freshRow = checkRes.data.filter(function(r){ return r.Unit === unit; })[0];
+      if(freshRow && freshRow.OwnerName && String(freshRow.OwnerName).trim() !== ''){
+        ownerData[unit] = {
+          name: freshRow.OwnerName || '',
+          contact: freshRow.Contact || '',
+          status: freshRow.Status || 'unknown',
+          notes: freshRow.Notes || '',
+          claimed: true
+        };
+        errEl.textContent = 'Someone else just claimed this unit. Refresh to see the latest status.';
+        render();
+        return;
+      }
+    }
+  } catch(e){
+    console.error('Availability check failed, proceeding to claim attempt anyway:', e);
+  }
+
   errEl.textContent = 'Saving...';
   var url = APPS_SCRIPT_URL + '?action=claim'
     + '&unit=' + encodeURIComponent(unit)
@@ -717,7 +767,7 @@ async function submitClaim(unit){
     + '&notes=' + encodeURIComponent(notes);
 
   try{
-    var res = await jsonp(url);
+    var res = await jsonpWithRetry(url, 2);
     if(res && res.ok){
       ownerData[unit] = {name:name, contact:contact, status:status, notes:notes, claimed:true};
       unlockedUnits[unit] = contact;
@@ -728,7 +778,7 @@ async function submitClaim(unit){
     }
   } catch(e){
     console.error('Claim request failed:', e);
-    errEl.textContent = 'Request failed: ' + (e && e.message ? e.message : 'unknown error') + '. Check the browser console for details.';
+    errEl.textContent = CONNECTION_HELP;
   }
 }
 
@@ -756,7 +806,7 @@ async function submitUpdate(unit){
     + '&notes=' + encodeURIComponent(notes);
 
   try{
-    var res = await jsonp(url);
+    var res = await jsonpWithRetry(url, 2);
     if(res && res.ok){
       ownerData[unit] = {name:name, contact:contact, status:status, notes:notes, claimed:true};
       unlockedUnits[unit] = contact;
@@ -767,7 +817,7 @@ async function submitUpdate(unit){
     }
   } catch(e){
     console.error('Update request failed:', e);
-    errEl.textContent = 'Request failed: ' + (e && e.message ? e.message : 'unknown error') + '. Check the browser console for details.';
+    errEl.textContent = CONNECTION_HELP;
   }
 }
 
