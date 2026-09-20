@@ -191,32 +191,32 @@ tr:hover td{background:var(--surf2);}
 <div class="hero">
   <div class="hero-tag">Governance &middot; Private Owner Outreach</div>
   <h1>Owner <em>Voting Majority</em> Tracker</h1>
-  <div class="hero-sub">The Paraiso Residences &middot; 43 private units &middot; <span id="heroPrivPct">&hellip;</span> of total Indivisogeneral &middot; claim your unit once, then confirm your contact info any time you need to change it.</div>
+  <div class="hero-sub">The Paraiso Residences &middot; 43 private units &middot; 73.6% of total millesimis &middot; claim your unit once, then confirm your contact info any time you need to change it.</div>
   <div class="sync-badge"><span class="sync-dot" id="syncDot"></span><span id="syncText">Connecting to Google Sheet...</span></div>
 </div>
 
 <div class="main">
 
   <div class="weight-note">
-    <strong>What these figures mean:</strong> voting power is weighted by each unit's <strong>Indivisogeneral</strong>, the official undivided ownership share on record for the building. The Monthly Fee shown per unit is kept only as a separate reference figure and no longer feeds any of the totals or thresholds below.
+    <strong>What the $ figures mean:</strong> these are not money owed or collected. Each unit's monthly HOA fee is used here as a stand-in for its millesimal value, the ownership share that determines voting power, since fee tier is the closest proxy available from the payment schedule. If official millesimal values exist in your bylaws, those should replace this proxy.
   </div>
 
   <div class="thresh-row">
-    <div class="thresh"><div class="thresh-top gold"></div><div class="thresh-lbl">Total Indivisogeneral</div><div class="thresh-val" id="threshTotal">&hellip;</div><div class="thresh-note">All 58 units combined</div></div>
-    <div class="thresh"><div class="thresh-top purple"></div><div class="thresh-lbl">Builder Indivisogeneral (fixed)</div><div class="thresh-val" id="threshBuilder">&hellip;</div><div class="thresh-note" id="threshBuilderNote">15 units, not private</div></div>
-    <div class="thresh"><div class="thresh-top teal"></div><div class="thresh-lbl">Majority Needed</div><div class="thresh-val" id="threshMajority">&hellip;</div><div class="thresh-note">50% plus the smallest unit of total Indivisogeneral</div></div>
-    <div class="thresh"><div class="thresh-top rose"></div><div class="thresh-lbl">Supermajority Needed</div><div class="thresh-val" id="threshSuper">&hellip;</div><div class="thresh-note" id="threshSuperNote">75% of total Indivisogeneral</div></div>
+    <div class="thresh"><div class="thresh-top gold"></div><div class="thresh-lbl">Total Millesimal Value</div><div class="thresh-val">$35,095</div><div class="thresh-note">All 58 units combined</div></div>
+    <div class="thresh"><div class="thresh-top purple"></div><div class="thresh-lbl">Builder Millesimal Value (fixed)</div><div class="thresh-val">$9,260</div><div class="thresh-note">26.4% &middot; 15 units, not private</div></div>
+    <div class="thresh"><div class="thresh-top teal"></div><div class="thresh-lbl">Majority Needed</div><div class="thresh-val">$17,548</div><div class="thresh-note">50% plus $1 of total millesimal value</div></div>
+    <div class="thresh"><div class="thresh-top rose"></div><div class="thresh-lbl">Supermajority Needed</div><div class="thresh-val">$26,321</div><div class="thresh-note">75% &middot; exceeds private total</div></div>
   </div>
 
   <div class="progress-card">
     <div class="progress-head">
-      <div class="progress-title">Live Indivisogeneral Progress</div>
+      <div class="progress-title">Live Millesimal Value Progress</div>
       <div class="progress-sub">Counts units marked Committed Yes below, pulled live from the Google Sheet.</div>
     </div>
     <div class="progress-body">
       <div class="bar-block">
         <div class="bar-label-row">
-          <div class="bar-label">Indivisogeneral: Builder vs Claimed vs Unclaimed</div>
+          <div class="bar-label">Millesimal Value: Builder vs Claimed vs Unclaimed</div>
         </div>
         <div class="stack-track">
           <div class="stack-seg seg-builder" id="segBuilder" style="width:0%"></div>
@@ -239,20 +239,20 @@ tr:hover td{background:var(--surf2);}
       <div class="bar-block">
         <div class="bar-label-row">
           <div class="bar-label">Toward Simple Majority</div>
-          <div class="bar-num" id="majNum">&hellip;</div>
+          <div class="bar-num" id="majNum">$0 of $17,548</div>
         </div>
         <div class="bar-track"><div class="bar-fill" id="majBar" style="width:0%"></div></div>
       </div>
       <div class="bar-block">
         <div class="bar-label-row">
-          <div class="bar-label" id="superLabel">Toward 75% Supermajority</div>
-          <div class="bar-num" id="superNum">&hellip;</div>
+          <div class="bar-label">Toward 75% Supermajority (private ceiling $25,835)</div>
+          <div class="bar-num" id="superNum">$0 of $26,321</div>
         </div>
         <div class="bar-track"><div class="bar-fill" id="superBar" style="width:0%;background:var(--rose);"></div></div>
       </div>
-      <div class="gap-alert impossible" id="superImpossibleAlert" style="display:none;">
+      <div class="gap-alert impossible">
         <span>&#9888;</span>
-        <span id="superImpossibleText"></span>
+        <span>A 75% supermajority cannot be reached by private owners alone. Private units cap out at 73.6% of total millesimal value. Check your bylaws for the exact threshold this specific resolution needs.</span>
       </div>
       <div class="gap-alert need" id="majAlert" style="margin-top:10px;"></div>
       <div class="gap-alert need" id="unclaimedAlert" style="margin-top:10px;"></div>
@@ -261,7 +261,7 @@ tr:hover td{background:var(--surf2);}
 
   <div class="targets-card">
     <div class="targets-title">Recommended Outreach Targets</div>
-    <div class="targets-sub">Not yet committed private units, ranked by Indivisogeneral, needed to close the gap to simple majority</div>
+    <div class="targets-sub">Not yet committed private units, ranked by millesimal value, needed to close the gap to simple majority</div>
     <div class="target-chips" id="targetChips"></div>
   </div>
 
@@ -295,7 +295,7 @@ tr:hover td{background:var(--surf2);}
         <thead>
           <tr>
             <th>Unit #</th>
-            <th>Indivisogeneral</th>
+            <th>Millesimal Value</th>
             <th>Owner</th>
             <th>Status</th>
             <th>Notes</th>
@@ -309,7 +309,7 @@ tr:hover td{background:var(--surf2);}
 
 </div>
 
-<div class="footer">Live data source: Google Sheet linked via Apps Script. Unit and floor numbering is fixed on this page; Indivisogeneral, Monthly Fee, owner name, contact, status, and notes are all pulled live from the sheet. Owner details are hidden behind a shared PIN in this page's display only; the underlying data feed is not independently access-controlled.</div>
+<div class="footer">Live data source: Google Sheet linked via Apps Script. Unit and fee data is fixed; owner name, contact, status, and notes are entered by owners themselves and stored in the sheet. Owner details are hidden behind a shared PIN in this page's display only; the underlying data feed is not independently access-controlled.</div>
 
 <script>
 var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxuJUWuLh3clUqPRilu07Sexa23pq-KFYvrHhqSGb1HoVuLDCasSuic7xNnfXmL0qOJ_Q/exec';
@@ -342,14 +342,10 @@ ALL_UNITS.forEach(function(r){
 });
 var PRIVATE_UNITS = ALL_UNITS.filter(function(r){ return !r.builder; });
 
-/* Voting weight is each unit's Indivisogeneral, a real per-unit figure that lives only in the
-   Google Sheet (column D). These totals start at 0 and are recomputed by computeTotals() every
-   time fresh data comes back from the sheet, rather than being hardcoded here. */
-var TOTAL_WEIGHT = 0;
-var BUILDER_WEIGHT = 0;
-var MAJORITY_TARGET = 0;
-var SUPER_TARGET = 0;
-var totalsReady = false;
+var TOTAL_WEIGHT = 35095;
+var MAJORITY_TARGET = Math.floor(TOTAL_WEIGHT/2)+1;
+var SUPER_TARGET = Math.ceil(TOTAL_WEIGHT*0.75);
+var BUILDER_WEIGHT = ALL_UNITS.filter(function(r){ return r.builder; }).reduce(function(s,r){ return s+r.mo; }, 0);
 
 var PIN_CODE = '20182026';
 var PIN_STORAGE_KEY = 'paraisoPinUnlocked';
@@ -458,16 +454,10 @@ async function loadFromSheet(){
           contact: row.Contact || '',
           status: row.Status || 'unknown',
           notes: row.Notes || '',
-          indivisogeneral: Number(row.Indivisogeneral) || 0,
           claimed: !!(row.OwnerName && String(row.OwnerName).trim() !== '')
         };
       });
-      computeTotals();
-      if(totalsReady){
-        setSyncStatus('ok', 'Synced with Google Sheet');
-      } else {
-        setSyncStatus('err', 'Synced, but no Indivisogeneral values were found in the sheet yet.');
-      }
+      setSyncStatus('ok', 'Synced with Google Sheet');
     } else {
       setSyncStatus('err', (res && res.error) ? res.error : 'Could not load data from the sheet');
     }
@@ -479,72 +469,8 @@ async function loadFromSheet(){
 }
 
 function getRow(u){
-  if(!ownerData[u]) ownerData[u] = {name:'', contact:'', status:'unknown', notes:'', indivisogeneral:0, claimed:false};
+  if(!ownerData[u]) ownerData[u] = {name:'', contact:'', status:'unknown', notes:'', claimed:false};
   return ownerData[u];
-}
-
-/* Voting weight for a unit, read live from the sheet's Indivisogeneral column. */
-function getWeight(u){
-  return Number(getRow(u).indivisogeneral) || 0;
-}
-
-/* Recomputes every total that depends on Indivisogeneral, using whatever the sheet just
-   returned. Called every time loadFromSheet() gets fresh data, since these values are not
-   hardcoded on the page. */
-function computeTotals(){
-  var total = 0, builderTotal = 0;
-  ALL_UNITS.forEach(function(r){
-    var w = getWeight(r.u);
-    total += w;
-    if(r.builder) builderTotal += w;
-  });
-  TOTAL_WEIGHT = total;
-  BUILDER_WEIGHT = builderTotal;
-  MAJORITY_TARGET = total > 0 ? Math.floor(total/2)+1 : 0;
-  SUPER_TARGET = total > 0 ? Math.ceil(total*0.75) : 0;
-  totalsReady = total > 0;
-  renderTotals();
-}
-
-function fmtW(n){
-  n = Number(n) || 0;
-  var rounded = Math.round(n*1000)/1000;
-  return rounded.toLocaleString(undefined, {maximumFractionDigits:3});
-}
-
-function renderTotals(){
-  if(!totalsReady){
-    ['threshTotal','threshBuilder','threshMajority','threshSuper'].forEach(function(id){
-      document.getElementById(id).textContent = '…';
-    });
-    document.getElementById('heroPrivPct').textContent = '…';
-    document.getElementById('superImpossibleAlert').style.display = 'none';
-    return;
-  }
-  var builderPct = TOTAL_WEIGHT ? (BUILDER_WEIGHT/TOTAL_WEIGHT*100) : 0;
-  var privateCeiling = TOTAL_WEIGHT - BUILDER_WEIGHT;
-  var privatePct = TOTAL_WEIGHT ? (privateCeiling/TOTAL_WEIGHT*100) : 0;
-
-  document.getElementById('threshTotal').textContent = fmtW(TOTAL_WEIGHT);
-  document.getElementById('threshBuilder').textContent = fmtW(BUILDER_WEIGHT);
-  document.getElementById('threshBuilderNote').textContent = builderPct.toFixed(1)+'% · 15 units, not private';
-  document.getElementById('threshMajority').textContent = fmtW(MAJORITY_TARGET);
-  document.getElementById('threshSuper').textContent = fmtW(SUPER_TARGET);
-  document.getElementById('heroPrivPct').textContent = privatePct.toFixed(1)+'% of total Indivisogeneral';
-
-  var superImpossibleAlert = document.getElementById('superImpossibleAlert');
-  var superLabel = document.getElementById('superLabel');
-  var threshSuperNote = document.getElementById('threshSuperNote');
-  if(privateCeiling < SUPER_TARGET){
-    superImpossibleAlert.style.display = 'flex';
-    document.getElementById('superImpossibleText').textContent = 'A 75% supermajority cannot be reached by private owners alone. Private units cap out at '+privatePct.toFixed(1)+'% of total Indivisogeneral. Check your bylaws for the exact threshold this specific resolution needs.';
-    superLabel.textContent = 'Toward 75% Supermajority (private ceiling '+fmtW(privateCeiling)+')';
-    threshSuperNote.textContent = '75% · exceeds private total';
-  } else {
-    superImpossibleAlert.style.display = 'none';
-    superLabel.textContent = 'Toward 75% Supermajority';
-    threshSuperNote.textContent = '75% of total Indivisogeneral';
-  }
 }
 
 function setStatusFilter(f, btn){
@@ -557,7 +483,7 @@ function setStatusFilter(f, btn){
 function committedWeight(){
   var sum = 0;
   PRIVATE_UNITS.forEach(function(r){
-    if(getRow(r.u).status === 'yes') sum += getWeight(r.u);
+    if(getRow(r.u).status === 'yes') sum += r.mo;
   });
   return sum;
 }
@@ -573,25 +499,17 @@ function claimedCount(){
 function claimedWeight(){
   var sum = 0;
   PRIVATE_UNITS.forEach(function(r){
-    if(getRow(r.u).claimed) sum += getWeight(r.u);
+    if(getRow(r.u).claimed) sum += r.mo;
   });
   return sum;
 }
 
 function updateProgress(){
-  if(!totalsReady){
-    document.getElementById('majNum').textContent = '…';
-    document.getElementById('superNum').textContent = '…';
-    document.getElementById('majBar').style.width = '0%';
-    document.getElementById('superBar').style.width = '0%';
-    document.getElementById('targetChips').innerHTML = '<span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">Waiting on Indivisogeneral values from the sheet.</span>';
-    return;
-  }
   var committed = committedWeight();
   var majPct = Math.min(100, committed/MAJORITY_TARGET*100);
   var superPct = Math.min(100, committed/SUPER_TARGET*100);
-  document.getElementById('majNum').textContent = fmtW(committed)+' of '+fmtW(MAJORITY_TARGET);
-  document.getElementById('superNum').textContent = fmtW(committed)+' of '+fmtW(SUPER_TARGET);
+  document.getElementById('majNum').textContent = '$'+committed.toLocaleString()+' of $'+MAJORITY_TARGET.toLocaleString();
+  document.getElementById('superNum').textContent = '$'+committed.toLocaleString()+' of $'+SUPER_TARGET.toLocaleString();
   document.getElementById('majBar').style.width = majPct+'%';
   document.getElementById('superBar').style.width = superPct+'%';
 
@@ -612,27 +530,27 @@ function updateProgress(){
   document.getElementById('segClaimed').style.width = claimedSharePct+'%';
   document.getElementById('segUnclaimed').style.width = unclaimedSharePct+'%';
 
-  document.getElementById('legBuilder').textContent = 'Builder (fixed): '+fmtW(BUILDER_WEIGHT)+' ('+builderSharePct.toFixed(1)+'%)';
-  document.getElementById('legClaimed').textContent = 'Claimed, votable: '+fmtW(cWeight)+' ('+claimedSharePct.toFixed(1)+'%)';
-  document.getElementById('legUnclaimed').textContent = 'Unclaimed, not yet votable: '+fmtW(uWeight)+' ('+unclaimedSharePct.toFixed(1)+'%)';
+  document.getElementById('legBuilder').textContent = 'Builder (fixed): $'+BUILDER_WEIGHT.toLocaleString()+' ('+builderSharePct.toFixed(1)+'%)';
+  document.getElementById('legClaimed').textContent = 'Claimed, votable: $'+cWeight.toLocaleString()+' ('+claimedSharePct.toFixed(1)+'%)';
+  document.getElementById('legUnclaimed').textContent = 'Unclaimed, not yet votable: $'+uWeight.toLocaleString()+' ('+unclaimedSharePct.toFixed(1)+'%)';
 
   var unclaimedAlertEl = document.getElementById('unclaimedAlert');
   if(uWeight > 0){
     unclaimedAlertEl.className = 'gap-alert need';
-    unclaimedAlertEl.innerHTML = '<span>&#9888;</span><span><strong>'+fmtW(uWeight)+'</strong> in Indivisogeneral ('+unclaimedSharePct.toFixed(1)+'% of the total) still sits in unclaimed units. Only claimed units can be counted toward a vote, so this weight is currently untracked and cannot be relied on.</span>';
+    unclaimedAlertEl.innerHTML = '<span>&#9888;</span><span><strong>$'+uWeight.toLocaleString()+'</strong> in millesimal value ('+unclaimedSharePct.toFixed(1)+'% of the total) still sits in unclaimed units. Only claimed units can be counted toward a vote, so this weight is currently untracked and cannot be relied on.</span>';
   } else {
     unclaimedAlertEl.className = 'gap-alert reached';
-    unclaimedAlertEl.innerHTML = '<span>&#10003;</span><span>All private units are claimed. Every point of votable Indivisogeneral is now tracked.</span>';
+    unclaimedAlertEl.innerHTML = '<span>&#10003;</span><span>All private units are claimed. Every dollar of votable millesimal value is now tracked.</span>';
   }
 
   var alertEl = document.getElementById('majAlert');
   var gap = MAJORITY_TARGET - committed;
   if(gap <= 0){
     alertEl.className = 'gap-alert reached';
-    alertEl.innerHTML = '<span>&#10003;</span><span><strong>Simple majority reached.</strong> Committed private weight exceeds the '+fmtW(MAJORITY_TARGET)+' threshold.</span>';
+    alertEl.innerHTML = '<span>&#10003;</span><span><strong>Simple majority reached.</strong> Committed private weight exceeds the $'+MAJORITY_TARGET.toLocaleString()+' threshold.</span>';
   } else {
     alertEl.className = 'gap-alert need';
-    alertEl.innerHTML = '<span>&#8594;</span><span>Still need <strong>'+fmtW(gap)+'</strong> more in committed weight to cross simple majority.</span>';
+    alertEl.innerHTML = '<span>&#8594;</span><span>Still need <strong>$'+gap.toLocaleString()+'</strong> more in committed weight to cross simple majority.</span>';
   }
 
   var chipsEl = document.getElementById('targetChips');
@@ -640,12 +558,12 @@ function updateProgress(){
   if(gap > 0){
     var remaining = PRIVATE_UNITS
       .filter(function(r){ return getRow(r.u).status !== 'yes'; })
-      .sort(function(a,b){ return getWeight(b.u) - getWeight(a.u); });
+      .sort(function(a,b){ return b.mo - a.mo; });
     var acc = 0, picks = [];
     for(var i=0;i<remaining.length;i++){
       if(acc >= gap) break;
       picks.push(remaining[i]);
-      acc += getWeight(remaining[i].u);
+      acc += remaining[i].mo;
     }
     if(picks.length === 0){
       chipsEl.innerHTML = '<span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">No private units left to target.</span>';
@@ -658,7 +576,7 @@ function updateProgress(){
         if(!row.claimed){ tag = ', unclaimed'; }
         else if(pinUnlocked && row.name){ tag = ', '+row.name; }
         else { tag = ', claimed'; }
-        chip.textContent = 'Unit '+r.u+' ('+fmtW(getWeight(r.u))+' indiviso)'+tag;
+        chip.textContent = 'Unit '+r.u+' ($'+r.mo+'/mo)'+tag;
         chipsEl.appendChild(chip);
       });
     }
@@ -699,7 +617,7 @@ function render(){
       return r.u.toLowerCase().indexOf(q) >= 0 || nameMatch;
     });
   }
-  data.sort(function(a,b){ return getWeight(b.u) - getWeight(a.u); });
+  data.sort(function(a,b){ return b.mo - a.mo; });
 
   var tbody = document.getElementById('tblBody');
   tbody.innerHTML = '';
@@ -711,7 +629,7 @@ function render(){
       tr.className = 'builder-row';
       tr.innerHTML =
         '<td class="td-unit"><span class="tier-dot dot-'+r.tier+'"></span>'+r.u+'</td>'+
-        '<td class="td-weight">'+fmtW(getWeight(r.u))+'<br><span style="color:var(--text3);font-size:10px;">$'+r.mo+'/mo ref.</span></td>'+
+        '<td class="td-weight">$'+r.mo+'/mo</td>'+
         '<td colspan="4" style="font-family:var(--font-mono);font-size:10px;color:var(--purple);">Builder-owned, not claimable</td>';
       tbody.appendChild(tr);
       return;
@@ -720,7 +638,7 @@ function render(){
     var row = getRow(r.u);
     var unit = r.u;
     tr.setAttribute('data-unit', unit);
-    var weightCell = '<td class="td-unit"><span class="tier-dot dot-'+r.tier+'"></span>'+unit+'</td><td class="td-weight">'+fmtW(getWeight(unit))+'<br><span style="color:var(--text3);font-size:10px;">$'+r.mo+'/mo ref.</span></td>';
+    var weightCell = '<td class="td-unit"><span class="tier-dot dot-'+r.tier+'"></span>'+unit+'</td><td class="td-weight">$'+r.mo+'/mo</td>';
 
     if(!row.claimed){
       /* Unclaimed units stay open to everyone so any owner can find and claim theirs. */
@@ -829,7 +747,6 @@ async function submitClaim(unit){
           contact: freshRow.Contact || '',
           status: freshRow.Status || 'unknown',
           notes: freshRow.Notes || '',
-          indivisogeneral: Number(freshRow.Indivisogeneral) || getWeight(unit),
           claimed: true
         };
         errEl.textContent = 'Someone else just claimed this unit. Refresh to see the latest status.';
@@ -852,7 +769,7 @@ async function submitClaim(unit){
   try{
     var res = await jsonpWithRetry(url, 2);
     if(res && res.ok){
-      ownerData[unit] = {name:name, contact:contact, status:status, notes:notes, indivisogeneral:getWeight(unit), claimed:true};
+      ownerData[unit] = {name:name, contact:contact, status:status, notes:notes, claimed:true};
       unlockedUnits[unit] = contact;
       openEditUnit = null;
       render();
@@ -891,7 +808,7 @@ async function submitUpdate(unit){
   try{
     var res = await jsonpWithRetry(url, 2);
     if(res && res.ok){
-      ownerData[unit] = {name:name, contact:contact, status:status, notes:notes, indivisogeneral:getWeight(unit), claimed:true};
+      ownerData[unit] = {name:name, contact:contact, status:status, notes:notes, claimed:true};
       unlockedUnits[unit] = contact;
       openEditUnit = null;
       render();
