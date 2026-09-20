@@ -704,7 +704,7 @@ function render(){
       return r.u.toLowerCase().indexOf(q) >= 0 || nameMatch;
     });
   }
-  data.sort(function(a,b){ return getWeight(b.u) - getWeight(a.u); });
+  data.sort(function(a,b){ return a.u.localeCompare(b.u, undefined, {numeric:true}); });
 
   var tbody = document.getElementById('tblBody');
   tbody.innerHTML = '';
