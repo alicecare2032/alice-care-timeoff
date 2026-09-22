@@ -8,9 +8,6 @@
     <meta name="format-detection" content="telephone=no">
     <title>Alice Care | Home Care Evaluation</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html { font-size: 16px; -webkit-text-size-adjust: 100%; }
@@ -1052,7 +1049,7 @@
         <div class="form-actions">
             <button type="button" class="btn btn-draft" onclick="saveDraft()">Save Draft</button>
             <button type="button" class="btn btn-primary" onclick="submitForm()">Submit &amp; Save</button>
-            <button type="button" class="btn btn-secondary" onclick="generatePDF()">Generate PDF</button>
+            <button type="button" class="btn btn-secondary" onclick="generateReport()">Generate Report</button>
             <button type="button" class="btn btn-outline" onclick="clearForm()">Clear Form</button>
         </div>
     </div>
@@ -1552,627 +1549,789 @@
             });
         }
 
-        // ── Detect Safari (desktop or iOS) — html2canvas is unreliable on WebKit ──
-        function isSafariBrowser() {
-            var ua = navigator.userAgent;
-            var isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
-            var isDesktopSafari = /^((?!chrome|android).)*safari/i.test(ua);
-            return isIOS || isDesktopSafari;
+        // ── Rich-Text (Word) Report Generator ───────────────────────────────
+        // Builds a complete, editable .doc report with every field on the
+        // form plus a narrative summary written from the actual responses.
+        // Field names below are matched directly against the form's inputs,
+        // so every section that was silently dropped by the old PDF export
+        // (Care Requirements, Hearing & Vision, Reminders & Mobility, Home
+        // Environment, Fall Risk) is now captured correctly.
+        // ─────────────────────────────────────────────────────────────────
+
+        function escHtml(s) {
+            if (s === undefined || s === null) return '';
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+        function gv(data, key) {
+            var val = data[key];
+            if (val === undefined || val === null) return '';
+            return String(val).trim();
+        }
+        function gyn(data, key) { return gv(data, key); }
+        function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+        function sentence(bits) { return bits.length ? bits.map(cap).join('. ') + '.' : ''; }
+        function joinNatural(arr) {
+            var items = arr.filter(Boolean);
+            if (items.length === 0) return '';
+            if (items.length === 1) return items[0];
+            if (items.length === 2) return items[0] + ' and ' + items[1];
+            return items.slice(0, -1).join(', ') + ', and ' + items[items.length - 1];
+        }
+        function fmtDate(str) {
+            if (!str) return '';
+            var d = new Date(str + 'T00:00:00');
+            if (isNaN(d.getTime())) return str;
+            return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
         }
 
-        // ── Document-style PDF Generator ──────────────────────────────────────
-        // Produces a reader-friendly summary document using jsPDF + autoTable.
-        // All form data is read from live DOM values — no screenshot/canvas used.
-        // ──────────────────────────────────────────────────────────────────────
-        function generatePDF() {
-            var data = getFormData();
-            var clientName = ((data.firstName || '') + ' ' + (data.lastName || '')).trim() || 'Unknown Client';
-            var today = new Date();
-            var dateStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
-            var filename = 'HomeCare_Eval_' + clientName.replace(/\s+/g, '_') + '_' + dateStr + '.pdf';
+        // ── Field maps for the radio-based care-requirement tables ─────────
+        var PERSONAL_CARE_ITEMS = [
+            ['bathingAssist', 'Bathing/Showering'], ['hairAssist', 'Hair Care'],
+            ['shavingAssist', 'Shaving'], ['dressingAssist', 'Dressing/Undressing'],
+            ['toiletingAssist', 'Toileting'], ['creamAssist', 'Cream Application'],
+            ['makeupAssist', 'Make-up'], ['fingernailsAssist', 'Fingernails'],
+            ['toenailsAssist', 'Toenails'], ['jewelryAssist', 'Jewelry']
+        ];
+        var MEALS_ITEMS = [
+            ['prepareMealsAssist', 'Prepare Meals'], ['prepareSnacksAssist', 'Prepare Snacks'],
+            ['hotDrinksAssist', 'Hot Drinks'], ['drinkAssist', 'Water Intake'],
+            ['setTableAssist', 'Set/Clear Table'], ['cleanMealAssist', 'Clean Up after Meal'],
+            ['cueEatAssist', 'Cueing for Eating'], ['rotateFoodAssist', 'Rotate Food']
+        ];
+        var HOME_CLEAN_ITEMS = [
+            ['sheetsAssist', 'Bed Making/Sheets'], ['surfaceCleanAssist', 'Surface Cleaning'],
+            ['bathroomCleanAssist', 'Washroom Cleaning'], ['laundryAssist', 'Laundry/Ironing'],
+            ['garbageAssist', 'Garbage Removal'], ['yardAssist', 'Yard Maintenance'],
+            ['organizingAssist', 'Organizing'], ['petAssistance', 'Pet Assistance'],
+            ['techAssist', 'Tech Assistance']
+        ];
+        var HOUSEKEEPING_ITEMS = [
+            ['bedAssist', 'Bed Making'], ['bathroomAccessAssist', 'Bathroom Access'],
+            ['stairsAssist', 'Stairs'], ['basementAssist', 'Basement'],
+            ['chairsAssist', 'Chairs'], ['phoneAnswerAssist', 'Answering Phone'],
+            ['doorAssist', 'Door']
+        ];
+        var ACTIVITY_MOVEMENT_ITEMS = [
+            ['exerciseAssist', 'Exercise/Physio'], ['walkIndoorsAssist', 'Walking Indoors'],
+            ['walkOutdoorsAssist', 'Walking Outdoors']
+        ];
+        var SOCIAL_ITEMS = [
+            ['mentalEngageAssist', 'Mental Engagement'],
+            ['physicalParticipateAssist', 'Physical Participation'],
+            ['willingParticipateAssist', 'Willingness to Participate']
+        ];
 
-            showToast('Building document PDF...', 'info');
+        function assistNarrative(subjectLabel, items, data) {
+            var groups = { Full: [], Partial: [], Standby: [], None: [] };
+            items.forEach(function(it) {
+                var v = gv(data, it[0]);
+                if (groups[v]) groups[v].push(it[1].toLowerCase());
+            });
+            var clauses = [];
+            if (groups.Full.length) clauses.push('needs full assistance with ' + joinNatural(groups.Full));
+            if (groups.Partial.length) clauses.push('needs partial assistance with ' + joinNatural(groups.Partial));
+            if (groups.Standby.length) clauses.push('needs standby supervision for ' + joinNatural(groups.Standby));
+            if (groups.None.length) clauses.push('manages independently with ' + joinNatural(groups.None));
+            if (!clauses.length) return '';
+            return 'For ' + subjectLabel + ', the client ' + clauses.join('; ') + '.';
+        }
 
+        function assistTable(title, items, data) {
+            var rows = items.map(function(it) {
+                var val = gv(data, it[0]);
+                if (!val) return '';
+                return '<tr><td class="tLabel">' + escHtml(it[1]) + '</td>' +
+                    '<td class="tCell">' + (val === 'Full' ? '&#9679;' : '') + '</td>' +
+                    '<td class="tCell">' + (val === 'Partial' ? '&#9679;' : '') + '</td>' +
+                    '<td class="tCell">' + (val === 'Standby' ? '&#9679;' : '') + '</td>' +
+                    '<td class="tCell">' + (val === 'None' ? '&#9679;' : '') + '</td></tr>';
+            }).filter(Boolean).join('');
+            if (!rows) return '';
+            return subHead(title) +
+                '<table class="careTable"><thead><tr><th>Task</th><th>Full</th><th>Partial</th><th>Standby</th><th>None</th></tr></thead><tbody>' + rows + '</tbody></table>';
+        }
+
+        function factRow(label, value) {
+            if (!value) return '';
+            return '<tr><td class="fLabel">' + escHtml(label) + '</td><td class="fValue">' + escHtml(value) + '</td></tr>';
+        }
+        function factGrid(pairs) {
+            var rows = pairs.map(function(p) { return factRow(p[0], p[1]); }).filter(Boolean).join('');
+            if (!rows) return '';
+            return '<table class="factTable"><tbody>' + rows + '</tbody></table>';
+        }
+        function sectionOpen(title, orange) {
+            return '<div class="section"><div class="sHead' + (orange ? ' orange' : '') + '">' + escHtml(title) + '</div><div class="sBody">';
+        }
+        function sectionClose() { return '</div></div>'; }
+        function subHead(title) { return '<div class="subHead">' + escHtml(title) + '</div>'; }
+        function dataTable(head, rows, colWidths) {
+            var hasData = rows.some(function(r) { return r.some(function(c) { return c; }); });
+            if (!hasData) return '';
+            var thead = '<tr>' + head.map(function(h) { return '<th>' + escHtml(h) + '</th>'; }).join('') + '</tr>';
+            var tbody = rows.map(function(r) {
+                return '<tr>' + r.map(function(c) { return '<td>' + escHtml(c) + '</td>'; }).join('') + '</tr>';
+            }).join('');
+            return '<table class="dataTable"><thead>' + thead + '</thead><tbody>' + tbody + '</tbody></table>';
+        }
+
+        function livingArrPhrase(v) {
+            var map = {
+                'Lives at home alone': 'lives at home alone',
+                'Lives with family/friend': 'lives at home with family or a friend',
+                'Senior residence': 'resides in a senior residence',
+                'Care facility': 'resides in a care facility',
+                'Hospital/Rehab': 'is currently in a hospital or rehabilitation setting'
+            };
+            return map[v] || ('lives in the following setting: ' + v.toLowerCase());
+        }
+        function maritalPhrase(v) {
+            var map = { 'Married': 'married', 'Single': 'single', 'Divorced': 'divorced', 'Widow': 'widowed' };
+            return map[v] || v.toLowerCase();
+        }
+        function articleForAge(numStr) {
+            var n = parseInt(numStr, 10);
+            if (isNaN(n)) return 'a';
+            var s = String(n);
+            if (/^8/.test(s) || /^11/.test(s) || /^18/.test(s)) return 'an';
+            return 'a';
+        }
+
+        // ── Narrative: turns the raw answers into a readable clinical summary ──
+        function buildNarrative(data, clientName) {
+            var paras = [];
+
+            // Overview
+            var age = gv(data, 'age'), gender = gv(data, 'gender'), marital = gv(data, 'maritalStatus');
+            var descriptors = [];
+            if (age) descriptors.push(age + '-year-old');
+            if (gender) descriptors.push(gender.toLowerCase());
+            var article = age ? articleForAge(age) : (gender && /^[aeiou]/i.test(gender) ? 'an' : 'a');
+            var overview = escHtml(clientName) + (descriptors.length ? ' is ' + article + ' ' + descriptors.join(' ') + ' client' : ' is a prospective client');
+            if (marital) overview += ' who is ' + maritalPhrase(marital);
+            var livingArr = gv(data, 'livingArrangement');
+            if (livingArr) overview += '. The client currently ' + livingArrPhrase(livingArr);
+            var careLevel = gv(data, 'careLevel');
+            if (careLevel) overview += ', and the level of care required is categorized as ' + careLevel.toLowerCase();
+            overview += '.';
+            paras.push(overview);
+
+            // Communication & technology
+            var techBits = [];
+            var commMethods = [];
+            if (data.commPhone) commMethods.push('phone');
+            if (data.commEmail) commMethods.push('email');
+            if (data.commVideoChat) commMethods.push('video chat');
+            if (commMethods.length) techBits.push('the family prefers to be reached by ' + joinNatural(commMethods));
+            if (gyn(data, 'hasWifi') === 'Yes') techBits.push('the home has WiFi access');
+            if (gyn(data, 'ownsComputer') === 'Yes') techBits.push('the client owns a computer' + (gyn(data, 'canOperateComputer') === 'No' ? ', though needs help operating it' : ''));
+            if (techBits.length) paras.push(sentence(techBits));
+
+            // Personal care & meals
+            var pcNarr = assistNarrative('personal care', PERSONAL_CARE_ITEMS, data);
+            if (pcNarr) paras.push(pcNarr);
+            var mealsNarr = assistNarrative('meal-related tasks', MEALS_ITEMS, data);
+            if (mealsNarr) paras.push(mealsNarr);
+
+            // Household tasks
+            var homeCleanNarr = assistNarrative('household cleaning tasks', HOME_CLEAN_ITEMS, data);
+            if (homeCleanNarr) paras.push(homeCleanNarr);
+            var houseworkNarr = assistNarrative('general housekeeping tasks', HOUSEKEEPING_ITEMS, data);
+            if (houseworkNarr) paras.push(houseworkNarr);
+
+            // Movement & social engagement
+            var moveNarr = assistNarrative('physical activity and movement', ACTIVITY_MOVEMENT_ITEMS, data);
+            if (moveNarr) paras.push(moveNarr);
+            var socialNarr = assistNarrative('social engagement', SOCIAL_ITEMS, data);
+            if (socialNarr) paras.push(socialNarr);
+
+            // Vision
+            var visionBits = [];
+            var cataracts = [];
+            if (data.cataractLeft) cataracts.push('left eye');
+            if (data.cataractRight) cataracts.push('right eye');
+            if (data.cataractBoth) cataracts.push('both eyes');
+            if (cataracts.length) visionBits.push('the client has cataracts affecting the ' + joinNatural(cataracts));
+            var lens = [];
+            if (data.lensLeft) lens.push('left eye');
+            if (data.lensRight) lens.push('right eye');
+            if (data.lensBoth) lens.push('both eyes');
+            if (lens.length) visionBits.push('a lens implant is present in the ' + joinNatural(lens));
+            var visionAssist = [];
+            if (data.visionAssistLeft) visionAssist.push('left eye');
+            if (data.visionAssistRight) visionAssist.push('right eye');
+            if (data.visionAssistBoth) visionAssist.push('both eyes');
+            if (visionAssist.length) visionBits.push('vision assistance is needed for the ' + joinNatural(visionAssist));
+            if (visionBits.length) paras.push(sentence(visionBits));
+
+            // Hearing
+            var hearingBits = [];
+            var hAids = [];
+            if (data.hearingAidLeft) hAids.push('left ear');
+            if (data.hearingAidRight) hAids.push('right ear');
+            if (data.hearingAidBoth) hAids.push('both ears');
+            if (hAids.length) hearingBits.push('the client wears a hearing aid in the ' + joinNatural(hAids));
+            var hAssist = [];
+            if (data.hearingAssistLeft) hAssist.push('left ear');
+            if (data.hearingAssistRight) hAssist.push('right ear');
+            if (data.hearingAssistBoth) hAssist.push('both ears');
+            if (hAssist.length) hearingBits.push('hearing assistance is needed for the ' + joinNatural(hAssist));
+            if (hearingBits.length) paras.push(sentence(hearingBits));
+
+            // Reminders & mobility
+            var remindBits = [];
+            if (gyn(data, 'medicationReminders') === 'Yes') remindBits.push('the client needs medication reminders');
+            if (gyn(data, 'appointmentReminders') === 'Yes') remindBits.push('appointment reminders are also needed');
+            var mobAids = [];
+            if (data.mobilityNoAssist) mobAids.push('requires no mobility aid');
+            if (data.mobilityCane) mobAids.push('uses a cane');
+            if (data.mobilityWalker) mobAids.push('uses a walker');
+            if (data.mobilityWheelchair) mobAids.push('uses a wheelchair');
+            if (data.mobilityLift) mobAids.push('uses a lift');
+            if (mobAids.length) remindBits.push('for mobility, the client ' + joinNatural(mobAids));
+            if (remindBits.length) paras.push(sentence(remindBits));
+
+            // Home safety
+            var safetyBits = [];
+            if (gyn(data, 'stairsPresent') === 'Yes') {
+                var railingsTxt = gyn(data, 'stairsRailings') === 'Yes' ? ' with railings in place' : (gyn(data, 'stairsRailings') === 'No' ? ' without railings, which is a safety concern' : '');
+                safetyBits.push('the home has stairs' + railingsTxt);
+            }
+            if (gyn(data, 'streetLevelAccessible') === 'No') safetyBits.push('the home does not have street-level access');
+            if (gyn(data, 'easyBathroomAccess') === 'No') safetyBits.push('bathroom access is not easy for the client');
+            if (gyn(data, 'bathAccess') === 'No') safetyBits.push('the bath or shower is not easily accessible');
+            if (gyn(data, 'hasPets') === 'Yes') safetyBits.push('there are pets in the home');
+            if (gyn(data, 'hasSpareKey') === 'Yes') safetyBits.push('a spare key is available' + (gv(data, 'spareKeyLocation') ? ' (' + gv(data, 'spareKeyLocation') + ')' : ''));
+            if (gyn(data, 'envConcerns') === 'Yes') safetyBits.push('environmental concerns were noted' + (gv(data, 'envConcernsList') ? ': ' + gv(data, 'envConcernsList') : ''));
+            if (safetyBits.length) paras.push(escHtml(sentence(safetyBits)));
+            if (gv(data, 'homeEnvComments')) paras.push(escHtml(gv(data, 'homeEnvComments')));
+
+            // Fall risk
+            var fallBits = [];
+            if (gyn(data, 'hadFalls') === 'Yes') fallBits.push('the client has had recent falls' + (gv(data, 'recentFallInfo') ? ' (' + gv(data, 'recentFallInfo') + ')' : ''));
+            else if (gyn(data, 'hadFalls') === 'No') fallBits.push('the client has not had recent falls');
+            if (gyn(data, 'medsDizziness') === 'Yes') fallBits.push('current medications may cause dizziness');
+            if (gyn(data, 'depthPerception') === 'Yes') fallBits.push('depth perception issues were identified');
+            if (gyn(data, 'peripheralVision') === 'Yes') fallBits.push('peripheral vision issues were identified');
+            if (gyn(data, 'hasRugs') === 'Yes') fallBits.push('area rugs in the home present a trip hazard');
+            if (gyn(data, 'safeToiletAccess') === 'No') fallBits.push('toilet access is not considered safe');
+            if (gyn(data, 'safeBedAccess') === 'No') fallBits.push('bed access is not considered safe');
+            if (gyn(data, 'easilyAgitated') === 'Yes') fallBits.push('the client is easily agitated, which can increase fall risk');
+            if (gyn(data, 'incontinence') === 'Yes') fallBits.push('incontinence increases the frequency of unassisted bathroom trips');
+            var riskLevel = gv(data, 'fallRiskLevel');
+            if (riskLevel) fallBits.push('the overall fall risk level has been assessed as ' + riskLevel.toLowerCase());
+            if (fallBits.length) paras.push(escHtml(sentence(fallBits)));
+            var interventions = [gv(data, 'fallInterventions'), gv(data, 'lowInterventions'), gv(data, 'moderateInterventions'), gv(data, 'highInterventions')].filter(Boolean);
+            if (interventions.length) paras.push('Recommended fall-prevention interventions include: ' + interventions.map(escHtml).join('; ') + '.');
+
+            // Verbal communication & preferences
+            var commAbility = gv(data, 'communicationAbility');
+            var prefBits = [];
+            if (commAbility) prefBits.push("the client's verbal communication ability is rated as " + commAbility.toLowerCase());
+            var likes = [gv(data, 'activityLikes'), gv(data, 'socialLikes'), gv(data, 'facialLikes'), gv(data, 'otherLikes')].filter(Boolean);
+            var dislikes = [gv(data, 'activityDislikes'), gv(data, 'socialDislikes'), gv(data, 'facialDislikes'), gv(data, 'otherDislikes')].filter(Boolean);
+            if (likes.length) prefBits.push('preferences include ' + likes.join(', '));
+            if (dislikes.length) prefBits.push('the client prefers to avoid ' + dislikes.join(', '));
+            if (prefBits.length) paras.push(escHtml(sentence(prefBits)));
+
+            // Chronic pain
+            var painDescs = [];
+            for (var pI = 1; pI <= 4; pI++) {
+                var pd = gv(data, 'pain' + pI + '_desc');
+                if (pd) {
+                    var onset = gv(data, 'pain' + pI + '_onset');
+                    var remedy = gv(data, 'pain' + pI + '_remedy');
+                    var t = pd;
+                    if (onset) t += ' (onset: ' + onset + ')';
+                    if (remedy) t += ', managed with ' + remedy;
+                    painDescs.push(t);
+                }
+            }
+            if (painDescs.length) paras.push('The client reports the following chronic pain or physical issues: ' + escHtml(painDescs.join('; ')) + '.');
+
+            // Medical status & medications
+            var diagMap = { diagDementia: 'dementia', diagParkinsons: "Parkinson's disease", diagMS: 'multiple sclerosis', diagDiabetes: 'diabetes', diagCancer: 'cancer', diagStroke: 'a history of stroke', diagHeart: 'heart disease', diagArthritis: 'arthritis', diagMacular: 'macular degeneration', diagOther: 'other conditions noted in the medical record' };
+            var diagnoses = [];
+            Object.keys(diagMap).forEach(function(k) { if (data[k]) diagnoses.push(diagMap[k]); });
+            var medBits = [];
+            if (diagnoses.length) medBits.push('the client has a documented history of ' + joinNatural(diagnoses));
+            if (gv(data, 'medicalDetails')) medBits.push('additional medical details: ' + gv(data, 'medicalDetails'));
+            var medCount = 0;
+            for (var mI = 1; mI <= 5; mI++) { if (gv(data, 'med' + mI + '_name')) medCount++; }
+            if (medCount) medBits.push('the client is currently prescribed ' + medCount + (medCount === 1 ? ' medication' : ' medications') + (gyn(data, 'needsMedReminders') === 'Yes' ? ', and requires medication reminders' : ''));
+            var allergiesTxt = gv(data, 'allergiesList') || gv(data, 'allAllergies');
+            if (gyn(data, 'hasAllergies') === 'Yes' && allergiesTxt) medBits.push('known allergies include ' + allergiesTxt);
+            if (medBits.length) paras.push(escHtml(sentence(medBits)));
+
+            // Nutrition
+            var nutriBits = [];
+            if (gyn(data, 'hasRestrictions') === 'Yes' && gv(data, 'restrictionsList')) nutriBits.push('the client follows dietary restrictions: ' + gv(data, 'restrictionsList'));
+            if (gv(data, 'foodLikesList')) nutriBits.push('preferred foods include ' + gv(data, 'foodLikesList'));
+            if (gv(data, 'foodDislikesList')) nutriBits.push('foods to avoid include ' + gv(data, 'foodDislikesList'));
+            if (gyn(data, 'needsThickener') === 'Yes') nutriBits.push('liquids require thickening' + (gv(data, 'thickenerType') ? ' (' + gv(data, 'thickenerType') + ')' : ''));
+            if (gyn(data, 'alcoholPermitted') === 'No') nutriBits.push('alcohol is not permitted');
+            if (nutriBits.length) paras.push(escHtml(sentence(nutriBits)));
+            if (gv(data, 'foodComments')) paras.push(escHtml(gv(data, 'foodComments')));
+
+            // Transportation, services, schedule
+            var transBits = [];
+            if (gyn(data, 'needsCaregiverTransport') === 'Yes') transBits.push('the client requires caregiver-provided transportation');
+            if (gyn(data, 'clientDrives') === 'Yes') transBits.push('the client still drives independently');
+            if (transBits.length) paras.push(escHtml(sentence(transBits)));
+
+            var services = [];
+            if (data.serviceHourly) services.push('hourly care');
+            if (data.serviceLiveIn24) services.push('24-hour live-in care');
+            if (data.serviceLiveOut24) services.push('24-hour live-out care');
+            if (data.serviceOvernight) services.push('overnight care');
+            if (data.serviceRespite) services.push('respite care');
+            if (data.serviceOnCall) services.push('on-call care');
+            var days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            var schedDays = days.filter(function(d) { return data['schedule' + d]; });
+            var servicePara = '';
+            if (services.length) servicePara += 'The care plan calls for ' + joinNatural(services);
+            if (schedDays.length) servicePara += (servicePara ? ', scheduled on ' : 'Visits are scheduled on ') + joinNatural(schedDays);
+            if (servicePara) paras.push(servicePara + '.');
+
+            // Closing / review
+            var reviewFreq = gv(data, 'reviewFrequency');
+            var nextReview = gv(data, 'nextReviewDate');
+            var closeBits = [];
+            var reviewClause = '';
+            if (reviewFreq) reviewClause = 'this care plan is scheduled for ' + reviewFreq.toLowerCase() + ' review';
+            if (nextReview) reviewClause += (reviewClause ? ', with the next review date set for ' : 'the next review date is set for ') + fmtDate(nextReview);
+            if (reviewClause) closeBits.push(reviewClause);
+            if (gv(data, 'carePlanNotes')) closeBits.push('additional notes: ' + gv(data, 'carePlanNotes'));
+            if (closeBits.length) paras.push(escHtml(sentence(closeBits)));
+
+            return paras;
+        }
+
+        // ── Assembles the full Word-compatible HTML document ────────────────
+        function buildReportDocument(data, clientName, evalDate) {
+            var days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+            var body = '';
+            body += '<h1 class="title">Alice Care | Home Care Evaluation Report</h1>';
+            body += '<div class="subtitle">Comprehensive client assessment</div>';
+            body += '<table class="metaTable"><tr>' +
+                '<td><b>Client:</b> ' + escHtml(clientName) + '</td>' +
+                '<td><b>Evaluation Date:</b> ' + escHtml(fmtDate(evalDate) || evalDate) + '</td>' +
+                '<td><b>Record ID:</b> ' + escHtml(gv(data, 'recordId')) + '</td>' +
+                '</tr></table>';
+
+            var narrParas = buildNarrative(data, clientName);
+            if (narrParas.length) {
+                body += '<div class="narrBox"><div class="subHead" style="margin-top:0;">Care Summary Narrative</div>' +
+                    narrParas.map(function(p) { return '<p class="narr">' + p + '</p>'; }).join('') +
+                    '</div>';
+            }
+
+            // 1. Client Personal Information
+            body += sectionOpen('Client Personal Information');
+            body += factGrid([
+                ['First Name', gv(data, 'firstName')], ['Last Name', gv(data, 'lastName')],
+                ['Gender', gv(data, 'gender')], ['Date of Birth', fmtDate(gv(data, 'dob'))],
+                ['Age', gv(data, 'age')], ['Marital Status', gv(data, 'maritalStatus')],
+                ['Phone', gv(data, 'phone')], ['First Language', gv(data, 'firstLanguage')],
+                ['2nd Language', gv(data, 'secondLanguage')], ['Height', gv(data, 'height')],
+                ['Weight', gv(data, 'weight')]
+            ]);
+            var addr = [gv(data, 'unitNumber') ? 'Unit ' + gv(data, 'unitNumber') + ', ' : '', gv(data, 'streetAddress'), gv(data, 'city') ? ', ' + gv(data, 'city') : '', gv(data, 'state') ? ', ' + gv(data, 'state') : '', gv(data, 'zipCode') ? ' ' + gv(data, 'zipCode') : ''].join('').trim().replace(/^,\s*/, '');
+            body += factGrid([['Address', addr]]);
+            body += sectionClose();
+
+            // 2. Authorized Contacts
+            body += sectionOpen('Authorized Contacts', true);
+            var pName = [gv(data, 'primaryFirstName'), gv(data, 'primaryLastName')].filter(Boolean).join(' ');
+            if (pName) {
+                body += subHead('Primary Contact');
+                body += factGrid([
+                    ['Name', pName], ['Relation', gv(data, 'primaryRelation')],
+                    ['Address', gv(data, 'primaryAddress')],
+                    ['Cell', gv(data, 'primaryCellPhone')], ['Home', gv(data, 'primaryHomePhone')],
+                    ['Work', gv(data, 'primaryWorkPhone')], ['Email', gv(data, 'primaryEmail')]
+                ]);
+            }
+            var sName = [gv(data, 'secondaryFirstName'), gv(data, 'secondaryLastName')].filter(Boolean).join(' ');
+            if (sName) {
+                body += subHead('Secondary Contact');
+                body += factGrid([
+                    ['Name', sName], ['Relation', gv(data, 'secondaryRelation')],
+                    ['Location', gv(data, 'secondaryLocation')],
+                    ['Phone', gv(data, 'secondaryPhone')], ['Email', gv(data, 'secondaryEmail')]
+                ]);
+            }
+            body += sectionClose();
+
+            // 3. Communication Details
+            body += sectionOpen('Communication Details');
+            var commMethods = [];
+            if (data.commPhone) commMethods.push('Phone');
+            if (data.commEmail) commMethods.push('Email');
+            if (data.commVideoChat) commMethods.push('Video Chat');
+            body += factGrid([
+                ['Communication Methods', commMethods.join(', ')],
+                ['Has Landline', gyn(data, 'hasLandline')], ['Landline #', gv(data, 'landlineNumber')],
+                ['Has Cell', gyn(data, 'hasCellphone')], ['Cell #', gv(data, 'cellNumber')],
+                ['Owns Computer', gyn(data, 'ownsComputer')], ['Can Operate It', gyn(data, 'canOperateComputer')],
+                ['Can Access Email', gyn(data, 'canAccessEmail')], ['Client Email', gv(data, 'clientEmail')],
+                ['Has WiFi', gyn(data, 'hasWifi')], ['WiFi Network', gv(data, 'wifiNetwork')]
+            ]);
+            body += sectionClose();
+
+            // 4. Living Situation
+            body += sectionOpen('Living Situation', true);
+            body += factGrid([
+                ['Living Arrangement', gv(data, 'livingArrangement')],
+                ['Level of Care Assistance', gv(data, 'careLevel')]
+            ]);
+            body += sectionClose();
+
+            // 5. Care Requirements — the section the old PDF silently dropped
+            body += sectionOpen('Care Requirements');
+            body += assistTable('Personal Care', PERSONAL_CARE_ITEMS, data);
+            body += assistTable('Meals', MEALS_ITEMS, data);
+            body += assistTable('Home Environment', HOME_CLEAN_ITEMS, data);
+            body += assistTable('Housekeeping Tasks', HOUSEKEEPING_ITEMS, data);
+            body += assistTable('Activity/Movement', ACTIVITY_MOVEMENT_ITEMS, data);
+            body += assistTable('Social Engagement', SOCIAL_ITEMS, data);
+            body += sectionClose();
+
+            // 6. Hearing & Vision
+            body += sectionOpen('Hearing & Vision', true);
+            var cataracts = [];
+            if (data.cataractLeft) cataracts.push('Left');
+            if (data.cataractRight) cataracts.push('Right');
+            if (data.cataractBoth) cataracts.push('Both');
+            var lens = [];
+            if (data.lensLeft) lens.push('Left');
+            if (data.lensRight) lens.push('Right');
+            if (data.lensBoth) lens.push('Both');
+            var visionAssist = [];
+            if (data.visionAssistLeft) visionAssist.push('Left');
+            if (data.visionAssistRight) visionAssist.push('Right');
+            if (data.visionAssistBoth) visionAssist.push('Both');
+            var hAids = [];
+            if (data.hearingAidLeft) hAids.push('Left');
+            if (data.hearingAidRight) hAids.push('Right');
+            if (data.hearingAidBoth) hAids.push('Both');
+            var hAssist = [];
+            if (data.hearingAssistLeft) hAssist.push('Left');
+            if (data.hearingAssistRight) hAssist.push('Right');
+            if (data.hearingAssistBoth) hAssist.push('Both');
+            body += factGrid([
+                ['Cataracts', cataracts.join(', ')], ['Lens Implant', lens.join(', ')],
+                ['Vision Assistance', visionAssist.join(', ')],
+                ['Hearing Aids', hAids.join(', ')], ['Hearing Assistance', hAssist.join(', ')]
+            ]);
+            body += sectionClose();
+
+            // 7. Reminders & Mobility
+            body += sectionOpen('Reminders & Mobility');
+            var mobAids = [];
+            if (data.mobilityNoAssist) mobAids.push('No Assistance');
+            if (data.mobilityCane) mobAids.push('Cane');
+            if (data.mobilityWalker) mobAids.push('Walker');
+            if (data.mobilityWheelchair) mobAids.push('Wheelchair');
+            if (data.mobilityLift) mobAids.push('Lift');
+            body += factGrid([
+                ['Medication Reminders', gyn(data, 'medicationReminders')],
+                ['Appointment Reminders', gyn(data, 'appointmentReminders')],
+                ['Mobility Aid', mobAids.join(', ')]
+            ]);
+            body += sectionClose();
+
+            // 8. Home Environment
+            body += sectionOpen('Home Environment', true);
+            body += factGrid([
+                ['Street Level Access', gyn(data, 'streetLevelAccessible')], ['Access Details', gv(data, 'streetAccessDetails')],
+                ['Stairs', gyn(data, 'stairsPresent')], ['Railings', gyn(data, 'stairsRailings')],
+                ['Floor Levels', gv(data, 'floorLevels')],
+                ['Easy Bathroom Access', gyn(data, 'easyBathroomAccess')],
+                ['Bath/Shower Accessible', gyn(data, 'bathAccess')], ['Bath Details', gv(data, 'bathAccessDetails')],
+                ['Pets', gyn(data, 'hasPets')], ['Street Access', gyn(data, 'streetAccess')],
+                ['Washroom Access', gyn(data, 'washroomAccess')], ['Washroom Details', gv(data, 'washroomAccessDetails')],
+                ['Spare Key', gyn(data, 'hasSpareKey')], ['Key Location', gv(data, 'spareKeyLocation')],
+                ['Environmental Concerns', gyn(data, 'envConcerns')], ['Concerns List', gv(data, 'envConcernsList')],
+                ['Comments', gv(data, 'homeEnvComments')]
+            ]);
+            body += sectionClose();
+
+            // 9. Fall Risk Assessment
+            body += sectionOpen('Fall Risk Assessment');
+            body += subHead('Recent Falls');
+            body += factGrid([
+                ['Had Recent Falls', gyn(data, 'hadFalls')], ['Where', gv(data, 'recentFallInfo')],
+                ['Aware of Cause', gyn(data, 'awareFallCause')], ['Aware of Limitations', gyn(data, 'awareLimitations')],
+                ['Aware of Hazards', gyn(data, 'awareObjects')], ['Observation Level', gv(data, 'observationLevel')]
+            ]);
+            body += subHead('Medications Impact');
+            body += factGrid([
+                ['Recent Med Changes', gyn(data, 'recentMedChanges')], ['Meds Cause Dizziness', gyn(data, 'medsDizziness')]
+            ]);
+            body += subHead('Vision Assessment');
+            body += factGrid([
+                ['Glasses Reviewed', gyn(data, 'glassesReview')], ['Depth Perception Issues', gyn(data, 'depthPerception')],
+                ['Peripheral Vision Issues', gyn(data, 'peripheralVision')], ['Rooms Well Lit', gyn(data, 'roomsWellLit')],
+                ['Entrance Clear', gyn(data, 'entranceClear')]
+            ]);
+            body += subHead('Hearing Assessment');
+            body += factGrid([
+                ['Has Hearing Aids', gyn(data, 'hasHearingAids')], ['Hears Conversations', gyn(data, 'hearConversations')],
+                ['Resistant to Aids', gyn(data, 'resistantHearingAids')], ['Seen Audiologist', gyn(data, 'seenAudiologist')]
+            ]);
+            body += subHead('Mobility Assessment');
+            body += factGrid([
+                ['Uses Mobility Aid', gyn(data, 'walkingAssist')], ['Aid Working', gyn(data, 'mobilityAidWorking')],
+                ['Aid Appropriate', gyn(data, 'mobilityAidAppropriate')], ['Can Operate Aid', gyn(data, 'canOperateMobilityAid')],
+                ['Dress Independently', gyn(data, 'canDressUndress')], ['Needs Walking Help', gyn(data, 'needsWalkAssist')],
+                ['Can Stand 10 Sec', gyn(data, 'canStand10Sec')]
+            ]);
+            body += subHead('Physical Environment');
+            body += factGrid([
+                ['Has Rugs (Hazard)', gyn(data, 'hasRugs')], ['Has Stairs', gyn(data, 'hasStairs')],
+                ['Safe Toilet Access', gyn(data, 'safeToiletAccess')], ['Safe Bed Access', gyn(data, 'safeBedAccess')],
+                ['Has Comfort Place', gyn(data, 'hasComfortPlace')], ['Comfort Place Location', gv(data, 'comfortPlaceDetails')]
+            ]);
+            body += subHead('Behaviours');
+            body += factGrid([
+                ['Client Paces', gyn(data, 'paces')], ['Easily Agitated', gyn(data, 'easilyAgitated')],
+                ['Asks for Help', gyn(data, 'willingAskHelp')]
+            ]);
+            body += subHead('Bladder/Bowel');
+            body += factGrid([
+                ['Frequent Bathroom', gyn(data, 'frequentBathroom')], ['Incontinence', gyn(data, 'incontinence')],
+                ['Needs Exercise Cues', gyn(data, 'needsExerciseEncouragement')]
+            ]);
+            body += subHead('Footwear');
+            body += factGrid([
+                ['Proper Shoes', gyn(data, 'properShoes')], ['No Shoes at Night', gyn(data, 'nightNoShoes')],
+                ['Easy On/Off Shoes', gyn(data, 'easyShoes')]
+            ]);
+            body += subHead('Risk Level');
+            body += factGrid([
+                ['Fall Risk Level', gv(data, 'fallRiskLevel')],
+                ['General Fall Interventions', gv(data, 'fallInterventions')],
+                ['Low Risk Interventions', gv(data, 'lowInterventions')],
+                ['Moderate Risk Interventions', gv(data, 'moderateInterventions')],
+                ['High Risk Interventions', gv(data, 'highInterventions')]
+            ]);
+            body += sectionClose();
+
+            // 10. Verbal Communication
+            body += sectionOpen('Verbal Communication', true);
+            body += factGrid([['Communication Ability', gv(data, 'communicationAbility')]]);
+            body += dataTable(['Category', 'Likes', 'Dislikes'], [
+                ['Activity (Hobbies, Sports)', gv(data, 'activityLikes'), gv(data, 'activityDislikes')],
+                ['Social (Music, Movies, TV)', gv(data, 'socialLikes'), gv(data, 'socialDislikes')],
+                ['Facial (Makeup, Shaving)', gv(data, 'facialLikes'), gv(data, 'facialDislikes')],
+                ['Other', gv(data, 'otherLikes'), gv(data, 'otherDislikes')]
+            ]);
+            body += sectionClose();
+
+            // 11. Chronic Physical Issues
+            body += sectionOpen('Chronic Physical Issues');
+            var painRows = [];
+            for (var p = 1; p <= 4; p++) {
+                var pr = [gv(data, 'pain' + p + '_desc'), gv(data, 'pain' + p + '_onset'), gv(data, 'pain' + p + '_expressed'), gv(data, 'pain' + p + '_remedy')];
+                if (pr.some(Boolean)) painRows.push(pr);
+            }
+            body += dataTable(['Pain Description', 'Onset', 'How Expressed', 'Remedy'], painRows);
+            body += sectionClose();
+
+            // 12. Food & Drink Preferences
+            body += sectionOpen('Food & Drink Preferences', true);
+            body += factGrid([
+                ['Has Allergies', gyn(data, 'hasAllergies')], ['Allergies List', gv(data, 'allergiesList')],
+                ['Dietary Restrictions', gyn(data, 'hasRestrictions')], ['Restrictions List', gv(data, 'restrictionsList')],
+                ['Foods Liked?', gyn(data, 'hasFoodLikes')], ['Foods Liked List', gv(data, 'foodLikesList')],
+                ['Foods Disliked?', gyn(data, 'hasFoodDislikes')], ['Foods Disliked List', gv(data, 'foodDislikesList')],
+                ['Dietitian Recs?', gyn(data, 'hasDietitianRecs')], ['Dietitian Recs List', gv(data, 'dietitianRecsList')],
+                ['Needs Thickener', gyn(data, 'needsThickener')], ['Thickener Type', gv(data, 'thickenerType')],
+                ['Alcohol Permitted', gyn(data, 'alcoholPermitted')], ['Alcohol Restrictions', gv(data, 'alcoholRestrictions')],
+                ['Food Comments', gv(data, 'foodComments')]
+            ]);
+            body += sectionClose();
+
+            // 13. Emergency Information
+            body += sectionOpen('Emergency Information');
+            body += factGrid([
+                ['Medical Card #', gv(data, 'medicalCard')], ['Medical Insurance', gv(data, 'medicalInsurance')],
+                ['Emergency Contact Name', gv(data, 'medContactFirstName')], ['Emergency Contact Phone', gv(data, 'medContactFirstPhone')],
+                ['2nd Contact Name', gv(data, 'medContactLastName')], ['2nd Contact Phone', gv(data, 'medContactLastPhone')],
+                ['GP/Physician', gv(data, 'gpName')], ['GP Address', gv(data, 'gpAddress')],
+                ['Neighbor Name', gv(data, 'neighborName')], ['Neighbor Phone', gv(data, 'neighborPhone')],
+                ['All Allergies', gv(data, 'allAllergies')],
+                ['Client Smokes', gyn(data, 'clientSmokes')], ['Smoking Frequency', gv(data, 'smokingFrequency')],
+                ['Has Directives', gyn(data, 'hasDirectives')]
+            ]);
+            body += sectionClose();
+
+            // 14. Medical Status/Diagnosis
+            body += sectionOpen('Medical Status/Diagnosis', true);
+            var diagMap = { diagDementia: 'Dementia', diagParkinsons: "Parkinson's", diagMS: 'MS', diagDiabetes: 'Diabetes', diagCancer: 'Cancer', diagStroke: 'Stroke', diagHeart: 'Heart Disease', diagArthritis: 'Arthritis', diagMacular: 'Macular Degen.', diagOther: 'Other' };
+            var diagnoses = [];
+            Object.keys(diagMap).forEach(function(k) { if (data[k]) diagnoses.push(diagMap[k]); });
+            body += factGrid([
+                ['Diagnoses', diagnoses.join(', ')],
+                ['Medical Details', gv(data, 'medicalDetails')]
+            ]);
+            body += sectionClose();
+
+            // 15. Medications
+            body += sectionOpen('Medications');
+            body += factGrid([['Needs Med Reminders', gyn(data, 'needsMedReminders')]]);
+            var medRows = [];
+            for (var m = 1; m <= 5; m++) {
+                var mr = [gv(data, 'med' + m + '_name'), gv(data, 'med' + m + '_purpose'), gv(data, 'med' + m + '_dose'), gv(data, 'med' + m + '_route'), gv(data, 'med' + m + '_admin'), gv(data, 'med' + m + '_freq')];
+                if (mr.some(Boolean)) medRows.push(mr);
+            }
+            body += dataTable(['Name', 'Purpose', 'Dose', 'Route', 'Admin By', 'Frequency'], medRows);
+            body += sectionClose();
+
+            // 16. Vitamins/Supplements
+            body += sectionOpen('Vitamins/Supplements', true);
+            var vitRows = [];
+            for (var v = 1; v <= 3; v++) {
+                var vr = [gv(data, 'vit' + v + '_name'), gv(data, 'vit' + v + '_purpose'), gv(data, 'vit' + v + '_perday'), gv(data, 'vit' + v + '_freq')];
+                if (vr.some(Boolean)) vitRows.push(vr);
+            }
+            body += dataTable(['Name', 'Purpose', 'Per Day', 'Frequency'], vitRows);
+            body += sectionClose();
+
+            // 17. Weekly Activities
+            body += sectionOpen('Weekly Activities');
+            var actRows = [];
+            for (var a = 1; a <= 3; a++) {
+                var ar = [gv(data, 'act' + a + '_type'), gv(data, 'act' + a + '_days'), gv(data, 'act' + a + '_times'), gv(data, 'act' + a + '_location')];
+                if (ar.some(Boolean)) actRows.push(ar);
+            }
+            body += dataTable(['Activity', 'Day(s)', 'Time(s)', 'Location'], actRows);
+            body += sectionClose();
+
+            // 18. Transportation
+            body += sectionOpen('Transportation', true);
+            body += subHead('Caregiver Transportation');
+            body += factGrid([
+                ['Needs Transport', gyn(data, 'needsCaregiverTransport')], ['Caregiver Can Drive', gyn(data, 'caregiverCanDrive')],
+                ['Transport Details', gv(data, 'caregiverDriveDetails')], ['Use Company Car', gyn(data, 'useCompanyCar')],
+                ["Use Client's Car", gyn(data, 'useOwnCar')], ['Caregiver Parking', gv(data, 'caregiverParking')]
+            ]);
+            body += subHead('Client Vehicle');
+            var vehicle = [gv(data, 'vehicleModel'), gv(data, 'vehicleYear') ? '(' + gv(data, 'vehicleYear') + ')' : ''].filter(Boolean).join(' ');
+            body += factGrid([
+                ['Client Drives', gyn(data, 'clientDrives')], ['Vehicle', vehicle],
+                ['License Plate', gv(data, 'vehiclePlate')], ['Insurance Co', gv(data, 'insuranceCompany')],
+                ['Policy #', gv(data, 'insurancePolicy')], ['Insurance Contact', gv(data, 'insuranceContact')],
+                ['Insurance Expiry', fmtDate(gv(data, 'insuranceExpiry'))], ['Driving Restrictions', gyn(data, 'hasDrivingRestrictions')],
+                ['Restriction Details', gv(data, 'drivingRestrictions')], ['Roadside Assistance', gyn(data, 'hasRoadsideAssistance')],
+                ['Roadside Company', gv(data, 'roadsideCompany')], ['Parking Location', gv(data, 'parkingLocation')],
+                ['Wheelchair Permit', gyn(data, 'hasWheelchairPermit')], ['Permit Location', gv(data, 'wheelchairPermitLocation')],
+                ['Permit Details', gv(data, 'parkingPermitDetails')], ['Transport Notes', gv(data, 'transportNotes')]
+            ]);
+            body += sectionClose();
+
+            // 19. Required Services
+            body += sectionOpen('Required Services');
+            var services = [];
+            if (data.serviceHourly) services.push('Hourly');
+            if (data.serviceLiveIn24) services.push('Live In 24h');
+            if (data.serviceLiveOut24) services.push('Live Out 24h');
+            if (data.serviceOvernight) services.push('Overnight');
+            if (data.serviceRespite) services.push('Respite');
+            if (data.serviceOnCall) services.push('On Call');
+            body += factGrid([['Selected Services', services.join(', ')]]);
+            body += sectionClose();
+
+            // 20. Visit Schedule
+            body += sectionOpen('Visit Schedule', true);
+            var schedRows = [];
+            days.forEach(function(d) {
+                if (data['schedule' + d]) {
+                    schedRows.push([d, gv(data, 'schedule' + d + 'Time1'), gv(data, 'schedule' + d + 'Time2')]);
+                }
+            });
+            body += dataTable(['Day', 'Start Time', 'End Time'], schedRows);
+            body += sectionClose();
+
+            // 21. Care Plan Review
+            body += sectionOpen('Care Plan Review');
+            body += factGrid([
+                ['Review Frequency', gv(data, 'reviewFrequency')], ['Next Review Date', fmtDate(gv(data, 'nextReviewDate'))],
+                ['Care Plan Notes', gv(data, 'carePlanNotes')]
+            ]);
+            body += sectionClose();
+
+            // Signature block
+            body += '<table class="sigTable"><tr>' +
+                '<td style="width:48%;"><div class="sigLine"></div><div class="sigLabel">Client / Authorized Representative &nbsp;&nbsp; Date: _______________</div></td>' +
+                '<td style="width:4%;"></td>' +
+                '<td style="width:48%;"><div class="sigLine"></div><div class="sigLabel">Assessor / Coordinator &nbsp;&nbsp; Date: _______________</div></td>' +
+                '</tr></table>';
+
+            var styles = '' +
+                '@page Section1 { size:8.5in 11.0in; margin:0.6in 0.6in 0.6in 0.6in; }' +
+                'div.Section1 { page:Section1; }' +
+                'body { font-family:Calibri,Arial,sans-serif; font-size:10.5pt; color:#222222; }' +
+                'h1.title { color:#1A365C; font-size:18pt; margin:0 0 2pt; }' +
+                '.subtitle { color:#555555; font-size:10pt; margin-bottom:12pt; }' +
+                '.metaTable { width:100%; margin-bottom:14pt; }' +
+                '.metaTable td { font-size:10pt; padding:2pt 14pt 2pt 0; }' +
+                '.narrBox { background:#FFF8F0; border-left:4px solid #F57600; padding:10pt 14pt; margin-bottom:16pt; }' +
+                'p.narr { margin:0 0 8pt; line-height:1.5; text-align:justify; }' +
+                '.section { margin-bottom:14pt; }' +
+                '.sHead { background:#1A365C; color:#ffffff; padding:6pt 10pt; font-size:11pt; font-weight:bold; }' +
+                '.sHead.orange { background:#F57600; }' +
+                '.sBody { border:1px solid #D3D7DF; border-top:none; padding:8pt 10pt; }' +
+                '.subHead { color:#1A365C; font-weight:bold; font-size:10pt; margin:8pt 0 4pt; }' +
+                'table.factTable { width:100%; border-collapse:collapse; margin-bottom:6pt; }' +
+                'table.factTable td.fLabel { color:#1A365C; font-weight:bold; width:32%; padding:3pt 6pt; border-bottom:1px solid #eeeeee; vertical-align:top; }' +
+                'table.factTable td.fValue { padding:3pt 6pt; border-bottom:1px solid #eeeeee; vertical-align:top; }' +
+                'table.careTable { width:100%; border-collapse:collapse; margin-bottom:8pt; }' +
+                'table.careTable th { background:#1A365C; color:#ffffff; padding:4pt; font-size:8.5pt; text-align:center; }' +
+                'table.careTable th:first-child { text-align:left; }' +
+                'table.careTable td { padding:4pt; border-bottom:1px solid #eeeeee; font-size:9pt; }' +
+                'table.careTable td.tLabel { color:#1A365C; }' +
+                'table.careTable td.tCell { text-align:center; }' +
+                'table.dataTable { width:100%; border-collapse:collapse; margin-bottom:8pt; }' +
+                'table.dataTable th { background:#1A365C; color:#ffffff; padding:4pt; font-size:8.5pt; text-align:left; }' +
+                'table.dataTable td { padding:4pt; border-bottom:1px solid #eeeeee; font-size:9pt; }' +
+                '.sigTable { width:100%; margin-top:20pt; }' +
+                '.sigLine { border-bottom:1px solid #555555; height:24pt; }' +
+                '.sigLabel { font-size:8.5pt; color:#555555; padding-top:2pt; }';
+
+            return '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">' +
+                '<head><meta charset="utf-8"><title>Home Care Evaluation - ' + escHtml(clientName) + '</title>' +
+                '<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom><w:DoNotOptimizeForBrowser/></w:WordDocument></xml><![endif]-->' +
+                '<style>' + styles + '</style></head>' +
+                '<body><div class="Section1">' + body + '</div></body></html>';
+        }
+
+        // ── Entry point wired to the "Generate Report" button ──────────────
+        function generateReport() {
             try {
-                var jsPDFLib = window.jspdf ? window.jspdf.jsPDF : window.jsPDF;
-                if (!jsPDFLib) { throw new Error('jsPDF not loaded'); }
-                var doc = new jsPDFLib({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+                var data = getFormData();
+                var clientName = ((data.firstName || '') + ' ' + (data.lastName || '')).trim() || 'Unknown Client';
+                var today = new Date();
+                var dateStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+                var evalDate = data.evaluationDate || dateStr;
+                var filename = 'HomeCare_Eval_' + clientName.replace(/\s+/g, '_') + '_' + dateStr + '.doc';
 
-                // ── Design tokens ──
-                var NAVY    = [26, 54, 92];
-                var ORANGE  = [245, 118, 0];
-                var WHITE   = [255, 255, 255];
-                var LGRAY   = [245, 247, 250];
-                var MGRAY   = [211, 215, 223];
-                var DKTEXT  = [61, 61, 61];
-                var SUBTEXT = [100, 110, 130];
-
-                var PAGE_W  = 210;
-                var PAGE_H  = 297;
-                var ML      = 14;   // left margin
-                var MR      = 14;   // right margin
-                var BODY_W  = PAGE_W - ML - MR;
-                var y       = 0;    // current Y cursor
-
-                // ── Helpers ────────────────────────────────────────────────
-                function val(k) {
-                    var v = data[k];
-                    if (v === undefined || v === null || v === '') return '';
-                    if (v === true)  return 'Yes';
-                    if (v === false) return '';
-                    return String(v);
-                }
-                function yesNo(k) { return val(k) || ''; }
-                function checkNew(needed) {
-                    if (y + needed > PAGE_H - 18) { doc.addPage(); y = 18; }
-                }
-                function drawPageHeader() {
-                    // Orange top stripe
-                    doc.setFillColor(245, 118, 0);
-                    doc.rect(0, 0, PAGE_W, 9, 'F');
-                    // Navy footer stripe
-                    doc.setFillColor(26, 54, 92);
-                    doc.rect(0, PAGE_H - 8, PAGE_W, 8, 'F');
-                    // Footer text
-                    doc.setFont('helvetica', 'normal');
-                    doc.setFontSize(7);
-                    doc.setTextColor(200, 210, 220);
-                    doc.text('alice.care | Home Care Evaluation', ML, PAGE_H - 3);
-                    doc.text('Page ' + doc.internal.getCurrentPageInfo().pageNumber, PAGE_W - MR, PAGE_H - 3, { align: 'right' });
-                }
-
-                // ── Cover / Title Page ─────────────────────────────────────
-                // Navy background block
-                doc.setFillColor(...NAVY);
-                doc.rect(0, 0, PAGE_W, 72, 'F');
-                // Orange accent bar
-                doc.setFillColor(...ORANGE);
-                doc.rect(0, 72, PAGE_W, 3, 'F');
-                // Logo: "alice." orange "care" white
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(32);
-                doc.setTextColor(...ORANGE);
-                doc.text('alice.', ML, 30);
-                var aliceW = doc.getTextWidth('alice.');
-                doc.setTextColor(...WHITE);
-                doc.text('care', ML + aliceW, 30);
-                // Subtitle
-                doc.setFont('helvetica', 'normal');
-                doc.setFontSize(11);
-                doc.setTextColor(180, 200, 220);
-                doc.text('Home Care Evaluation Summary', ML, 40);
-                // Client name large
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(20);
-                doc.setTextColor(...WHITE);
-                doc.text(clientName, ML, 56);
-                // Eval date right-aligned
-                var evalDate = val('evaluationDate') || dateStr;
-                doc.setFont('helvetica', 'normal');
-                doc.setFontSize(9);
-                doc.setTextColor(180, 200, 220);
-                doc.text('Evaluation Date: ' + evalDate, PAGE_W - MR, 56, { align: 'right' });
-                // Record ID
-                if (val('recordId')) {
-                    doc.setFontSize(7.5);
-                    doc.setTextColor(140, 160, 185);
-                    doc.text('Record ID: ' + val('recordId'), ML, 66);
-                }
-                // Background body
-                doc.setFillColor(248, 249, 252);
-                doc.rect(0, 75, PAGE_W, PAGE_H - 75, 'F');
-                // Quick summary box
-                y = 84;
-                doc.setFillColor(...WHITE);
-                doc.roundedRect(ML, y, BODY_W, 52, 3, 3, 'F');
-                doc.setDrawColor(...MGRAY);
-                doc.setLineWidth(0.3);
-                doc.roundedRect(ML, y, BODY_W, 52, 3, 3, 'S');
-                // Quick-glance fields
-                var qFields = [
-                    ['Date of Birth', val('dob')],
-                    ['Age', val('age')],
-                    ['Gender', val('gender')],
-                    ['Marital Status', val('maritalStatus')],
-                    ['Phone', val('phone')],
-                    ['Living Arrangement', val('livingArrangement')],
-                    ['Care Level', val('careLevel')],
-                    ['Fall Risk', val('fallRiskLevel')]
-                ];
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(8);
-                doc.setTextColor(...NAVY);
-                doc.text('CLIENT AT A GLANCE', ML + 5, y + 8);
-                doc.setDrawColor(...MGRAY);
-                doc.line(ML + 5, y + 10, ML + BODY_W - 5, y + 10);
-                var qx = ML + 5;
-                var qy = y + 17;
-                var qColW = (BODY_W - 10) / 2;
-                qFields.forEach(function(f, i) {
-                    var col = i % 2;
-                    var row = Math.floor(i / 2);
-                    var fx = qx + col * qColW;
-                    var fy = qy + row * 8.5;
-                    doc.setFont('helvetica', 'normal');
-                    doc.setFontSize(7.5);
-                    doc.setTextColor(...SUBTEXT);
-                    doc.text(f[0] + ':', fx, fy);
-                    doc.setFont('helvetica', 'bold');
-                    doc.setTextColor(...DKTEXT);
-                    doc.text(f[1] || 'Not specified', fx + 36, fy);
-                });
-                // Orange footer on cover
-                doc.setFillColor(...ORANGE);
-                doc.rect(0, PAGE_H - 8, PAGE_W, 8, 'F');
-                doc.setFont('helvetica', 'normal');
-                doc.setFontSize(7);
-                doc.setTextColor(...WHITE);
-                doc.text('alice.care | Home Care Evaluation', ML, PAGE_H - 3);
-                doc.text('Page 1', PAGE_W - MR, PAGE_H - 3, { align: 'right' });
-
-                // ── Helper: draw section header ────────────────────────────
-                function sectionHead(title, isOrange) {
-                    checkNew(14);
-                    var bg = isOrange ? ORANGE : NAVY;
-                    doc.setFillColor(...bg);
-                    doc.rect(ML, y, BODY_W, 8, 'F');
-                    doc.setFont('helvetica', 'bold');
-                    doc.setFontSize(8.5);
-                    doc.setTextColor(...WHITE);
-                    doc.text(title.toUpperCase(), ML + 4, y + 5.5);
-                    y += 10;
-                }
-
-                // ── Helper: draw subsection title ──────────────────────────
-                function subHead(title) {
-                    checkNew(10);
-                    doc.setFont('helvetica', 'bold');
-                    doc.setFontSize(8);
-                    doc.setTextColor(...NAVY);
-                    // Orange left accent bar
-                    doc.setFillColor(...ORANGE);
-                    doc.rect(ML, y, 2, 5, 'F');
-                    doc.text(title, ML + 4, y + 4);
-                    y += 7;
-                }
-
-                // ── Helper: two-column label/value row ─────────────────────
-                function fieldRow(label, value, labelW) {
-                    if (!value && value !== 0) return;
-                    checkNew(8);
-                    var lw = labelW || 50;
-                    doc.setFont('helvetica', 'normal');
-                    doc.setFontSize(8);
-                    doc.setTextColor(...SUBTEXT);
-                    doc.text(label + ':', ML, y);
-                    doc.setFont('helvetica', 'bold');
-                    doc.setTextColor(...DKTEXT);
-                    // Wrap long values
-                    var wrapped = doc.splitTextToSize(String(value), BODY_W - lw - 4);
-                    doc.text(wrapped, ML + lw, y);
-                    y += (wrapped.length * 4.5) + 1.5;
-                }
-
-                // ── Helper: two-per-row grid ───────────────────────────────
-                function fieldGrid(pairs, labelW) {
-                    var lw = labelW || 38;
-                    var colW = BODY_W / 2;
-                    for (var i = 0; i < pairs.length; i += 2) {
-                        checkNew(7);
-                        var a = pairs[i];
-                        var b = pairs[i + 1];
-                        if (a && a[1]) {
-                            doc.setFont('helvetica', 'normal');
-                            doc.setFontSize(7.5);
-                            doc.setTextColor(...SUBTEXT);
-                            doc.text(a[0] + ':', ML, y);
-                            doc.setFont('helvetica', 'bold');
-                            doc.setTextColor(...DKTEXT);
-                            doc.text(String(a[1]), ML + lw, y);
-                        }
-                        if (b && b[1]) {
-                            var bx = ML + colW;
-                            doc.setFont('helvetica', 'normal');
-                            doc.setFontSize(7.5);
-                            doc.setTextColor(...SUBTEXT);
-                            doc.text(b[0] + ':', bx, y);
-                            doc.setFont('helvetica', 'bold');
-                            doc.setTextColor(...DKTEXT);
-                            doc.text(String(b[1]), bx + lw, y);
-                        }
-                        y += 5.5;
-                    }
-                    y += 1;
-                }
-
-                // ── Helper: autoTable wrapper ──────────────────────────────
-                function drawTable(head, body, opts) {
-                    if (!body || body.length === 0) return;
-                    var hasData = body.some(function(r) { return r.some(function(c) { return c && c !== ''; }); });
-                    if (!hasData) return;
-                    doc.autoTable(Object.assign({
-                        head: [head],
-                        body: body,
-                        startY: y,
-                        margin: { left: ML, right: MR },
-                        tableWidth: BODY_W,
-                        styles: { fontSize: 7.5, cellPadding: 2.5, textColor: DKTEXT, lineColor: MGRAY, lineWidth: 0.2, font: 'helvetica' },
-                        headStyles: { fillColor: NAVY, textColor: WHITE, fontStyle: 'bold', fontSize: 8 },
-                        alternateRowStyles: { fillColor: LGRAY },
-                        didDrawPage: function(d) { drawPageHeader(); y = d.cursor.y; }
-                    }, opts || {}));
-                    y = doc.lastAutoTable.finalY + 4;
-                }
-
-                // ── Helper: care-requirements table ───────────────────────
-                function careReqTable(title, rows) {
-                    var hasData = rows.some(function(r) { return r[1] || r[2] || r[3] || r[4]; });
-                    if (!hasData) return;
-                    subHead(title);
-                    drawTable(
-                        ['Task', 'Full Assist', 'Partial', 'Standby', 'None'],
-                        rows.map(function(r) {
-                            return [r[0], r[1] ? 'X' : '', r[2] ? 'X' : '', r[3] ? 'X' : '', r[4] ? 'X' : ''];
-                        }),
-                        { columnStyles: { 0: { cellWidth: 55 }, 1: { halign: 'center', cellWidth: 28 }, 2: { halign: 'center', cellWidth: 28 }, 3: { halign: 'center', cellWidth: 28 }, 4: { halign: 'center' } } }
-                    );
-                }
-
-                // ══ PAGE 2+ CONTENT ═══════════════════════════════════════
-                doc.addPage();
-                drawPageHeader();
-                y = 18;
-
-                // ── 1. Client Personal Information ─────────────────────────
-                sectionHead('Client Personal Information');
-                fieldGrid([
-                    ['First Name', val('firstName')], ['Last Name', val('lastName')],
-                    ['Gender', val('gender')], ['Date of Birth', val('dob')],
-                    ['Age', val('age')], ['Marital Status', val('maritalStatus')],
-                    ['Phone', val('phone')], ['First Language', val('firstLanguage')],
-                    ['2nd Language', val('secondLanguage')], ['Height', val('height')],
-                    ['Weight', val('weight')]
-                ]);
-                var addr = [val('unitNumber') ? 'Unit ' + val('unitNumber') + ', ' : '', val('streetAddress'), val('city') ? ', ' + val('city') : '', val('state') ? ', ' + val('state') : '', val('zipCode') ? ' ' + val('zipCode') : ''].join('').trim().replace(/^,\s*/, '');
-                if (addr) fieldRow('Address', addr, 30);
-                y += 2;
-
-                // ── 2. Authorized Contacts ──────────────────────────────────
-                sectionHead('Authorized Contacts', true);
-                var pName = [val('primaryFirstName'), val('primaryLastName')].filter(Boolean).join(' ');
-                if (pName) {
-                    subHead('Primary Contact');
-                    fieldGrid([
-                        ['Name', pName], ['Relation', val('primaryRelation')],
-                        ['Cell', val('primaryCellPhone')], ['Home', val('primaryHomePhone')],
-                        ['Work', val('primaryWorkPhone')], ['Email', val('primaryEmail')]
-                    ]);
-                    if (val('primaryAddress')) fieldRow('Address', val('primaryAddress'), 30);
-                }
-                var sName = [val('secondaryFirstName'), val('secondaryLastName')].filter(Boolean).join(' ');
-                if (sName) {
-                    subHead('Secondary Contact');
-                    fieldGrid([
-                        ['Name', sName], ['Relation', val('secondaryRelation')],
-                        ['Phone', val('secondaryPhone')], ['Email', val('secondaryEmail')]
-                    ]);
-                    if (val('secondaryLocation')) fieldRow('Location', val('secondaryLocation'), 30);
-                }
-                y += 2;
-
-                // ── 3. Communication Details ───────────────────────────────
-                sectionHead('Communication Details');
-                var commMethods = [];
-                if (data.commPhone) commMethods.push('Phone');
-                if (data.commEmail) commMethods.push('Email');
-                if (data.commVideoChat) commMethods.push('Video Chat');
-                if (commMethods.length) fieldRow('Methods', commMethods.join(', '), 30);
-                fieldGrid([
-                    ['Has Landline', yesNo('hasLandline')], ['Landline #', val('landlineNumber')],
-                    ['Has Cell', yesNo('hasCellphone')], ['Cell #', val('cellNumber')],
-                    ['Owns Computer', yesNo('ownsComputer')], ['Can Operate', yesNo('canOperateComputer')],
-                    ['Can Access Email', yesNo('canAccessEmail')], ['Client Email', val('clientEmail')],
-                    ['Has WiFi', yesNo('hasWifi')], ['WiFi Network', val('wifiNetwork')]
-                ]);
-                y += 2;
-
-                // ── 4. Living Situation ─────────────────────────────────────
-                sectionHead('Living Situation', true);
-                fieldGrid([
-                    ['Living Arrangement', val('livingArrangement')], ['Care Level', val('careLevel')]
-                ]);
-                y += 2;
-
-                // ── 5. Care Requirements ───────────────────────────────────
-                sectionHead('Care Requirements');
-                careReqTable('Personal Care', [
-                    ['Bathing', data.bathingFull, data.bathingPartial, data.bathingStandby, data.bathingNone],
-                    ['Grooming', data.groomingFull, data.groomingPartial, data.groomingStandby, data.groomingNone],
-                    ['Oral Care', data.oralFull, data.oralPartial, data.oralStandby, data.oralNone],
-                    ['Dressing Upper', data.dressingUpperFull, data.dressingUpperPartial, data.dressingUpperStandby, data.dressingUpperNone],
-                    ['Dressing Lower', data.dressingLowerFull, data.dressingLowerPartial, data.dressingLowerStandby, data.dressingLowerNone],
-                    ['Toileting', data.toiletingFull, data.toiletingPartial, data.toiletingStandby, data.toiletingNone],
-                    ['Incontinence', data.incontinenceFull, data.incontinencePartial, data.incontinenceStandby, data.incontinenceNone],
-                    ['Skin Care', data.skinCareFull, data.skinCarePartial, data.skinCareStandby, data.skinCareNone]
-                ]);
-                careReqTable('Meals', [
-                    ['Breakfast', data.breakfastFull, data.breakfastPartial, data.breakfastStandby, data.breakfastNone],
-                    ['Lunch', data.lunchFull, data.lunchPartial, data.lunchStandby, data.lunchNone],
-                    ['Dinner', data.dinnerFull, data.dinnerPartial, data.dinnerStandby, data.dinnerNone],
-                    ['Snacks', data.snacksFull, data.snacksPartial, data.snacksStandby, data.snacksNone]
-                ]);
-                careReqTable('Home Environment', [
-                    ['Make Bed', data.makeBedFull, data.makeBedPartial, data.makeBedStandby, data.makeBedNone],
-                    ['Change Bed', data.changeBedFull, data.changeBedPartial, data.changeBedStandby, data.changeBedNone],
-                    ['Laundry', data.laundryFull, data.laundryPartial, data.laundryStandby, data.laundryNone]
-                ]);
-                careReqTable('Activity / Movement', [
-                    ['Transfers', data.transfersFull, data.transfersPartial, data.transfersStandby, data.transfersNone],
-                    ['Walking', data.walkingFull, data.walkingPartial, data.walkingStandby, data.walkingNone],
-                    ['Positioning', data.positioningFull, data.positioningPartial, data.positioningStandby, data.positioningNone]
-                ]);
-                careReqTable('Housekeeping', [
-                    ['Vacuuming', data.vacuumingFull, data.vacuumingPartial, data.vacuumingStandby, data.vacuumingNone],
-                    ['Dusting', data.dustingFull, data.dustingPartial, data.dustingStandby, data.dustingNone],
-                    ['Kitchen Clean', data.kitchenFull, data.kitchenPartial, data.kitchenStandby, data.kitchenNone],
-                    ['Bathroom Clean', data.bathroomFull, data.bathroomPartial, data.bathroomStandby, data.bathroomNone]
-                ]);
-                careReqTable('Social Engagement', [
-                    ['Physical Participate', data.physicalParticipateAssistFull, data.physicalParticipateAssistPartial, data.physicalParticipateAssistStandby, data.physicalParticipateAssistNone]
-                ]);
-                y += 2;
-
-                // ── 6. Hearing & Vision ────────────────────────────────────
-                sectionHead('Hearing & Vision', true);
-                fieldGrid([
-                    ['Vision Issues', val('visionIssues')], ['Vision Assistance', val('visionAssistance')],
-                    ['Hearing Aids', yesNo('hearingAids')], ['Hearing Assistance', val('hearingAssistance')]
-                ]);
-                y += 2;
-
-                // ── 7. Reminders & Mobility ────────────────────────────────
-                sectionHead('Reminders & Mobility');
-                fieldGrid([
-                    ['Needs Reminders', yesNo('needsReminders')], ['Mobility Aid', val('mobilityAid')]
-                ]);
-                y += 2;
-
-                // ── 8. Home Environment ────────────────────────────────────
-                sectionHead('Home Environment', true);
-                fieldGrid([
-                    ['Home Type', val('homeType')], ['Entry Access', val('entryAccess')],
-                    ['Key Location', val('keyLocation')], ['Alarm Code', val('alarmCode')],
-                    ['Pets', yesNo('hasPets')], ['Pet Type/Name', val('petDetails')],
-                    ['Pet concerns', val('petConcerns')]
-                ]);
-                y += 2;
-
-                // ── 9. Fall Risk Assessment ────────────────────────────────
-                sectionHead('Fall Risk Assessment');
-                fieldGrid([
-                    ['Fall Risk Level', val('fallRiskLevel')],
-                    ['Recent Falls', yesNo('recentFalls')],
-                    ['Meds Impact', val('medsImpact')],
-                    ['Vision Assess.', val('visionAssessment')],
-                    ['Hearing Assess.', val('hearingAssessment')],
-                    ['Mobility Assess.', val('mobilityAssessment')],
-                    ['Environment', val('physicalEnvironment')],
-                    ['Bladder/Bowel', val('bladderBowel')]
-                ]);
-                if (val('fallInterventions')) fieldRow('General Interventions', val('fallInterventions'), 42);
-                if (val('lowInterventions')) fieldRow('Low Risk Interventions', val('lowInterventions'), 42);
-                if (val('moderateInterventions')) fieldRow('Moderate Interventions', val('moderateInterventions'), 42);
-                if (val('highInterventions')) fieldRow('High Interventions', val('highInterventions'), 42);
-                y += 2;
-
-                // ── 10. Verbal Communication ───────────────────────────────
-                sectionHead('Verbal Communication', true);
-                fieldRow('Communication Ability', val('communicationAbility'), 50);
-                var likesDislikes = [
-                    ['Activity (Hobbies/Sports)', val('activityLikes'), val('activityDislikes')],
-                    ['Social (Music/Movies/TV)', val('socialLikes'), val('socialDislikes')],
-                    ['Facial (Makeup/Shaving)', val('facialLikes'), val('facialDislikes')],
-                    ['Other', val('otherLikes'), val('otherDislikes')]
-                ].filter(function(r) { return r[1] || r[2]; });
-                if (likesDislikes.length) {
-                    drawTable(['Category', 'Likes', 'Dislikes'], likesDislikes,
-                        { columnStyles: { 0: { cellWidth: 52 } } });
-                }
-                y += 2;
-
-                // ── 11. Chronic Physical Issues ────────────────────────────
-                sectionHead('Chronic Physical Issues');
-                var painRows = [];
-                for (var p = 1; p <= 4; p++) {
-                    var pr = [val('pain'+p+'_desc'), val('pain'+p+'_onset'), val('pain'+p+'_expressed'), val('pain'+p+'_remedy')];
-                    if (pr.some(Boolean)) painRows.push(pr);
-                }
-                if (painRows.length) {
-                    drawTable(['Pain Description', 'Onset', 'How Expressed', 'Remedy'], painRows);
-                }
-                y += 2;
-
-                // ── 12. Food & Drink Preferences ──────────────────────────
-                sectionHead('Food & Drink Preferences', true);
-                fieldGrid([
-                    ['Has Allergies', yesNo('hasAllergies')], ['Allergies List', val('allergiesList')],
-                    ['Dietary Restrictions', yesNo('hasRestrictions')], ['Restrictions', val('restrictionsList')],
-                    ['Foods Liked', val('foodLikesList')], ['Foods Disliked', val('foodDislikesList')],
-                    ['Dietitian Recs', val('dietitianRecsList')], ['Needs Thickener', yesNo('needsThickener')],
-                    ['Thickener Type', val('thickenerType')], ['Alcohol Permitted', yesNo('alcoholPermitted')],
-                    ['Alcohol Restrictions', val('alcoholRestrictions')]
-                ]);
-                if (val('foodComments')) fieldRow('Food Comments', val('foodComments'), 35);
-                y += 2;
-
-                // ── 13. Emergency Information ──────────────────────────────
-                sectionHead('Emergency Information');
-                fieldGrid([
-                    ['Medical Card #', val('medicalCard')], ['Medical Insurance', val('medicalInsurance')],
-                    ['Emergency Contact', val('medContactFirstName')], ['Contact Phone', val('medContactFirstPhone')],
-                    ['2nd Contact', val('medContactLastName')], ['2nd Contact Phone', val('medContactLastPhone')],
-                    ['GP/Physician', val('gpName')], ['GP Address', val('gpAddress')],
-                    ['Neighbor', val('neighborName')], ['Neighbor Phone', val('neighborPhone')],
-                    ['Client Smokes', yesNo('clientSmokes')], ['Smoking Frequency', val('smokingFrequency')],
-                    ['Has Directives', yesNo('hasDirectives')]
-                ]);
-                if (val('allAllergies')) fieldRow('All Allergies', val('allAllergies'), 35);
-                y += 2;
-
-                // ── 14. Medical Status / Diagnoses ─────────────────────────
-                sectionHead('Medical Status / Diagnosis', true);
-                var diagnoses = [];
-                var diagMap = { diagDementia: 'Dementia', diagParkinsons: "Parkinson's", diagMS: 'MS', diagDiabetes: 'Diabetes', diagCancer: 'Cancer', diagStroke: 'Stroke', diagHeart: 'Heart Disease', diagArthritis: 'Arthritis', diagMacular: 'Macular Degen.', diagOther: 'Other' };
-                Object.keys(diagMap).forEach(function(k) { if (data[k]) diagnoses.push(diagMap[k]); });
-                if (diagnoses.length) fieldRow('Diagnoses', diagnoses.join(', '), 30);
-                if (val('medicalDetails')) fieldRow('Medical Details', val('medicalDetails'), 30);
-                y += 2;
-
-                // ── 15. Medications ────────────────────────────────────────
-                sectionHead('Medications');
-                fieldRow('Med Reminders', yesNo('needsMedReminders'), 35);
-                var medRows = [];
-                for (var m = 1; m <= 5; m++) {
-                    var mr = [val('med'+m+'_name'), val('med'+m+'_purpose'), val('med'+m+'_dose'), val('med'+m+'_route'), val('med'+m+'_admin'), val('med'+m+'_freq')];
-                    if (mr.some(Boolean)) medRows.push(mr);
-                }
-                if (medRows.length) {
-                    drawTable(['Name', 'Purpose', 'Dose', 'Route', 'Admin By', 'Frequency'], medRows,
-                        { columnStyles: { 0: { cellWidth: 32 }, 1: { cellWidth: 38 } } });
-                }
-                y += 2;
-
-                // ── 16. Vitamins / Supplements ─────────────────────────────
-                sectionHead('Vitamins / Supplements', true);
-                var vitRows = [];
-                for (var v = 1; v <= 3; v++) {
-                    var vr = [val('vit'+v+'_name'), val('vit'+v+'_purpose'), val('vit'+v+'_perday'), val('vit'+v+'_freq')];
-                    if (vr.some(Boolean)) vitRows.push(vr);
-                }
-                if (vitRows.length) {
-                    drawTable(['Name', 'Purpose', 'Per Day', 'Frequency'], vitRows);
-                }
-                y += 2;
-
-                // ── 17. Weekly Activities ──────────────────────────────────
-                sectionHead('Weekly Activities');
-                var actRows = [];
-                for (var a = 1; a <= 3; a++) {
-                    var ar = [val('act'+a+'_type'), val('act'+a+'_days'), val('act'+a+'_times'), val('act'+a+'_location')];
-                    if (ar.some(Boolean)) actRows.push(ar);
-                }
-                if (actRows.length) {
-                    drawTable(['Activity', 'Day(s)', 'Time(s)', 'Location'], actRows);
-                }
-                y += 2;
-
-                // ── 18. Transportation ─────────────────────────────────────
-                sectionHead('Transportation', true);
-                subHead('Caregiver Transportation');
-                fieldGrid([
-                    ['Needs Transport', yesNo('needsCaregiverTransport')], ['CG Can Drive', yesNo('caregiverCanDrive')],
-                    ['Transport Details', val('caregiverDriveDetails')], ['Use Company Car', yesNo('useCompanyCar')],
-                    ['Use Client Car', yesNo('useOwnCar')], ['CG Parking', val('caregiverParking')]
-                ]);
-                subHead('Client Vehicle');
-                fieldGrid([
-                    ['Client Drives', yesNo('clientDrives')], ['Vehicle', val('vehicleModel') + (val('vehicleYear') ? ' (' + val('vehicleYear') + ')' : '')],
-                    ['License Plate', val('vehiclePlate')], ['Insurance Co', val('insuranceCompany')],
-                    ['Policy #', val('insurancePolicy')], ['Insurance Contact', val('insuranceContact')],
-                    ['Insurance Expiry', val('insuranceExpiry')], ['Driving Restrictions', yesNo('hasDrivingRestrictions')],
-                    ['Restriction Details', val('drivingRestrictions')], ['Roadside Assist', yesNo('hasRoadsideAssistance')],
-                    ['Roadside Company', val('roadsideCompany')], ['Parking', val('parkingLocation')],
-                    ['Wheelchair Permit', yesNo('hasWheelchairPermit')], ['Permit Location', val('wheelchairPermitLocation')]
-                ]);
-                if (val('transportNotes')) fieldRow('Transport Notes', val('transportNotes'), 35);
-                y += 2;
-
-                // ── 19. Required Services ──────────────────────────────────
-                sectionHead('Required Services');
-                var services = [];
-                if (data.serviceHourly) services.push('Hourly');
-                if (data.serviceLiveIn24) services.push('Live In 24h');
-                if (data.serviceLiveOut24) services.push('Live Out 24h');
-                if (data.serviceOvernight) services.push('Overnight');
-                if (data.serviceRespite) services.push('Respite');
-                if (data.serviceOnCall) services.push('On Call');
-                if (services.length) fieldRow('Selected Services', services.join(', '), 40);
-                y += 2;
-
-                // ── 20. Visit Schedule ─────────────────────────────────────
-                sectionHead('Visit Schedule', true);
-                var days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-                var schedRows = [];
-                days.forEach(function(d) {
-                    var dayKey = 'schedule' + d;
-                    if (data[dayKey]) {
-                        var t1 = val('schedule' + d + 'Time1');
-                        var t2 = val('schedule' + d + 'Time2');
-                        schedRows.push([d, t1 || '', t2 || '']);
-                    }
-                });
-                if (schedRows.length) {
-                    drawTable(['Day', 'Start Time', 'End Time'], schedRows,
-                        { columnStyles: { 0: { cellWidth: 25 }, 1: { cellWidth: 50 }, 2: { cellWidth: 50 } } });
-                }
-                y += 2;
-
-                // ── 21. Care Plan Review ───────────────────────────────────
-                sectionHead('Care Plan Review');
-                fieldGrid([
-                    ['Review Frequency', val('reviewFrequency')], ['Next Review Date', val('nextReviewDate')]
-                ]);
-                if (val('carePlanNotes')) fieldRow('Care Plan Notes', val('carePlanNotes'), 38);
-                y += 4;
-
-                // ── Signature Block ────────────────────────────────────────
-                checkNew(40);
-                doc.setFillColor(...LGRAY);
-                doc.roundedRect(ML, y, BODY_W, 32, 2, 2, 'F');
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(8);
-                doc.setTextColor(...NAVY);
-                doc.text('SIGNATURES', ML + 5, y + 7);
-                doc.setDrawColor(...MGRAY);
-                var halfW = (BODY_W - 10) / 2;
-                // Client signature line
-                doc.line(ML + 5, y + 22, ML + 5 + halfW - 5, y + 22);
-                doc.setFont('helvetica', 'normal');
-                doc.setFontSize(7);
-                doc.setTextColor(...SUBTEXT);
-                doc.text('Client / Authorized Representative', ML + 5, y + 26);
-                doc.text('Date: _______________', ML + 5, y + 30);
-                // Assessor signature line
-                var sx2 = ML + 5 + halfW + 5;
-                doc.line(sx2, y + 22, sx2 + halfW - 5, y + 22);
-                doc.text('Assessor / Coordinator', sx2, y + 26);
-                doc.text('Date: _______________', sx2, y + 30);
-                y += 36;
-
-                // ── Page headers on all pages after page 1 ─────────────────
-                var totalPages = doc.internal.getNumberOfPages();
-                for (var pg = 2; pg <= totalPages; pg++) {
-                    doc.setPage(pg);
-                    drawPageHeader();
-                    // Running header
-                    doc.setFillColor(248, 249, 252);
-                    doc.rect(0, 9, PAGE_W, 9, 'F');
-                    doc.setFont('helvetica', 'normal');
-                    doc.setFontSize(7.5);
-                    doc.setTextColor(...SUBTEXT);
-                    doc.text('Home Care Evaluation: ' + clientName, ML, 15);
-                    doc.text('Eval Date: ' + evalDate, PAGE_W - MR, 15, { align: 'right' });
-                    doc.setDrawColor(...MGRAY);
-                    doc.line(ML, 17.5, PAGE_W - MR, 17.5);
-                }
-
-                doc.save(filename);
-                showToast('PDF downloaded: ' + filename, 'success');
-
-            } catch(err) {
-                console.error('PDF generation error:', err);
-                showToast('PDF error — check console. Falling back to print.', 'error');
-                setTimeout(function() { window.print(); }, 400);
+                var html = buildReportDocument(data, clientName, evalDate);
+                var blob = new Blob(['﻿', html], { type: 'application/msword;charset=utf-8' });
+                var url = URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                setTimeout(function() { URL.revokeObjectURL(url); }, 2000);
+                showToast('Report downloaded: ' + filename, 'success');
+            } catch (err) {
+                console.error('Report generation error:', err);
+                showToast('Report error, check console.', 'error');
             }
         }
 
