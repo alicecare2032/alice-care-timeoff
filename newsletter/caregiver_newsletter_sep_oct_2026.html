@@ -593,7 +593,6 @@
               <option value="1.2">1.2x faster</option>
               <option value="1.5">1.5x fastest</option>
             </select>
-            <select class="tts-select" id="ttsVoice" aria-label="Voice" title="Voice"></select>
           </div>
         </div>
       <nav class="toc">
@@ -1055,7 +1054,7 @@
     var synth = window.speechSynthesis;
     var $ = function (id) { return document.getElementById(id); };
     var playBtn = $('ttsPlay'), stopBtn = $('ttsStop'), prevBtn = $('ttsPrev'), nextBtn = $('ttsNext');
-    var rateSel = $('ttsRate'), voiceSel = $('ttsVoice'), nowEl = $('ttsNow'), barEl = $('ttsBar');
+    var rateSel = $('ttsRate'), nowEl = $('ttsNow'), barEl = $('ttsBar');
 
     if (!synth || typeof SpeechSynthesisUtterance === 'undefined') {
       $('ttsPlayer').style.display = 'none';
@@ -1155,27 +1154,22 @@
     }
 
     /* Voices */
-    var voices = [];
+    /* Always use Samantha. Devices without Samantha (Windows, Android) get the
+       closest natural US English female voice so the player never goes silent. */
+    var chosenVoice = null;
+    var FALLBACKS = [
+      /samantha/i,
+      /aria.*(natural|online)/i, /jenny.*(natural|online)/i,
+      /google us english/i,
+      /\b(zira|ava|allison|susan)\b/i
+    ];
     function loadVoices() {
-      var all = synth.getVoices();
-      voices = all.filter(function (v) { return /^en/i.test(v.lang); });
-      if (!voices.length) voices = all;
-      var prev = voiceSel.value;
-      voiceSel.innerHTML = '';
-      voices.forEach(function (v, i) {
-        var o = document.createElement('option');
-        o.value = v.name;
-        o.textContent = v.name.replace(/^(Microsoft|Google)\s+/, '') + (v.lang ? ' (' + v.lang + ')' : '');
-        voiceSel.appendChild(o);
-      });
-      if (prev && voices.some(function (v) { return v.name === prev; })) { voiceSel.value = prev; }
-      else {
-        var pick = voices.find(function (v) { return /en-US/i.test(v.lang) && /natural|online|samantha|aria|jenny|google us/i.test(v.name); })
-          || voices.find(function (v) { return /en-US/i.test(v.lang); })
-          || voices[0];
-        if (pick) voiceSel.value = pick.name;
+      var en = synth.getVoices().filter(function (v) { return /^en[-_]US/i.test(v.lang); });
+      chosenVoice = null;
+      for (var i = 0; i < FALLBACKS.length && !chosenVoice; i++) {
+        chosenVoice = en.find(function (v) { return FALLBACKS[i].test(v.name); }) || null;
       }
-      voiceSel.style.display = voices.length ? '' : 'none';
+      if (!chosenVoice) chosenVoice = en.find(function (v) { return v.localService; }) || en[0] || null;
     }
     loadVoices();
     if (typeof synth.onvoiceschanged !== 'undefined') synth.onvoiceschanged = loadVoices;
@@ -1228,7 +1222,8 @@
       highlight(item);
       updateInfo();
       var u = new SpeechSynthesisUtterance(item.text);
-      var v = voices.find(function (x) { return x.name === voiceSel.value; });
+      if (!chosenVoice) loadVoices();
+      var v = chosenVoice;
       if (v) { u.voice = v; u.lang = v.lang; } else { u.lang = 'en-US'; }
       u.rate = parseFloat(rateSel.value) || 1;
       u.onend = function () {
@@ -1299,19 +1294,16 @@
     nextBtn.addEventListener('click', function () { jumpSection(1); });
     function restartIfPlaying() { if (state === 'playing') startAt(idx, false); }
     rateSel.addEventListener('change', restartIfPlaying);
-    voiceSel.addEventListener('change', restartIfPlaying);
 
     /* Remember speed and voice for this reader */
     try {
       var saved = JSON.parse(localStorage.getItem('aliceNewsletterTts') || '{}');
       if (saved.rate) rateSel.value = saved.rate;
-      if (saved.voice) setTimeout(function () { if (voices.some(function (v) { return v.name === saved.voice; })) voiceSel.value = saved.voice; }, 400);
     } catch (e) {}
     function savePrefs() {
-      try { localStorage.setItem('aliceNewsletterTts', JSON.stringify({ rate: rateSel.value, voice: voiceSel.value })); } catch (e) {}
+      try { localStorage.setItem('aliceNewsletterTts', JSON.stringify({ rate: rateSel.value })); } catch (e) {}
     }
     rateSel.addEventListener('change', savePrefs);
-    voiceSel.addEventListener('change', savePrefs);
 
     window.addEventListener('beforeunload', function () { synth.cancel(); });
     setState('idle');
