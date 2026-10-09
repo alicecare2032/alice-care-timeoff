@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caregiver Newsletter | Alice Care</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Poppins', Arial, Helvetica, sans-serif;
+      background-color: #F0F7FF;
+      color: #2D4A6F;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page-wrapper { padding: 30px 15px 50px; }
+
+    .app-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #FFFFFF;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 6px 28px rgba(26, 54, 92, 0.08);
+    }
+
+    /* Header (kept from the checklist template) */
+    .app-header {
+      background: linear-gradient(135deg, #F57600 0%, #E06900 100%);
+      padding: 22px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+    .app-header::before {
+      content: '';
+      position: absolute;
+      width: 200px; height: 200px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 50%;
+      top: -90px; right: 6%;
+    }
+    .logo { font-size: 26px; font-weight: 700; position: relative; z-index: 1; }
+    .logo .alice { color: #FFFFFF; }
+    .logo .care { color: #1A365C; font-weight: 400; }
+    .header-label {
+      color: rgba(255, 255, 255, 0.92);
+      font-size: 12px;
+      font-weight: 500;
+      position: relative;
+      z-index: 1;
+      text-align: right;
+    }
+    .header-label strong { display: block; font-size: 14px; font-weight: 700; color: #FFFFFF; }
+    .header-label small { display: block; font-size: 10.5px; opacity: 0.85; font-weight: 400; margin-top: 3px; }
+
+    /* Title */
+    .title-section { padding: 28px 36px 22px; border-bottom: 1px solid #E2E8F0; }
+    .issue-tag {
+      display: inline-block;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #F57600;
+      background: #FFF3E8;
+      border: 1px solid #F5C992;
+      padding: 3px 10px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 10px;
+    }
+    .title-section h1 { font-size: 26px; font-weight: 700; color: #1A365C; margin-bottom: 8px; }
+    .title-section h1 span { color: #F57600; }
+    .title-section p { font-size: 13.5px; color: #4A5F7F; line-height: 1.65; max-width: 860px; }
+    .title-section p + p { margin-top: 8px; }
+
+    /* Table of contents */
+    .toc {
+      background: #FAFCFF;
+      padding: 14px 36px;
+      border-bottom: 1px solid #E2E8F0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .toc a {
+      padding: 6px 13px;
+      background: #FFFFFF;
+      border: 1.5px solid #D0DDF0;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #4A5F7F;
+      text-decoration: none;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .toc a:hover { border-color: #F57600; color: #F57600; }
+
+    /* Sections */
+    .nl-section { padding: 28px 36px; border-bottom: 1px solid #E2E8F0; scroll-margin-top: 70px; }
+    .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .section-icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+      color: #FFFFFF;
+      flex-shrink: 0;
+    }
+    .section-icon.blue { background: linear-gradient(135deg, #1A365C 0%, #2D4A6F 100%); }
+    .section-icon.orange { background: linear-gradient(135deg, #F57600 0%, #E06900 100%); }
+    .section-icon.green { background: linear-gradient(135deg, #1B7A3D 0%, #166530 100%); }
+    .section-icon.purple { background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%); }
+    .section-icon.teal { background: linear-gradient(135deg, #0F766E 0%, #115E59 100%); }
+    .section-icon.rose { background: linear-gradient(135deg, #E11D48 0%, #BE123C 100%); }
+    .section-icon.amber { background: linear-gradient(135deg, #D97706 0%, #B45309 100%); }
+    .section-icon.slate { background: linear-gradient(135deg, #475569 0%, #334155 100%); }
+    .section-icon.indigo { background: linear-gradient(135deg, #4F46E5 0%, #4338CA 100%); }
+    .section-title { font-size: 18px; font-weight: 700; color: #1A365C; }
+    .section-subtitle { font-size: 11.5px; color: #7A8BA3; margin-top: 1px; }
+
+    .nl-section p { font-size: 13.5px; line-height: 1.7; color: #2D4A6F; margin-bottom: 10px; }
+    .nl-section p:last-child { margin-bottom: 0; }
+    .nl-section a { color: #1D4ED8; font-weight: 600; }
+
+    ul.nl-list { list-style: none; margin: 8px 0 14px; display: grid; gap: 7px; }
+    ul.nl-list li {
+      font-size: 13px;
+      line-height: 1.55;
+      padding-left: 24px;
+      position: relative;
+    }
+    ul.nl-list li::before {
+      content: '';
+      position: absolute;
+      left: 6px; top: 8px;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #F57600;
+    }
+    ul.nl-list.two-col { grid-template-columns: repeat(2, 1fr); column-gap: 20px; }
+    ul.nl-list.no li::before { background: #DC2626; }
+    ul.nl-list.check li::before { background: #1B7A3D; }
+
+    .list-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #1A365C;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 14px;
+    }
+
+    /* Callouts */
+    .callout {
+      padding: 14px 18px;
+      border-radius: 9px;
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 14px 0;
+      border: 1px solid;
+      border-left-width: 4px;
+    }
+    .callout.info { background: #F0F9FF; border-color: #93C5FD; border-left-color: #1D4ED8; color: #1E3A8A; }
+    .callout.warn { background: #FFFBF0; border-color: #F5DFA0; border-left-color: #F57600; color: #5A4A1E; }
+    .callout.alert { background: #FEF2F2; border-color: #FCA5A5; border-left-color: #DC2626; color: #7F1D1D; }
+    .callout strong { font-weight: 700; }
+
+    /* Spotlight */
+    .spotlight {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 24px;
+      background: linear-gradient(135deg, #FFF9F0 0%, #FFF3E8 100%);
+      border: 1px solid #F5C992;
+      border-radius: 14px;
+      padding: 24px;
+    }
+    .spotlight-badge {
+      width: 150px; height: 150px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #F57600 0%, #E06900 100%);
+      color: #FFFFFF;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      box-shadow: 0 8px 22px rgba(245, 118, 0, 0.3);
+    }
+    .spotlight-badge .star { font-size: 34px; line-height: 1; }
+    .spotlight-badge .lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-top: 6px; }
+    .spotlight-badge .who { font-size: 15px; font-weight: 700; margin-top: 2px; }
+    .spotlight h3 { font-size: 20px; font-weight: 700; color: #1A365C; margin-bottom: 8px; }
+    .trait-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 12px; }
+    .trait {
+      font-size: 11px;
+      font-weight: 600;
+      color: #B85300;
+      background: #FFFFFF;
+      border: 1px solid #F5C992;
+      padding: 3px 10px;
+      border-radius: 12px;
+    }
+
+    /* Celebrations */
+    .celebrate-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .celebrate-card { border-radius: 12px; padding: 18px 20px; border: 1px solid; }
+    .celebrate-card.bday { background: linear-gradient(135deg, #FDF2F8 0%, #FCE7F3 100%); border-color: #F9A8D4; }
+    .celebrate-card.anniv { background: linear-gradient(135deg, #F0FAF3 0%, #E6F4EA 100%); border-color: #B7DFC6; }
+    .celebrate-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .celebrate-card.bday h3 { color: #9D174D; }
+    .celebrate-card.anniv h3 { color: #1B7A3D; }
+    .name-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+    .name-chip {
+      background: #FFFFFF;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #1A365C;
+      padding: 6px 13px;
+      border-radius: 18px;
+      border: 1px solid;
+    }
+    .bday .name-chip { border-color: #F9A8D4; }
+    .anniv .name-chip { border-color: #B7DFC6; }
+
+    /* Medication Q&A */
+    .qa-card {
+      border: 1px solid #E2E8F0;
+      border-radius: 11px;
+      padding: 18px 20px;
+      margin-bottom: 12px;
+      background: #FFFFFF;
+    }
+    .qa-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+    .qa-num { font-size: 15px; font-weight: 700; color: #1A365C; }
+    .verdict {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 4px 12px;
+      border-radius: 12px;
+      border: 1px solid;
+      white-space: nowrap;
+    }
+    .verdict.yes { background: #E6F4EA; color: #1B7A3D; border-color: #B7DFC6; }
+    .verdict.no { background: #FEE2E2; color: #991B1B; border-color: #FCA5A5; }
+    .verdict.pending { background: #FEF3C7; color: #92400E; border-color: #FCD34D; }
+    .qa-card.yes { border-left: 4px solid #1B7A3D; }
+    .qa-card.no { border-left: 4px solid #DC2626; }
+    .qa-card.pending { border-left: 4px solid #D97706; }
+    .qa-q {
+      font-size: 13px;
+      line-height: 1.6;
+      color: #4A5F7F;
+      background: #FAFCFF;
+      border: 1px dashed #D0DDF0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 10px;
+    }
+    .qa-q b, .qa-a b { color: #1A365C; }
+    .qa-a { font-size: 13px; line-height: 1.65; }
+    .qa-a p { font-size: 13px; margin-bottom: 6px; }
+
+    /* Steps / two-panel */
+    .panel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
+    .panel {
+      background: #FAFCFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 11px;
+      padding: 16px 18px;
+    }
+    .panel h4 { font-size: 13px; font-weight: 700; color: #1A365C; margin-bottom: 4px; }
+
+    .email-pill {
+      display: inline-block;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: #1D4ED8;
+      background: #DBEAFE;
+      border: 1px solid #93C5FD;
+      padding: 4px 12px;
+      border-radius: 6px;
+      margin: 4px 0 10px;
+    }
+
+    .btn-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 16px;
+      background: #1D4ED8;
+      color: #FFFFFF !important;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .btn-link:hover { background: #1E40AF; transform: translateY(-1px); }
+    .btn-link.orange { background: #F57600; }
+    .btn-link.orange:hover { background: #E06900; }
+
+    /* Example note */
+    .example-note {
+      background: linear-gradient(135deg, #F0FAF3 0%, #F7FCF9 100%);
+      border: 1px solid #B7DFC6;
+      border-radius: 11px;
+      padding: 18px 20px;
+      margin-top: 14px;
+    }
+    .example-note .ex-label {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #1B7A3D;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .example-note blockquote {
+      font-size: 13px;
+      line-height: 1.7;
+      color: #1A365C;
+      font-style: italic;
+      border-left: 3px solid #1B7A3D;
+      padding-left: 14px;
+    }
+    .vague-chips { display: flex; flex-wrap: wrap; gap: 7px; margin: 6px 0 10px; }
+    .vague-chip {
+      font-size: 12px;
+      font-weight: 600;
+      color: #991B1B;
+      background: #FEF2F2;
+      border: 1px solid #FCA5A5;
+      padding: 4px 11px;
+      border-radius: 14px;
+      text-decoration: line-through;
+      text-decoration-color: rgba(153, 27, 27, 0.5);
+    }
+
+    /* Contact */
+    .contact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .contact-card {
+      background: #F0F7FF;
+      border: 1px solid #D0DDF0;
+      border-radius: 11px;
+      padding: 14px 16px;
+      text-decoration: none;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      transition: all 0.15s;
+      min-width: 0;
+    }
+    .contact-card:hover { border-color: #F57600; transform: translateY(-1px); box-shadow: 0 3px 10px rgba(245, 118, 0, 0.1); }
+    .contact-icon {
+      width: 36px; height: 36px;
+      border-radius: 9px;
+      background: #FFFFFF;
+      border: 1px solid #D0DDF0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .contact-text { min-width: 0; }
+    .contact-text .lbl { font-size: 10px; font-weight: 700; color: #7A8BA3; text-transform: uppercase; letter-spacing: 0.5px; }
+    .contact-text .val {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1A365C;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .signoff { margin-top: 20px; font-size: 13.5px; color: #1A365C; }
+    .signoff strong { color: #F57600; }
+
+    .app-footer {
+      padding: 18px 36px;
+      background: linear-gradient(135deg, #1A365C 0%, #2D4A6F 100%);
+      color: rgba(255,255,255,0.85);
+      font-size: 11px;
+      line-height: 1.6;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .app-footer a { color: #F57600; text-decoration: none; font-weight: 600; }
+    .app-footer .footer-right { font-size: 10.5px; opacity: 0.75; }
+
+    @media print {
+      body { background: #FFFFFF; }
+      .page-wrapper { padding: 0; }
+      .app-container { box-shadow: none; border-radius: 0; }
+      .toc { display: none; }
+      .nl-section, .qa-card, .spotlight, .celebrate-card { break-inside: avoid; page-break-inside: avoid; }
+    }
+
+    @media (max-width: 768px) {
+      .page-wrapper { padding: 15px 8px 30px; }
+      .app-header, .title-section, .toc, .nl-section, .app-footer { padding-left: 18px; padding-right: 18px; }
+      .title-section h1 { font-size: 22px; }
+      .spotlight { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+      .trait-row { justify-content: center; }
+      .celebrate-grid, .panel-grid { grid-template-columns: 1fr; }
+      .contact-grid { grid-template-columns: 1fr; }
+      ul.nl-list.two-col { grid-template-columns: 1fr; }
+      .toc { flex-wrap: nowrap; overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="app-container">
+
+      <div class="app-header">
+        <div class="logo"><span class="alice">alice.</span><span class="care">care</span></div>
+        <div class="header-label">
+          <strong>Caregiver Newsletter</strong>
+          September to October 2026
+          <small>Licensed HCO #344700080</small>
+        </div>
+      </div>
+
+      <div class="title-section">
+        <span class="issue-tag">September to October 2026 Edition</span>
+        <h1>Caregiver <span>Newsletter</span></h1>
+        <p>Welcome to our latest caregiver newsletter. This edition recognizes our Caregiver of the Month, celebrates team birthdays and work anniversaries, and shares important updates about service assignments, overtime approval, the Alice Care app, shift documentation, mobile phone use, transportation expenses, incident reporting, and client communication.</p>
+        <p>Thank you for the compassion, professionalism, and dependable care you provide every day.</p>
+      </div>
+
+      <nav class="toc">
+        <a href="#spotlight">⭐ Caregiver of the Month</a>
+        <a href="#celebrations">🎉 Celebrations</a>
+        <a href="#medication">💊 Medication Guidelines</a>
+        <a href="#password">🔑 Password Reset</a>
+        <a href="#assignments">📋 Service Assignments</a>
+        <a href="#jobboard">💬 Job Board Feedback</a>
+        <a href="#app">📱 New App</a>
+        <a href="#documentation">📝 Shift Notes</a>
+        <a href="#parking">🚗 Traffic &amp; Parking</a>
+        <a href="#phone">📵 Phone Use</a>
+        <a href="#events">🚨 Unusual Events</a>
+        <a href="#privacy">🛡️ Personal Contact Info</a>
+        <a href="#contact">☎️ Contacts</a>
+      </nav>
+
+      <!-- Caregiver of the Month -->
+      <section class="nl-section" id="spotlight">
+        <div class="section-header">
+          <div class="section-icon orange">⭐</div>
+          <div>
+            <div class="section-title">Caregiver of the Month</div>
+            <div class="section-subtitle">Recognizing reliability and attention to detail</div>
+          </div>
+        </div>
+        <div class="spotlight">
+          <div class="spotlight-badge">
+            <div class="star">★</div>
+            <div class="lbl">Caregiver of<br>the Month</div>
+            <div class="who">Stephanie H.</div>
+          </div>
+          <div>
+            <h3>Stephanie Hillebrand</h3>
+            <div class="trait-row">
+              <span class="trait">Punctual</span>
+              <span class="trait">Consistent</span>
+              <span class="trait">Dependable</span>
+              <span class="trait">Flexible</span>
+              <span class="trait">Detail oriented</span>
+            </div>
+            <p>Although Stephanie Hillebrand joined alice.care recently, she already demonstrates several qualities that closely align with the Alice Care approach and philosophy.</p>
+            <p>Stephanie shows up on time, works consistently, and stays dependable. She also shows flexibility by making herself available for both short and extended shifts. Most importantly, she carefully reviews and follows each client's care instructions.</p>
+            <p>As we update care plans and share new instructions, especially when a client's Responsible Party provides detailed guidance, Stephanie stays attentive and follows through without reminders. Her willingness to listen, learn, and respect each client's preferences helps us deliver care safely and consistently.</p>
+            <p>We appreciate Stephanie's reliability, attention to detail, and commitment to following client specific directions. We proudly recognize her as our Caregiver of the Month.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Celebrations -->
+      <section class="nl-section" id="celebrations">
+        <div class="section-header">
+          <div class="section-icon rose">🎉</div>
+          <div>
+            <div class="section-title">Celebrations</div>
+            <div class="section-subtitle">Birthdays and work anniversaries this season</div>
+          </div>
+        </div>
+        <div class="celebrate-grid">
+          <div class="celebrate-card bday">
+            <h3>🎂 Happy Birthday</h3>
+            <div class="name-chips">
+              <span class="name-chip">Cecilia</span>
+              <span class="name-chip">Jeddalyn</span>
+              <span class="name-chip">Racheal</span>
+              <span class="name-chip">Jecinta</span>
+              <span class="name-chip">Lori</span>
+              <span class="name-chip">Stephanie C.</span>
+            </div>
+          </div>
+          <div class="celebrate-card anniv">
+            <h3>🏅 Happy Work Anniversary</h3>
+            <div class="name-chips">
+              <span class="name-chip">Geoffrey</span>
+              <span class="name-chip">Glenda</span>
+              <span class="name-chip">Ayla</span>
+              <span class="name-chip">Cecilia</span>
+              <span class="name-chip">India</span>
+              <span class="name-chip">Sheila</span>
+              <span class="name-chip">Virginia</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Medication -->
+      <section class="nl-section" id="medication">
+        <div class="section-header">
+          <div class="section-icon rose">💊</div>
+          <div>
+            <div class="section-title">Important Medication Assistance Guidelines Updates</div>
+            <div class="section-subtitle">What a Home Care Aide may and may not do</div>
+          </div>
+        </div>
+        <p>Home Care Aides provide nonmedical services and may not administer medication. The guidance below explains what an aide may and may not do when assisting a client with self administered medication.</p>
+        <div class="callout warn"><strong>When in doubt, stop.</strong> If you feel uncertain whether alice.care permits a requested task, do not complete the task until you contact the alice.care office for guidance.</div>
+
+        <div class="qa-card yes">
+          <div class="qa-top">
+            <div class="qa-num">1. Accessing Preorganized Medication</div>
+            <span class="verdict yes">✓ Yes, permitted</span>
+          </div>
+          <div class="qa-q"><b>Question:</b> A client keeps medications in a locked cabinet. May a Home Care Aide unlock and open the cabinet, remove a pill organizer that the client, a family member, or another authorized person prepared and separated, and make the organizer available to the client?</div>
+          <div class="qa-a">
+            <p><b>Answer:</b> Yes. A Home Care Aide may unlock the cabinet, remove the prepared pill organizer, and open the organizer for the client, provided the aide does not handle the medication.</p>
+            <p>The aide assists with access to the medication container and does not handle or administer the medication. The client must take the medication independently.</p>
+          </div>
+        </div>
+
+        <div class="qa-card no">
+          <div class="qa-top">
+            <div class="qa-num">2. Placing Medication Into Food</div>
+            <span class="verdict no">✕ Not permitted</span>
+          </div>
+          <div class="qa-q"><b>Question:</b> A client cannot swallow pills and states that they must take the pills with applesauce. If someone already prepared the medication in a pill organizer, may the Home Care Aide remove the pill from the appropriate compartment and place it into the applesauce for the client to eat independently?</div>
+          <div class="qa-a">
+            <p><b>Answer:</b> No. A Home Care Aide may not remove medication from a pill organizer or place medication into food or a beverage.</p>
+            <p>Mixing medication into food or a beverage counts as medication administration, which falls outside the permitted scope of nonmedical home care services.</p>
+          </div>
+        </div>
+
+        <div class="qa-card no">
+          <div class="qa-top">
+            <div class="qa-num">3. Feeding a Client Food Containing Medication</div>
+            <span class="verdict no">✕ Not permitted</span>
+          </div>
+          <div class="qa-q"><b>Question:</b> If an authorized person already placed or mixed medication into food, may a Home Care Aide feed that prepared food to a client who cannot feed themselves?</div>
+          <div class="qa-a">
+            <p><b>Answer:</b> No. A Home Care Aide may not feed a client food or beverages containing medication.</p>
+            <p>Feeding medicated food or beverages introduces medication into the client's body and counts as medication administration, even when someone outside alice.care prepared the food.</p>
+            <p>If you discover medication mixed into a client's food or beverage, stop and contact the alice.care office for instructions.</p>
+          </div>
+        </div>
+
+        <div class="qa-card pending">
+          <div class="qa-top">
+            <div class="qa-num">4. Adding Thickener to Beverages</div>
+            <span class="verdict pending">⏳ Pending guidance</span>
+          </div>
+          <div class="qa-q"><b>Question:</b> A client requires thickened liquids and cannot consume plain water or other thin liquids. May a Home Care Aide add a commercially available thickening powder to the client's beverages according to established instructions?</div>
+          <div class="qa-a">
+            <p><b>Answer:</b> alice.care has requested additional clarification on this situation.</p>
+            <p>Although stores sell thickening powder over the counter as a food additive, a clinician may also prescribe it as a functional medical food. When a clinician prescribes it for a medical purpose, preparing or serving thickened beverages may require oversight from a licensed healthcare professional.</p>
+            <p>Until we share further guidance, contact the alice.care office before preparing or serving a beverage that requires a prescribed thickening product.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Password reset -->
+      <section class="nl-section" id="password">
+        <div class="section-header">
+          <div class="section-icon indigo">🔑</div>
+          <div>
+            <div class="section-title">Password Reset Emails</div>
+            <div class="section-subtitle">Keep verification emails out of spam</div>
+          </div>
+        </div>
+        <p>When you request a password reset, the verification email may land in your spam or junk folder. Add the following address to your email contacts or approved sender list:</p>
+        <div class="email-pill">no-reply@verificationemail.com</div>
+        <div class="panel-grid">
+          <div class="panel">
+            <h4>If the reset email does not arrive</h4>
+            <ul class="nl-list check">
+              <li>Check your spam or junk folder.</li>
+              <li>Check any folders or filters you created for automated emails.</li>
+              <li>Confirm that you entered the correct email address.</li>
+              <li>Contact the alice.care office if you still cannot access your account.</li>
+            </ul>
+          </div>
+          <div class="panel">
+            <h4>Watch the walkthrough</h4>
+            <p>We recorded this video for the previous version of the app, but the password reset process remains similar.</p>
+            <a class="btn-link" href="https://youtu.be/HFxmDjM2HX8" target="_blank" rel="noopener">▶ Watch the video</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Service assignments -->
+      <section class="nl-section" id="assignments">
+        <div class="section-header">
+          <div class="section-icon blue">📋</div>
+          <div>
+            <div class="section-title">Accepting and Managing Service Assignments</div>
+            <div class="section-subtitle">Self accept, overtime approval, and commitment</div>
+          </div>
+        </div>
+        <p>We post open services on the job board, and caregivers receive an app notification when a new service becomes available. Caregivers with self accept access may review available services and assign themselves directly through the app.</p>
+        <div class="list-label">Before accepting a service</div>
+        <ul class="nl-list check">
+          <li>Review the date, time, location, and service requirements.</li>
+          <li>Confirm that you can complete the entire service.</li>
+          <li>Check whether the service could place you into overtime.</li>
+          <li>Request approval before accepting a service that may result in overtime.</li>
+          <li>Request assignment approval when the Care Team must approve the assignment.</li>
+        </ul>
+        <p>Once you accept a service, the client and Care Team rely on you to complete it. Accepting and then repeatedly declining services disrupts the client's care plan and makes consistent coverage difficult.</p>
+        <div class="callout alert">If a caregiver repeatedly accepts and then declines services, alice.care may change the caregiver's profile settings. This may include removing self accept access and requiring Care Team approval for future service assignments.</div>
+        <p>Accept only the services you feel prepared and authorized to complete. If an emergency prevents you from working an accepted service, notify the office immediately.</p>
+      </section>
+
+      <!-- Job board feedback -->
+      <section class="nl-section" id="jobboard">
+        <div class="section-header">
+          <div class="section-icon purple">💬</div>
+          <div>
+            <div class="section-title">Help Us Improve the Job Board Process</div>
+            <div class="section-subtitle">We want to hear from you</div>
+          </div>
+        </div>
+        <p>We post open services on the job board and send an app notification whenever a new service becomes available. However, we notice that caregivers accept many services only after a Care Coach sends a separate text message.</p>
+        <p>We would like to understand what keeps caregivers from proactively reviewing and accepting available services through the app. Possible issues may include:</p>
+        <ul class="nl-list two-col">
+          <li>App notifications do not appear.</li>
+          <li>Caregivers easily miss notifications.</li>
+          <li>Service details lack clarity.</li>
+          <li>Caregivers feel unsure whether they qualify for an assignment.</li>
+          <li>Caregivers find the job board hard to locate or use.</li>
+          <li>Caregivers prefer extra confirmation before accepting a service.</li>
+        </ul>
+        <div class="callout info">Your feedback helps us improve the process. Call or text the office with your ideas, questions, or concerns about the job board and self assignment process, or write to <a href="mailto:tom@alice.care">tom@alice.care</a>.</div>
+      </section>
+
+      <!-- New app -->
+      <section class="nl-section" id="app">
+        <div class="section-header">
+          <div class="section-icon teal">📱</div>
+          <div>
+            <div class="section-title">New alice.care App Release</div>
+            <div class="section-subtitle">Better performance plus new preparation tools</div>
+          </div>
+        </div>
+        <p>You already started using the new alice.care app. Beyond improvements to the user experience and app performance, the updated version includes new tools that help caregivers prepare for services.</p>
+        <p>Thank you to everyone who shared feedback and positive comments after the release. We appreciate your continued input and welcome constructive ideas that improve the app and the caregiver experience.</p>
+
+        <div class="panel-grid">
+          <div class="panel">
+            <h4>✨ New AI Summary Feature</h4>
+            <p>The app creates an AI summary of the client's information from available notes and other client information. You can read or listen to the summary before beginning a service.</p>
+            <p>The AI Summary updates automatically as caregivers complete services and submit new notes.</p>
+          </div>
+          <div class="panel">
+            <h4>Before every service</h4>
+            <ul class="nl-list check">
+              <li>Review the full client, provider, and service notes.</li>
+              <li>Read or listen to the AI Summary as an additional resource.</li>
+              <li>Follow the most current care instructions.</li>
+              <li>Contact the office if any information appears incorrect, incomplete, outdated, or inconsistent.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="callout warn"><strong>Remember:</strong> AI generated information may occasionally contain gaps or errors. The AI Summary serves as a helpful preparation tool, but it does not replace the full client, provider, and service notes. If you notice information that needs an update in the AI Summary or the detailed notes, message the office. We will review and correct it so every caregiver has the most current and accurate information.</div>
+      </section>
+
+      <!-- Documentation -->
+      <section class="nl-section" id="documentation">
+        <div class="section-header">
+          <div class="section-icon green">📝</div>
+          <div>
+            <div class="section-title">Proper Shift Documentation</div>
+            <div class="section-subtitle">Specific, factual, and objective notes</div>
+          </div>
+        </div>
+        <p>Accurate documentation forms an essential part of every service. Your notes create a record of the care you provided, help the Care Team monitor changes, support communication with the client's Responsible Party, and protect both the client and caregiver.</p>
+        <p>Complete your notes before ending the service whenever possible. Document the care you actually provided during the shift.</p>
+        <div class="list-label">Include when applicable</div>
+        <ul class="nl-list two-col">
+          <li>The client's condition and mood when you arrived and throughout the shift</li>
+          <li>Personal care such as bathing, dressing, grooming, toileting, brief changes, or mobility assistance</li>
+          <li>Assistance with transfers, walking, positioning, or mobility equipment</li>
+          <li>Meals or snacks you prepared</li>
+          <li>Approximately how much the client ate or drank</li>
+          <li>Household tasks such as laundry, dishes, or light housekeeping</li>
+          <li>Activities and cognitive or social engagement with the client</li>
+          <li>Medication reminders you provided</li>
+          <li>Changes in the client's condition, behavior, mobility, appetite, or routine</li>
+          <li>Falls, injuries, unusual events, or safety concerns</li>
+          <li>Issues you reported to the office or the client's family</li>
+          <li>The client's condition and location when you left</li>
+        </ul>
+        <p>Write specific, factual, and objective notes about what occurred during the shift. Do not guess, diagnose, or include personal opinions.</p>
+        <div class="list-label">Avoid vague statements like these</div>
+        <div class="vague-chips">
+          <span class="vague-chip">"Everything was good."</span>
+          <span class="vague-chip">"Client is fine."</span>
+          <span class="vague-chip">"Completed all tasks."</span>
+          <span class="vague-chip">"No changes."</span>
+        </div>
+        <p>These statements do not provide enough information about the care you delivered.</p>
+        <div class="example-note">
+          <div class="ex-label">✓ Example of a complete shift note</div>
+          <blockquote>"Client was awake and in good spirits upon arrival. Assisted with showering, dressing, and transferring from the wheelchair to the shower chair. Prepared scrambled eggs and toast. Client ate approximately 75% of breakfast and drank one glass of water. Completed one load of laundry and cleaned the kitchen. Client and caregiver worked on a puzzle and discussed family photos for cognitive and social engagement. Provided a medication reminder at 10:00 a.m. Client was resting comfortably in the living room when the shift ended. No falls or safety concerns were observed."</blockquote>
+        </div>
+      </section>
+
+      <!-- Parking -->
+      <section class="nl-section" id="parking">
+        <div class="section-header">
+          <div class="section-icon amber">🚗</div>
+          <div>
+            <div class="section-title">Traffic and Parking Responsibilities</div>
+            <div class="section-subtitle">What alice.care covers and what it does not</div>
+          </div>
+        </div>
+        <p>Caregivers must follow all traffic and parking laws while providing transportation or completing client related errands. This applies whether you drive your own vehicle or the client's vehicle.</p>
+        <div class="panel-grid">
+          <div class="panel">
+            <h4>alice.care does not pay or reimburse</h4>
+            <ul class="nl-list no">
+              <li>Speeding tickets</li>
+              <li>Moving violations</li>
+              <li>Parking tickets</li>
+              <li>Towing charges caused by illegal parking</li>
+              <li>Other fines resulting from a caregiver's actions</li>
+            </ul>
+          </div>
+          <div class="panel">
+            <h4>Eligible paid parking</h4>
+            <p>When an authorized service reasonably requires paid parking, alice.care covers the eligible parking expense you incur during the service. Keep the receipt or other proof of payment and follow the company reimbursement process.</p>
+            <p>Parking reimbursement excludes tickets, penalties, late fees, towing charges, and other violations.</p>
+          </div>
+        </div>
+        <div class="callout info">Before parking, check all posted signs, time limits, permit requirements, and payment instructions. If a spot requires payment, complete it correctly and on time.</div>
+      </section>
+
+      <!-- Phone use -->
+      <section class="nl-section" id="phone">
+        <div class="section-header">
+          <div class="section-icon slate">📵</div>
+          <div>
+            <div class="section-title">Mobile Phone Use During Services</div>
+            <div class="section-subtitle">Keep your attention on the client</div>
+          </div>
+        </div>
+        <p>Your attention must stay focused on the client throughout the service. alice.care does not permit personal mobile phone use while you provide care.</p>
+        <div class="panel-grid">
+          <div class="panel">
+            <h4>Allowed work related uses</h4>
+            <ul class="nl-list check">
+              <li>Communicating with the alice.care office</li>
+              <li>Using the alice.care app</li>
+              <li>Completing required service documentation</li>
+              <li>Responding to an emergency</li>
+              <li>Completing an authorized task related to the client's care</li>
+            </ul>
+          </div>
+          <div class="panel">
+            <h4>Not allowed during a service</h4>
+            <ul class="nl-list no">
+              <li>Personal calls or text messages</li>
+              <li>Social media</li>
+              <li>Entertainment</li>
+              <li>Shopping</li>
+              <li>Other unrelated activities</li>
+            </ul>
+          </div>
+        </div>
+        <p style="margin-top:12px">If you must handle an urgent personal matter, make sure the client stays safe and contact the office for guidance.</p>
+      </section>
+
+      <!-- Unusual events -->
+      <section class="nl-section" id="events">
+        <div class="section-header">
+          <div class="section-icon rose">🚨</div>
+          <div>
+            <div class="section-title">Report Unusual Events Immediately</div>
+            <div class="section-subtitle">Call the office first, then document</div>
+          </div>
+        </div>
+        <p>Notify the alice.care office immediately about any event that feels unexpected, significant, or related to the client's safety or well being. Examples include:</p>
+        <ul class="nl-list two-col">
+          <li>A fall or near fall</li>
+          <li>An injury</li>
+          <li>A sudden change in the client's condition or behavior</li>
+          <li>Property damage or a broken item of significance</li>
+          <li>A medication related concern</li>
+          <li>A transportation issue or accident</li>
+          <li>A safety hazard in the home</li>
+          <li>A conflict involving the client or another person</li>
+          <li>An emergency response or hospitalization</li>
+          <li>Any situation that may concern the client's Responsible Party</li>
+        </ul>
+        <p>Do not wait until the end of the shift or rely only on a note in the app. Contact the office immediately so the Care Team can respond appropriately and communicate proactively with the client's Responsible Party.</p>
+        <div class="callout alert"><strong>The client's Responsible Party should never become the first person to inform alice.care about an incident during a service.</strong></div>
+        <p>After you notify the office, document the event accurately and follow any additional instructions from the Care Team.</p>
+      </section>
+
+      <!-- Privacy -->
+      <section class="nl-section" id="privacy">
+        <div class="section-header">
+          <div class="section-icon indigo">🛡️</div>
+          <div>
+            <div class="section-title">Protect Your Personal Contact Information</div>
+            <div class="section-subtitle">Keep communication in approved channels</div>
+          </div>
+        </div>
+        <p>Do not give clients or their family members your personal phone number or other private contact information. This policy protects caregivers from direct requests involving:</p>
+        <ul class="nl-list two-col">
+          <li>Schedule changes</li>
+          <li>Additional services</li>
+          <li>Personal needs or concerns</li>
+          <li>Requests outside the approved care plan</li>
+          <li>Communication outside appropriate work channels</li>
+        </ul>
+        <p>The Care Team manages caregiver schedules. A Care Coach must review and confirm any request to change a service date, start time, end time, duration, or assignment.</p>
+        <div class="callout warn">Do not make private scheduling arrangements directly with a client or family member. If a client asks you to change the schedule, contact the office before agreeing to the request.</div>
+      </section>
+
+      <!-- Contact -->
+      <section class="nl-section" id="contact">
+        <div class="section-header">
+          <div class="section-icon orange">☎️</div>
+          <div>
+            <div class="section-title">Contact Information</div>
+            <div class="section-subtitle">Reach the right team quickly</div>
+          </div>
+        </div>
+        <div class="contact-grid">
+          <a class="contact-card" href="tel:+19162691337">
+            <div class="contact-icon">📞</div>
+            <div class="contact-text"><div class="lbl">Care Coach Line</div><div class="val">916-269-1337</div></div>
+          </a>
+          <a class="contact-card" href="mailto:payroll@alicecare.com">
+            <div class="contact-icon">💵</div>
+            <div class="contact-text"><div class="lbl">Payroll</div><div class="val">payroll@alicecare.com</div></div>
+          </a>
+          <a class="contact-card" href="mailto:hr@alicecare.com">
+            <div class="contact-icon">👥</div>
+            <div class="contact-text"><div class="lbl">Human Resources</div><div class="val">hr@alicecare.com</div></div>
+          </a>
+          <a class="contact-card" href="https://www.alicecare.com" target="_blank" rel="noopener">
+            <div class="contact-icon">🌐</div>
+            <div class="contact-text"><div class="lbl">Company Website</div><div class="val">www.alicecare.com</div></div>
+          </a>
+          <a class="contact-card" href="https://www.paychex.com" target="_blank" rel="noopener">
+            <div class="contact-icon">💼</div>
+            <div class="contact-text"><div class="lbl">Paychex</div><div class="val">www.paychex.com</div></div>
+          </a>
+          <a class="contact-card" href="https://alicecare2032.github.io/alice-care-timeoff/" target="_blank" rel="noopener">
+            <div class="contact-icon">🗓️</div>
+            <div class="contact-text"><div class="lbl">Sick &amp; Vacation Requests</div><div class="val">Time Off Request Form</div></div>
+          </a>
+        </div>
+        <div class="signoff">Regards,<br><strong>alice.care Team</strong></div>
+      </section>
+
+      <div class="app-footer">
+        <div>
+          Caregiver Newsletter &middot; September to October 2026 edition.
+          Visit <a href="https://www.Alicecare.com" target="_blank" rel="noopener">www.Alicecare.com</a> for the operations home page.
+        </div>
+        <div class="footer-right">alice.care &copy; 2026 &middot; TEKKS LLC</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
