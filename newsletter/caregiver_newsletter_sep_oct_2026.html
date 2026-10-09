@@ -80,17 +80,142 @@
     .title-section p { font-size: 13.5px; color: #4A5F7F; line-height: 1.65; max-width: 860px; }
     .title-section p + p { margin-top: 8px; }
 
-    /* Table of contents */
-    .toc {
-      background: #FAFCFF;
-      padding: 14px 36px;
-      border-bottom: 1px solid #E2E8F0;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+    /* Sticky bar: read aloud player + table of contents */
+    .sticky-bar {
       position: sticky;
       top: 0;
       z-index: 10;
+      background: #FAFCFF;
+      border-bottom: 1px solid #E2E8F0;
+      box-shadow: 0 4px 14px rgba(26, 54, 92, 0.05);
+    }
+
+    .tts-player {
+      padding: 12px 36px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid #E2E8F0;
+      background: linear-gradient(135deg, #FFFFFF 0%, #FFF9F0 100%);
+    }
+    .tts-play {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, #F57600 0%, #E06900 100%);
+      color: #FFFFFF;
+      font-size: 17px;
+      cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 12px rgba(245, 118, 0, 0.3);
+      transition: transform 0.15s;
+      flex-shrink: 0;
+    }
+    .tts-play:hover { transform: scale(1.06); }
+    .tts-play:focus-visible, .tts-btn:focus-visible, .tts-select:focus-visible, .listen-btn:focus-visible {
+      outline: 3px solid rgba(29, 78, 216, 0.4);
+      outline-offset: 2px;
+    }
+    .tts-info { flex: 1; min-width: 180px; }
+    .tts-title { font-size: 13px; font-weight: 700; color: #1A365C; }
+    .tts-now {
+      font-size: 11.5px;
+      color: #7A8BA3;
+      margin-top: 1px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .tts-progress {
+      height: 5px;
+      background: #FFE5CC;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .tts-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #F57600, #E06900);
+      transition: width 0.3s;
+    }
+    .tts-controls { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .tts-btn {
+      height: 34px;
+      min-width: 34px;
+      padding: 0 10px;
+      border-radius: 8px;
+      background: #FFFFFF;
+      border: 1.5px solid #D0DDF0;
+      color: #1A365C;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    .tts-btn:hover:not(:disabled) { border-color: #F57600; color: #F57600; }
+    .tts-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .tts-select {
+      height: 34px;
+      padding: 0 8px;
+      border-radius: 8px;
+      border: 1.5px solid #D0DDF0;
+      background: #FFFFFF;
+      color: #1A365C;
+      font-family: 'Poppins', sans-serif;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      max-width: 170px;
+    }
+    .tts-unsupported {
+      padding: 10px 36px;
+      font-size: 12px;
+      color: #92400E;
+      background: #FEF3C7;
+      border-bottom: 1px solid #FCD34D;
+      display: none;
+    }
+
+    /* Listen button on each section */
+    .listen-btn {
+      margin-left: auto;
+      padding: 6px 12px;
+      border-radius: 18px;
+      border: 1.5px solid #F5C992;
+      background: #FFF3E8;
+      color: #B85300;
+      font-family: 'Poppins', sans-serif;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .listen-btn:hover { background: #F57600; border-color: #F57600; color: #FFFFFF; }
+
+    /* Reading highlight */
+    .nl-section.tts-section-active, .title-section.tts-section-active {
+      background: linear-gradient(90deg, rgba(245, 118, 0, 0.05) 0%, rgba(255, 255, 255, 0) 60%);
+      box-shadow: inset 4px 0 0 #F57600;
+    }
+    .tts-active {
+      background-color: #FFF0C2 !important;
+      box-shadow: 0 0 0 4px #FFF0C2;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+    }
+
+    /* Table of contents */
+    .toc {
+      background: #FAFCFF;
+      padding: 12px 36px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
     }
     .toc a {
       padding: 6px 13px;
@@ -406,13 +531,19 @@
       body { background: #FFFFFF; }
       .page-wrapper { padding: 0; }
       .app-container { box-shadow: none; border-radius: 0; }
-      .toc { display: none; }
+      .toc, .tts-player, .listen-btn, .tts-unsupported { display: none !important; }
+      .tts-active { background: none !important; box-shadow: none !important; }
       .nl-section, .qa-card, .spotlight, .celebrate-card { break-inside: avoid; page-break-inside: avoid; }
     }
 
     @media (max-width: 768px) {
       .page-wrapper { padding: 15px 8px 30px; }
-      .app-header, .title-section, .toc, .nl-section, .app-footer { padding-left: 18px; padding-right: 18px; }
+      .app-header, .title-section, .toc, .tts-player, .tts-unsupported, .nl-section, .app-footer { padding-left: 18px; padding-right: 18px; }
+      .tts-player { gap: 10px; }
+      .tts-info { min-width: 0; flex-basis: calc(100% - 60px); }
+      .tts-controls { width: 100%; }
+      .tts-select { max-width: none; flex: 1; }
+      .listen-btn .lb-text { display: none; }
       .title-section h1 { font-size: 22px; }
       .spotlight { grid-template-columns: 1fr; justify-items: center; text-align: center; }
       .trait-row { justify-content: center; }
@@ -436,13 +567,35 @@
         </div>
       </div>
 
-      <div class="title-section">
+      <div class="title-section" id="intro" data-tts-name="Introduction">
         <span class="issue-tag">September to October 2026 Edition</span>
         <h1>Caregiver <span>Newsletter</span></h1>
         <p>Welcome to our latest caregiver newsletter. This edition recognizes our Caregiver of the Month, celebrates team birthdays and work anniversaries, and shares important updates about service assignments, overtime approval, the Alice Care app, shift documentation, mobile phone use, transportation expenses, incident reporting, and client communication.</p>
         <p>Thank you for the compassion, professionalism, and dependable care you provide every day.</p>
       </div>
 
+      <div class="sticky-bar">
+        <div class="tts-unsupported" id="ttsUnsupported">Read aloud does not work in this browser. Try Chrome, Edge, or Safari.</div>
+        <div class="tts-player" id="ttsPlayer" role="region" aria-label="Read the newsletter aloud">
+          <button class="tts-play" id="ttsPlay" type="button" aria-label="Play newsletter">&#9654;</button>
+          <div class="tts-info">
+            <div class="tts-title">&#128264; Listen to this newsletter</div>
+            <div class="tts-now" id="ttsNow">Press play to hear the full newsletter, or tap Listen on any section.</div>
+            <div class="tts-progress"><div class="tts-progress-bar" id="ttsBar"></div></div>
+          </div>
+          <div class="tts-controls">
+            <button class="tts-btn" id="ttsPrev" type="button" aria-label="Previous section" title="Previous section">&#9198;</button>
+            <button class="tts-btn" id="ttsStop" type="button" aria-label="Stop" title="Stop">&#9632;</button>
+            <button class="tts-btn" id="ttsNext" type="button" aria-label="Next section" title="Next section">&#9197;</button>
+            <select class="tts-select" id="ttsRate" aria-label="Reading speed" title="Reading speed">
+              <option value="0.8">0.8x slower</option>
+              <option value="1" selected>1x normal</option>
+              <option value="1.2">1.2x faster</option>
+              <option value="1.5">1.5x fastest</option>
+            </select>
+            <select class="tts-select" id="ttsVoice" aria-label="Voice" title="Voice"></select>
+          </div>
+        </div>
       <nav class="toc">
         <a href="#spotlight">⭐ Caregiver of the Month</a>
         <a href="#celebrations">🎉 Celebrations</a>
@@ -458,6 +611,7 @@
         <a href="#privacy">🛡️ Personal Contact Info</a>
         <a href="#contact">☎️ Contacts</a>
       </nav>
+      </div>
 
       <!-- Caregiver of the Month -->
       <section class="nl-section" id="spotlight">
@@ -896,5 +1050,273 @@
       </div>
     </div>
   </div>
+  <script>
+  (function () {
+    var synth = window.speechSynthesis;
+    var $ = function (id) { return document.getElementById(id); };
+    var playBtn = $('ttsPlay'), stopBtn = $('ttsStop'), prevBtn = $('ttsPrev'), nextBtn = $('ttsNext');
+    var rateSel = $('ttsRate'), voiceSel = $('ttsVoice'), nowEl = $('ttsNow'), barEl = $('ttsBar');
+
+    if (!synth || typeof SpeechSynthesisUtterance === 'undefined') {
+      $('ttsPlayer').style.display = 'none';
+      $('ttsUnsupported').style.display = 'block';
+      return;
+    }
+
+    /* Elements that hold readable text, in page order */
+    var READ_SEL = [
+      '.issue-tag', '.title-section h1', '.title-section p',
+      '.section-title', '.section-subtitle',
+      '.spotlight h3', '.trait-row', '.nl-section p', '.panel h4', '.list-label',
+      '.celebrate-card h3', '.name-chips',
+      '.qa-num', '.verdict', '.qa-q', '.callout', '.email-pill',
+      '.nl-list li', '.vague-chips', '.ex-label', 'blockquote',
+      '.contact-card', '.signoff'
+    ].join(',');
+
+    function cleanText(s) {
+      return s
+        .replace(/[☀-➿⬀-⯿⏩-⏺⌀-⏿]/g, ' ')
+        .replace(/[\uD83C-\uDBFF][\uDC00-\uDFFF]/g, ' ')
+        .replace(/[️‍]/g, '')
+        .replace(/alice\.care/gi, 'Alice Care')
+        .replace(/\bHCO\b/g, 'H C O')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function textFor(el) {
+      if (el.matches('.name-chips, .trait-row, .vague-chips')) {
+        return Array.prototype.map.call(el.children, function (c) { return c.textContent.trim(); }).join(', ').replace(/\.$/, '') + '.';
+      }
+      if (el.matches('.contact-card')) {
+        var lbl = el.querySelector('.lbl'), val = el.querySelector('.val');
+        var v = val ? val.textContent : '';
+        /* Read phone numbers digit by digit, and web addresses the way people say them */
+        if (/^\d{3}-\d{3}-\d{4}$/.test(v)) v = v.split('').map(function (c) { return c === '-' ? ',' : c; }).join(' ');
+        v = v.replace(/^www\./i, '').replace(/@/g, ' at ').replace(/\.com$/i, ' dot com');
+        return (lbl ? lbl.textContent : '') + ': ' + v + '.';
+      }
+      if (el.matches('.signoff')) return 'Regards, the Alice Care Team.';
+      var t = el.textContent.trim();
+      if (!/[.!?:"”]$/.test(t)) t += '.';
+      return t;
+    }
+
+    function splitSentences(t) {
+      /* Split only where punctuation ends a sentence: a space and a capital letter follow it */
+      var parts = t.split(/(?<=[.!?]["”)]?)\s+(?=["“]?[A-Z])/);
+      var out = [], buf = '';
+      parts.forEach(function (p) {
+        p = p.trim();
+        if (!p) return;
+        if ((buf + ' ' + p).length < 180) { buf = buf ? buf + ' ' + p : p; }
+        else { if (buf) out.push(buf); buf = p; }
+      });
+      if (buf) out.push(buf);
+      return out;
+    }
+
+    /* Build the reading queue: one entry per sentence group, grouped by section */
+    var sections = Array.prototype.slice.call(document.querySelectorAll('.title-section, .nl-section'));
+    var queue = [], sectionStart = [];
+    sections.forEach(function (sec, si) {
+      sectionStart[si] = queue.length;
+      var nodes = Array.prototype.filter.call(sec.querySelectorAll(READ_SEL), function (el) {
+        var parent = el.parentElement && el.parentElement.closest(READ_SEL);
+        return !(parent && sec.contains(parent)) && !el.closest('.spotlight-badge');
+      });
+      nodes.forEach(function (el) {
+        var txt = cleanText(textFor(el));
+        if (!txt || txt === '.') return;
+        splitSentences(txt).forEach(function (chunk) {
+          queue.push({ text: chunk, el: el, sec: si });
+        });
+      });
+
+      /* Listen button for each section */
+      var header = sec.querySelector('.section-header');
+      if (header) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'listen-btn';
+        b.setAttribute('aria-label', 'Listen to this section');
+        b.innerHTML = '&#128264; <span class="lb-text">Listen</span>';
+        b.addEventListener('click', function () { startAt(sectionStart[si], true); });
+        header.appendChild(b);
+      }
+    });
+
+    function sectionName(si) {
+      var sec = sections[si];
+      if (sec.dataset.ttsName) return sec.dataset.ttsName;
+      var t = sec.querySelector('.section-title');
+      return t ? t.textContent.trim() : 'Section ' + (si + 1);
+    }
+
+    /* Voices */
+    var voices = [];
+    function loadVoices() {
+      var all = synth.getVoices();
+      voices = all.filter(function (v) { return /^en/i.test(v.lang); });
+      if (!voices.length) voices = all;
+      var prev = voiceSel.value;
+      voiceSel.innerHTML = '';
+      voices.forEach(function (v, i) {
+        var o = document.createElement('option');
+        o.value = v.name;
+        o.textContent = v.name.replace(/^(Microsoft|Google)\s+/, '') + (v.lang ? ' (' + v.lang + ')' : '');
+        voiceSel.appendChild(o);
+      });
+      if (prev && voices.some(function (v) { return v.name === prev; })) { voiceSel.value = prev; }
+      else {
+        var pick = voices.find(function (v) { return /en-US/i.test(v.lang) && /natural|online|samantha|aria|jenny|google us/i.test(v.name); })
+          || voices.find(function (v) { return /en-US/i.test(v.lang); })
+          || voices[0];
+        if (pick) voiceSel.value = pick.name;
+      }
+      voiceSel.style.display = voices.length ? '' : 'none';
+    }
+    loadVoices();
+    if (typeof synth.onvoiceschanged !== 'undefined') synth.onvoiceschanged = loadVoices;
+
+    /* Playback state */
+    var idx = 0, state = 'idle', token = 0, activeEl = null, activeSec = null;
+
+    function setState(s) {
+      state = s;
+      var playing = s === 'playing';
+      playBtn.innerHTML = playing ? '&#10074;&#10074;' : '&#9654;';
+      playBtn.setAttribute('aria-label', playing ? 'Pause' : (s === 'paused' ? 'Resume' : 'Play newsletter'));
+      stopBtn.disabled = s === 'idle';
+    }
+
+    function highlight(item) {
+      if (activeEl && activeEl !== (item && item.el)) activeEl.classList.remove('tts-active');
+      var sec = item ? sections[item.sec] : null;
+      if (activeSec && activeSec !== sec) activeSec.classList.remove('tts-section-active');
+      if (!item) { activeEl = activeSec = null; return; }
+      if (activeEl !== item.el) {
+        item.el.classList.add('tts-active');
+        var r = item.el.getBoundingClientRect();
+        var barH = document.querySelector('.sticky-bar').offsetHeight;
+        if (r.top < barH + 10 || r.bottom > window.innerHeight - 40) {
+          window.scrollBy({ top: r.top - barH - 90, behavior: 'smooth' });
+        }
+      }
+      sec.classList.add('tts-section-active');
+      activeEl = item.el; activeSec = sec;
+    }
+
+    function updateInfo() {
+      var item = queue[Math.min(idx, queue.length - 1)];
+      var pct = queue.length ? Math.round((idx / queue.length) * 100) : 0;
+      barEl.style.width = pct + '%';
+      if (state === 'idle') {
+        nowEl.textContent = idx >= queue.length && queue.length ? 'Finished. Press play to start again.' : 'Press play to hear the full newsletter, or tap Listen on any section.';
+      } else if (item) {
+        nowEl.textContent = (state === 'paused' ? 'Paused: ' : 'Now reading: ') + sectionName(item.sec) + ' (' + (item.sec + 1) + ' of ' + sections.length + ')';
+      }
+      prevBtn.disabled = !item || item.sec === 0;
+      nextBtn.disabled = !item || item.sec >= sections.length - 1;
+    }
+
+    function speakCurrent() {
+      if (idx >= queue.length) { finish(); return; }
+      var myToken = ++token;
+      var item = queue[idx];
+      highlight(item);
+      updateInfo();
+      var u = new SpeechSynthesisUtterance(item.text);
+      var v = voices.find(function (x) { return x.name === voiceSel.value; });
+      if (v) { u.voice = v; u.lang = v.lang; } else { u.lang = 'en-US'; }
+      u.rate = parseFloat(rateSel.value) || 1;
+      u.onend = function () {
+        if (myToken !== token || state !== 'playing') return;
+        idx++;
+        speakCurrent();
+      };
+      u.onerror = function (e) {
+        if (myToken !== token || state !== 'playing') return;
+        if (e.error === 'interrupted' || e.error === 'canceled') return;
+        idx++;
+        speakCurrent();
+      };
+      synth.speak(u);
+    }
+
+    /* Pause uses cancel plus restart of the current sentence, which works the same in every browser */
+    function startAt(i, fromSectionBtn) {
+      token++;
+      synth.cancel();
+      idx = Math.max(0, Math.min(i, queue.length - 1));
+      setState('playing');
+      if (fromSectionBtn) {
+        var sec = sections[queue[idx].sec];
+        var barH = document.querySelector('.sticky-bar').offsetHeight;
+        window.scrollTo({ top: sec.getBoundingClientRect().top + window.pageYOffset - barH, behavior: 'smooth' });
+      }
+      setTimeout(speakCurrent, 60);
+    }
+
+    function pause() {
+      token++;
+      synth.cancel();
+      setState('paused');
+      updateInfo();
+    }
+
+    function stop() {
+      token++;
+      synth.cancel();
+      idx = 0;
+      setState('idle');
+      highlight(null);
+      updateInfo();
+    }
+
+    function finish() {
+      setState('idle');
+      highlight(null);
+      idx = queue.length;
+      updateInfo();
+      idx = 0;
+    }
+
+    function jumpSection(dir) {
+      var cur = queue[Math.min(idx, queue.length - 1)];
+      var target = Math.max(0, Math.min(sections.length - 1, (cur ? cur.sec : 0) + dir));
+      if (state === 'playing') startAt(sectionStart[target], true);
+      else { idx = sectionStart[target]; if (state === 'idle') setState('paused'); highlight(queue[idx]); updateInfo(); }
+    }
+
+    playBtn.addEventListener('click', function () {
+      if (state === 'playing') pause();
+      else startAt(idx, false);
+    });
+    stopBtn.addEventListener('click', stop);
+    prevBtn.addEventListener('click', function () { jumpSection(-1); });
+    nextBtn.addEventListener('click', function () { jumpSection(1); });
+    function restartIfPlaying() { if (state === 'playing') startAt(idx, false); }
+    rateSel.addEventListener('change', restartIfPlaying);
+    voiceSel.addEventListener('change', restartIfPlaying);
+
+    /* Remember speed and voice for this reader */
+    try {
+      var saved = JSON.parse(localStorage.getItem('aliceNewsletterTts') || '{}');
+      if (saved.rate) rateSel.value = saved.rate;
+      if (saved.voice) setTimeout(function () { if (voices.some(function (v) { return v.name === saved.voice; })) voiceSel.value = saved.voice; }, 400);
+    } catch (e) {}
+    function savePrefs() {
+      try { localStorage.setItem('aliceNewsletterTts', JSON.stringify({ rate: rateSel.value, voice: voiceSel.value })); } catch (e) {}
+    }
+    rateSel.addEventListener('change', savePrefs);
+    voiceSel.addEventListener('change', savePrefs);
+
+    window.addEventListener('beforeunload', function () { synth.cancel(); });
+    setState('idle');
+    updateInfo();
+  })();
+  </script>
 </body>
 </html>
