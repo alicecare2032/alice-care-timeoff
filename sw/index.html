@@ -292,7 +292,11 @@
       var timer = setTimeout(function () { cleanup(); rej(new Error('The server took too long to answer.')); }, 120000);
       function cleanup() { clearTimeout(timer); delete window[cb]; if (s.parentNode) s.parentNode.removeChild(s); }
       window[cb] = function (out) { cleanup(); res(out); };
-      s.onerror = function () { cleanup(); rej(new Error('Could not reach Apps Script. Check API_URL and that the deployment allows "Anyone".')); };
+      s.onerror = function () {
+        cleanup();
+        showBanner('Apps Script did not return data for "' + action + '". Usually the /exec URL changed after a new deployment, or the script failed to start.', true);
+        rej(new Error('Could not reach Apps Script (' + action + ').'));
+      };
       s.src = API_URL + '?action=' + encodeURIComponent(action) + '&args=' + encodeURIComponent(JSON.stringify(args || [])) +
         '&pin=' + encodeURIComponent(getPin()) + '&callback=' + cb;
       document.body.appendChild(s);
@@ -339,9 +343,11 @@
     var v = $('pinInput').value.trim(); if (!v) return;
     setPin(v); $('pinInput').value = ''; closeModal('pinModal'); $('banner').style.display = 'none'; load();
   }
-  function showBanner(msg) {
+  function showBanner(msg, withTest) {
+    var test = API_URL + '?action=getAppState&pin=' + encodeURIComponent(getPin()) + '&callback=test';
     $('banner').innerHTML = '<b>The app could not load its data.</b> ' + esc(msg) +
-      ' <button class="btn sm" onclick="$(\'banner\').style.display=\'none\';load()">Retry</button>';
+      (withTest ? '<div style="margin-top:6px">Open the <a href="' + esc(test) + '" target="_blank" rel="noopener">connection test</a>: a working script shows <span class="mono">test({"ok":true</span>. Any other page shows the real problem. URL in use: <span class="mono">' + esc(API_URL.replace(/^(.{45}).*(.{12})$/, '$1...$2')) + '</span></div>' : '') +
+      ' <button class="btn sm" style="margin-top:6px" onclick="$(\'banner\').style.display=\'none\';load()">Retry</button>';
     $('banner').style.display = 'block';
   }
   function closeModal(id) { $(id).classList.remove('on'); }
