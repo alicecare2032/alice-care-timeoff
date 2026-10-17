@@ -276,7 +276,7 @@
   function toast(msg, err) { var t = $('toast'); t.textContent = msg; t.className = err ? 'err' : ''; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(function () { t.style.display = 'none'; }, err ? 7000 : 3500); }
   // ---------- connection to Google Apps Script ----------
   // Paste your Apps Script web app URL (ends in /exec) here.
-  var API_URL = 'https://www.Alicecare.com';
+  var API_URL = 'https://script.google.com/macros/s/AKfycbx7N2w8lovpySaAdn2mIbLS54eezmS1V6hbd3exECAkd6XVcNpv3UJnRV3S8GjSyr2U/exec';
 
   var GET_ACTIONS = ['getAppState', 'computeBilling', 'previewInvoiceHtml', 'generateInvoice', 'sendInvoice', 'setInvoiceStatus', 'refreshBillableFlags', 'listInvoices'];
   var jsonpSeq = 0;
