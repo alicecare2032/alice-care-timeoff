@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<base target="_top">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Service Wave Invoicing</title>
@@ -85,7 +84,7 @@
 <header>
   <div class="bar">
     <div class="brand">
-      <span class="chip"><img src="<?= logo ?>" alt="Service Wave"></span>
+      <span class="chip"><img src="logo.png" alt="Service Wave"></span>
       <div><b>Service Wave Invoicing</b><small>Europediatria Srl · SaaS pay per use</small></div>
     </div>
     <nav>
@@ -253,6 +252,16 @@
   </div>
 </div>
 
+<div class="modal" id="pinModal">
+  <div class="sheet" style="width:min(380px,100%)">
+    <div class="hd"><b>Enter PIN</b></div>
+    <div class="bd">
+      <input id="pinInput" type="password" inputmode="numeric" autocomplete="current-password" placeholder="PIN" onkeydown="if(event.key==='Enter')submitPin()">
+      <button class="btn" onclick="submitPin()">Unlock</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -265,18 +274,70 @@
   function eur(n) { return '€' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
   function label(p) { var a = p.split('-'); return a[1] + '/' + a[0]; }
   function toast(msg, err) { var t = $('toast'); t.textContent = msg; t.className = err ? 'err' : ''; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(function () { t.style.display = 'none'; }, err ? 7000 : 3500); }
-  /** Every server reply arrives as a JSON string, so dates can never turn a reply into null. */
+  // ---------- connection to Google Apps Script ----------
+  // Paste your Apps Script web app URL (ends in /exec) here.
+  var API_URL = 'https://www.Alicecare.com';
+
+  var GET_ACTIONS = ['getAppState', 'computeBilling', 'previewInvoiceHtml', 'generateInvoice', 'sendInvoice', 'setInvoiceStatus', 'refreshBillableFlags', 'listInvoices'];
+  var jsonpSeq = 0;
+
+  function getPin() { try { return sessionStorage.getItem('sw_pin') || ''; } catch (e) { return ''; } }
+  function setPin(p) { try { sessionStorage.setItem('sw_pin', p); } catch (e) {} }
+
+  /** JSONP GET: works across origins, including Safari and Workspace accounts. */
+  function jsonp(action, args) {
+    return new Promise(function (res, rej) {
+      var cb = 'swcb_' + Date.now() + '_' + (jsonpSeq++);
+      var s = document.createElement('script');
+      var timer = setTimeout(function () { cleanup(); rej(new Error('The server took too long to answer.')); }, 120000);
+      function cleanup() { clearTimeout(timer); delete window[cb]; if (s.parentNode) s.parentNode.removeChild(s); }
+      window[cb] = function (out) { cleanup(); res(out); };
+      s.onerror = function () { cleanup(); rej(new Error('Could not reach Apps Script. Check API_URL and that the deployment allows "Anyone".')); };
+      s.src = API_URL + '?action=' + encodeURIComponent(action) + '&args=' + encodeURIComponent(JSON.stringify(args || [])) +
+        '&pin=' + encodeURIComponent(getPin()) + '&callback=' + cb;
+      document.body.appendChild(s);
+    });
+  }
+
+  /** no-cors POST for large payloads, then poll for the stored result over JSONP. */
+  function post(action, args) {
+    var id = 'r' + Date.now() + Math.random().toString(36).slice(2, 8);
+    var body = JSON.stringify({ action: action, args: args, pin: getPin(), requestId: id });
+    return fetch(API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: body })
+      .then(function () {
+        return new Promise(function (res, rej) {
+          var tries = 0;
+          (function poll() {
+            jsonp('getResult', [id]).then(function (out) {
+              if (out && out.ok && out.data) return res(out.data);
+              if (out && !out.ok) return res(out);
+              if (++tries > 60) return rej(new Error('The upload did not confirm in time. Check the Clients tab.'));
+              setTimeout(poll, 2000);
+            }, rej);
+          })();
+        });
+      });
+  }
+
   function call(fn) {
     var args = Array.prototype.slice.call(arguments, 1);
-    return new Promise(function (res, rej) {
-      var r = google.script.run
-        .withSuccessHandler(function (out) {
-          try { res(typeof out === 'string' ? JSON.parse(out) : out); }
-          catch (e) { res(out); }
-        })
-        .withFailureHandler(function (e) { toast(e.message || String(e), true); rej(e); });
-      if (fn === 'getAppState') r.getAppState(); else r.api(fn, args);
-    });
+    if (/alicecare\.com/i.test(API_URL)) {
+      var m = 'Set API_URL in index.html to your Apps Script /exec URL.';
+      toast(m, true); return Promise.reject(new Error(m));
+    }
+    var p = GET_ACTIONS.indexOf(fn) >= 0 ? jsonp(fn, args) : post(fn, args);
+    return p.then(function (out) {
+      if (out && out.ok) return out.data;
+      if (out && out.error === 'PIN') { setPin(''); askPin(); }
+      var err = new Error((out && out.message) || 'Unknown server error.');
+      throw err;
+    }).catch(function (e) { toast(e.message || String(e), true); throw e; });
+  }
+
+  function askPin() { $('pinModal').classList.add('on'); setTimeout(function () { $('pinInput').focus(); }, 50); }
+  function submitPin() {
+    var v = $('pinInput').value.trim(); if (!v) return;
+    setPin(v); $('pinInput').value = ''; closeModal('pinModal'); $('banner').style.display = 'none'; load();
   }
   function showBanner(msg) {
     $('banner').innerHTML = '<b>The app could not load its data.</b> ' + esc(msg) +
@@ -507,7 +568,7 @@
     }).then(function (stats) { renderStats(stats); toast('Settings saved'); compute(); });
   }
 
-  load();
+  if (getPin()) load(); else askPin();
 </script>
 </body>
 </html>
