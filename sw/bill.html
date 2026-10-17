@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Service Wave Invoicing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --deep: #17484C; --pine: #1E6A5C; --teal: #278876; --mint: #34A891;
+    --tint: #E8F4F1; --tint2: #F5FAF9; --line: #D5E6E2; --ink: #1C2B2D; --muted: #5B6B6D;
+    --bg: #F3F7F6; --card: #FFFFFF; --warn: #B4531F; --warnbg: #FCEFE6;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Manrope', system-ui, sans-serif; color: var(--ink); background: var(--bg); }
+  header { background: var(--deep); color: #fff; }
+  .bar { max-width: 1180px; margin: 0 auto; padding: 14px 16px; display: flex; align-items: center; gap: 14px; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand .chip { background: #fff; border-radius: 10px; padding: 5px 8px; display: flex; }
+  .brand img { height: 30px; }
+  .brand b { font-size: 17px; letter-spacing: .2px; }
+  .brand small { display: block; color: #A9D8CC; font-size: 12px; font-weight: 500; }
+  nav { margin-left: auto; display: flex; gap: 4px; flex-wrap: wrap; }
+  nav button { background: transparent; color: #CFE9E2; border: 0; padding: 9px 14px; border-radius: 8px; font: 600 14px 'Manrope'; cursor: pointer; }
+  nav button.on { background: var(--mint); color: #062B26; }
+  nav button:hover:not(.on) { background: rgba(255,255,255,.08); }
+  .stripe { height: 4px; background: linear-gradient(90deg, var(--pine) 0 33%, var(--teal) 33% 66%, var(--mint) 66%); }
+  main { max-width: 1180px; margin: 0 auto; padding: 22px 16px 60px; }
+  section { display: none; } section.on { display: block; }
+  h1 { font-size: 22px; margin: 0 0 4px; color: var(--deep); }
+  .sub { color: var(--muted); margin: 0 0 18px; font-size: 14px; }
+  .grid { display: grid; gap: 16px; }
+  .g2 { grid-template-columns: 1.4fr 1fr; } .g4 { grid-template-columns: repeat(4, 1fr); }
+  @media (max-width: 860px) { .g2, .g4 { grid-template-columns: 1fr; } nav { width: 100%; margin-left: 0; } .bar { flex-wrap: wrap; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
+  .card h2 { font-size: 15px; margin: 0 0 12px; color: var(--deep); }
+  .kpi .v { font-size: 26px; font-weight: 800; color: var(--deep); }
+  .kpi .k { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; font-weight: 700; }
+  .kpi.accent { background: var(--deep); border-color: var(--deep); } .kpi.accent .v { color: #fff; } .kpi.accent .k { color: #A9D8CC; }
+  label { display: block; font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin: 0 0 6px; }
+  input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px; font: 500 14px 'Manrope'; color: var(--ink); background: #fff; }
+  textarea { font-family: 'JetBrains Mono', monospace; font-size: 12px; min-height: 110px; }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--mint); border-color: var(--mint); }
+  .btn { border: 0; border-radius: 9px; padding: 10px 16px; font: 700 14px 'Manrope'; cursor: pointer; background: var(--pine); color: #fff; }
+  .btn:hover { background: var(--deep); } .btn:disabled { opacity: .5; cursor: wait; }
+  .btn.ghost { background: #fff; color: var(--pine); border: 1px solid var(--line); } .btn.ghost:hover { background: var(--tint); }
+  .btn.mint { background: var(--mint); color: #062B26; } .btn.sm { padding: 6px 10px; font-size: 12px; }
+  .row { display: flex; gap: 10px; align-items: end; flex-wrap: wrap; } .row > * { flex: 1; min-width: 140px; }
+  .row > .btn { flex: 0 0 auto; }
+  table.t { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .t th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); padding: 8px; border-bottom: 2px solid var(--line); }
+  .t td { padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .t .r { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .t tr.total td { font-weight: 800; color: #fff; background: var(--deep); border: 0; }
+  .t tr.waived td { color: var(--muted); font-style: italic; }
+  .scroll { overflow-x: auto; }
+  .pill { display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+  .pill.Draft { background: var(--warnbg); color: var(--warn); } .pill.Sent { background: var(--tint); color: var(--pine); } .pill.Paid { background: var(--mint); color: #062B26; }
+  .drop { border: 2px dashed var(--teal); border-radius: 14px; padding: 34px 18px; text-align: center; background: var(--tint2); cursor: pointer; }
+  .drop.over { background: var(--tint); }
+  .drop b { color: var(--deep); font-size: 16px; display: block; margin-bottom: 4px; }
+  .note { font-size: 13px; color: var(--muted); background: var(--tint2); border-left: 3px solid var(--mint); padding: 10px 12px; border-radius: 0 8px 8px 0; }
+  .zones { display: flex; flex-wrap: wrap; gap: 8px; }
+  .zone { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; cursor: pointer; font-weight: 600; font-size: 14px; }
+  .zone input { width: auto; margin: 0; accent-color: var(--pine); }
+  .zone.on { border-color: var(--pine); background: var(--tint); }
+  .zone small { color: var(--muted); font-weight: 500; }
+  #toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: var(--deep); color: #fff; padding: 12px 18px; border-radius: 10px; font-weight: 600; display: none; z-index: 30; max-width: 92vw; }
+  #toast.err { background: var(--warn); }
+  .modal { position: fixed; inset: 0; background: rgba(10,30,32,.55); display: none; align-items: center; justify-content: center; z-index: 20; padding: 16px; }
+  .modal.on { display: flex; }
+  .sheet { background: #fff; border-radius: 14px; width: min(900px, 100%); max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; }
+  .sheet .hd { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  .sheet .hd b { color: var(--deep); margin-right: auto; }
+  .sheet iframe { border: 0; width: 100%; height: 75vh; background: #fff; }
+  .sheet .bd { padding: 16px; display: grid; gap: 12px; }
+  .muted { color: var(--muted); } .mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .loading { color: var(--muted); padding: 20px 0; }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="brand">
+      <span class="chip"><img src="<?= logo ?>" alt="Service Wave"></span>
+      <div><b>Service Wave Invoicing</b><small>Europediatria Srl · SaaS pay per use</small></div>
+    </div>
+    <nav>
+      <button data-tab="billing" class="on">Billing</button>
+      <button data-tab="upload">Upload</button>
+      <button data-tab="invoices">Invoices</button>
+      <button data-tab="settings">Settings</button>
+    </nav>
+  </div>
+  <div class="stripe"></div>
+</header>
+
+<main>
+  <!-- BILLING -->
+  <section id="billing" class="on">
+    <h1>Monthly billing</h1>
+    <p class="sub">Pick a period, check the charges, then generate the Italian invoice and its English copy.</p>
+    <div class="grid g4" style="margin-bottom:16px">
+      <div class="card kpi"><div class="k">Clients in sheet</div><div class="v" id="kTotal">0</div></div>
+      <div class="card kpi"><div class="k">In billing zones</div><div class="v" id="kZone">0</div></div>
+      <div class="card kpi"><div class="k">Billable this month</div><div class="v" id="kBill">0</div></div>
+      <div class="card kpi accent"><div class="k">Period total</div><div class="v" id="kAmt">€0.00</div></div>
+    </div>
+    <div class="grid g2">
+      <div class="card">
+        <div class="row" style="margin-bottom:14px">
+          <div><label for="period">Billing period (mm/yyyy)</label><select id="period"></select></div>
+          <button class="btn ghost" onclick="preview('it')">Preview IT</button>
+          <button class="btn ghost" onclick="preview('en')">Preview EN</button>
+          <button class="btn" id="genBtn" onclick="generate()">Generate invoice</button>
+        </div>
+        <div class="scroll" id="lines"><div class="loading">Loading…</div></div>
+      </div>
+      <div class="card">
+        <h2>How this period adds up</h2>
+        <div id="explain" class="muted" style="font-size:14px; line-height:1.6"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- UPLOAD -->
+  <section id="upload">
+    <h1>Upload client export</h1>
+    <p class="sub">Drop the Customer Report CSV. The tool updates existing clients, adds new ones and never removes a billing obligation.</p>
+    <div class="grid g2">
+      <div class="card">
+        <div class="drop" id="drop" onclick="document.getElementById('file').click()">
+          <b>Drop the CSV here or click to choose</b>
+          <span class="muted">Dates in the file read as mm/dd/yyyy and save as dd/mm/yyyy</span>
+        </div>
+        <input type="file" id="file" accept=".csv,text/csv" style="display:none">
+        <div id="parsed" style="margin-top:16px"></div>
+      </div>
+      <div class="card">
+        <h2>Upload rules</h2>
+        <div class="note" style="margin-bottom:10px">A client becomes billable the first time an upload shows them <b>Active</b>. If a later upload shows them Inactive, billing continues until their 24 month window ends.</div>
+        <div class="note" style="margin-bottom:10px">Clients outside the zones you select in Settings never appear on an invoice.</div>
+        <div class="note">Rows stay in the sheet even when a later file omits them.</div>
+        <div id="uploadResult" style="margin-top:16px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INVOICES -->
+  <section id="invoices">
+    <h1>Invoices</h1>
+    <p class="sub">Drafts can regenerate. Once sent, an invoice stays frozen.</p>
+    <div class="card scroll"><div id="invList" class="loading">Loading…</div></div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="settings">
+    <h1>Settings</h1>
+    <p class="sub">Changes apply to the next invoice you generate. Issued invoices keep their original amounts.</p>
+    <div class="grid" style="gap:16px">
+      <div class="card">
+        <h2>Active billing zones</h2>
+        <div class="zones" id="zoneList"></div>
+        <div class="hint">Only clients in a checked zone get billed. Zones appear here once a CSV upload contains them.</div>
+      </div>
+      <div class="grid g2">
+        <div class="card">
+          <h2>Rates (EUR)</h2>
+          <div class="grid" style="grid-template-columns:1fr 1fr; gap:12px">
+            <div><label>Maintenance / month</label><input id="r_maintenance" type="number" step="0.01"></div>
+            <div><label>Video module / month</label><input id="r_video" type="number" step="0.01"></div>
+            <div><label>Admin user / month</label><input id="r_admin" type="number" step="0.01"></div>
+            <div><label>Admins included</label><input id="r_adminIncluded" type="number" step="1"></div>
+            <div><label>Operator / month</label><input id="r_operator" type="number" step="0.01"></div>
+            <div><label>Client / month</label><input id="r_client" type="number" step="0.01"></div>
+            <div><label>Billing window (months)</label><input id="r_windowMonths" type="number" step="1"></div>
+            <div><label>Month with no maintenance</label><select id="noMaintenanceMonth"></select></div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Invoicing</h2>
+          <div class="grid" style="grid-template-columns:1fr 1fr; gap:12px">
+            <div><label>First period (mm/yyyy)</label><input id="billingStart" type="month"></div>
+            <div><label>Payment days</label><input id="paymentDays" type="number" step="1"></div>
+            <div><label>Invoice prefix</label><input id="invoicePrefix"></div>
+            <div><label>Next invoice number</label><input id="nextInvoiceNumber" type="number" step="1"></div>
+            <div style="grid-column:1/-1"><label>Send to (comma separated)</label><input id="recipients"></div>
+            <div style="grid-column:1/-1"><label>CC</label><input id="cc"></div>
+            <div style="grid-column:1/-1"><label class="zone" style="text-transform:none; letter-spacing:0; color:var(--ink)"><input type="checkbox" id="includeDetail"> Add the billed users annex to each invoice</label></div>
+          </div>
+        </div>
+      </div>
+      <div class="grid g2">
+        <div class="card">
+          <h2>Customer</h2>
+          <div class="grid" style="grid-template-columns:1fr 1fr; gap:12px">
+            <div style="grid-column:1/-1"><label>Name</label><input id="c_name"></div>
+            <div><label>Address</label><input id="c_address"></div>
+            <div><label>City</label><input id="c_city"></div>
+            <div><label>P.IVA / VAT No.</label><input id="c_vat"></div>
+            <div><label>Codice SDI</label><input id="c_sdi"></div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Issuer</h2>
+          <div class="grid" style="grid-template-columns:1fr 1fr; gap:12px">
+            <div style="grid-column:1/-1"><label>Name</label><input id="i_name"></div>
+            <div><label>Address</label><input id="i_address"></div>
+            <div><label>City</label><input id="i_city"></div>
+            <div><label>Website</label><input id="i_web"></div>
+            <div><label>Billing email</label><input id="i_email"></div>
+            <div><label>EIN / Tax ID</label><input id="i_taxId"></div>
+          </div>
+        </div>
+      </div>
+      <div class="grid g2">
+        <div class="card">
+          <h2>Bank details (printed on invoice)</h2>
+          <textarea id="bank"></textarea>
+        </div>
+        <div class="card">
+          <h2>Invoice notes</h2>
+          <label>VAT note (Italian)</label><textarea id="vatNoteIt" style="min-height:60px"></textarea>
+          <label style="margin-top:10px">VAT note (English)</label><textarea id="vatNoteEn" style="min-height:60px"></textarea>
+          <div class="hint">Confirm the reverse charge wording with your accountant before the first send.</div>
+        </div>
+      </div>
+      <div><button class="btn" onclick="saveAll()">Save settings</button></div>
+    </div>
+  </section>
+</main>
+
+<div class="modal" id="previewModal">
+  <div class="sheet">
+    <div class="hd"><b id="previewTitle">Preview</b><button class="btn ghost sm" onclick="closeModal('previewModal')">Close</button></div>
+    <iframe id="previewFrame"></iframe>
+  </div>
+</div>
+
+<div class="modal" id="sendModal">
+  <div class="sheet" style="width:min(520px,100%)">
+    <div class="hd"><b id="sendTitle">Send invoice</b><button class="btn ghost sm" onclick="closeModal('sendModal')">Close</button></div>
+    <div class="bd">
+      <div class="note">The email carries the Italian original and the English copy as PDF attachments.</div>
+      <div><label>To</label><input id="sendTo"></div>
+      <div><label>CC</label><input id="sendCc"></div>
+      <button class="btn" id="sendBtn">Send now</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  var STATE = null;
+  var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  // ---------- helpers ----------
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function eur(n) { return '€' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function label(p) { var a = p.split('-'); return a[1] + '/' + a[0]; }
+  function toast(msg, err) { var t = $('toast'); t.textContent = msg; t.className = err ? 'err' : ''; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(function () { t.style.display = 'none'; }, err ? 7000 : 3500); }
+  function call(fn) {
+    var args = Array.prototype.slice.call(arguments, 1);
+    return new Promise(function (res, rej) {
+      var r = google.script.run.withSuccessHandler(res).withFailureHandler(function (e) { toast(e.message || String(e), true); rej(e); });
+      r[fn].apply(r, args);
+    });
+  }
+  function closeModal(id) { $(id).classList.remove('on'); }
+
+  // ---------- tabs ----------
+  document.querySelectorAll('nav button').forEach(function (b) {
+    b.onclick = function () {
+      document.querySelectorAll('nav button').forEach(function (x) { x.classList.toggle('on', x === b); });
+      document.querySelectorAll('section').forEach(function (s) { s.classList.toggle('on', s.id === b.dataset.tab); });
+    };
+  });
+
+  // ---------- load ----------
+  function load() {
+    call('getAppState').then(function (st) {
+      STATE = st;
+      renderStats(st.stats);
+      var sel = $('period');
+      sel.innerHTML = st.periods.map(function (p) { return '<option value="' + p + '">' + label(p) + ' · ' + MONTHS[+p.split('-')[1] - 1] + '</option>'; }).join('');
+      var now = new Date(), cur = now.getFullYear() + '-' + ('0' + (now.getMonth() + 1)).slice(-2);
+      if (st.periods.indexOf(cur) >= 0) sel.value = cur;
+      sel.onchange = compute;
+      compute();
+      renderInvoices(st.invoices);
+      fillSettings(st.settings, st.zones);
+    });
+  }
+
+  function renderStats(s) { $('kTotal').textContent = s.total; $('kZone').textContent = s.inZone; $('kBill').textContent = s.billableNow; }
+
+  // ---------- billing ----------
+  function compute() {
+    var p = $('period').value; if (!p) return;
+    $('lines').innerHTML = '<div class="loading">Calculating…</div>';
+    call('computeBilling', p).then(function (b) {
+      var L = b.lines, r = STATE.settings.rates;
+      var rows = [
+        L.maintenance.waived
+          ? ['Maintenance: not charged in June (11 installments)', 0, L.maintenance.unit, 0, 'waived']
+          : ['Platform maintenance', 1, L.maintenance.unit, L.maintenance.amount],
+        ['Videoconference module', 1, L.video.unit, L.video.amount],
+        ['Admin users: ' + L.admins.active + ' active, ' + L.admins.included + ' included', L.admins.qty, L.admins.unit, L.admins.amount],
+        ['Operator/provider users', L.operators.qty, L.operators.unit, L.operators.amount],
+        ['Client users', L.clients.qty, L.clients.unit, L.clients.amount]
+      ];
+      $('lines').innerHTML = '<table class="t"><tr><th>Line</th><th class="r">Qty</th><th class="r">Unit</th><th class="r">Amount</th></tr>' +
+        rows.map(function (x) { return '<tr class="' + (x[4] || '') + '"><td>' + esc(x[0]) + '</td><td class="r">' + x[1] + '</td><td class="r">' + eur(x[2]) + '</td><td class="r">' + eur(x[3]) + '</td></tr>'; }).join('') +
+        '<tr class="total"><td>Total · ' + esc(b.periodLabel) + '</td><td></td><td></td><td class="r">' + eur(b.total) + '</td></tr></table>' +
+        '<p class="hint">Issue date (dd/mm/yyyy): <b>' + b.issueDate + '</b> · Due date (dd/mm/yyyy): <b>' + b.dueDate + '</b></p>';
+      $('kAmt').textContent = eur(b.total);
+      var ex = [];
+      ex.push('<b>' + b.clients.length + '</b> clients count for ' + esc(b.periodLabel) + ' in ' + esc((b.zones || []).join(', ') || 'no zone') + '. Each has appeared Active at least once and sits inside their ' + r.windowMonths + ' month window.');
+      ex.push('<b>' + L.admins.active + '</b> billable admin' + (L.admins.active === 1 ? '' : 's') + '; the first ' + r.adminIncluded + ' ride free with maintenance.');
+      ex.push('<b>' + L.operators.qty + '</b> billable operator' + (L.operators.qty === 1 ? '' : 's') + (b.operators.length ? ': ' + b.operators.map(function (o) { return esc(o.name) + ' (until ' + o.until + ')'; }).join(', ') : '') + '.');
+      if (b.pendingStamps.length) ex.push('Generating this invoice stamps a First Seen date (dd/mm/yyyy) of <b>' + b.pendingStamps[0].value + '</b> on ' + b.pendingStamps.length + ' operator row(s) in the Admin tab.');
+      if (L.maintenance.waived) ex.push('June carries no maintenance installment.');
+      $('explain').innerHTML = ex.map(function (x) { return '<p style="margin:0 0 10px">' + x + '</p>'; }).join('');
+    }).catch(function () { $('lines').innerHTML = ''; });
+  }
+
+  function preview(lang) {
+    var p = $('period').value;
+    $('previewTitle').textContent = (lang === 'it' ? 'Fattura (anteprima)' : 'Invoice preview') + ' · ' + label(p);
+    $('previewFrame').srcdoc = '<p style="font-family:sans-serif;padding:20px;color:#5B6B6D">Loading…</p>';
+    $('previewModal').classList.add('on');
+    call('previewInvoiceHtml', p, lang).then(function (html) { $('previewFrame').srcdoc = html; });
+  }
+
+  function generate() {
+    var p = $('period').value, btn = $('genBtn');
+    btn.disabled = true; btn.textContent = 'Generating…';
+    call('generateInvoice', p).then(function (r) {
+      toast('Invoice ' + r.number + ' ready: ' + eur(r.total));
+      renderInvoices(r.invoices);
+    }).finally(function () { btn.disabled = false; btn.textContent = 'Generate invoice'; });
+  }
+
+  // ---------- invoices ----------
+  function renderInvoices(list) {
+    if (!list || !list.length) { $('invList').innerHTML = '<p class="muted">No invoices yet. Generate one from the Billing tab.</p>'; return; }
+    $('invList').innerHTML = '<table class="t"><tr><th>Invoice</th><th>Period (mm/yyyy)</th><th>Issue (dd/mm/yyyy)</th><th>Due (dd/mm/yyyy)</th><th class="r">Clients</th><th class="r">Total</th><th>PDF</th><th>Status</th><th></th></tr>' +
+      list.map(function (v) {
+        var n = esc(v['Invoice No.']), st = v['Status'];
+        var actions = '';
+        if (st === 'Draft') actions += '<button class="btn sm" onclick="openSend(\'' + n + '\')">Send</button> ';
+        if (st === 'Sent') actions += '<button class="btn mint sm" onclick="setStatus(\'' + n + '\',\'Paid\')">Mark paid</button> ';
+        if (st === 'Paid') actions += '<button class="btn ghost sm" onclick="setStatus(\'' + n + '\',\'Sent\')">Undo paid</button>';
+        return '<tr><td class="mono">' + n + '</td><td>' + esc(v['Period (mm/yyyy)']) + '</td><td>' + esc(v['Issue Date (dd/mm/yyyy)']) + '</td><td>' + esc(v['Due Date (dd/mm/yyyy)']) + '</td>' +
+          '<td class="r">' + esc(v['Clients Qty']) + '</td><td class="r"><b>' + esc(v['Total EUR']) + '</b></td>' +
+          '<td><a href="' + esc(v['PDF IT']) + '" target="_blank">IT</a> · <a href="' + esc(v['PDF EN']) + '" target="_blank">EN</a></td>' +
+          '<td><span class="pill ' + esc(st) + '">' + esc(st) + '</span>' + (v['Sent On (dd/mm/yyyy)'] ? '<div class="hint">' + esc(v['Sent On (dd/mm/yyyy)']) + '</div>' : '') + '</td>' +
+          '<td style="white-space:nowrap">' + actions + '</td></tr>';
+      }).join('') + '</table>';
+  }
+
+  function openSend(n) {
+    $('sendTitle').textContent = 'Send ' + n;
+    $('sendTo').value = STATE.settings.recipients || '';
+    $('sendCc').value = STATE.settings.cc || '';
+    $('sendModal').classList.add('on');
+    $('sendBtn').onclick = function () {
+      var b = $('sendBtn'); b.disabled = true; b.textContent = 'Sending…';
+      call('sendInvoice', n, $('sendTo').value, $('sendCc').value).then(function (list) {
+        toast(n + ' sent'); renderInvoices(list); closeModal('sendModal');
+      }).finally(function () { b.disabled = false; b.textContent = 'Send now'; });
+    };
+  }
+
+  function setStatus(n, st) { call('setInvoiceStatus', n, st).then(renderInvoices); }
+
+  // ---------- upload ----------
+  var PARSED = null;
+  var drop = $('drop');
+  ['dragenter', 'dragover'].forEach(function (e) { drop.addEventListener(e, function (ev) { ev.preventDefault(); drop.classList.add('over'); }); });
+  ['dragleave', 'drop'].forEach(function (e) { drop.addEventListener(e, function (ev) { ev.preventDefault(); drop.classList.remove('over'); }); });
+  drop.addEventListener('drop', function (ev) { if (ev.dataTransfer.files[0]) readFile(ev.dataTransfer.files[0]); });
+  $('file').onchange = function () { if (this.files[0]) readFile(this.files[0]); this.value = ''; };
+
+  function readFile(f) {
+    var fr = new FileReader();
+    fr.onload = function () {
+      try { PARSED = parseCsv(fr.result); showParsed(f.name); }
+      catch (e) { toast(e.message, true); }
+    };
+    fr.readAsText(f, 'utf-8');
+  }
+
+  /** RFC 4180 style parser that also tolerates unquoted values such as undefined. */
+  function parseCsv(text) {
+    text = text.replace(/^﻿/, '');
+    var rows = [], row = [], field = '', q = false;
+    for (var i = 0; i < text.length; i++) {
+      var c = text[i];
+      if (q) {
+        if (c === '"') { if (text[i + 1] === '"') { field += '"'; i++; } else q = false; }
+        else field += c;
+      } else if (c === '"') q = true;
+      else if (c === ',') { row.push(field); field = ''; }
+      else if (c === '\n' || c === '\r') {
+        if (c === '\r' && text[i + 1] === '\n') i++;
+        row.push(field); field = '';
+        if (row.length > 1 || row[0] !== '') rows.push(row);
+        row = [];
+      } else field += c;
+    }
+    if (field !== '' || row.length) { row.push(field); rows.push(row); }
+    if (rows.length < 2) throw new Error('The file has no data rows.');
+    var h = rows[0].map(function (x) { return x.trim(); });
+    return rows.slice(1).map(function (r) { var o = {}; h.forEach(function (k, i) { o[k] = r[i] == null ? '' : r[i]; }); return o; });
+  }
+
+  function showParsed(name) {
+    var zones = {}, active = 0;
+    PARSED.forEach(function (r) {
+      var z = (r['Service Zone'] || '(none)').trim(); zones[z] = zones[z] || { all: 0, active: 0 }; zones[z].all++;
+      if (String(r['Account Status']).trim().toLowerCase() === 'active') { zones[z].active++; active++; }
+    });
+    var sel = (STATE.settings.activeZones || []).map(function (z) { return z.toLowerCase(); });
+    $('parsed').innerHTML = '<h2 style="font-size:15px;color:var(--deep);margin:0 0 8px">' + esc(name) + '</h2>' +
+      '<p class="muted" style="margin:0 0 10px">' + PARSED.length + ' rows · ' + active + ' Active</p>' +
+      '<table class="t"><tr><th>Zone</th><th class="r">Rows</th><th class="r">Active</th><th>Billing</th></tr>' +
+      Object.keys(zones).sort().map(function (z) {
+        var on = sel.indexOf(z.toLowerCase()) >= 0;
+        return '<tr><td>' + esc(z) + '</td><td class="r">' + zones[z].all + '</td><td class="r">' + zones[z].active + '</td><td>' + (on ? '<span class="pill Paid">Billed</span>' : '<span class="muted">Ignored</span>') + '</td></tr>';
+      }).join('') + '</table>' +
+      '<div style="margin-top:14px"><button class="btn" id="saveUpload">Save to Clients tab</button></div>';
+    $('saveUpload').onclick = function () {
+      var b = this; b.disabled = true; b.textContent = 'Saving…';
+      call('uploadClients', PARSED).then(function (r) {
+        $('uploadResult').innerHTML = '<table class="t">' +
+          [['Rows in file', r.total], ['New clients added', r.added], ['Existing clients updated', r.updated], ['Newly locked as billable (first time Active)', r.newlyLocked], ['Duplicates in file skipped', r.duplicateInFile], ['Rows skipped (no email or date)', r.skipped + (r.skippedRows.length ? ' (row ' + r.skippedRows.join(', ') + ')' : '')]]
+            .map(function (x) { return '<tr><td>' + x[0] + '</td><td class="r"><b>' + x[1] + '</b></td></tr>'; }).join('') + '</table>';
+        renderStats(r.stats);
+        STATE.zones = r.zones; renderZones(STATE.settings.activeZones, r.zones);
+        toast('Upload saved'); compute();
+      }).finally(function () { b.disabled = false; b.textContent = 'Save to Clients tab'; });
+    };
+  }
+
+  // ---------- settings ----------
+  function renderZones(active, zones) {
+    var on = (active || []).map(function (z) { return z.toLowerCase(); });
+    var names = (zones || []).slice();
+    (active || []).forEach(function (a) { if (!names.some(function (z) { return z.name.toLowerCase() === a.toLowerCase(); })) names.push({ name: a, count: 0 }); });
+    $('zoneList').innerHTML = names.map(function (z) {
+      var c = on.indexOf(z.name.toLowerCase()) >= 0;
+      return '<label class="zone' + (c ? ' on' : '') + '"><input type="checkbox" value="' + esc(z.name) + '"' + (c ? ' checked' : '') + ' onchange="this.parentNode.classList.toggle(\'on\', this.checked)"> ' + esc(z.name) + ' <small>' + z.count + ' clients</small></label>';
+    }).join('') || '<span class="muted">Upload a CSV to list zones.</span>';
+  }
+
+  function fillSettings(s, zones) {
+    renderZones(s.activeZones, zones);
+    Object.keys(s.rates).forEach(function (k) { if ($('r_' + k)) $('r_' + k).value = s.rates[k]; });
+    $('noMaintenanceMonth').innerHTML = MONTHS.map(function (m, i) { return '<option value="' + (i + 1) + '">' + m + '</option>'; }).join('');
+    $('noMaintenanceMonth').value = s.noMaintenanceMonth;
+    ['billingStart', 'paymentDays', 'invoicePrefix', 'nextInvoiceNumber', 'recipients', 'cc', 'bank', 'vatNoteIt', 'vatNoteEn'].forEach(function (k) { $(k).value = s[k]; });
+    $('includeDetail').checked = !!s.includeDetail;
+    ['name', 'address', 'city', 'vat', 'sdi'].forEach(function (k) { $('c_' + k).value = s.customer[k] || ''; });
+    ['name', 'address', 'city', 'web', 'email', 'taxId'].forEach(function (k) { $('i_' + k).value = s.issuer[k] || ''; });
+  }
+
+  function saveAll() {
+    var num = function (id) { return Number($(id).value); };
+    var s = {
+      activeZones: Array.prototype.map.call(document.querySelectorAll('#zoneList input:checked'), function (i) { return i.value; }),
+      rates: { maintenance: num('r_maintenance'), video: num('r_video'), admin: num('r_admin'), adminIncluded: num('r_adminIncluded'), operator: num('r_operator'), client: num('r_client'), windowMonths: num('r_windowMonths') },
+      noMaintenanceMonth: num('noMaintenanceMonth'), billingStart: $('billingStart').value, paymentDays: num('paymentDays'),
+      invoicePrefix: $('invoicePrefix').value.trim(), nextInvoiceNumber: num('nextInvoiceNumber'),
+      recipients: $('recipients').value.trim(), cc: $('cc').value.trim(), includeDetail: $('includeDetail').checked,
+      bank: $('bank').value, vatNoteIt: $('vatNoteIt').value, vatNoteEn: $('vatNoteEn').value,
+      customer: {}, issuer: {}
+    };
+    ['name', 'address', 'city', 'vat', 'sdi'].forEach(function (k) { s.customer[k] = $('c_' + k).value.trim(); });
+    ['name', 'address', 'city', 'web', 'email', 'taxId'].forEach(function (k) { s.issuer[k] = $('i_' + k).value.trim(); });
+    call('saveSettings', s).then(function (saved) {
+      STATE.settings = saved;
+      return call('refreshBillableFlags');
+    }).then(function (stats) { renderStats(stats); toast('Settings saved'); compute(); });
+  }
+
+  load();
+</script>
+</body>
+</html>

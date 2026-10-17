@@ -1,0 +1,214 @@
+<?
+  // Template variables: b (billing), s (settings), number, lang ('it' | 'en'), logo
+  var IT = lang === 'it';
+  var T = IT ? {
+    title: 'FATTURA', copy: 'Documento originale', no: 'Numero fattura', issue: 'Data emissione (gg/mm/aaaa)',
+    due: 'Scadenza (gg/mm/aaaa)', period: 'Periodo di riferimento (mm/aaaa)', billTo: 'Intestata a', from: 'Emessa da',
+    vat: 'P.IVA', sdi: 'Codice SDI', desc: 'Descrizione', qty: 'Q.tà', unit: 'Prezzo unitario', amount: 'Importo',
+    maint: 'Canone di manutenzione piattaforma (rata mensile, 11 rate annuali)',
+    maintWaived: 'Canone di manutenzione: non dovuto nel mese di giugno (11 rate annuali)',
+    video: 'Modulo Videoconferenza (include le richieste di modifica approvate)',
+    admins: function (a, inc) { return 'Utenti Amministratore attivi: ' + a + ' (primi ' + inc + ' inclusi nel canone di manutenzione)'; },
+    ops: 'Utenti Operatore/Provider attivi (primi 24 mesi dalla creazione dell\'account)',
+    cli: 'Utenti Cliente attivi (primi 24 mesi dalla creazione dell\'account)',
+    subtotal: 'Imponibile', vatLine: 'IVA', total: 'Totale da pagare', terms: 'Condizioni di pagamento',
+    termsText: 'Pagamento entro ' + s.paymentDays + ' giorni dal ricevimento della fattura. In caso di ritardo maturano interessi al tasso del 10% mensile sull\'importo scaduto, come previsto dal contratto.',
+    bank: 'Coordinate bancarie (bonifico internazionale)', zones: 'Zone di fatturazione', detail: 'Allegato: dettaglio utenti fatturati',
+    dClients: 'Utenti Cliente', dName: 'Nome', dResp: 'Responsabile', dCompany: 'Azienda', dOnboard: 'Attivazione (gg/mm/aaaa)',
+    dUntil: 'Fatturabile fino al (gg/mm/aaaa)', dStatus: 'Stato', dAdmins: 'Utenti Amministratore', dOps: 'Utenti Operatore/Provider',
+    dSince: 'Dal (gg/mm/aaaa)', none: 'Nessuno', page: 'Fattura',
+    rule: 'Un utente cliente risultato attivo almeno una volta resta fatturabile fino al termine dei 24 mesi dalla creazione dell\'account, anche se successivamente disattivato.'
+  } : {
+    title: 'INVOICE', copy: 'English courtesy copy. The Italian version is the original.', no: 'Invoice number', issue: 'Issue date (dd/mm/yyyy)',
+    due: 'Due date (dd/mm/yyyy)', period: 'Billing period (mm/yyyy)', billTo: 'Bill to', from: 'From',
+    vat: 'VAT No.', sdi: 'SDI code', desc: 'Description', qty: 'Qty', unit: 'Unit price', amount: 'Amount',
+    maint: 'Platform maintenance fee (monthly installment, 11 per year)',
+    maintWaived: 'Platform maintenance fee: not charged in June (11 installments per year)',
+    video: 'Videoconference module (includes approved change requests)',
+    admins: function (a, inc) { return 'Active admin users: ' + a + ' (first ' + inc + ' included in maintenance)'; },
+    ops: 'Active operator/provider users (first 24 months from account creation)',
+    cli: 'Active client users (first 24 months from account creation)',
+    subtotal: 'Taxable amount', vatLine: 'VAT', total: 'Total due', terms: 'Payment terms',
+    termsText: 'Payment due within ' + s.paymentDays + ' days of receipt of this invoice. Late payments accrue interest at 10% per month on the overdue amount, as set out in the agreement.',
+    bank: 'Bank details (international wire)', zones: 'Billing zones', detail: 'Annex: billed users detail',
+    dClients: 'Client users', dName: 'Name', dResp: 'Responsible party', dCompany: 'Company', dOnboard: 'Activated (dd/mm/yyyy)',
+    dUntil: 'Billable until (dd/mm/yyyy)', dStatus: 'Status', dAdmins: 'Admin users', dOps: 'Operator/provider users',
+    dSince: 'Since (dd/mm/yyyy)', none: 'None', page: 'Invoice',
+    rule: 'A client user who has appeared as active at least once stays billable until the end of the 24 months from account creation, even if later deactivated.'
+  };
+  function eur(n) {
+    var v = Number(n || 0).toFixed(2).split('.');
+    var sep = IT ? '.' : ',', dec = IT ? ',' : '.';
+    v[0] = v[0].replace(/\B(?=(\d{3})+(?!\d))/g, sep);
+    return '€ ' + v[0] + dec + v[1];
+  }
+  var L = b.lines;
+?>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @page { size: A4; margin: 14mm 14mm 16mm 14mm; }
+  body { font-family: Arial, Helvetica, sans-serif; color: #1C2B2D; font-size: 10pt; margin: 0; }
+  table { border-collapse: collapse; width: 100%; }
+  .muted { color: #5B6B6D; }
+  .small { font-size: 8.5pt; }
+  .head td { vertical-align: top; }
+  .title { font-size: 22pt; font-weight: bold; color: #17484C; letter-spacing: 2px; text-align: right; }
+  .copy { font-size: 8pt; color: #278876; text-align: right; }
+  .rule { height: 3px; background: #17484C; margin: 10px 0 0 0; }
+  .rule2 { height: 3px; background: #34A891; width: 30%; }
+  .meta td { padding: 3px 0; }
+  .meta .k { color: #5B6B6D; width: 52%; }
+  .meta .v { font-weight: bold; text-align: right; }
+  .party { background: #E8F4F1; padding: 10px 12px; vertical-align: top; width: 49%; }
+  .party .lbl { font-size: 8pt; text-transform: uppercase; letter-spacing: 1px; color: #1E6A5C; font-weight: bold; margin-bottom: 4px; }
+  .party .nm { font-size: 11pt; font-weight: bold; color: #17484C; }
+  .lines th { background: #1E6A5C; color: #FFFFFF; font-size: 8.5pt; text-align: left; padding: 7px 8px; }
+  .lines td { padding: 8px; border-bottom: 1px solid #D5E6E2; vertical-align: top; }
+  .lines .r { text-align: right; white-space: nowrap; }
+  .lines tr.alt td { background: #F5FAF9; }
+  .waived { color: #5B6B6D; font-style: italic; }
+  .tot td { padding: 5px 8px; }
+  .tot .k { text-align: right; color: #5B6B6D; }
+  .tot .v { text-align: right; width: 120px; white-space: nowrap; }
+  .grand td { background: #17484C; color: #FFFFFF; font-size: 12pt; font-weight: bold; padding: 9px 8px; }
+  .box { border: 1px solid #D5E6E2; padding: 9px 12px; }
+  .box h4 { margin: 0 0 4px 0; font-size: 8.5pt; color: #1E6A5C; text-transform: uppercase; letter-spacing: 1px; }
+  .note { border-left: 3px solid #34A891; padding: 6px 10px; background: #F5FAF9; font-size: 8.5pt; }
+  .foot { font-size: 8pt; color: #5B6B6D; text-align: center; border-top: 1px solid #D5E6E2; padding-top: 6px; margin-top: 18px; }
+  .detail th { background: #E8F4F1; color: #17484C; font-size: 8pt; text-align: left; padding: 5px 6px; }
+  .detail td { font-size: 8pt; padding: 4px 6px; border-bottom: 1px solid #E3EEEB; }
+  h3 { color: #17484C; font-size: 11pt; margin: 14px 0 6px 0; }
+  .pb { page-break-before: always; }
+</style>
+</head>
+<body>
+
+<table class="head">
+  <tr>
+    <td style="width:50%"><img src="<?= logo ?>" style="height:58px"></td>
+    <td>
+      <div class="title"><?= T.title ?></div>
+      <div class="copy"><?= T.copy ?></div>
+    </td>
+  </tr>
+</table>
+<div class="rule"></div><div class="rule2"></div>
+
+<table style="margin-top:14px">
+  <tr>
+    <td style="width:52%; vertical-align:top" class="small">
+      <b style="color:#17484C"><?= s.issuer.name ?></b><br>
+      <?= s.issuer.address ?><br><?= s.issuer.city ?><br>
+      <?= s.issuer.web ?><? if (s.issuer.email) { ?><br><?= s.issuer.email ?><? } ?>
+      <? if (s.issuer.taxId) { ?><br>EIN: <?= s.issuer.taxId ?><? } ?>
+    </td>
+    <td style="vertical-align:top">
+      <table class="meta">
+        <tr><td class="k"><?= T.no ?></td><td class="v"><?= number ?></td></tr>
+        <tr><td class="k"><?= T.issue ?></td><td class="v"><?= b.issueDate ?></td></tr>
+        <tr><td class="k"><?= T.due ?></td><td class="v"><?= b.dueDate ?></td></tr>
+        <tr><td class="k"><?= T.period ?></td><td class="v"><?= b.periodLabel ?></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+<table style="margin-top:14px">
+  <tr>
+    <td class="party">
+      <div class="lbl"><?= T.billTo ?></div>
+      <div class="nm"><?= s.customer.name ?></div>
+      <?= s.customer.address ?><br><?= s.customer.city ?>
+      <? if (s.customer.vat) { ?><br><?= T.vat ?>: <?= s.customer.vat ?><? } ?>
+      <? if (s.customer.sdi) { ?><br><?= T.sdi ?>: <?= s.customer.sdi ?><? } ?>
+    </td>
+    <td style="width:2%"></td>
+    <td class="party">
+      <div class="lbl"><?= T.zones ?></div>
+      <div class="nm"><?= (b.zones || []).join(', ') ?></div>
+      <span class="small muted"><?= IT ? s.contractRefIt : s.contractRefEn ?></span>
+    </td>
+  </tr>
+</table>
+
+<table class="lines" style="margin-top:16px">
+  <tr><th><?= T.desc ?></th><th class="r" style="text-align:right">
+    <?= T.qty ?></th><th class="r" style="text-align:right"><?= T.unit ?></th><th class="r" style="text-align:right"><?= T.amount ?></th></tr>
+  <? if (L.maintenance.waived) { ?>
+    <tr><td class="waived"><?= T.maintWaived ?></td><td class="r">0</td><td class="r"><?= eur(L.maintenance.unit) ?></td><td class="r"><?= eur(0) ?></td></tr>
+  <? } else { ?>
+    <tr><td><?= T.maint ?></td><td class="r">1</td><td class="r"><?= eur(L.maintenance.unit) ?></td><td class="r"><?= eur(L.maintenance.amount) ?></td></tr>
+  <? } ?>
+  <tr class="alt"><td><?= T.video ?></td><td class="r">1</td><td class="r"><?= eur(L.video.unit) ?></td><td class="r"><?= eur(L.video.amount) ?></td></tr>
+  <tr><td><?= T.admins(L.admins.active, s.rates.adminIncluded) ?></td><td class="r"><?= L.admins.qty ?></td><td class="r"><?= eur(L.admins.unit) ?></td><td class="r"><?= eur(L.admins.amount) ?></td></tr>
+  <tr class="alt"><td><?= T.ops ?></td><td class="r"><?= L.operators.qty ?></td><td class="r"><?= eur(L.operators.unit) ?></td><td class="r"><?= eur(L.operators.amount) ?></td></tr>
+  <tr><td><?= T.cli ?></td><td class="r"><?= L.clients.qty ?></td><td class="r"><?= eur(L.clients.unit) ?></td><td class="r"><?= eur(L.clients.amount) ?></td></tr>
+</table>
+
+<table class="tot" style="margin-top:8px">
+  <tr><td class="k"><?= T.subtotal ?></td><td class="v"><?= eur(b.total) ?></td></tr>
+  <tr><td class="k"><?= T.vatLine ?></td><td class="v"><?= eur(0) ?></td></tr>
+</table>
+<table style="margin-top:4px">
+  <tr class="grand"><td style="text-align:right"><?= T.total ?></td><td style="text-align:right; width:140px; white-space:nowrap"><?= eur(b.total) ?></td></tr>
+</table>
+
+<div class="note" style="margin-top:12px"><?= IT ? s.vatNoteIt : s.vatNoteEn ?></div>
+
+<table style="margin-top:12px">
+  <tr>
+    <td class="box" style="width:49%; vertical-align:top">
+      <h4><?= T.terms ?></h4>
+      <span class="small"><?= T.termsText ?></span>
+    </td>
+    <td style="width:2%"></td>
+    <td class="box" style="vertical-align:top">
+      <h4><?= T.bank ?></h4>
+      <span class="small"><? String(s.bank).split('\n').forEach(function (line) { ?><?= line ?><br><? }); ?></span>
+    </td>
+  </tr>
+</table>
+
+<div class="foot"><?= s.issuer.name ?> · <?= s.issuer.address ?>, <?= s.issuer.city ?> · <?= s.issuer.web ?></div>
+
+<? if (s.includeDetail) { ?>
+<div class="pb"></div>
+<table class="head">
+  <tr>
+    <td><img src="<?= logo ?>" style="height:34px"></td>
+    <td style="text-align:right" class="small muted"><?= T.page ?> <?= number ?> · <?= T.period ?>: <?= b.periodLabel ?></td>
+  </tr>
+</table>
+<div class="rule"></div>
+<h3><?= T.detail ?></h3>
+<div class="note"><?= T.rule ?></div>
+
+<h3><?= T.dClients ?> (<?= b.clients.length ?>)</h3>
+<table class="detail">
+  <tr><th>#</th><th><?= T.dName ?></th><th><?= T.dResp ?></th><th><?= T.dCompany ?></th><th><?= T.dOnboard ?></th><th><?= T.dUntil ?></th><th><?= T.dStatus ?></th></tr>
+  <? b.clients.forEach(function (c, i) { ?>
+    <tr><td><?= i + 1 ?></td><td><?= c.name ?></td><td><?= c.responsible ?></td><td><?= c.company ?></td><td><?= c.onboard ?></td><td><?= c.until ?></td><td><?= c.status ?></td></tr>
+  <? }); ?>
+  <? if (!b.clients.length) { ?><tr><td colspan="7"><?= T.none ?></td></tr><? } ?>
+</table>
+
+<h3><?= T.dAdmins ?> (<?= b.admins.length ?>)</h3>
+<table class="detail">
+  <tr><th>#</th><th><?= T.dName ?></th><th>Email</th></tr>
+  <? b.admins.forEach(function (p, i) { ?><tr><td><?= i + 1 ?></td><td><?= p.name ?></td><td><?= p.email ?></td></tr><? }); ?>
+  <? if (!b.admins.length) { ?><tr><td colspan="3"><?= T.none ?></td></tr><? } ?>
+</table>
+
+<h3><?= T.dOps ?> (<?= b.operators.length ?>)</h3>
+<table class="detail">
+  <tr><th>#</th><th><?= T.dName ?></th><th>Email</th><th><?= T.dSince ?></th><th><?= T.dUntil ?></th></tr>
+  <? b.operators.forEach(function (p, i) { ?><tr><td><?= i + 1 ?></td><td><?= p.name ?></td><td><?= p.email ?></td><td><?= p.since ?></td><td><?= p.until ?></td></tr><? }); ?>
+  <? if (!b.operators.length) { ?><tr><td colspan="5"><?= T.none ?></td></tr><? } ?>
+</table>
+<? } ?>
+
+</body>
+</html>
