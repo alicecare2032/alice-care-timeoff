@@ -99,6 +99,7 @@
 </header>
 
 <main>
+  <div id="banner" style="display:none; background:var(--warnbg); color:var(--warn); border:1px solid #F0C9AE; border-radius:12px; padding:12px 16px; margin-bottom:16px; font-size:14px"></div>
   <!-- BILLING -->
   <section id="billing" class="on">
     <h1>Monthly billing</h1>
@@ -264,12 +265,23 @@
   function eur(n) { return '€' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
   function label(p) { var a = p.split('-'); return a[1] + '/' + a[0]; }
   function toast(msg, err) { var t = $('toast'); t.textContent = msg; t.className = err ? 'err' : ''; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(function () { t.style.display = 'none'; }, err ? 7000 : 3500); }
+  /** Every server reply arrives as a JSON string, so dates can never turn a reply into null. */
   function call(fn) {
     var args = Array.prototype.slice.call(arguments, 1);
     return new Promise(function (res, rej) {
-      var r = google.script.run.withSuccessHandler(res).withFailureHandler(function (e) { toast(e.message || String(e), true); rej(e); });
-      r[fn].apply(r, args);
+      var r = google.script.run
+        .withSuccessHandler(function (out) {
+          try { res(typeof out === 'string' ? JSON.parse(out) : out); }
+          catch (e) { res(out); }
+        })
+        .withFailureHandler(function (e) { toast(e.message || String(e), true); rej(e); });
+      if (fn === 'getAppState') r.getAppState(); else r.api(fn, args);
     });
+  }
+  function showBanner(msg) {
+    $('banner').innerHTML = '<b>The app could not load its data.</b> ' + esc(msg) +
+      ' <button class="btn sm" onclick="$(\'banner\').style.display=\'none\';load()">Retry</button>';
+    $('banner').style.display = 'block';
   }
   function closeModal(id) { $(id).classList.remove('on'); }
 
@@ -283,8 +295,10 @@
 
   // ---------- load ----------
   function load() {
-    call('getAppState').then(function (st) {
+    call('getAppState').catch(function (e) { showBanner(e.message || String(e)); throw e; }).then(function (st) {
+      if (!st || !st.settings) { showBanner('The server returned no settings. Check the Executions log in Apps Script.'); return; }
       STATE = st;
+      if (PARSED) showParsed(PARSED_NAME);
       renderStats(st.stats);
       var sel = $('period');
       sel.innerHTML = st.periods.map(function (p) { return '<option value="' + p + '">' + label(p) + ' · ' + MONTHS[+p.split('-')[1] - 1] + '</option>'; }).join('');
@@ -380,7 +394,7 @@
   function setStatus(n, st) { call('setInvoiceStatus', n, st).then(renderInvoices); }
 
   // ---------- upload ----------
-  var PARSED = null;
+  var PARSED = null, PARSED_NAME = '';
   var drop = $('drop');
   ['dragenter', 'dragover'].forEach(function (e) { drop.addEventListener(e, function (ev) { ev.preventDefault(); drop.classList.add('over'); }); });
   ['dragleave', 'drop'].forEach(function (e) { drop.addEventListener(e, function (ev) { ev.preventDefault(); drop.classList.remove('over'); }); });
@@ -390,7 +404,7 @@
   function readFile(f) {
     var fr = new FileReader();
     fr.onload = function () {
-      try { PARSED = parseCsv(fr.result); showParsed(f.name); }
+      try { PARSED = parseCsv(fr.result); PARSED_NAME = f.name; showParsed(f.name); }
       catch (e) { toast(e.message, true); }
     };
     fr.readAsText(f, 'utf-8');
@@ -426,6 +440,10 @@
       var z = (r['Service Zone'] || '(none)').trim(); zones[z] = zones[z] || { all: 0, active: 0 }; zones[z].all++;
       if (String(r['Account Status']).trim().toLowerCase() === 'active') { zones[z].active++; active++; }
     });
+    if (!STATE || !STATE.settings) {
+      $('parsed').innerHTML = '<p class="muted">' + PARSED.length + ' rows read from ' + esc(name) + '. Waiting for the app to finish loading…</p>';
+      return;
+    }
     var sel = (STATE.settings.activeZones || []).map(function (z) { return z.toLowerCase(); });
     $('parsed').innerHTML = '<h2 style="font-size:15px;color:var(--deep);margin:0 0 8px">' + esc(name) + '</h2>' +
       '<p class="muted" style="margin:0 0 10px">' + PARSED.length + ' rows · ' + active + ' Active</p>' +
