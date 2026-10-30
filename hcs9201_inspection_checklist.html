@@ -1936,12 +1936,181 @@
       box-shadow: none;
     }
 
+
+    /* ===== Inspection Results ===== */
+    .inspection-section {
+      padding: 24px 36px;
+      border-top: 3px solid #0F766E;
+      background: linear-gradient(180deg, #F0FDFA 0%, #FFFFFF 140px);
+    }
+    .btn-add-inspection {
+      padding: 8px 14px;
+      background: linear-gradient(135deg, #0F766E 0%, #115E59 100%);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 6px rgba(15, 118, 110, 0.25);
+    }
+    .btn-add-inspection:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(15, 118, 110, 0.35);
+    }
+    .insp-card {
+      background: #FFFFFF;
+      border: 1px solid #CCE7E3;
+      border-left: 4px solid #0F766E;
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin-bottom: 12px;
+    }
+    .insp-card.latest { box-shadow: 0 3px 12px rgba(15, 118, 110, 0.12); }
+    .insp-top {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 14px;
+      align-items: start;
+    }
+    .insp-date-badge {
+      width: 64px;
+      text-align: center;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #0F766E 0%, #115E59 100%);
+      color: #FFFFFF;
+      padding: 8px 4px;
+      flex-shrink: 0;
+    }
+    .insp-date-badge .m { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; opacity: 0.9; }
+    .insp-date-badge .d { font-size: 22px; font-weight: 700; line-height: 1.1; }
+    .insp-date-badge .y { font-size: 10.5px; opacity: 0.85; }
+    .insp-content { min-width: 0; }
+    .insp-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1A365C;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .latest-chip {
+      font-size: 9.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #0F766E;
+      background: #CCFBF1;
+      border: 1px solid #5EEAD4;
+      padding: 2px 7px;
+      border-radius: 10px;
+    }
+    .insp-meta {
+      font-size: 11.5px;
+      color: #4A5F7F;
+      margin-top: 4px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .insp-notes {
+      font-size: 12px;
+      color: #2D4A6F;
+      margin-top: 8px;
+      padding-left: 10px;
+      border-left: 2px solid #99D5CC;
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+    .outcome-chip {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      padding: 4px 10px;
+      border-radius: 10px;
+      white-space: nowrap;
+    }
+    .outcome-chip.clear { background: #E6F4EA; color: #1B7A3D; border: 1px solid #B7DFC6; }
+    .outcome-chip.cited { background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; }
+    .outcome-chip.poc { background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; }
+    .outcome-chip.pending { background: #F1F5F9; color: #475569; border: 1px solid #CBD5E1; }
+
+    .cat-header.insp-mode { background: linear-gradient(135deg, #0F766E 0%, #115E59 100%); }
+    .cat-btn.submit.insp-mode { background: #0F766E; }
+    .cat-btn.submit.insp-mode:hover { background: #115E59; }
+    .cat-btn.submit:disabled { opacity: 0.6; cursor: not-allowed; }
+    .insp-date-wrap { display: flex; position: relative; }
+    .insp-date-wrap #inspFieldDate { border-radius: 7px 0 0 7px; border-right: none; letter-spacing: 0.3px; }
+    .insp-date-wrap .insp-cal-btn {
+      padding: 0 14px;
+      background: #F0FDFA;
+      color: #0F766E;
+      border: 1.5px solid #D0DDF0;
+      border-radius: 0 7px 7px 0;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    .insp-date-wrap .insp-cal-btn:hover { background: #CCFBF1; }
+    .cat-field #inspDatePicker {
+      position: absolute;
+      left: 0; top: 100%;
+      width: 1px; height: 1px;
+      padding: 0; border: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .insp-dropzone {
+      border: 2px dashed #99D5CC;
+      border-radius: 9px;
+      padding: 18px 12px;
+      text-align: center;
+      background: #F0FDFA;
+      cursor: pointer;
+      font-size: 12.5px;
+      color: #0F766E;
+      font-weight: 600;
+      transition: all 0.15s;
+    }
+    .insp-dropzone small { display: block; font-weight: 400; color: #4A5F7F; margin-top: 3px; font-size: 11px; }
+    .insp-dropzone:hover, .insp-dropzone.dragover { background: #CCFBF1; border-color: #0F766E; }
+    .insp-picked-list { margin-top: 8px; display: flex; flex-direction: column; gap: 5px; }
+    .insp-picked {
+      display: grid;
+      grid-template-columns: auto 1fr auto auto;
+      gap: 8px;
+      align-items: center;
+      font-size: 11.5px;
+      padding: 6px 10px;
+      background: #FFFFFF;
+      border: 1px solid #D0DDF0;
+      border-radius: 6px;
+    }
+    .insp-picked .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #1A365C; font-weight: 600; }
+    .insp-picked .sz { color: #7A8BA3; }
+    .insp-picked button {
+      background: #FFFFFF;
+      color: #B91C1C;
+      border: 1.5px solid #FCA5A5;
+      border-radius: 5px;
+      cursor: pointer;
+      padding: 2px 8px;
+      font-weight: 700;
+    }
+    .insp-existing-note { font-size: 11px; color: #0F766E; font-weight: 600; margin-bottom: 6px; }
+
     @media print {
       body { background: #FFFFFF; }
       .page-wrapper { padding: 0; }
       .app-container { box-shadow: none; border-radius: 0; }
       .action-bar, .btn-upload, .file-actions, .fh-btn, .fh-edit-panel, .setup-banner, .preview-overlay, .reflink-actions, .reflink-edit { display: none !important; }
-      .checklist-item { break-inside: avoid; page-break-inside: avoid; }
+      .checklist-item, .insp-card { break-inside: avoid; page-break-inside: avoid; }
     }
 
     @media (max-width: 768px) {
@@ -1960,6 +2129,9 @@
       .reflink-item { grid-template-columns: auto 1fr; }
       .reflink-item-actions { grid-column: 1 / -1; justify-content: flex-end; margin-top: 4px; }
       .preview-modal { height: 95vh; }
+      .inspection-section { padding-left: 18px; padding-right: 18px; }
+      .insp-top { grid-template-columns: auto 1fr; }
+      .insp-top .outcome-chip { grid-column: 1 / -1; justify-self: start; }
     }
   </style>
 </head>
@@ -2048,6 +2220,8 @@
       </div>
 
       <div id="checklistRoot"></div>
+
+      <div id="inspectionRoot"></div>
 
       <div class="app-footer">
         <div>
@@ -2161,6 +2335,67 @@
     </div>
   </div>
 
+
+  <!-- Inspection result modal -->
+  <div class="cat-overlay" id="inspOverlay">
+    <div class="cat-modal">
+      <div class="cat-header insp-mode">
+        <div class="cat-title" id="inspTitleText">📋 Add Inspection Result</div>
+        <button class="cat-close" id="inspCloseBtn">×</button>
+      </div>
+      <div class="cat-body">
+        <div class="cat-field">
+          <label>Inspection Completion Date <span class="req">*</span></label>
+          <div class="insp-date-wrap">
+            <input type="text" id="inspFieldDate" placeholder="MM/DD/YYYY" maxlength="10" inputmode="numeric" autocomplete="off">
+            <button class="insp-cal-btn" id="inspDateBtn" type="button" title="Open calendar">📅</button>
+            <input type="date" id="inspDatePicker" tabindex="-1">
+          </div>
+          <div class="hint">Type the date or pick it from the calendar.</div>
+        </div>
+        <div class="cat-field">
+          <label>Inspection Type</label>
+          <select id="inspFieldType"></select>
+        </div>
+        <div class="cat-field">
+          <label>Result</label>
+          <select id="inspFieldOutcome"></select>
+        </div>
+        <div class="cat-field">
+          <label>Licensing Program Analyst (optional)</label>
+          <input type="text" id="inspFieldInspector" placeholder="e.g. Analyst name or CDSS regional office" maxlength="100">
+        </div>
+        <div class="cat-field">
+          <label>Report or Case Number (optional)</label>
+          <input type="text" id="inspFieldRef" placeholder="e.g. LIC 809 report number" maxlength="60">
+        </div>
+        <div class="cat-field">
+          <label>Notes (optional)</label>
+          <textarea id="inspFieldNotes" rows="3" placeholder="e.g. Analyst cited 1796.44(c). Plan of correction due within 30 days." maxlength="1500"></textarea>
+        </div>
+        <div class="cat-field">
+          <label>Inspection Documents</label>
+          <div class="insp-existing-note" id="inspExistingNote" style="display:none"></div>
+          <div class="insp-dropzone" id="inspDropzone">
+            📎 Drop files here or click to choose
+            <small>Select several documents at once. Each file uploads to the shared Google Drive folder (25 MB max per file).</small>
+          </div>
+          <input type="file" id="inspFilePicker" multiple style="display:none">
+          <div class="insp-picked-list" id="inspPickedList"></div>
+        </div>
+      </div>
+      <div class="cat-footer">
+        <div class="cat-footer-left">
+          <button class="cat-btn delete" id="inspDeleteBtn" style="display:none">🗑 Delete Result</button>
+        </div>
+        <div class="cat-footer-right">
+          <button class="cat-btn cancel" id="inspCancelBtn">Cancel</button>
+          <button class="cat-btn submit insp-mode" id="inspSubmitBtn">Save Result</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="preview-overlay" id="previewOverlay">
     <div class="preview-modal">
       <div class="preview-header">
@@ -2243,6 +2478,7 @@
       checkboxes: {},
       refLinks: {},
       customSections: [],
+      inspections: [],
       lastModified: null,
       lastModifiedBy: null
     };
@@ -2274,6 +2510,7 @@
           });
           normalizeRefLinks();
           normalizeCustomSections();
+          normalizeInspections();
         }
       } catch (e) { /* keep default */ }
     }
@@ -2370,7 +2607,8 @@
         const resp = await apiCall('setState', {
           checkboxes: state.checkboxes,
           refLinks: state.refLinks,
-          customSections: state.customSections
+          customSections: state.customSections,
+          inspections: state.inspections
         });
         state.lastModified = resp.lastModified;
         state.lastModifiedBy = resp.lastModifiedBy;
@@ -2392,10 +2630,14 @@
         if (Array.isArray(data.customSections)) {
           state.customSections = data.customSections;
         }
+        if (Array.isArray(data.inspections)) {
+          state.inspections = data.inspections;
+        }
         state.lastModified = data.lastModified || null;
         state.lastModifiedBy = data.lastModifiedBy || null;
         normalizeRefLinks();
         normalizeCustomSections();
+        normalizeInspections();
         saveLocal();
       } catch (err) {
         showToast('Could not load team state: ' + err.message, 'error');
@@ -2456,7 +2698,7 @@
     }
 
     async function uploadFilesForItem(slug, files) {
-      const itemEl = document.querySelector(`.checklist-item[data-slug="${slug}"]`);
+      const itemEl = document.querySelector(`[data-slug="${slug}"]`);
       const list = itemEl ? itemEl.querySelector('.files-list') : null;
       if (list) {
         const empty = list.querySelector('.files-empty');
@@ -2548,6 +2790,11 @@
     }
 
     function render() {
+      renderChecklist();
+      renderInspections();
+    }
+
+    function renderChecklist() {
       const root = document.getElementById('checklistRoot');
       root.innerHTML = '';
 
@@ -2999,7 +3246,7 @@
       const dt = new Date(y, m - 1, d);
       if (dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== d) return null;
       const pad = n => String(n).padStart(2, '0');
-      return `${y}-${pad(m)}-${pad(d)}T00:00:00.000Z`;
+      return `${y}-${pad(m)}-${pad(d)}T00:00:00`;
     }
 
     function formatDateForInput(iso) {
@@ -3082,7 +3329,7 @@
           rerender();
         });
         itemEl.querySelector('.delete').addEventListener('click', () => {
-          const desc = link.label ? host + ' — ' + link.label : host;
+          const desc = link.label ? host + ' : ' + link.label : host;
           if (!confirm(`Remove link "${desc}"?`)) return;
           refLinks.splice(idx, 1);
           if (refLinks.length === 0) {
@@ -3270,6 +3517,10 @@
           });
         });
       });
+      sortedInspections().forEach(rec => {
+        const pseudo = inspectionPseudoItem(rec);
+        (filesBySlug[pseudo.slug] || []).forEach(f => previewList.push({ item: pseudo, file: f }));
+      });
     }
 
     function openPreview(item, file) {
@@ -3384,13 +3635,14 @@
         licensee: 'TEKKS LLC DBA alice.care',
         licenseNumber: '344700080',
         form: 'HCS 9201 (11/25)',
-        version: 8,
+        version: 9,
         state: {
           folderUrl: state.folderUrl,
           folderName: state.folderName,
           checkboxes: state.checkboxes,
           refLinks: state.refLinks,
           customSections: state.customSections,
+          inspections: state.inspections,
           lastModified: state.lastModified,
           lastModifiedBy: state.lastModifiedBy
         }
@@ -3418,10 +3670,11 @@
         try {
           const data = JSON.parse(evt.target.result);
           if (!data.state) throw new Error('Invalid backup format');
-          if (!confirm('Importing replaces the team-wide state (checkboxes, expirations, reference links, and custom categories). Continue?')) return;
+          if (!confirm('Importing replaces the team-wide state (checkboxes, expirations, reference links, custom categories, and inspection results). Continue?')) return;
           state.checkboxes = data.state.checkboxes || {};
           state.refLinks = data.state.refLinks || {};
           state.customSections = Array.isArray(data.state.customSections) ? data.state.customSections : [];
+          state.inspections = Array.isArray(data.state.inspections) ? data.state.inspections : [];
           // Normalize legacy boolean checkboxes.
           Object.keys(state.checkboxes).forEach(slug => {
             if (typeof state.checkboxes[slug] === 'boolean') {
@@ -3430,6 +3683,7 @@
           });
           normalizeRefLinks();
           normalizeCustomSections();
+          normalizeInspections();
           saveLocal();
           await pushSharedState();
           render();
@@ -3881,6 +4135,445 @@
     window.openCategoryModal = openCategoryModal;
     window.openItemModal = openItemModal;
     window.deleteCustomItem = deleteCustomItem;
+
+    // ============================================================
+    // Inspection Results
+    // Each result stores its completion date and details in shared state.
+    // Its documents live in the shared Drive folder with the prefix
+    // "insp_<id>__", so the backend lists them like any checklist item.
+    // ============================================================
+    const INSPECTION_TYPES = [
+      'Annual or Routine Inspection',
+      'Unannounced Visit',
+      'Complaint Investigation',
+      'Initial Licensing Visit',
+      'Follow-up or Plan of Correction Review',
+      'Other'
+    ];
+    const INSPECTION_OUTCOMES = [
+      { value: 'clear', label: 'No Deficiencies' },
+      { value: 'cited', label: 'Deficiencies Cited' },
+      { value: 'poc', label: 'Plan of Correction Required' },
+      { value: 'pending', label: 'Pending Final Report' }
+    ];
+
+    let inspEditor = { editingId: null, pending: [], saving: false };
+
+    function normalizeInspections() {
+      if (!Array.isArray(state.inspections)) { state.inspections = []; return; }
+      state.inspections = state.inspections
+        .filter(r => r && r.id && r.date)
+        .map(r => ({
+          id: String(r.id),
+          date: String(r.date).slice(0, 10),
+          type: r.type || '',
+          outcome: r.outcome || 'pending',
+          inspector: r.inspector || '',
+          reference: r.reference || '',
+          notes: r.notes || '',
+          createdAt: r.createdAt || null,
+          updatedAt: r.updatedAt || null
+        }));
+    }
+
+    function inspSlug(id) { return 'insp_' + id; }
+
+    function sortedInspections() {
+      return (state.inspections || []).slice().sort((a, b) => b.date.localeCompare(a.date));
+    }
+
+    function findInspection(id) {
+      return (state.inspections || []).find(r => r.id === id) || null;
+    }
+
+    function ymdToInput(ymd) {
+      if (!ymd) return '';
+      const [y, m, d] = ymd.split('-');
+      return `${m}/${d}/${y}`;
+    }
+
+    function todayYMD() {
+      const t = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      return `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`;
+    }
+
+    function inspDateParts(ymd) {
+      const [y, m, d] = ymd.split('-').map(Number);
+      const dt = new Date(y, m - 1, d);
+      return {
+        mon: dt.toLocaleDateString('en-US', { month: 'short' }),
+        day: d,
+        year: y,
+        long: dt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+      };
+    }
+
+    function outcomeInfo(v) {
+      return INSPECTION_OUTCOMES.find(o => o.value === v) || INSPECTION_OUTCOMES[3];
+    }
+
+    function inspectionPseudoItem(rec) {
+      return { slug: inspSlug(rec.id), code: 'Inspection ' + ymdToInput(rec.date) };
+    }
+
+    function renderInspections() {
+      const root = document.getElementById('inspectionRoot');
+      if (!root) return;
+      const records = sortedInspections();
+      const canUpload = backendStatus === 'connected';
+      let fileTotal = 0;
+      records.forEach(r => { fileTotal += (filesBySlug[inspSlug(r.id)] || []).length; });
+
+      root.innerHTML = `
+        <div class="inspection-section">
+          <div class="section-header-wrap">
+            <div class="section-header">
+              <div class="section-icon teal">R</div>
+              <div class="section-title-group">
+                <div class="section-title">Inspection Results</div>
+                <div class="section-subtitle">CDSS inspection reports, citations, and plans of correction saved to the shared Drive folder</div>
+              </div>
+              <div class="section-progress">${records.length} result${records.length === 1 ? '' : 's'} · ${fileTotal} file${fileTotal === 1 ? '' : 's'}</div>
+            </div>
+            <div class="section-controls">
+              <button class="btn-add-inspection edit-only" id="addInspBtn">➕ Add Inspection Result</button>
+            </div>
+          </div>
+          <div class="insp-list"></div>
+        </div>
+      `;
+
+      root.querySelector('#addInspBtn').addEventListener('click', () => openInspectionModal(null));
+
+      const list = root.querySelector('.insp-list');
+      if (records.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'empty-custom-msg';
+        empty.textContent = 'No inspection results recorded yet. Unlock edit mode and click "Add Inspection Result" to log the completion date and upload the documents.';
+        list.appendChild(empty);
+        return;
+      }
+      records.forEach((rec, i) => list.appendChild(buildInspectionCard(rec, i === 0, canUpload)));
+    }
+
+    function buildInspectionCard(rec, isLatest, canUpload) {
+      const pseudo = inspectionPseudoItem(rec);
+      const files = filesBySlug[pseudo.slug] || [];
+      const p = inspDateParts(rec.date);
+      const oc = outcomeInfo(rec.outcome);
+
+      const el = document.createElement('div');
+      el.className = 'insp-card' + (isLatest ? ' latest' : '');
+      el.dataset.slug = pseudo.slug;
+      el.innerHTML = `
+        <div class="insp-top">
+          <div class="insp-date-badge">
+            <div class="m">${p.mon}</div>
+            <div class="d">${p.day}</div>
+            <div class="y">${p.year}</div>
+          </div>
+          <div class="insp-content">
+            <div class="insp-title">
+              ${escapeHTML(rec.type || 'Inspection')}
+              ${isLatest ? '<span class="latest-chip">Most recent</span>' : ''}
+            </div>
+            <div class="insp-meta">
+              <span>📅 Completed ${escapeHTML(p.long)}</span>
+              ${rec.inspector ? `<span>👤 ${escapeHTML(rec.inspector)}</span>` : ''}
+              ${rec.reference ? `<span>🔖 ${escapeHTML(rec.reference)}</span>` : ''}
+            </div>
+            ${rec.notes ? `<div class="insp-notes">${escapeHTML(rec.notes)}</div>` : ''}
+          </div>
+          <span class="outcome-chip ${escapeAttr(oc.value)}">${escapeHTML(oc.label)}</span>
+        </div>
+        <div class="files-block">
+          <div class="files-header">
+            <div class="files-label">
+              Inspection Documents
+              <span class="files-count ${files.length > 0 ? 'has' : ''}">${files.length}</span>
+            </div>
+            <button class="btn-upload edit-only" ${canUpload ? '' : 'disabled title="Backend not connected"'}>
+              <span class="plus">+</span> Upload Files
+            </button>
+          </div>
+          <div class="files-list"></div>
+          <input type="file" class="file-picker" multiple style="display:none">
+        </div>
+        <div class="custom-item-controls edit-only">
+          <button class="item-ctrl-btn insp-edit-btn">✎ Edit result</button>
+          <button class="item-ctrl-btn danger insp-delete-btn">🗑 Delete</button>
+        </div>
+      `;
+
+      const uploadBtn = el.querySelector('.btn-upload');
+      const picker = el.querySelector('.file-picker');
+      if (!uploadBtn.disabled) {
+        uploadBtn.addEventListener('click', () => picker.click());
+        picker.addEventListener('change', async (e) => {
+          const chosen = Array.from(e.target.files);
+          picker.value = '';
+          if (chosen.length) await uploadFilesForItem(pseudo.slug, chosen);
+        });
+      }
+
+      const listEl = el.querySelector('.files-list');
+      if (files.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'files-empty';
+        empty.innerHTML = backendStatus !== 'connected'
+          ? 'Backend unavailable. Check configuration.'
+          : 'No documents uploaded yet.<span class="hint">Click Upload Files to add the report, citations, or plan of correction.</span>';
+        listEl.appendChild(empty);
+      } else {
+        files.forEach(f => listEl.appendChild(buildFileCard(pseudo, f)));
+      }
+
+      el.querySelector('.insp-edit-btn').addEventListener('click', () => openInspectionModal(rec.id));
+      el.querySelector('.insp-delete-btn').addEventListener('click', () => deleteInspection(rec.id));
+      return el;
+    }
+
+    // ----- Modal -----
+    function fillInspectionSelects() {
+      const typeSel = document.getElementById('inspFieldType');
+      const outSel = document.getElementById('inspFieldOutcome');
+      if (!typeSel.options.length) {
+        typeSel.innerHTML = INSPECTION_TYPES.map(t => `<option value="${escapeAttr(t)}">${escapeHTML(t)}</option>`).join('');
+      }
+      if (!outSel.options.length) {
+        outSel.innerHTML = INSPECTION_OUTCOMES.map(o => `<option value="${o.value}">${escapeHTML(o.label)}</option>`).join('');
+      }
+    }
+
+    function openInspectionModal(id) {
+      if (!isEditMode()) { showPinModal(); return; }
+      fillInspectionSelects();
+      inspEditor = { editingId: id || null, pending: [], saving: false };
+
+      const titleText = document.getElementById('inspTitleText');
+      const deleteBtn = document.getElementById('inspDeleteBtn');
+      const submitBtn = document.getElementById('inspSubmitBtn');
+      const note = document.getElementById('inspExistingNote');
+      submitBtn.disabled = false;
+
+      if (id) {
+        const rec = findInspection(id);
+        if (!rec) { showToast('Inspection result not found', 'error'); return; }
+        document.getElementById('inspFieldDate').value = ymdToInput(rec.date);
+        const typeSel = document.getElementById('inspFieldType');
+        if (rec.type && !INSPECTION_TYPES.includes(rec.type)) {
+          typeSel.insertAdjacentHTML('beforeend', `<option value="${escapeAttr(rec.type)}">${escapeHTML(rec.type)}</option>`);
+        }
+        typeSel.value = rec.type || INSPECTION_TYPES[0];
+        document.getElementById('inspFieldOutcome').value = rec.outcome || 'pending';
+        document.getElementById('inspFieldInspector').value = rec.inspector || '';
+        document.getElementById('inspFieldRef').value = rec.reference || '';
+        document.getElementById('inspFieldNotes').value = rec.notes || '';
+        const count = (filesBySlug[inspSlug(id)] || []).length;
+        note.textContent = count > 0
+          ? `${count} document${count === 1 ? '' : 's'} already attached. Add more below if needed.`
+          : 'No documents attached yet.';
+        note.style.display = '';
+        titleText.textContent = '✎ Edit Inspection Result';
+        deleteBtn.style.display = '';
+        submitBtn.textContent = 'Save Changes';
+      } else {
+        document.getElementById('inspFieldDate').value = ymdToInput(todayYMD());
+        document.getElementById('inspFieldType').value = INSPECTION_TYPES[0];
+        document.getElementById('inspFieldOutcome').value = 'clear';
+        document.getElementById('inspFieldInspector').value = '';
+        document.getElementById('inspFieldRef').value = '';
+        document.getElementById('inspFieldNotes').value = '';
+        note.style.display = 'none';
+        titleText.textContent = '📋 Add Inspection Result';
+        deleteBtn.style.display = 'none';
+        submitBtn.textContent = 'Save Result';
+      }
+
+      renderPickedFiles();
+      document.getElementById('inspOverlay').classList.add('open');
+      setTimeout(() => document.getElementById('inspFieldDate').focus(), 60);
+    }
+
+    function closeInspectionModal() {
+      document.getElementById('inspOverlay').classList.remove('open');
+      inspEditor.pending = [];
+    }
+
+    function addPickedFiles(fileList) {
+      Array.from(fileList || []).forEach(f => {
+        if (f.size > MAX_FILE_SIZE) {
+          showToast(`"${f.name}" exceeds 25 MB limit`, 'error');
+          return;
+        }
+        const dup = inspEditor.pending.some(x => x.name === f.name && x.size === f.size);
+        if (!dup) inspEditor.pending.push(f);
+      });
+      renderPickedFiles();
+    }
+
+    function renderPickedFiles() {
+      const list = document.getElementById('inspPickedList');
+      list.innerHTML = '';
+      inspEditor.pending.forEach((f, idx) => {
+        const row = document.createElement('div');
+        row.className = 'insp-picked';
+        row.innerHTML = `
+          <span>${fileEmoji(f.type, f.name)}</span>
+          <span class="nm">${escapeHTML(f.name)}</span>
+          <span class="sz">${formatSize(f.size)}</span>
+          <button type="button" title="Remove">×</button>
+        `;
+        row.querySelector('button').addEventListener('click', () => {
+          inspEditor.pending.splice(idx, 1);
+          renderPickedFiles();
+        });
+        list.appendChild(row);
+      });
+    }
+
+    async function submitInspection() {
+      if (inspEditor.saving) return;
+      const rawDate = document.getElementById('inspFieldDate').value.trim();
+      const iso = parseFlexibleDate(rawDate);
+      if (!iso) {
+        showToast('Enter a valid completion date (MM/DD/YYYY).', 'error');
+        document.getElementById('inspFieldDate').focus();
+        return;
+      }
+      const ymd = iso.slice(0, 10);
+      if (ymd > todayYMD()) {
+        showToast('The completion date cannot fall in the future.', 'error');
+        document.getElementById('inspFieldDate').focus();
+        return;
+      }
+      const files = inspEditor.pending.slice();
+      if (files.length && backendStatus !== 'connected') {
+        showToast('The backend is offline, so documents cannot upload right now.', 'error');
+        return;
+      }
+
+      const fields = {
+        date: ymd,
+        type: document.getElementById('inspFieldType').value,
+        outcome: document.getElementById('inspFieldOutcome').value,
+        inspector: document.getElementById('inspFieldInspector').value.trim(),
+        reference: document.getElementById('inspFieldRef').value.trim(),
+        notes: document.getElementById('inspFieldNotes').value.trim()
+      };
+      const now = new Date().toISOString();
+      let id = inspEditor.editingId;
+
+      if (id) {
+        const rec = findInspection(id);
+        if (!rec) { showToast('Inspection result not found', 'error'); return; }
+        Object.assign(rec, fields, { updatedAt: now });
+      } else {
+        id = genId();
+        state.inspections.push(Object.assign({ id, createdAt: now, updatedAt: now }, fields));
+      }
+
+      inspEditor.saving = true;
+      document.getElementById('inspSubmitBtn').disabled = true;
+      closeInspectionModal();
+      scheduleSync();
+      render();
+      renderStats();
+      showToast(inspEditor.editingId ? 'Inspection result updated' : 'Inspection result saved', 'success');
+
+      if (files.length) await uploadFilesForItem(inspSlug(id), files);
+      inspEditor.saving = false;
+    }
+
+    async function deleteInspection(id) {
+      const rec = findInspection(id);
+      if (!rec) return;
+      const slug = inspSlug(id);
+      const files = filesBySlug[slug] || [];
+      const fileMsg = files.length
+        ? ` Its ${files.length} document${files.length === 1 ? '' : 's'} will move to Drive trash, where you can recover them for 30 days.`
+        : '';
+      if (!confirm(`Delete the ${rec.type || 'inspection'} result completed ${ymdToInput(rec.date)}?${fileMsg}`)) return;
+
+      let failed = 0;
+      for (const f of files) {
+        try { await apiCall('delete', { fileId: f.id }); }
+        catch (err) { failed++; }
+      }
+      if (failed === 0) delete filesBySlug[slug];
+
+      state.inspections = state.inspections.filter(r => r.id !== id);
+      scheduleSync();
+      closeInspectionModal();
+      render();
+      renderStats();
+      showToast(failed ? `Result deleted. ${failed} file${failed === 1 ? '' : 's'} could not move to trash.` : 'Inspection result deleted',
+        failed ? 'error' : 'success');
+    }
+
+    // ----- Modal wiring -----
+    (function wireInspectionModal() {
+      const dateInput = document.getElementById('inspFieldDate');
+      const datePicker = document.getElementById('inspDatePicker');
+      const dropzone = document.getElementById('inspDropzone');
+      const filePicker = document.getElementById('inspFilePicker');
+
+      dateInput.addEventListener('input', (e) => {
+        const digits = e.target.value.replace(/\D/g, '').slice(0, 8);
+        let out = digits;
+        if (digits.length >= 5) out = digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4);
+        else if (digits.length >= 3) out = digits.slice(0, 2) + '/' + digits.slice(2);
+        e.target.value = out;
+      });
+      dateInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); submitInspection(); }
+      });
+
+      document.getElementById('inspDateBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        const iso = parseFlexibleDate(dateInput.value);
+        datePicker.value = (iso || todayYMD()).slice(0, 10);
+        datePicker.max = todayYMD();
+        try { datePicker.showPicker(); }
+        catch (err) { datePicker.focus(); datePicker.click(); }
+      });
+      datePicker.addEventListener('change', (e) => {
+        if (e.target.value) dateInput.value = ymdToInput(e.target.value);
+      });
+
+      dropzone.addEventListener('click', () => filePicker.click());
+      filePicker.addEventListener('change', (e) => {
+        addPickedFiles(e.target.files);
+        filePicker.value = '';
+      });
+      ['dragenter', 'dragover'].forEach(evt => dropzone.addEventListener(evt, (e) => {
+        e.preventDefault();
+        dropzone.classList.add('dragover');
+      }));
+      ['dragleave', 'drop'].forEach(evt => dropzone.addEventListener(evt, (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('dragover');
+      }));
+      dropzone.addEventListener('drop', (e) => addPickedFiles(e.dataTransfer.files));
+
+      document.getElementById('inspSubmitBtn').addEventListener('click', submitInspection);
+      document.getElementById('inspDeleteBtn').addEventListener('click', () => {
+        if (inspEditor.editingId) deleteInspection(inspEditor.editingId);
+      });
+      document.getElementById('inspCloseBtn').addEventListener('click', closeInspectionModal);
+      document.getElementById('inspCancelBtn').addEventListener('click', closeInspectionModal);
+      document.getElementById('inspOverlay').addEventListener('click', (e) => {
+        if (e.target.id === 'inspOverlay') closeInspectionModal();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && document.getElementById('inspOverlay').classList.contains('open')) {
+          closeInspectionModal();
+        }
+      });
+    })();
+
+    window.openInspectionModal = openInspectionModal;
 
     // Apply current edit mode state to body on load
     document.body.classList.toggle('edit-mode', isEditMode());
