@@ -91,6 +91,15 @@
   .status-dot.rejected { background: var(--rejected-dot); }
   .status-dot.pending  { background: var(--pending-dot); }
   .status-dot.reviewed { background: var(--reviewed-dot); }
+  /* NO ACCRUAL (employee opted out of using accrued time) */
+  .event-chip.no-accrual { outline: 1px dashed #B7950B; outline-offset: -1px; }
+  .accrual-flag { font-size: 9px; font-weight: 700; color: #856404; background: #FFF3CD; border: 1px solid #FFEAA7; border-radius: 3px; padding: 0 3px; margin-left: 2px; flex-shrink: 0; line-height: 13px; }
+  .legend-chip.no-accrual { background: #FFF3CD; border: 1px dashed #B7950B; border-left: 3px solid #B7950B; }
+  .accrual-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .accrual-badge.no { background: #FFF3CD; color: #856404; border: 1px solid #FFEAA7; }
+  .accrual-badge.yes { background: #E0F1E9; color: #2F7A55; }
+  .accrual-badge.unknown { background: var(--bg); color: var(--muted); }
+  .accrual-warning { font-size: 11px; color: #856404; background: #FFF3CD; border: 1px solid #FFEAA7; border-radius: 6px; padding: 6px 10px; margin-bottom: 12px; }
   .more-chip { font-size: 10px; color: var(--orange); font-weight: 700; padding: 3px 6px; cursor: pointer; background: rgba(245,118,0,.1); border-radius: 4px; display: inline-block; margin-top: 1px; transition: background .15s; }
   .more-chip:hover { background: rgba(245,118,0,.2); }
   .month-day.expanded { min-height: unset; }
@@ -270,6 +279,11 @@
       <option value="rejected">Rejected</option>
       <option value="pending">Pending</option>
     </select>
+    <select id="accrualFilter" onchange="render()">
+      <option value="">All Accrual Usage</option>
+      <option value="uses">Uses Accrued Hours</option>
+      <option value="no">No Accrual (Opted Out)</option>
+    </select>
     <div class="legend">
       <div class="legend-item"><div class="legend-chip vacation"></div>Vacation</div>
       <div class="legend-item"><div class="legend-chip sick"></div>Sick</div>
@@ -277,6 +291,7 @@
       <div class="legend-item"><div class="legend-dot reviewed"></div>Reviewed</div>
       <div class="legend-item"><div class="legend-dot pending"></div>Pending</div>
       <div class="legend-item"><div class="legend-dot rejected"></div>Rejected</div>
+      <div class="legend-item"><div class="legend-chip no-accrual"></div>No Accrual</div>
     </div>
   </div>
 </div>
@@ -305,6 +320,14 @@ let RAW = [{"id":"AC-1761229957113-93","name":"Lucia Diaz","type":"vacation","da
 const localStatus = {};
 const pinnedStatus = {}; // user-confirmed actions — never overwritten by live fetch
 let liveLoaded = false;
+
+// Normalize the noAccruedTime flag from Google Sheets. The sheet may send
+// a real boolean, or a string such as "TRUE", "yes" or "1".
+function isNoAccrual(v) {
+  if (v === true || v === 1) return true;
+  const s = String(v == null ? '' : v).trim().toLowerCase();
+  return s === 'true' || s === 'yes' || s === 'y' || s === '1';
+}
 
 // Normalize any date string to YYYY-MM-DD
 function toISODate(raw) {
@@ -365,6 +388,9 @@ function loadLiveStatuses(afterAction) {
           // Patch employee ID onto pre-embedded seed records so the ID filter
           // (and name canonicalization) works for them too.
           if (empId && !existing.employeeId) existing.employeeId = empId;
+
+          // Accrual usage: the live sheet is the source of truth, same as HR Dashboard.
+          existing.noAccruedTime = isNoAccrual(req.noAccruedTime);
 
           // Always patch hours on existing RAW records when live has a real value
           // Try every field name the GAS might use
@@ -427,6 +453,7 @@ function loadLiveStatuses(afterAction) {
           date,
           hours: isNaN(hours) ? 0 : hours,
           approvedHours: isNaN(approvedHrs) ? 0 : approvedHrs,
+          noAccruedTime: isNoAccrual(req.noAccruedTime),
           status: resolvedStatus
         });
 
@@ -578,9 +605,11 @@ function filtered() {
   const empId = document.getElementById('empIdFilter').value;
   const type = document.getElementById('typeFilter').value;
   const stat = document.getElementById('statusFilter').value;
+  const accr = document.getElementById('accrualFilter').value;
   return RAW.filter(e => {
     const st = getStatus(e);
-    return (!emp||e.name===emp) && (!empId||String(e.employeeId||'')===empId) && (!type||e.type===type) && (!stat||st===stat);
+    const matchAccr = !accr || (accr === 'no' ? !!e.noAccruedTime : !e.noAccruedTime);
+    return (!emp||e.name===emp) && (!empId||String(e.employeeId||'')===empId) && (!type||e.type===type) && (!stat||st===stat) && matchAccr;
   });
 }
 
@@ -591,8 +620,11 @@ function chipHTML(ev, short) {
   const st = getStatus(ev);
   const name = short ? ev.name.split(' ')[0] : ev.name;
   const icon = ev.type==='vacation' ? '🏖️' : '🤢';
-  return `<div class="event-chip ${ev.type}" onclick="showModal('${ev.id}','${ev.date}')">
-    <span class="status-dot ${st}"></span>${icon} ${name}
+  const noAcc = !!ev.noAccruedTime;
+  const flag = noAcc ? `<span class="accrual-flag" title="Employee opted out of using accrued time">NA</span>` : '';
+  const tip = noAcc ? ' title="No Accrual: employee opted out of using accrued time"' : '';
+  return `<div class="event-chip ${ev.type}${noAcc ? ' no-accrual' : ''}"${tip} onclick="showModal('${ev.id}','${ev.date}')">
+    <span class="status-dot ${st}"></span>${icon} ${name}${flag}
   </div>`;
 }
 
@@ -680,6 +712,7 @@ function renderDay() {
           <div class="day-event-name">${ev.name}</div>
           <div class="day-event-meta">${ev.type.charAt(0).toUpperCase()+ev.type.slice(1)} &middot; ${ev.hours} hrs</div>
           <div class="day-event-badge ${st}"><span class="legend-dot ${st}" style="width:8px;height:8px;display:inline-block;border-radius:50%;"></span>${cap(st)}</div>
+          ${ev.noAccruedTime ? `<div class="day-event-badge" style="background:#FFF3CD;color:#856404;border:1px solid #FFEAA7;margin-left:4px;">&#9888; No Accrual Used</div>` : ''}
         </div>
       </div>`;
     });
@@ -698,6 +731,7 @@ function countStrip(evs) {
   const revd=evs.filter(e=>getStatus(e)==='reviewed').length;
   const pend=evs.filter(e=>getStatus(e)==='pending').length;
   const rej =evs.filter(e=>getStatus(e)==='rejected').length;
+  const noAcc=evs.filter(e=>e.noAccruedTime).length;
   return `<div class="count-strip">
     <span>Showing: <strong>${evs.length} requests</strong></span>
     <span>🏖️ Vacation: <strong>${vac}</strong> &middot; <strong>${fmtHrs(vacHrs)} hrs</strong></span><span>🤢 Sick: <strong>${sick}</strong> &middot; <strong>${fmtHrs(sickHrs)} hrs</strong></span>
@@ -705,6 +739,7 @@ function countStrip(evs) {
     <span style="color:#d8b4fe">&#9679; Reviewed: <strong>${revd}</strong></span>
     <span style="color:#fde68a">&#9679; Pending: <strong>${pend}</strong></span>
     <span style="color:#fca5a5">&#9679; Rejected: <strong>${rej}</strong></span>
+    <span style="color:#FFEAA7">&#9888; No Accrual: <strong>${noAcc}</strong></span>
   </div>`;
 }
 
@@ -733,6 +768,7 @@ function showModal(id, date) {
     actionZone = `
     <div class="action-zone">
       <div class="action-zone-title">&#9889; Quick Actions</div>
+      ${ev.noAccruedTime ? '<div class="accrual-warning">&#9888; This employee opted out of using accrued time. These hours will be excluded from the Paychex export.</div>' : ''}
 
       <!-- REVIEW + APPROVE -->
       <div class="quick-action-card approve-card">
@@ -796,6 +832,7 @@ function showModal(id, date) {
     actionZone = `
     <div class="action-zone">
       <div class="action-zone-title">&#9889; Final Approval Required</div>
+      ${ev.noAccruedTime ? '<div class="accrual-warning">&#9888; This employee opted out of using accrued time. These hours will be excluded from the Paychex export.</div>' : ''}
 
       <!-- FINAL APPROVE -->
       <div class="quick-action-card approve-card">
@@ -908,6 +945,16 @@ function showModal(id, date) {
     <div class="modal-field">
       <div class="modal-label">Request ID</div>
       <div class="modal-value" style="font-size:11px;color:var(--muted);font-family:monospace;">${ev.id}</div>
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Accrual Usage</div>
+      <div>${
+        !liveLoaded
+          ? '<span class="accrual-badge unknown">Syncing with Google Sheets...</span>'
+          : ev.noAccruedTime
+            ? '<span class="accrual-badge no">&#9888; Employee opted out: accrued hours will NOT be used</span>'
+            : '<span class="accrual-badge yes">&#10003; Accrued hours apply</span>'
+      }</div>
     </div>
     ${ev.employeeId ? `<div class="modal-field">
       <div class="modal-label">Employee ID</div>
