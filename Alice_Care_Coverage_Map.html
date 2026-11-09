@@ -1,5 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>Alice Care Coverage Map</title>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>Alice Care Coverage Map</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
 <style id="css">
@@ -125,8 +124,8 @@ textarea:focus{border-color:var(--orange);outline:none}
 .btn2.sm:hover{background:#FFF4EA}
 .pickbtn[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
 svg.picking .ctx,svg.picking .z{cursor:copy}
-svg .ctx.pend-add{transition:none;fill:#FBC08A;stroke:var(--orange);stroke-width:2;stroke-dasharray:5 3}
-svg .z.pend-rem{transition:none;fill:#B9C4D2;stroke:var(--navy);stroke-width:2;stroke-dasharray:5 3}
+.ctx.pend-add{fill:#FBC08A;stroke:var(--orange);stroke-width:2;stroke-dasharray:5 3}
+.z.pend-rem{fill:#B9C4D2;stroke:var(--navy);stroke-width:2;stroke-dasharray:5 3}
 .editbar{position:absolute;left:12px;right:60px;bottom:10px;background:var(--navy);color:#fff;border-radius:8px;padding:8px 12px;font-size:12.5px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .editbar button{margin-left:auto;background:var(--orange);color:#fff;border:0;border-radius:6px;padding:5px 12px;font:600 12px var(--font);cursor:pointer}
 </style>
@@ -140,6 +139,8 @@ const GEOTXT=document.getElementById('geo').textContent;
 const SRC=document.getElementById('app-src').textContent;
 const G=JSON.parse(GEOTXT);
 let STATE=JSON.parse(document.getElementById('state').textContent);
+const LOCAL=!window.claude, LKEY='alicecare-coverage-state';
+if(LOCAL){try{const s=JSON.parse(localStorage.getItem(LKEY)||'null');if(s&&Array.isArray(s.approved)&&s.approved.length)STATE=s}catch(e){}}
 const APPROVED=new Set(STATE.approved);
 const NAME=z=>(G.names[z]||[''])[0], COUNTY=z=>(G.names[z]||['',''])[1];
 const SHAPE={};G.shapes.forEach(s=>SHAPE[s.z]=s);
@@ -197,6 +198,8 @@ document.getElementById('app').innerHTML=`
       <button class="btn" type="button" id="apply" disabled>Add ZIP codes</button>
       <button class="btn2" type="button" id="clearBulk">Clear</button>
       <button class="btn2" type="button" id="copyList">Copy approved list</button>
+      <button class="btn2" type="button" id="dlFile" hidden>Download updated map file</button>
+      <button class="btn2" type="button" id="resetLocal" hidden>Undo browser changes</button>
     </div>
     <div class="status" id="mstatus" aria-live="polite"></div>
   </section>
@@ -429,7 +432,13 @@ function buildDoc(st){const S='scr'+'ipt';
   return '<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>'+RESET+'</style></head><body>'
    +'<title>Alice Care Coverage Map</title>\n<meta name="claude:viewport-fit-sides" content="cover">\n<link rel="stylesheet" href="'+FONTS+'">\n<style id="css">'+CSS+'</style>\n<div id="app"></div>\n'
    +'<'+S+' type="application/json" id="state">'+J(st)+'</'+S+'>\n<'+S+' type="application/json" id="geo">'+GEOTXT+'</'+S+'>\n<'+S+' id="app-src">'+SRC+'</'+S+'>\n</body></html>'}
-apply.onclick=async()=>{if(!plan||!plan.change.length)return;if(!artifactApi){mst.textContent=saveNote;return}
+apply.onclick=async()=>{if(!plan||!plan.change.length)return;
+  if(LOCAL){const next=new Set(APPROVED);plan.change.forEach(z=>plan.m==='add'?next.add(z):next.delete(z));
+    if(!next.size){mst.textContent='The approved list cannot be empty. Keep at least one ZIP code.';return}
+    const st={approved:[...next].sort(),updated:new Date().toLocaleDateString('en-CA',{timeZone:'America/Los_Angeles'})};
+    try{localStorage.setItem(LKEY,JSON.stringify(st));location.reload()}catch(e){STATE=st;mst.textContent='This browser blocks saving, so use Download updated map file to keep the new list.';APPROVED.clear();st.approved.forEach(z=>APPROVED.add(z))}
+    return}
+  if(!artifactApi){mst.textContent=saveNote;return}
   setPicking(false);
   const next=new Set(APPROVED);plan.change.forEach(z=>plan.m==='add'?next.add(z):next.delete(z));
   if(!next.size){mst.textContent='The approved list cannot be empty. Keep at least one ZIP code.';return}
@@ -441,7 +450,11 @@ apply.onclick=async()=>{if(!plan||!plan.change.length)return;if(!artifactApi){ms
       :(c==='not_writer'||c==='not_granted')?'Your access to this page is view only, so you cannot change the list.'
       :'The list did not save. Check your connection and try again.';
     if(c==='not_writer'||c==='not_granted')$('manage').hidden=true}};
-(async()=>{const off='Saving works only when you open this map on claude.ai while signed in as its owner or an editor. You can still preview and copy the list here.';
+if(LOCAL){$('dlFile').hidden=false;let has=false;try{has=!!localStorage.getItem(LKEY)}catch(e){}$('resetLocal').hidden=!has;
+  saveNote='';mst.textContent=has?'This browser has saved changes to the list. Download the updated map file to keep them or share them.':'Changes save in this browser. Use Download updated map file to keep a copy or put it on your website.';}
+$('dlFile').onclick=()=>{try{const b=new Blob([buildDoc(STATE)],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='alice-care-coverage-map.html';document.body.appendChild(a);a.click();a.remove();mst.textContent='Downloaded alice-care-coverage-map.html with '+APPROVED.size+' ZIP codes.'}catch(e){mst.textContent='The download did not start. Use Copy approved list instead.'}};
+$('resetLocal').onclick=()=>{try{localStorage.removeItem(LKEY)}catch(e){}location.reload()};
+if(!LOCAL)(async()=>{const off='Saving works only when you open this map on claude.ai while signed in as its owner or an editor. You can still preview and copy the list here.';
   try{if(!window.claude){saveNote=off;mst.textContent=off;return}
     const[a,u]=await Promise.all([window.claude.use('artifact'),window.claude.use('user')]);
     if(!a){saveNote=off;mst.textContent=off;return}
@@ -451,5 +464,4 @@ apply.onclick=async()=>{if(!plan||!plan.change.length)return;if(!artifactApi){ms
   }catch(e){saveNote=off;mst.textContent=off}renderPreview()})();
 })();
 </script>
-
 </body></html>
