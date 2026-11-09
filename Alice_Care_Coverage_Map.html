@@ -119,6 +119,16 @@ textarea:focus{border-color:var(--orange);outline:none}
 .pv.bad{background:var(--no-bg);border-color:var(--no-line)}
 .status{font-size:12.5px;color:var(--muted)}
 .updated{font-size:12px;color:var(--muted)}
+
+.hdrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:12px}
+.btn2.sm{padding:7px 14px;font-size:12.5px;border-color:var(--orange);color:var(--orange)}
+.btn2.sm:hover{background:#FFF4EA}
+.pickbtn[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+svg.picking .ctx,svg.picking .z{cursor:copy}
+svg .ctx.pend-add{transition:none;fill:#FBC08A;stroke:var(--orange);stroke-width:2;stroke-dasharray:5 3}
+svg .z.pend-rem{transition:none;fill:#B9C4D2;stroke:var(--navy);stroke-width:2;stroke-dasharray:5 3}
+.editbar{position:absolute;left:12px;right:60px;bottom:10px;background:var(--navy);color:#fff;border-radius:8px;padding:8px 12px;font-size:12.5px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.editbar button{margin-left:auto;background:var(--orange);color:#fff;border:0;border-radius:6px;padding:5px 12px;font:600 12px var(--font);cursor:pointer}
 </style>
 <div id="app"></div>
 <script type="application/json" id="state">{"approved": ["95605", "95608", "95609", "95610", "95611", "95621", "95624", "95626", "95628", "95630", "95648", "95652", "95655", "95660", "95661", "95662", "95670", "95673", "95677", "95678", "95691", "95741", "95742", "95746", "95747", "95757", "95758", "95759", "95765", "95798", "95799", "95811", "95814", "95815", "95816", "95817", "95818", "95819", "95820", "95821", "95822", "95823", "95824", "95825", "95826", "95827", "95828", "95829", "95830", "95831", "95832", "95833", "95834", "95835", "95836", "95837", "95838", "95839", "95840", "95841", "95842", "95843", "95851", "95852", "95853", "95860", "95864", "95865", "95866", "95867", "95887", "95894", "95899"], "updated": "2026-11-09"}</script>
@@ -150,7 +160,7 @@ document.getElementById('app').innerHTML=`
       <div class="stat"><b id="sMapped"></b><span>delivery areas on the map</span></div>
       <div class="stat"><b id="sArea"></b><span>square miles served</span></div>
     </div>
-    <div class="updated" id="upd"></div>
+    <div class="hdrow"><div class="updated" id="upd"></div><button class="btn2 sm" type="button" id="toManage">Manage ZIP codes</button></div>
   </header>
   <section class="checker" aria-labelledby="chkTitle">
     <h2 id="chkTitle">Check an address</h2>
@@ -169,9 +179,9 @@ document.getElementById('app').innerHTML=`
     </div>
     <div id="out" aria-live="polite"></div>
   </section>
-  <section class="checker manage" id="manage" hidden aria-labelledby="mTitle">
+  <section class="checker manage" id="manage" aria-labelledby="mTitle">
     <h2 id="mTitle">Manage ZIP codes</h2>
-    <p class="sub">Paste ZIP codes separated by commas, spaces, or new lines, or upload a CSV or text file. Only you and editors see this panel.</p>
+    <p class="sub">Paste ZIP codes separated by commas, spaces, or new lines, upload a CSV or text file, or pick areas on the map. Review the preview, then save.</p>
     <div class="mode" role="radiogroup" aria-label="Add or remove">
       <label><input type="radio" name="mode" id="mAdd" value="add" checked>Add ZIP codes</label>
       <label><input type="radio" name="mode" id="mRem" value="remove">Remove ZIP codes</label>
@@ -180,6 +190,7 @@ document.getElementById('app').innerHTML=`
     <textarea id="bulk" placeholder="95762, 95650, 95603"></textarea>
     <div class="row">
       <span class="file"><label for="csv">Or upload a file: </label><input type="file" id="csv" accept=".csv,.txt,text/csv,text/plain"></span>
+      <button class="btn2 pickbtn" type="button" id="mapPick" aria-pressed="false">Select on map</button>
     </div>
     <div class="preview" id="preview"></div>
     <div class="row">
@@ -203,7 +214,7 @@ document.getElementById('app').innerHTML=`
         <button id="zreset" aria-label="Reset view" style="font-size:13px">⤢</button>
       </div>
       <div class="tip" id="tip" hidden></div>
-      <div class="hint">Drag to pan · scroll or pinch to zoom · click any area</div>
+      <div class="hint" id="hint">Drag to pan · scroll or pinch to zoom · click any area</div><div class="editbar" id="editbar" hidden></div>
     </div>
     <aside>
       <h2>Approved ZIP codes</h2>
@@ -284,6 +295,7 @@ function pickZip(z,focus=true){gp.innerHTML='';
   if(PATH[z])selectZips([z],focus);else{selectZips([z],false)}
   showResult(checkZip(z))}
 svg.addEventListener('click',e=>{if(moved)return;const z=e.target.dataset&&e.target.dataset.z;
+  if(z&&picking){togglePick(z);return}
   if(z){if(sel.has(z)&&sel.size===1)pickZip('');else pickZip(z,false);return}
   if(e.target===svg){clearSel();gp.innerHTML='';zsel.value='';zclear.hidden=false;
     showResult({cls:'info',h:'No ZIP area here',p:'This spot has no ZIP code area, usually open land, a river, or the edge of the map. Click a shaded area for its ZIP and name.'})}});
@@ -362,7 +374,24 @@ let lastAr=aspect();new ResizeObserver(()=>{const ar=aspect();if(Math.abs(ar-las
   lastAr=ar;computeFull();vb=wasFull?{...full}:{x:c.x-w/2,y:c.y-w*ar/2,w,h:w*ar};setVB()}).observe(svg);
 // ---------- manage ZIP codes ----------
 const bulk=$('bulk'),pv=$('preview'),apply=$('apply'),mst=$('mstatus');
-let plan=null,artifactApi=null;
+let plan=null,artifactApi=null,saveNote='Checking your edit access…',picking=false;
+const mapPick=$('mapPick'),editbar=$('editbar'),hint=$('hint');
+$('toManage').onclick=()=>{$('manage').scrollIntoView({behavior:'smooth',block:'start'});setTimeout(()=>bulk.focus({preventScroll:true}),400)};
+function bulkZips(){return [...new Set(bulk.value.match(/\b\d{5}\b/g)||[])]}
+function setPicking(on){picking=on;mapPick.setAttribute('aria-pressed',on);mapPick.textContent=on?'Done selecting':'Select on map';
+  svg.classList.toggle('picking',on);hint.hidden=on;editbar.hidden=!on;updateEditbar();
+  if(on){clearSel();gp.innerHTML='';box.scrollIntoView({behavior:'smooth',block:'center'})}}
+function updateEditbar(){const m=mode();editbar.innerHTML=m==='add'?'<b>Adding:</b> click grey areas to add them, click again to undo. <button type="button" id="ebDone">Done</button>':'<b>Removing:</b> click orange areas to remove them, click again to undo. <button type="button" id="ebDone">Done</button>';
+  const d=$('ebDone');if(d)d.onclick=()=>{setPicking(false);$('manage').scrollIntoView({behavior:'smooth',block:'center'})}}
+function togglePick(z){const m=mode(),cov=APPROVED.has(z),nm=NAME(z)||z;
+  if(m==='add'&&cov){flash(`${z} ${nm} is already approved. Switch to Remove to take it off.`);return}
+  if(m==='remove'&&!cov){flash(`${z} ${nm} is not on the approved list.`);return}
+  const cur=bulkZips();const i=cur.indexOf(z);if(i>=0)cur.splice(i,1);else cur.push(z);
+  bulk.value=cur.join(', ');renderPreview();flash(i>=0?`Removed ${z} ${nm} from your selection.`:`Selected ${z} ${nm}.`)}
+let flashT=null;function flash(msg){tip.hidden=false;tip.innerHTML=esc(msg);const r=box.getBoundingClientRect();tip.style.left=(r.width/2)+'px';tip.style.top='70px';clearTimeout(flashT);flashT=setTimeout(()=>tip.hidden=true,1800)}
+function markPending(){document.querySelectorAll('.pend').forEach(p=>p.classList.remove('pend','pend-add','pend-rem'));
+  if(!plan)return;plan.change.forEach(z=>{const p=PATH[z];if(p)p.classList.add('pend',plan.m==='add'?'pend-add':'pend-rem')})}
+mapPick.onclick=()=>setPicking(!picking);
 const mode=()=>$('mRem').checked?'remove':'add';
 function parse(){const txt=bulk.value,zs=[...new Set((txt.match(/\b\d{5}\b/g)||[]))];const bad=(txt.replace(/\b\d{5}(-\d{4})?\b/g,' ').match(/\b\d+\b/g)||[]);
   const m=mode(),r={m,zs,bad:[...new Set(bad)]};
@@ -371,6 +400,7 @@ function parse(){const txt=bulk.value,zs=[...new Set((txt.match(/\b\d{5}\b/g)||[
   return r}
 const zl=(arr,n=40)=>`<span class="zl">${arr.slice(0,n).map(z=>z+(NAME(z)?' '+esc(NAME(z)):'')).join(', ')}${arr.length>n?', and '+(arr.length-n)+' more':''}</span>`;
 function renderPreview(){plan=parse();const p=plan;let h='';
+  markPending();
   if(!p.zs.length&&!p.bad.length){pv.innerHTML='';apply.disabled=true;apply.textContent=p.m==='add'?'Add ZIP codes':'Remove ZIP codes';return}
   if(p.m==='add'){
     if(p.mapped.length)h+=`<div class="pv good"><b>${p.mapped.length} new with a map area:</b> ${zl(p.mapped)}</div>`;
@@ -382,10 +412,10 @@ function renderPreview(){plan=parse();const p=plan;let h='';
     if(p.missing.length)h+=`<div class="pv"><b>${p.missing.length} not in the approved list</b>, no change: <span class="zl">${p.missing.join(', ')}</span></div>`;
   }
   if(p.bad.length)h+=`<div class="pv bad"><b>Ignored</b> entries that are not 5 digit ZIP codes: <span class="zl">${esc(p.bad.slice(0,20).join(', '))}</span></div>`;
-  pv.innerHTML=h;const n=p.change.length;apply.disabled=!n;
+  pv.innerHTML=h;const n=p.change.length;apply.disabled=!n;if(n&&!artifactApi)pv.insertAdjacentHTML('beforeend',`<div class="pv warn">${esc(saveNote)}</div>`);
   apply.textContent=n?(p.m==='add'?`Add ${n} ZIP code${n>1?'s':''}`:`Remove ${n} ZIP code${n>1?'s':''}`):(p.m==='add'?'Add ZIP codes':'Remove ZIP codes')}
 bulk.addEventListener('input',renderPreview);
-document.querySelectorAll('input[name=mode]').forEach(r=>r.addEventListener('change',renderPreview));
+document.querySelectorAll('input[name=mode]').forEach(r=>r.addEventListener('change',()=>{bulk.value='';renderPreview();updateEditbar()}));
 $('csv').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const rd=new FileReader();
   rd.onload=()=>{bulk.value=(bulk.value.trim()?bulk.value.trim()+', ':'')+String(rd.result);renderPreview();mst.textContent=`Loaded ${f.name}.`};
   rd.onerror=()=>{mst.textContent='That file could not be read. Try saving it as a CSV or plain text file.'};rd.readAsText(f);e.target.value=''});
@@ -399,7 +429,8 @@ function buildDoc(st){const S='scr'+'ipt';
   return '<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>'+RESET+'</style></head><body>'
    +'<title>Alice Care Coverage Map</title>\n<meta name="claude:viewport-fit-sides" content="cover">\n<link rel="stylesheet" href="'+FONTS+'">\n<style id="css">'+CSS+'</style>\n<div id="app"></div>\n'
    +'<'+S+' type="application/json" id="state">'+J(st)+'</'+S+'>\n<'+S+' type="application/json" id="geo">'+GEOTXT+'</'+S+'>\n<'+S+' id="app-src">'+SRC+'</'+S+'>\n</body></html>'}
-apply.onclick=async()=>{if(!plan||!plan.change.length||!artifactApi)return;
+apply.onclick=async()=>{if(!plan||!plan.change.length)return;if(!artifactApi){mst.textContent=saveNote;return}
+  setPicking(false);
   const next=new Set(APPROVED);plan.change.forEach(z=>plan.m==='add'?next.add(z):next.delete(z));
   if(!next.size){mst.textContent='The approved list cannot be empty. Keep at least one ZIP code.';return}
   const st={approved:[...next].sort(),updated:new Date().toLocaleDateString('en-CA',{timeZone:'America/Los_Angeles'})};
@@ -410,9 +441,14 @@ apply.onclick=async()=>{if(!plan||!plan.change.length||!artifactApi)return;
       :(c==='not_writer'||c==='not_granted')?'Your access to this page is view only, so you cannot change the list.'
       :'The list did not save. Check your connection and try again.';
     if(c==='not_writer'||c==='not_granted')$('manage').hidden=true}};
-(async()=>{try{if(!window.claude)return;const[a,u]=await Promise.all([window.claude.use('artifact'),window.claude.use('user')]);
-  if(!a)return;let can=true;if(u){try{can=await u.canEdit()}catch(e){can=true}}
-  if(can){artifactApi=a;$('manage').hidden=false}}catch(e){}})();
+(async()=>{const off='Saving works only when you open this map on claude.ai while signed in as its owner or an editor. You can still preview and copy the list here.';
+  try{if(!window.claude){saveNote=off;mst.textContent=off;return}
+    const[a,u]=await Promise.all([window.claude.use('artifact'),window.claude.use('user')]);
+    if(!a){saveNote=off;mst.textContent=off;return}
+    let can=true;if(u){try{can=await u.canEdit()}catch(e){can=true}}
+    if(can){artifactApi=a;saveNote='';mst.textContent=''}
+    else{saveNote='You have view only access to this map, so you can preview changes but not save them. Ask the owner for edit access.';mst.textContent=saveNote}
+  }catch(e){saveNote=off;mst.textContent=off}renderPreview()})();
 })();
 </script>
 
